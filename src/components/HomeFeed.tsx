@@ -38,11 +38,11 @@ const HomeFeed = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-bold text-primary-foreground">KejaSure</h1>
-            <p className="text-xs text-primary-foreground/70">Find your perfect home</p>
+            <p className="text-xs text-primary-foreground/70">Pata Keja, Be Sure.</p>
           </div>
           <button className="relative w-10 h-10 rounded-full bg-primary-foreground/15 flex items-center justify-center">
             <Bell className="w-5 h-5 text-primary-foreground" />
-            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-destructive" />
+            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent" />
           </button>
         </div>
 
@@ -133,7 +133,8 @@ const HomeFeed = () => {
 
             {filteredProperties.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground text-sm">No properties found in this area</p>
+                <p className="text-sm text-muted-foreground">Keja Safi, Keja Sure.</p>
+                <p className="text-xs text-muted-foreground mt-1">No properties found in this area</p>
               </div>
             )}
           </div>

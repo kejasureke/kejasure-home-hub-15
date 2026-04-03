@@ -45,7 +45,8 @@ const Index = () => {
             <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
               <Heart className="w-8 h-8 text-muted-foreground" />
             </div>
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-sm font-medium text-foreground mb-1">Keja Safi, Keja Sure.</p>
+            <p className="text-xs text-muted-foreground text-center">
               Properties you save will appear here
             </p>
           </div>
