@@ -53,10 +53,17 @@ export default {
         trust: {
           DEFAULT: "hsl(var(--trust-green))",
           foreground: "hsl(var(--trust-green-foreground))",
+          light: "hsl(var(--trust-light))",
         },
         gold: {
           DEFAULT: "hsl(var(--premium-gold))",
           foreground: "hsl(var(--premium-gold-foreground))",
+        },
+        mpesa: {
+          DEFAULT: "hsl(var(--mpesa-green))",
+        },
+        cream: {
+          DEFAULT: "hsl(var(--cream-gold))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

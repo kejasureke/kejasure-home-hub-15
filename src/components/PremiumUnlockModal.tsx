@@ -49,10 +49,10 @@ const PremiumUnlockModal = ({ onClose }: PremiumUnlockModalProps) => {
         </div>
 
         {/* Trust banner */}
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-trust/5 border border-trust/15 mb-5">
-          <ShieldCheck className="w-4 h-4 text-trust shrink-0" />
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/15 mb-5">
+          <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
           <p className="text-xs text-muted-foreground">
-            <span className="font-semibold text-trust">100% Safe.</span> All contacts verified. Pay securely via M-Pesa.
+            <span className="font-semibold text-primary">Keja Safi, Keja Sure.</span> All contacts verified. Pay securely via M-Pesa.
           </p>
         </div>
 
@@ -63,24 +63,24 @@ const PremiumUnlockModal = ({ onClose }: PremiumUnlockModalProps) => {
               key={tier.price}
               className={`w-full text-left p-4 rounded-2xl border-2 transition-all active:scale-[0.98] relative ${
                 tier.popular
-                  ? "border-primary bg-primary/5 card-shadow-hover"
+                  ? "border-accent gradient-cream-gold card-shadow-hover"
                   : "border-border bg-card"
               }`}
             >
               {tier.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full gradient-trust text-[10px] font-bold text-primary-foreground uppercase tracking-wider">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full gradient-premium text-[10px] font-bold text-accent-foreground uppercase tracking-wider">
                   Most Popular
                 </div>
               )}
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h3 className={`text-base font-bold ${tier.popular ? "text-primary" : "text-foreground"}`}>
+                  <h3 className={`text-base font-bold ${tier.popular ? "text-accent-foreground" : "text-foreground"}`}>
                     KES {tier.price}
                   </h3>
                   <p className="text-xs text-muted-foreground">{tier.duration} access</p>
                 </div>
                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                  tier.popular ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                  tier.popular ? "gradient-premium text-accent-foreground" : "bg-secondary text-secondary-foreground"
                 }`}>
                   {tier.label}
                 </span>
@@ -88,7 +88,7 @@ const PremiumUnlockModal = ({ onClose }: PremiumUnlockModalProps) => {
               <div className="space-y-1">
                 {tier.features.map((f) => (
                   <div key={f} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Check className={`w-3 h-3 ${tier.popular ? "text-primary" : "text-trust"}`} />
+                    <Check className={`w-3 h-3 ${tier.popular ? "text-accent" : "text-primary"}`} />
                     {f}
                   </div>
                 ))}
@@ -98,7 +98,7 @@ const PremiumUnlockModal = ({ onClose }: PremiumUnlockModalProps) => {
         </div>
 
         {/* CTA */}
-        <button className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform mb-3">
+        <button className="w-full py-4 rounded-xl gradient-mpesa text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform mb-3">
           <Zap className="w-4 h-4 inline mr-1.5" />
           Pay with M-Pesa
         </button>
