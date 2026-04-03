@@ -4,13 +4,20 @@ import HomeFeed from "@/components/HomeFeed";
 import ChatScreen from "@/components/ChatScreen";
 import ProfileScreen from "@/components/ProfileScreen";
 import { Heart, Search, MessageCircle } from "lucide-react";
+import { useFavorites } from "@/hooks/useFavorites";
+import { properties } from "@/data/mockData";
+import PropertyCard from "@/components/PropertyCard";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [showChat, setShowChat] = useState(false);
+  const [chatContact, setChatContact] = useState("John Kamau");
+  const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
+
+  const favoriteProperties = properties.filter((p) => favoriteIds.includes(p.id));
 
   if (showChat) {
-    return <ChatScreen onBack={() => setShowChat(false)} />;
+    return <ChatScreen onBack={() => setShowChat(false)} contactName={chatContact} />;
   }
 
   return (
@@ -41,22 +48,35 @@ const Index = () => {
       {activeTab === "favorites" && (
         <div className="px-4 pt-6 pb-24">
           <h1 className="text-xl font-bold mb-4">Saved Properties</h1>
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
-              <Heart className="w-8 h-8 text-muted-foreground" />
+          {favoriteProperties.length > 0 ? (
+            <div className="space-y-4">
+              {favoriteProperties.map((p) => (
+                <PropertyCard
+                  key={p.id}
+                  property={p}
+                  onPress={() => {}}
+                  liked={true}
+                  onToggleLike={toggleFavorite}
+                />
+              ))}
             </div>
-            <p className="text-sm font-medium text-foreground mb-1">Keja Safi, Keja Sure.</p>
-            <p className="text-xs text-muted-foreground text-center">
-              Properties you save will appear here
-            </p>
-          </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
+                <Heart className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <p className="text-sm font-medium text-foreground mb-1">Keja Safi, Keja Sure.</p>
+              <p className="text-xs text-muted-foreground text-center">
+                Properties you save will appear here
+              </p>
+            </div>
+          )}
         </div>
       )}
 
       {activeTab === "chats" && (
         <div className="px-4 pt-6 pb-24">
           <h1 className="text-xl font-bold mb-4">Messages</h1>
-          {/* Chat list */}
           <div className="space-y-2">
             {[
               { name: "John Kamau", msg: "Saturday at 10 AM works perfectly.", time: "10:35 AM", unread: 1 },
@@ -65,7 +85,7 @@ const Index = () => {
             ].map((chat) => (
               <button
                 key={chat.name}
-                onClick={() => setShowChat(true)}
+                onClick={() => { setChatContact(chat.name); setShowChat(true); }}
                 className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform"
               >
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
