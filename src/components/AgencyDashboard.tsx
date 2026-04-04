@@ -132,7 +132,7 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
             <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
             <div className="space-y-2 mb-5">
               {[
-                { icon: Upload, label: "Bulk Upload", desc: "Import listings via CSV", gradient: "gradient-trust" },
+                { icon: Plus, label: "Add Listing", desc: "Create a new listing", gradient: "gradient-trust", action: () => setShowCRUD(true) },
                 { icon: UserPlus, label: "Add Agent", desc: "Invite a team member", gradient: "gradient-premium" },
                 { icon: Zap, label: "Boost Agency", desc: "Increase visibility", gradient: "bg-secondary" },
               ].map((a) => (
