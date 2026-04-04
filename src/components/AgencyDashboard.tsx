@@ -4,6 +4,7 @@ import {
   Upload, UserPlus, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
   Building2, Target, Clock, CheckCircle2, AlertTriangle
 } from "lucide-react";
+import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface AgencyDashboardProps {
   onBack: () => void;

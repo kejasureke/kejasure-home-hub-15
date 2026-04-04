@@ -4,6 +4,7 @@ import {
   Calendar, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
   Home, Star, Clock, CheckCircle2, DollarSign, Bed, Moon as MoonIcon
 } from "lucide-react";
+import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface StayHostDashboardProps {
   onBack: () => void;

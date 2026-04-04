@@ -4,6 +4,7 @@ import {
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight,
   Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2
 } from "lucide-react";
+import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface ServiceProviderDashboardProps {
   onBack: () => void;
