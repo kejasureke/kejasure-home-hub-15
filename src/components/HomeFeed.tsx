@@ -1,6 +1,6 @@
 import { Search, Bell, SlidersHorizontal, GitCompare, Bookmark, BookmarkCheck, ChevronRight, Clock } from "lucide-react";
 import { useState, useMemo } from "react";
-import LocationSelector from "./LocationSelector";
+
 import PropertyCard from "./PropertyCard";
 import ServiceCard from "./ServiceCard";
 import ListingDetail from "./ListingDetail";
