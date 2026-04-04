@@ -1,4 +1,4 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale, Search, Star } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
@@ -7,6 +7,11 @@ import ServiceProviderDashboard from "./ServiceProviderDashboard";
 import AdminPanel from "./AdminPanel";
 import DisputeFlow from "./DisputeFlow";
 import NotificationsScreen from "./NotificationsScreen";
+import KYCVerificationFlow from "./KYCVerificationFlow";
+import SettingsScreen from "./SettingsScreen";
+import HelpSupportScreen from "./HelpSupportScreen";
+import SavedSearchesScreen from "./SavedSearchesScreen";
+import ReviewRatingFlow from "./ReviewRatingFlow";
 import { useTheme } from "@/hooks/useTheme";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -19,6 +24,11 @@ const ProfileScreen = () => {
   const [showAdmin, setShowAdmin] = useState(false);
   const [showDispute, setShowDispute] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showKYC, setShowKYC] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showSavedSearches, setShowSavedSearches] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const { theme, setTheme } = useTheme();
   const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
@@ -31,6 +41,11 @@ const ProfileScreen = () => {
   if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
   if (showAdmin) return <AdminPanel onBack={() => setShowAdmin(false)} />;
   if (showDispute) return <DisputeFlow onClose={() => setShowDispute(false)} />;
+  if (showKYC) return <KYCVerificationFlow onClose={() => setShowKYC(false)} />;
+  if (showSettings) return <SettingsScreen onBack={() => setShowSettings(false)} />;
+  if (showHelp) return <HelpSupportScreen onBack={() => setShowHelp(false)} />;
+  if (showSavedSearches) return <SavedSearchesScreen onBack={() => setShowSavedSearches(false)} />;
+  if (showReviews) return <ReviewRatingFlow onClose={() => setShowReviews(false)} />;
   if (showNotifications) return (
     <NotificationsScreen
       onBack={() => setShowNotifications(false)}
@@ -66,11 +81,13 @@ const ProfileScreen = () => {
     ...(role !== "service" ? [{ icon: Wrench, label: "Service Dashboard", subtitle: "Service provider tools", action: () => setShowServiceProvider(true) }] : []),
     { icon: Shield, label: "Admin Panel", subtitle: "Platform management", action: () => setShowAdmin(true) },
     { icon: Crown, label: "Premium Plan", subtitle: "Active · 5 days left" },
-    { icon: ShieldCheck, label: "Verification", subtitle: "ID Verified ✓" },
+    { icon: ShieldCheck, label: "Verification", subtitle: "Verify your identity", action: () => setShowKYC(true) },
     { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
+    { icon: Search, label: "Saved Searches", subtitle: "Manage alerts & filters", action: () => setShowSavedSearches(true) },
+    { icon: Star, label: "Reviews & Ratings", subtitle: "View & write reviews", action: () => setShowReviews(true) },
     { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },
-    { icon: Settings, label: "Settings", subtitle: "Account preferences" },
-    { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact" },
+    { icon: Settings, label: "Settings", subtitle: "Account preferences", action: () => setShowSettings(true) },
+    { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact", action: () => setShowHelp(true) },
   ];
 
   const themeOptions = [

@@ -1,9 +1,10 @@
-import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, Lock } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
 import PremiumUnlockModal from "./PremiumUnlockModal";
 import ShareListingSheet from "./ShareListingSheet";
 import ReportListingModal from "./ReportListingModal";
+import ReviewRatingFlow from "./ReviewRatingFlow";
 
 interface ListingDetailProps {
   property: Property;
@@ -18,6 +19,8 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
   const [showBooking, setShowBooking] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
+  const [contactUnlocked, setContactUnlocked] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
 
@@ -76,11 +79,11 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
             <span className="text-2xl font-bold text-foreground">KES {formatPrice(property.price)}</span>
             <span className="text-sm text-muted-foreground">{property.priceUnit}</span>
             {property.rating && (
-              <div className="flex items-center gap-1 ml-auto px-2 py-1 rounded-lg bg-secondary">
+              <button onClick={() => setShowReviews(true)} className="flex items-center gap-1 ml-auto px-2 py-1 rounded-lg bg-secondary active:scale-95 transition-transform">
                 <Star className="w-3.5 h-3.5 fill-gold text-gold" />
                 <span className="text-xs font-semibold">{property.rating}</span>
                 <span className="text-[10px] text-muted-foreground">({property.reviewCount})</span>
-              </div>
+              </button>
             )}
           </div>
           <h1 className="text-lg font-semibold text-foreground mb-2">{property.title}</h1>
@@ -242,26 +245,47 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
 
       {/* Bottom CTA */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
-        <div className="flex gap-3 max-w-lg mx-auto">
-          <button
-            onClick={() => setShowBooking(true)}
-            className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98]"
-          >
-            {property.type === "shortstay" ? "Book Stay" : "Schedule Viewing"}
-          </button>
-          <button
-            onClick={() => setShowUnlock(true)}
-            className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98]"
-          >
-            <Phone className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setShowUnlock(true)}
-            className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98]"
-          >
-            <MessageCircle className="w-4 h-4" />
-          </button>
-        </div>
+        {contactUnlocked ? (
+          <div className="max-w-lg mx-auto">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 className="w-4 h-4 text-primary" />
+              <span className="text-xs font-semibold text-primary">Contact Unlocked</span>
+            </div>
+            <div className="flex gap-3">
+              <button className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                <Phone className="w-4 h-4" />
+                +254 712 345 678
+              </button>
+              <button className="flex-1 py-3.5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Chat Now
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex gap-3 max-w-lg mx-auto">
+            <button
+              onClick={() => setShowBooking(true)}
+              className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98]"
+            >
+              {property.type === "shortstay" ? "Book Stay" : "Schedule Viewing"}
+            </button>
+            <button
+              onClick={() => setShowUnlock(true)}
+              className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
+            >
+              <Lock className="w-4 h-4" />
+              <Phone className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setShowUnlock(true)}
+              className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
+            >
+              <Lock className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Booking Bottom Sheet */}
@@ -350,9 +374,10 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
         </div>
       )}
 
-      {showUnlock && <PremiumUnlockModal onClose={() => setShowUnlock(false)} />}
+      {showUnlock && <PremiumUnlockModal onClose={() => { setShowUnlock(false); setContactUnlocked(true); }} />}
       {showShare && <ShareListingSheet property={property} onClose={() => setShowShare(false)} />}
       {showReport && <ReportListingModal listingTitle={property.title} listingId={property.id} onClose={() => setShowReport(false)} />}
+      {showReviews && <ReviewRatingFlow onClose={() => setShowReviews(false)} targetName="Landlord" targetType="landlord" listingTitle={property.title} />}
     </div>
   );
 };
