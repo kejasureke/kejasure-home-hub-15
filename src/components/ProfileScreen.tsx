@@ -1,10 +1,11 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
 import StayHostDashboard from "./StayHostDashboard";
 import ServiceProviderDashboard from "./ServiceProviderDashboard";
 import AdminPanel from "./AdminPanel";
+import DisputeFlow from "./DisputeFlow";
 import NotificationsScreen from "./NotificationsScreen";
 import { useTheme } from "@/hooks/useTheme";
 
