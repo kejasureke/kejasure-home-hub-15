@@ -22,6 +22,14 @@ const landlordPlans = [
 
 const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
   const [showPayment, setShowPayment] = useState(false);
+  const [showCRUD, setShowCRUD] = useState(false);
+  const [editIdx, setEditIdx] = useState<number | null>(null);
+
+  const myListings = [
+    { title: "3BR Kilimani", views: 847, leads: 23, status: "active" },
+    { title: "2BR Westlands", views: 612, leads: 18, status: "active" },
+    { title: "Studio Westlands", views: 1203, leads: 45, status: "active" },
+  ];
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
