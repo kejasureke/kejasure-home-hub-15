@@ -19,7 +19,7 @@ const plans = [
 
 const stats = [
   { label: "Occupancy", value: "78%", icon: Bed, change: "+6%" },
-  { label: "Revenue", value: "KES 234K", icon: DollarSign, change: "+19%" },
+  { label: "Inquiries", value: "156", icon: MsgIcon, change: "+19%" },
   { label: "Bookings", value: "42", icon: Calendar, change: "+11%" },
   { label: "Rating", value: "4.8", icon: Star, change: "+0.2" },
 ];
