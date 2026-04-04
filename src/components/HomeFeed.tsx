@@ -113,6 +113,15 @@ const HomeFeed = () => {
     );
   }
 
+  if (showMap) {
+    return (
+      <MapDiscovery
+        onBack={() => setShowMap(false)}
+        onSelectProperty={(id) => { setShowMap(false); handleSelectProperty(id); }}
+      />
+    );
+  }
+
   const handleSaveSearch = () => {
     const label = [estate, ward, subcounty, county].filter(Boolean).join(", ") || "All Kenya";
     saveSearch({ label, county, subcounty: subcounty, estate, segment });
