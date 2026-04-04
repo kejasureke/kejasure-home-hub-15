@@ -21,7 +21,7 @@ const stats = [
   { label: "Total Listings", value: "87", icon: Building2, change: "+14%" },
   { label: "Active Leads", value: "342", icon: Target, change: "+22%" },
   { label: "Conversions", value: "89", icon: TrendingUp, change: "+18%" },
-  { label: "Revenue", value: "KES 1.2M", icon: BarChart3, change: "+31%" },
+  { label: "Inquiries", value: "412", icon: MessageCircle, change: "+31%" },
 ];
 
 const agents = [
