@@ -89,6 +89,18 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
       </div>
 
       <div className="px-4 py-5 space-y-6 pb-32">
+        {/* Location */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3">Location</h3>
+          <LocationSelector
+            selectedCounty={county}
+            selectedSubcounty={subcounty}
+            selectedWard={ward}
+            selectedEstate={estate}
+            onSelect={(c, sc, w, e) => onLocationChange(c, sc, w, e)}
+          />
+        </div>
+
         {/* Sort */}
         <div>
           <h3 className="text-sm font-semibold mb-3">Sort By</h3>
