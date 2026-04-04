@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock } from "lucide-react";
+import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench } from "lucide-react";
 import { useState, useMemo } from "react";
 
 import PropertyCard from "./PropertyCard";
@@ -7,6 +7,7 @@ import ListingDetail from "./ListingDetail";
 import AdvancedFilters from "./AdvancedFilters";
 import CompareProperties from "./CompareProperties";
 import { properties, serviceProviders } from "@/data/mockData";
+import MapDiscovery from "./MapDiscovery";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
@@ -26,6 +27,7 @@ const HomeFeed = () => {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
   const [serviceCategory, setServiceCategory] = useState("All");
+  const [showMap, setShowMap] = useState(false);
   const [filters, setFilters] = useState({
     minPrice: 0,
     maxPrice: 500000,
@@ -107,6 +109,15 @@ const HomeFeed = () => {
         properties={compareProperties}
         onClose={() => setShowCompare(false)}
         onRemove={(id) => setCompareIds((prev) => prev.filter((x) => x !== id))}
+      />
+    );
+  }
+
+  if (showMap) {
+    return (
+      <MapDiscovery
+        onBack={() => setShowMap(false)}
+        onSelectProperty={(id) => { setShowMap(false); handleSelectProperty(id); }}
       />
     );
   }
@@ -193,6 +204,13 @@ const HomeFeed = () => {
               </p>
               <div className="flex gap-2">
                 <button
+                  onClick={() => setShowMap(true)}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
+                >
+                  <MapPin className="w-3 h-3" />
+                  Map
+                </button>
+                <button
                   onClick={() => { setCompareMode(!compareMode); if (compareMode) setCompareIds([]); }}
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     compareMode ? "gradient-trust text-primary-foreground" : "bg-secondary text-secondary-foreground"
@@ -273,6 +291,71 @@ const HomeFeed = () => {
                         </div>
                       </button>
                     ))}
+                </div>
+              </div>
+            )}
+
+            {/* Nearby Rentals */}
+            {!searchQuery && !county && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-base font-semibold flex items-center gap-2">
+                    <Navigation className="w-4 h-4 text-primary" />
+                    Nearby Rentals
+                  </h2>
+                  <button onClick={() => setShowMap(true)} className="text-xs font-medium text-primary">
+                    View Map →
+                  </button>
+                </div>
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  {properties
+                    .filter((p) => p.type === "rental" && p.county === "Nairobi")
+                    .slice(0, 4)
+                    .map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => handleSelectProperty(p.id)}
+                        className="shrink-0 w-[160px] bg-card rounded-2xl card-shadow overflow-hidden"
+                      >
+                        <div className="aspect-[4/3] overflow-hidden relative">
+                          <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                          <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-card/90 text-[10px] font-bold text-foreground">
+                            {(Math.random() * 2 + 0.3).toFixed(1)} km
+                          </div>
+                        </div>
+                        <div className="p-2.5">
+                          <p className="text-xs font-semibold line-clamp-1">{p.title}</p>
+                          <p className="text-xs font-bold text-primary mt-0.5">
+                            KES {(p.price / 1000).toFixed(0)}K<span className="font-normal text-muted-foreground">{p.priceUnit}</span>
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Nearby Services */}
+            {!searchQuery && !county && (
+              <div>
+                <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
+                  <Wrench className="w-4 h-4 text-accent" />
+                  Nearby Services
+                </h2>
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  {serviceProviders.slice(0, 4).map((sp) => (
+                    <div
+                      key={sp.id}
+                      className="shrink-0 w-[140px] p-3 bg-card rounded-2xl card-shadow text-center"
+                    >
+                      <div className="text-2xl mb-2">{sp.avatar}</div>
+                      <p className="text-xs font-semibold line-clamp-1">{sp.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{sp.category}</p>
+                      <div className="flex items-center justify-center gap-1 mt-1">
+                        <span className="text-[10px] font-bold text-accent">⭐ {sp.rating}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

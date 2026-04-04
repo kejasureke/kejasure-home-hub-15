@@ -37,6 +37,8 @@ export interface Property {
   yearBuilt?: number;
   rating?: number;
   reviewCount?: number;
+  lat: number;
+  lng: number;
 }
 
 export interface ServiceProvider {
@@ -53,6 +55,8 @@ export interface ServiceProvider {
   description: string;
   price?: string;
   availability?: string;
+  lat: number;
+  lng: number;
 }
 
 export const properties: Property[] = [
@@ -88,6 +92,8 @@ export const properties: Property[] = [
     yearBuilt: 2021,
     rating: 4.8,
     reviewCount: 24,
+    lat: -1.2864,
+    lng: 36.7834,
   },
   {
     id: "2",
@@ -121,6 +127,8 @@ export const properties: Property[] = [
     yearBuilt: 2019,
     rating: 4.6,
     reviewCount: 18,
+    lat: -1.2637,
+    lng: 36.8033,
   },
   {
     id: "3",
@@ -149,6 +157,8 @@ export const properties: Property[] = [
     hostTrustBadge: true,
     rating: 4.9,
     reviewCount: 67,
+    lat: -1.2650,
+    lng: 36.8100,
   },
   {
     id: "4",
@@ -177,6 +187,8 @@ export const properties: Property[] = [
     hostTrustBadge: true,
     rating: 4.7,
     reviewCount: 41,
+    lat: -1.2921,
+    lng: 36.7810,
   },
   {
     id: "5",
@@ -210,6 +222,8 @@ export const properties: Property[] = [
     yearBuilt: 2018,
     rating: 4.3,
     reviewCount: 12,
+    lat: -1.3100,
+    lng: 36.8350,
   },
   {
     id: "6",
@@ -243,6 +257,8 @@ export const properties: Property[] = [
     yearBuilt: 2022,
     rating: 4.9,
     reviewCount: 8,
+    lat: -1.3184,
+    lng: 36.7122,
   },
   {
     id: "7",
@@ -271,6 +287,8 @@ export const properties: Property[] = [
     hostTrustBadge: true,
     rating: 4.8,
     reviewCount: 93,
+    lat: -4.0435,
+    lng: 39.7231,
   },
   {
     id: "8",
@@ -304,14 +322,16 @@ export const properties: Property[] = [
     yearBuilt: 2015,
     rating: 4.0,
     reviewCount: 5,
+    lat: -1.2190,
+    lng: 36.8574,
   },
 ];
 
 export const serviceProviders: ServiceProvider[] = [
-  { id: "s1", name: "SwiftMovers KE", category: "Movers", rating: 4.8, reviews: 234, responseSpeed: "< 5 mins", areaServed: "Nairobi & Environs", tier: "Premium", boosted: true, avatar: "🚛", description: "Professional moving services across Nairobi", price: "From KES 5,000", availability: "Same day" },
-  { id: "s2", name: "CleanPro Solutions", category: "Cleaners", rating: 4.6, reviews: 189, responseSpeed: "< 15 mins", areaServed: "Nairobi", tier: "Pro", boosted: false, avatar: "🧹", description: "Deep cleaning and regular housekeeping", price: "From KES 2,500", availability: "Next day" },
-  { id: "s3", name: "PowerFix Electricals", category: "Electricians", rating: 4.9, reviews: 312, responseSpeed: "< 10 mins", areaServed: "Nairobi, Kiambu", tier: "Premium", boosted: true, avatar: "⚡", description: "Licensed electricians for all installations", price: "From KES 1,500", availability: "Same day" },
-  { id: "s4", name: "PipeMaster Plumbing", category: "Plumbers", rating: 4.5, reviews: 156, responseSpeed: "< 20 mins", areaServed: "Nairobi", tier: "Pro", boosted: false, avatar: "🔧", description: "Emergency and scheduled plumbing services", price: "From KES 1,000", availability: "2 hours" },
-  { id: "s5", name: "NetConnect KE", category: "Internet Installers", rating: 4.7, reviews: 278, responseSpeed: "< 30 mins", areaServed: "Nairobi, Mombasa", tier: "Premium", boosted: false, avatar: "📡", description: "Fiber and WiFi installation specialists", price: "From KES 3,000", availability: "Next day" },
-  { id: "s6", name: "GuardPro Security", category: "Security", rating: 4.8, reviews: 198, responseSpeed: "< 10 mins", areaServed: "Nationwide", tier: "Basic", boosted: false, avatar: "🛡️", description: "CCTV, alarms, and guard services", price: "From KES 8,000/mo", availability: "48 hours" },
+  { id: "s1", name: "SwiftMovers KE", category: "Movers", rating: 4.8, reviews: 234, responseSpeed: "< 5 mins", areaServed: "Nairobi & Environs", tier: "Premium", boosted: true, avatar: "🚛", description: "Professional moving services across Nairobi", price: "From KES 5,000", availability: "Same day", lat: -1.2780, lng: 36.8150 },
+  { id: "s2", name: "CleanPro Solutions", category: "Cleaners", rating: 4.6, reviews: 189, responseSpeed: "< 15 mins", areaServed: "Nairobi", tier: "Pro", boosted: false, avatar: "🧹", description: "Deep cleaning and regular housekeeping", price: "From KES 2,500", availability: "Next day", lat: -1.2900, lng: 36.7900 },
+  { id: "s3", name: "PowerFix Electricals", category: "Electricians", rating: 4.9, reviews: 312, responseSpeed: "< 10 mins", areaServed: "Nairobi, Kiambu", tier: "Premium", boosted: true, avatar: "⚡", description: "Licensed electricians for all installations", price: "From KES 1,500", availability: "Same day", lat: -1.2700, lng: 36.8200 },
+  { id: "s4", name: "PipeMaster Plumbing", category: "Plumbers", rating: 4.5, reviews: 156, responseSpeed: "< 20 mins", areaServed: "Nairobi", tier: "Pro", boosted: false, avatar: "🔧", description: "Emergency and scheduled plumbing services", price: "From KES 1,000", availability: "2 hours", lat: -1.3050, lng: 36.8300 },
+  { id: "s5", name: "NetConnect KE", category: "Internet Installers", rating: 4.7, reviews: 278, responseSpeed: "< 30 mins", areaServed: "Nairobi, Mombasa", tier: "Premium", boosted: false, avatar: "📡", description: "Fiber and WiFi installation specialists", price: "From KES 3,000", availability: "Next day", lat: -1.2600, lng: 36.8050 },
+  { id: "s6", name: "GuardPro Security", category: "Security", rating: 4.8, reviews: 198, responseSpeed: "< 10 mins", areaServed: "Nationwide", tier: "Basic", boosted: false, avatar: "🛡️", description: "CCTV, alarms, and guard services", price: "From KES 8,000/mo", availability: "48 hours", lat: -1.2950, lng: 36.7800 },
 ];
