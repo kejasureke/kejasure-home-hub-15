@@ -322,6 +322,8 @@ export const properties: Property[] = [
     yearBuilt: 2015,
     rating: 4.0,
     reviewCount: 5,
+    lat: -1.2190,
+    lng: 36.8574,
   },
 ];
 
