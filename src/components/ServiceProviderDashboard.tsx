@@ -76,6 +76,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showCRUD && <ListingCRUD type="service" onClose={() => setShowCRUD(false)} />}
       {showPayment && (
         <MpesaPaymentFlow
           plans={serviceMpesaPlans}
