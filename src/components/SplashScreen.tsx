@@ -46,8 +46,6 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
           opacity: phase >= 2 ? 1 : 0,
           transform: phase >= 2 ? "scale(1)" : "scale(0.5)",
         }}
-      />
-
       {/* Animated logo assembly */}
       <div className="relative flex flex-col items-center">
         {/* Logo icon with clip-path reveal animation */}
