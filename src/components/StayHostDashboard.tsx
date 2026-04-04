@@ -54,6 +54,7 @@ type Tab = "overview" | "calendar" | "guests" | "billing";
 const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
+  const [showCRUD, setShowCRUD] = useState(false);
   const currentPlan = plans.find((p) => p.current)!;
 
   const hostMpesaPlans = plans.map((p) => ({
