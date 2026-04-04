@@ -1,9 +1,10 @@
-import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, Lock } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
 import PremiumUnlockModal from "./PremiumUnlockModal";
 import ShareListingSheet from "./ShareListingSheet";
 import ReportListingModal from "./ReportListingModal";
+import ReviewRatingFlow from "./ReviewRatingFlow";
 
 interface ListingDetailProps {
   property: Property;
