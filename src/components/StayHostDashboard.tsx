@@ -140,7 +140,7 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
                 { icon: Zap, label: "Feature Stay", desc: "Boost your listing", gradient: "gradient-trust" },
                 { icon: DollarSign, label: "Set Pricing", desc: "Nightly rates & cleaning fees", gradient: "bg-secondary" },
               ].map((a) => (
-                <button key={a.label} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
+                <button key={a.label} onClick={(a as any).action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
                   <div className={`w-10 h-10 rounded-xl ${a.gradient} flex items-center justify-center`}>
                     <a.icon className="w-5 h-5 text-primary-foreground" />
                   </div>
