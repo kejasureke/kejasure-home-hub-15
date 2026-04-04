@@ -68,15 +68,11 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
               transition: "opacity 0.7s ease-out, transform 0.7s ease-out, clip-path 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
-            <img
-              src={logoIcon}
+             <img
+              src={isDark ? logoIconGreen : logoIconWhite}
               alt="KejaSure"
               className="w-full h-full object-contain drop-shadow-lg"
-              style={{
-              filter: isDark
-                ? "brightness(1.4) saturate(1.2)"
-                : "brightness(0) invert(1) brightness(2)",
-              }}
+            />
             />
           </div>
 
