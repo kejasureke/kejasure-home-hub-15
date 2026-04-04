@@ -287,6 +287,8 @@ export const properties: Property[] = [
     hostTrustBadge: true,
     rating: 4.8,
     reviewCount: 93,
+    lat: -4.0435,
+    lng: 39.7231,
   },
   {
     id: "8",
