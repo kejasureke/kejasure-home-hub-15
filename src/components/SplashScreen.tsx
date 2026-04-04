@@ -7,13 +7,13 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 300),   // House drops in
-      setTimeout(() => setPhase(2), 900),   // Circle draws
-      setTimeout(() => setPhase(3), 1500),  // Hand sweeps in
-      setTimeout(() => setPhase(4), 2100),  // Brand name
-      setTimeout(() => setPhase(5), 2700),  // Slogan
-      setTimeout(() => setPhase(6), 4000),  // Fade out
-      setTimeout(() => onComplete(), 4600),
+      setTimeout(() => setPhase(1), 500),   // House drops in
+      setTimeout(() => setPhase(2), 1400),  // Circle draws
+      setTimeout(() => setPhase(3), 2400),  // Hand sweeps in
+      setTimeout(() => setPhase(4), 3400),  // Brand name
+      setTimeout(() => setPhase(5), 4200),  // Slogan
+      setTimeout(() => setPhase(6), 5800),  // Fade out
+      setTimeout(() => onComplete(), 6500),
     ];
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
