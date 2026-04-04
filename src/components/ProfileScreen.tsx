@@ -1,9 +1,10 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
 import StayHostDashboard from "./StayHostDashboard";
 import ServiceProviderDashboard from "./ServiceProviderDashboard";
+import AdminPanel from "./AdminPanel";
 import NotificationsScreen from "./NotificationsScreen";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -12,6 +13,7 @@ const ProfileScreen = () => {
   const [showAgency, setShowAgency] = useState(false);
   const [showStayHost, setShowStayHost] = useState(false);
   const [showServiceProvider, setShowServiceProvider] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -21,6 +23,7 @@ const ProfileScreen = () => {
   if (showAgency) return <AgencyDashboard onBack={() => setShowAgency(false)} />;
   if (showStayHost) return <StayHostDashboard onBack={() => setShowStayHost(false)} />;
   if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
+  if (showAdmin) return <AdminPanel onBack={() => setShowAdmin(false)} />;
   if (showNotifications) return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
 
   // Build dashboard menu item based on role
@@ -45,6 +48,7 @@ const ProfileScreen = () => {
     ...(role !== "agency" ? [{ icon: Building2, label: "Agency Dashboard", subtitle: "Multi-agent management", action: () => setShowAgency(true) }] : []),
     ...(role !== "stayhost" ? [{ icon: Home, label: "Stay Host Dashboard", subtitle: "Short stay management", action: () => setShowStayHost(true) }] : []),
     ...(role !== "service" ? [{ icon: Wrench, label: "Service Dashboard", subtitle: "Service provider tools", action: () => setShowServiceProvider(true) }] : []),
+    { icon: Shield, label: "Admin Panel", subtitle: "Platform management", action: () => setShowAdmin(true) },
     { icon: Crown, label: "Premium Plan", subtitle: "Active · 5 days left" },
     { icon: ShieldCheck, label: "Verification", subtitle: "ID Verified ✓" },
     { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },
