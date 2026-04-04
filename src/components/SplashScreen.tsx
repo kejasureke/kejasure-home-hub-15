@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import logoIcon from "@/assets/logo-icon-green.png";
+import logoIconWhite from "@/assets/logo-icon-white.png";
+import logoIconGreen from "@/assets/logo-icon-green.png";
 
 const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
   const [phase, setPhase] = useState(0);
