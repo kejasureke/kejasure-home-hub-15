@@ -204,6 +204,13 @@ const HomeFeed = () => {
               </p>
               <div className="flex gap-2">
                 <button
+                  onClick={() => setShowMap(true)}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
+                >
+                  <MapPin className="w-3 h-3" />
+                  Map
+                </button>
+                <button
                   onClick={() => { setCompareMode(!compareMode); if (compareMode) setCompareIds([]); }}
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     compareMode ? "gradient-trust text-primary-foreground" : "bg-secondary text-secondary-foreground"
