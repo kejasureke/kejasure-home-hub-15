@@ -1,4 +1,4 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale, Search, Star } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
@@ -7,6 +7,11 @@ import ServiceProviderDashboard from "./ServiceProviderDashboard";
 import AdminPanel from "./AdminPanel";
 import DisputeFlow from "./DisputeFlow";
 import NotificationsScreen from "./NotificationsScreen";
+import KYCVerificationFlow from "./KYCVerificationFlow";
+import SettingsScreen from "./SettingsScreen";
+import HelpSupportScreen from "./HelpSupportScreen";
+import SavedSearchesScreen from "./SavedSearchesScreen";
+import ReviewRatingFlow from "./ReviewRatingFlow";
 import { useTheme } from "@/hooks/useTheme";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useNotifications } from "@/hooks/useNotifications";
