@@ -74,6 +74,7 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showCRUD && <ListingCRUD type="shortstay" onClose={() => setShowCRUD(false)} />}
       {showPayment && (
         <MpesaPaymentFlow
           plans={hostMpesaPlans}
