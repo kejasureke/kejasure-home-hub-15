@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   ArrowLeft, Users, BarChart3, Shield, AlertTriangle, CheckCircle2, Clock,
   Eye, TrendingUp, MapPin, Search, ChevronRight, Crown, Ban, Flag,
-  FileWarning, RefreshCw, DollarSign, Building2, Home, Wrench, User,
+  FileWarning, RefreshCw, Coins, Building2, Home, Wrench, User,
   MessageCircle, XCircle, Filter, ChevronDown, Star, Zap, Activity
 } from "lucide-react";
 
@@ -83,9 +83,9 @@ const expiringSubscriptions = [
 ];
 
 const topProviders = [
-  { name: "SwiftMovers KE", category: "Movers", revenue: "KES 180K", rating: 4.8 },
-  { name: "CleanPro Solutions", category: "Cleaners", revenue: "KES 145K", rating: 4.6 },
-  { name: "PowerFix Electricals", category: "Electricians", revenue: "KES 120K", rating: 4.9 },
+  { name: "SwiftMovers KE", category: "Movers", bookings: 67, rating: 4.8 },
+  { name: "CleanPro Solutions", category: "Cleaners", bookings: 54, rating: 4.6 },
+  { name: "PowerFix Electricals", category: "Electricians", bookings: 43, rating: 4.9 },
 ];
 
 const AdminPanel = ({ onBack }: AdminPanelProps) => {
@@ -93,7 +93,7 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
 
   const tabs: { key: Tab; label: string; icon: typeof Users }[] = [
     { key: "users", label: "Users", icon: Users },
-    { key: "revenue", label: "Revenue", icon: DollarSign },
+    { key: "revenue", label: "Revenue", icon: Coins },
     { key: "fraud", label: "Fraud", icon: AlertTriangle },
     { key: "verification", label: "Verify", icon: Shield },
     { key: "moderation", label: "Moderate", icon: Flag },
@@ -303,8 +303,8 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
               ))}
             </div>
 
-            {/* Top Earning Providers */}
-            <h3 className="text-base font-semibold mb-3">Top Earning Providers</h3>
+            {/* Top Booked Providers */}
+            <h3 className="text-base font-semibold mb-3">Top Booked Providers</h3>
             <div className="space-y-2">
               {topProviders.map((p) => (
                 <div key={p.name} className="flex items-center gap-3 p-3 rounded-xl bg-card card-shadow">
@@ -313,7 +313,7 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
                     <p className="text-xs font-semibold">{p.name}</p>
                     <p className="text-[10px] text-muted-foreground">{p.category} · ⭐ {p.rating}</p>
                   </div>
-                  <span className="text-xs font-bold text-primary">{p.revenue}</span>
+                  <span className="text-xs font-bold text-primary">{p.bookings} bookings</span>
                 </div>
               ))}
             </div>

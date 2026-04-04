@@ -21,7 +21,7 @@ const stats = [
   { label: "Total Listings", value: "87", icon: Building2, change: "+14%" },
   { label: "Active Leads", value: "342", icon: Target, change: "+22%" },
   { label: "Conversions", value: "89", icon: TrendingUp, change: "+18%" },
-  { label: "Revenue", value: "KES 1.2M", icon: BarChart3, change: "+31%" },
+  { label: "Inquiries", value: "412", icon: MessageCircle, change: "+31%" },
 ];
 
 const agents = [
@@ -40,9 +40,9 @@ const pipeline = [
 ];
 
 const topCounties = [
-  { name: "Nairobi", conversions: 156, revenue: "KES 780K" },
-  { name: "Mombasa", conversions: 67, revenue: "KES 335K" },
-  { name: "Kisumu", conversions: 23, revenue: "KES 115K" },
+  { name: "Nairobi", conversions: 156, inquiries: 312 },
+  { name: "Mombasa", conversions: 67, inquiries: 134 },
+  { name: "Kisumu", conversions: 23, inquiries: 58 },
 ];
 
 type Tab = "overview" | "agents" | "leads" | "billing";
@@ -176,7 +176,7 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
                     <p className="text-sm font-medium">{c.name}</p>
                     <p className="text-xs text-muted-foreground">{c.conversions} conversions</p>
                   </div>
-                  <span className="text-xs font-semibold text-primary">{c.revenue}</span>
+                  <span className="text-xs font-semibold text-primary">{c.inquiries} inquiries</span>
                 </div>
               ))}
             </div>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
   Calendar, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
-  Home, Star, Clock, CheckCircle2, DollarSign, Bed, Moon as MoonIcon, Edit3, Trash2
+  Home, Star, Clock, CheckCircle2, Bed, Moon as MoonIcon, Edit3, Trash2, MessageCircle as MsgIcon
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import ListingCRUD from "./ListingCRUD";
@@ -14,12 +14,12 @@ interface StayHostDashboardProps {
 const plans = [
   { name: "Basic", price: 1000, features: ["2 listings", "Basic calendar", "Guest chat"], current: false },
   { name: "Pro", price: 2500, features: ["10 listings", "Full calendar", "Priority chat", "Featured stays"], current: true },
-  { name: "Premium", price: 5000, features: ["Unlimited listings", "Smart pricing", "Priority support", "County heatmaps", "Revenue analytics"], current: false },
+  { name: "Premium", price: 5000, features: ["Unlimited listings", "Smart pricing", "Priority support", "County heatmaps", "Booking analytics"], current: false },
 ];
 
 const stats = [
   { label: "Occupancy", value: "78%", icon: Bed, change: "+6%" },
-  { label: "Revenue", value: "KES 234K", icon: DollarSign, change: "+19%" },
+  { label: "Inquiries", value: "156", icon: MsgIcon, change: "+19%" },
   { label: "Bookings", value: "42", icon: Calendar, change: "+11%" },
   { label: "Rating", value: "4.8", icon: Star, change: "+0.2" },
 ];
@@ -138,7 +138,7 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
               {[
                 { icon: Plus, label: "Add New Stay", desc: "List a new short stay", gradient: "gradient-premium", action: () => setShowCRUD(true) },
                 { icon: Zap, label: "Feature Stay", desc: "Boost your listing", gradient: "gradient-trust" },
-                { icon: DollarSign, label: "Set Pricing", desc: "Nightly rates & cleaning fees", gradient: "bg-secondary" },
+                { icon: Edit3, label: "Set Pricing", desc: "Nightly rates & cleaning fees", gradient: "bg-secondary" },
               ].map((a) => (
                 <button key={a.label} onClick={(a as any).action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
                   <div className={`w-10 h-10 rounded-xl ${a.gradient} flex items-center justify-center`}>
@@ -272,21 +272,21 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
               ))}
             </div>
 
-            {/* Booking Deposits */}
-            <h3 className="text-base font-semibold mt-6 mb-3">Recent Deposits</h3>
+            {/* Recent Booking Requests */}
+            <h3 className="text-base font-semibold mt-6 mb-3">Recent Requests</h3>
             <div className="space-y-2">
               {[
-                { guest: "Alice N.", amount: "KES 4,500", date: "Today", status: "Confirmed" },
-                { guest: "Mark T.", amount: "KES 24,000", date: "Yesterday", status: "Confirmed" },
-                { guest: "Diana W.", amount: "KES 6,500", date: "2 days ago", status: "Pending" },
+                { guest: "Alice N.", stay: "Cozy Studio", date: "Today", nights: "3 nights", status: "Confirmed" },
+                { guest: "Mark T.", stay: "Penthouse Kilimani", date: "Yesterday", nights: "2 nights", status: "Confirmed" },
+                { guest: "Diana W.", stay: "Beach View Nyali", date: "2 days ago", nights: "5 nights", status: "Pending" },
               ].map((d) => (
                 <div key={d.guest} className="flex items-center justify-between p-3 rounded-xl bg-card card-shadow">
                   <div>
                     <p className="text-xs font-semibold">{d.guest}</p>
-                    <p className="text-[10px] text-muted-foreground">{d.date}</p>
+                    <p className="text-[10px] text-muted-foreground">{d.stay} · {d.nights}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-bold">{d.amount}</p>
+                    <p className="text-[10px] text-muted-foreground">{d.date}</p>
                     <p className={`text-[10px] font-medium ${d.status === "Confirmed" ? "text-trust" : "text-accent"}`}>{d.status}</p>
                   </div>
                 </div>
@@ -318,8 +318,8 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
               </button>
             </div>
 
-            {/* Revenue Trends */}
-            <h3 className="text-base font-semibold mb-3">Revenue Trend</h3>
+            {/* Booking Trends */}
+            <h3 className="text-base font-semibold mb-3">Booking Trend</h3>
             <div className="bg-card rounded-2xl card-shadow p-4 mb-5">
               <div className="flex items-end gap-1 h-24">
                 {[45, 62, 38, 78, 55, 90, 72, 85, 68, 95, 80, 88].map((v, i) => (

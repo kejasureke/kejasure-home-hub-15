@@ -42,9 +42,9 @@ const portfolio = [
 ];
 
 const countyStats = [
-  { county: "Nairobi", bookings: 45, revenue: "KES 180K", rating: 4.8 },
-  { county: "Kiambu", bookings: 12, revenue: "KES 48K", rating: 4.7 },
-  { county: "Mombasa", bookings: 10, revenue: "KES 40K", rating: 4.9 },
+  { county: "Nairobi", bookings: 45, inquiries: 128, rating: 4.8 },
+  { county: "Kiambu", bookings: 12, inquiries: 34, rating: 4.7 },
+  { county: "Mombasa", bookings: 10, inquiries: 29, rating: 4.9 },
 ];
 
 type Tab = "overview" | "bookings" | "portfolio" | "billing";
@@ -196,7 +196,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                     <p className="text-sm font-medium">{c.county}</p>
                     <p className="text-xs text-muted-foreground">{c.bookings} bookings · ⭐ {c.rating}</p>
                   </div>
-                  <span className="text-xs font-bold text-primary">{c.revenue}</span>
+                  <span className="text-xs font-bold text-primary">{c.inquiries} inquiries</span>
                 </div>
               ))}
             </div>
