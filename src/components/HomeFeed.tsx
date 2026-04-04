@@ -296,7 +296,7 @@ const HomeFeed = () => {
             )}
 
             {/* Nearby Rentals */}
-            {!searchQuery && !county && segment !== "Services" && (
+            {!searchQuery && !county && (
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-base font-semibold flex items-center gap-2">
