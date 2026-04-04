@@ -303,8 +303,8 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
               ))}
             </div>
 
-            {/* Top Earning Providers */}
-            <h3 className="text-base font-semibold mb-3">Top Earning Providers</h3>
+            {/* Top Booked Providers */}
+            <h3 className="text-base font-semibold mb-3">Top Booked Providers</h3>
             <div className="space-y-2">
               {topProviders.map((p) => (
                 <div key={p.name} className="flex items-center gap-3 p-3 rounded-xl bg-card card-shadow">
