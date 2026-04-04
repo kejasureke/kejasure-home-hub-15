@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft } from "lucide-react";
+import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft, Edit3, Trash2 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import ListingCRUD from "./ListingCRUD";
 
 interface DashboardScreenProps {
   onBack: () => void;
@@ -21,9 +22,20 @@ const landlordPlans = [
 
 const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
   const [showPayment, setShowPayment] = useState(false);
+  const [showCRUD, setShowCRUD] = useState(false);
+  const [editIdx, setEditIdx] = useState<number | null>(null);
+
+  const myListings = [
+    { title: "3BR Kilimani", views: 847, leads: 23, status: "active" },
+    { title: "2BR Westlands", views: 612, leads: 18, status: "active" },
+    { title: "Studio Westlands", views: 1203, leads: 45, status: "active" },
+  ];
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showCRUD && (
+        <ListingCRUD type="rental" onClose={() => { setShowCRUD(false); setEditIdx(null); }} />
+      )}
       {showPayment && (
         <MpesaPaymentFlow
           plans={landlordPlans}
@@ -71,7 +83,7 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
         {/* Quick Actions */}
         <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
         <div className="space-y-3 mb-6">
-          <button className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
+          <button onClick={() => setShowCRUD(true)} className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
             <div className="w-10 h-10 rounded-xl gradient-trust flex items-center justify-center">
               <Plus className="w-5 h-5 text-primary-foreground" />
             </div>
@@ -101,15 +113,16 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
         </div>
 
         {/* Active Listings */}
-        <h3 className="text-base font-semibold mb-3">Active Listings</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-semibold">Active Listings</h3>
+          <button onClick={() => setShowCRUD(true)} className="text-xs font-semibold text-primary flex items-center gap-1">
+            <Plus className="w-3.5 h-3.5" /> New
+          </button>
+        </div>
         <div className="space-y-3 pb-8">
-          {[
-            { title: "3BR Kilimani", views: 847, leads: 23 },
-            { title: "2BR Westlands", views: 612, leads: 18 },
-            { title: "Studio Westlands", views: 1203, leads: 45 },
-          ].map((listing) => (
+          {myListings.map((listing, i) => (
             <div key={listing.title} className="flex items-center gap-3 p-3 rounded-xl bg-card card-shadow">
-              <div className="w-12 h-12 rounded-xl bg-secondary" />
+              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-lg">🏠</div>
               <div className="flex-1">
                 <p className="text-sm font-medium">{listing.title}</p>
                 <div className="flex gap-3 text-xs text-muted-foreground">
@@ -117,7 +130,14 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
                   <span className="flex items-center gap-1"><Users className="w-3 h-3" />{listing.leads}</span>
                 </div>
               </div>
-              <TrendingUp className="w-4 h-4 text-trust" />
+              <div className="flex items-center gap-1">
+                <button onClick={() => { setEditIdx(i); setShowCRUD(true); }} className="p-1.5 rounded-lg bg-secondary">
+                  <Edit3 className="w-3.5 h-3.5 text-primary" />
+                </button>
+                <button className="p-1.5 rounded-lg bg-secondary">
+                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                </button>
+              </div>
             </div>
           ))}
         </div>

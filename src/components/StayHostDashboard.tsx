@@ -2,9 +2,10 @@ import { useState } from "react";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
   Calendar, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
-  Home, Star, Clock, CheckCircle2, DollarSign, Bed, Moon as MoonIcon
+  Home, Star, Clock, CheckCircle2, DollarSign, Bed, Moon as MoonIcon, Edit3, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import ListingCRUD from "./ListingCRUD";
 
 interface StayHostDashboardProps {
   onBack: () => void;
@@ -53,6 +54,7 @@ type Tab = "overview" | "calendar" | "guests" | "billing";
 const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
+  const [showCRUD, setShowCRUD] = useState(false);
   const currentPlan = plans.find((p) => p.current)!;
 
   const hostMpesaPlans = plans.map((p) => ({
@@ -72,6 +74,7 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showCRUD && <ListingCRUD type="shortstay" onClose={() => setShowCRUD(false)} />}
       {showPayment && (
         <MpesaPaymentFlow
           plans={hostMpesaPlans}
@@ -133,11 +136,11 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
             <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
             <div className="space-y-2 mb-5">
               {[
-                { icon: Plus, label: "Add New Stay", desc: "List a new short stay", gradient: "gradient-premium" },
+                { icon: Plus, label: "Add New Stay", desc: "List a new short stay", gradient: "gradient-premium", action: () => setShowCRUD(true) },
                 { icon: Zap, label: "Feature Stay", desc: "Boost your listing", gradient: "gradient-trust" },
                 { icon: DollarSign, label: "Set Pricing", desc: "Nightly rates & cleaning fees", gradient: "bg-secondary" },
               ].map((a) => (
-                <button key={a.label} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
+                <button key={a.label} onClick={(a as any).action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
                   <div className={`w-10 h-10 rounded-xl ${a.gradient} flex items-center justify-center`}>
                     <a.icon className="w-5 h-5 text-primary-foreground" />
                   </div>
@@ -157,9 +160,14 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
                 <div key={l.title} className="bg-card rounded-2xl card-shadow p-4">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold">{l.title}</p>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 text-accent fill-accent" />
-                      <span className="text-xs font-semibold">{l.rating}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 text-accent fill-accent" />
+                        <span className="text-xs font-semibold">{l.rating}</span>
+                      </div>
+                      <button onClick={() => setShowCRUD(true)} className="p-1 rounded-lg bg-secondary">
+                        <Edit3 className="w-3 h-3 text-primary" />
+                      </button>
                     </div>
                   </div>
                   <div className="flex gap-4 text-xs text-muted-foreground">

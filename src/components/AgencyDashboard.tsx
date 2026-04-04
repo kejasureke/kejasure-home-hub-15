@@ -2,9 +2,10 @@ import { useState } from "react";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
   Upload, UserPlus, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
-  Building2, Target, Clock, CheckCircle2, AlertTriangle
+  Building2, Target, Clock, CheckCircle2, AlertTriangle, Edit3, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import ListingCRUD from "./ListingCRUD";
 
 interface AgencyDashboardProps {
   onBack: () => void;
@@ -49,6 +50,7 @@ type Tab = "overview" | "agents" | "leads" | "billing";
 const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
+  const [showCRUD, setShowCRUD] = useState(false);
   const currentPlan = plans.find((p) => p.current)!;
 
   const agencyMpesaPlans = plans.map((p) => ({
@@ -68,6 +70,7 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showCRUD && <ListingCRUD type="rental" onClose={() => setShowCRUD(false)} />}
       {showPayment && (
         <MpesaPaymentFlow
           plans={agencyMpesaPlans}
@@ -129,11 +132,11 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
             <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
             <div className="space-y-2 mb-5">
               {[
-                { icon: Upload, label: "Bulk Upload", desc: "Import listings via CSV", gradient: "gradient-trust" },
+                { icon: Plus, label: "Add Listing", desc: "Create a new listing", gradient: "gradient-trust", action: () => setShowCRUD(true) },
                 { icon: UserPlus, label: "Add Agent", desc: "Invite a team member", gradient: "gradient-premium" },
                 { icon: Zap, label: "Boost Agency", desc: "Increase visibility", gradient: "bg-secondary" },
               ].map((a) => (
-                <button key={a.label} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
+                <button key={a.label} onClick={(a as any).action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
                   <div className={`w-10 h-10 rounded-xl ${a.gradient} flex items-center justify-center`}>
                     <a.icon className="w-5 h-5 text-primary-foreground" />
                   </div>

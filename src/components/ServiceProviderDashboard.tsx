@@ -5,6 +5,7 @@ import {
   Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import ListingCRUD from "./ListingCRUD";
 
 interface ServiceProviderDashboardProps {
   onBack: () => void;
@@ -53,6 +54,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [providerType] = useState<ProviderType>("individual");
+  const [showCRUD, setShowCRUD] = useState(false);
 
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
@@ -74,6 +76,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showCRUD && <ListingCRUD type="service" onClose={() => setShowCRUD(false)} />}
       {showPayment && (
         <MpesaPaymentFlow
           plans={serviceMpesaPlans}
@@ -145,11 +148,11 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
             <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
             <div className="space-y-2 mb-5">
               {[
-                { icon: Plus, label: "Add Service", desc: "List a new service", gradient: "gradient-trust" },
+                { icon: Plus, label: "Add Service", desc: "List a new service", gradient: "gradient-trust", action: () => setShowCRUD(true) },
                 { icon: Zap, label: "Boost Profile", desc: "Appear first in searches", gradient: "gradient-premium" },
                 { icon: Camera, label: "Add Portfolio", desc: "Showcase your work", gradient: "bg-secondary" },
               ].map((a) => (
-                <button key={a.label} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
+                <button key={a.label} onClick={(a as any).action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
                   <div className={`w-10 h-10 rounded-xl ${a.gradient} flex items-center justify-center`}>
                     <a.icon className="w-5 h-5 text-primary-foreground" />
                   </div>
