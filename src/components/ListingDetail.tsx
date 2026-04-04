@@ -352,6 +352,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
 
       {showUnlock && <PremiumUnlockModal onClose={() => setShowUnlock(false)} />}
       {showShare && <ShareListingSheet property={property} onClose={() => setShowShare(false)} />}
+      {showReport && <ReportListingModal listingTitle={property.title} listingId={property.id} onClose={() => setShowReport(false)} />}
     </div>
   );
 };
