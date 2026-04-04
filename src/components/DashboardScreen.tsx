@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft } from "lucide-react";
+import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface DashboardScreenProps {
   onBack: () => void;
@@ -11,9 +13,25 @@ const stats = [
   { label: "Bookings", value: "12", icon: Calendar, change: "+5%" },
 ];
 
+const landlordPlans = [
+  { name: "Basic", price: 500, duration: "1 month", features: ["3 listings", "Basic analytics"] },
+  { name: "Pro", price: 1000, duration: "1 month", features: ["10 listings", "Priority chat", "Boost"], popular: true },
+  { name: "Premium", price: 2000, duration: "1 month", features: ["Unlimited listings", "Featured badge", "County heatmaps", "Priority support"] },
+];
+
 const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
+  const [showPayment, setShowPayment] = useState(false);
+
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showPayment && (
+        <MpesaPaymentFlow
+          plans={landlordPlans}
+          selectedPlanIndex={1}
+          category="Landlord Plan"
+          onClose={() => setShowPayment(false)}
+        />
+      )}
       {/* Header */}
       <div className="gradient-trust px-4 pt-5 pb-8">
         <div className="flex items-center gap-3 mb-5">
@@ -71,7 +89,7 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
               <p className="text-xs text-muted-foreground">Get more visibility and leads</p>
             </div>
           </button>
-          <button className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
+          <button onClick={() => setShowPayment(true)} className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
             <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
               <Crown className="w-5 h-5 text-gold" />
             </div>

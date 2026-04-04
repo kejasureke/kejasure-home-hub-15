@@ -4,6 +4,7 @@ import {
   Calendar, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
   Home, Star, Clock, CheckCircle2, DollarSign, Bed, Moon as MoonIcon
 } from "lucide-react";
+import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface StayHostDashboardProps {
   onBack: () => void;
@@ -51,7 +52,16 @@ type Tab = "overview" | "calendar" | "guests" | "billing";
 
 const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
+  const [showPayment, setShowPayment] = useState(false);
   const currentPlan = plans.find((p) => p.current)!;
+
+  const hostMpesaPlans = plans.map((p) => ({
+    name: p.name,
+    price: p.price,
+    duration: "1 month",
+    features: p.features,
+    popular: p.current,
+  }));
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "overview", label: "Overview" },
@@ -62,6 +72,14 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showPayment && (
+        <MpesaPaymentFlow
+          plans={hostMpesaPlans}
+          selectedPlanIndex={1}
+          category="Stay Host Plan"
+          onClose={() => setShowPayment(false)}
+        />
+      )}
       {/* Header */}
       <div className="gradient-premium px-4 pt-5 pb-8">
         <div className="flex items-center gap-3 mb-5">
@@ -287,7 +305,7 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
                 <Clock className="w-3.5 h-3.5 text-accent" />
                 <span className="text-xs text-accent-foreground font-medium">Renews in 18 days</span>
               </div>
-              <button className="w-full py-2.5 rounded-xl bg-accent text-accent-foreground text-sm font-bold active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+              <button onClick={() => setShowPayment(true)} className="w-full py-2.5 rounded-xl bg-accent text-accent-foreground text-sm font-bold active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
                 <RefreshCw className="w-4 h-4" /> Renew Now
               </button>
             </div>
