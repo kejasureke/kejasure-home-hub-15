@@ -55,6 +55,8 @@ export interface ServiceProvider {
   description: string;
   price?: string;
   availability?: string;
+  lat: number;
+  lng: number;
 }
 
 export const properties: Property[] = [
