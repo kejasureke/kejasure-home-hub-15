@@ -318,8 +318,8 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
               </button>
             </div>
 
-            {/* Revenue Trends */}
-            <h3 className="text-base font-semibold mb-3">Revenue Trend</h3>
+            {/* Booking Trends */}
+            <h3 className="text-base font-semibold mb-3">Booking Trend</h3>
             <div className="bg-card rounded-2xl card-shadow p-4 mb-5">
               <div className="flex items-end gap-1 h-24">
                 {[45, 62, 38, 78, 55, 90, 72, 85, 68, 95, 80, 88].map((v, i) => (
