@@ -19,6 +19,8 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
   const [showBooking, setShowBooking] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
+  const [contactUnlocked, setContactUnlocked] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
 
