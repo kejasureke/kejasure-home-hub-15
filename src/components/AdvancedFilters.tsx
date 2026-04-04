@@ -1,5 +1,6 @@
 import { X, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import LocationSelector from "./LocationSelector";
 
 interface Filters {
   minPrice: number;
@@ -17,6 +18,11 @@ interface AdvancedFiltersProps {
   onClose: () => void;
   filters: Filters;
   onApply: (filters: Filters) => void;
+  county: string;
+  subcounty: string;
+  ward: string;
+  estate: string;
+  onLocationChange: (county: string, subcounty: string, ward: string, estate: string) => void;
 }
 
 const bedroomOptions = [1, 2, 3, 4, 5];
