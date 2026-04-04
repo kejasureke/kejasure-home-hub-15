@@ -272,21 +272,21 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
               ))}
             </div>
 
-            {/* Booking Deposits */}
-            <h3 className="text-base font-semibold mt-6 mb-3">Recent Deposits</h3>
+            {/* Recent Booking Requests */}
+            <h3 className="text-base font-semibold mt-6 mb-3">Recent Requests</h3>
             <div className="space-y-2">
               {[
-                { guest: "Alice N.", amount: "KES 4,500", date: "Today", status: "Confirmed" },
-                { guest: "Mark T.", amount: "KES 24,000", date: "Yesterday", status: "Confirmed" },
-                { guest: "Diana W.", amount: "KES 6,500", date: "2 days ago", status: "Pending" },
+                { guest: "Alice N.", stay: "Cozy Studio", date: "Today", nights: "3 nights", status: "Confirmed" },
+                { guest: "Mark T.", stay: "Penthouse Kilimani", date: "Yesterday", nights: "2 nights", status: "Confirmed" },
+                { guest: "Diana W.", stay: "Beach View Nyali", date: "2 days ago", nights: "5 nights", status: "Pending" },
               ].map((d) => (
                 <div key={d.guest} className="flex items-center justify-between p-3 rounded-xl bg-card card-shadow">
                   <div>
                     <p className="text-xs font-semibold">{d.guest}</p>
-                    <p className="text-[10px] text-muted-foreground">{d.date}</p>
+                    <p className="text-[10px] text-muted-foreground">{d.stay} · {d.nights}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-bold">{d.amount}</p>
+                    <p className="text-[10px] text-muted-foreground">{d.date}</p>
                     <p className={`text-[10px] font-medium ${d.status === "Confirmed" ? "text-trust" : "text-accent"}`}>{d.status}</p>
                   </div>
                 </div>
