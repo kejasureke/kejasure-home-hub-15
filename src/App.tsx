@@ -27,7 +27,15 @@ const useIsMobile = () => {
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
-  const [onboarded, setOnboarded] = useState(() => isOnboarded());
+  const [onboarded, setOnboarded] = useState(() => {
+    // DEV BYPASS: auto-onboard as tenant for testing
+    if (!isOnboarded()) {
+      localStorage.setItem("kejasure_onboarded", "true");
+      localStorage.setItem("kejasure_role", "tenant");
+      return true;
+    }
+    return true;
+  });
   const handleSplashComplete = useCallback(() => setShowSplash(false), []);
   const isMobile = useIsMobile();
 
