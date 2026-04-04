@@ -245,26 +245,47 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
 
       {/* Bottom CTA */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
-        <div className="flex gap-3 max-w-lg mx-auto">
-          <button
-            onClick={() => setShowBooking(true)}
-            className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98]"
-          >
-            {property.type === "shortstay" ? "Book Stay" : "Schedule Viewing"}
-          </button>
-          <button
-            onClick={() => setShowUnlock(true)}
-            className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98]"
-          >
-            <Phone className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setShowUnlock(true)}
-            className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98]"
-          >
-            <MessageCircle className="w-4 h-4" />
-          </button>
-        </div>
+        {contactUnlocked ? (
+          <div className="max-w-lg mx-auto">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 className="w-4 h-4 text-primary" />
+              <span className="text-xs font-semibold text-primary">Contact Unlocked</span>
+            </div>
+            <div className="flex gap-3">
+              <button className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                <Phone className="w-4 h-4" />
+                +254 712 345 678
+              </button>
+              <button className="flex-1 py-3.5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Chat Now
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex gap-3 max-w-lg mx-auto">
+            <button
+              onClick={() => setShowBooking(true)}
+              className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98]"
+            >
+              {property.type === "shortstay" ? "Book Stay" : "Schedule Viewing"}
+            </button>
+            <button
+              onClick={() => setShowUnlock(true)}
+              className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
+            >
+              <Lock className="w-4 h-4" />
+              <Phone className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setShowUnlock(true)}
+              className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
+            >
+              <Lock className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Booking Bottom Sheet */}
