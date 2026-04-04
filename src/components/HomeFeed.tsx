@@ -7,6 +7,7 @@ import ListingDetail from "./ListingDetail";
 import AdvancedFilters from "./AdvancedFilters";
 import CompareProperties from "./CompareProperties";
 import { properties, serviceProviders } from "@/data/mockData";
+import MapDiscovery from "./MapDiscovery";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
