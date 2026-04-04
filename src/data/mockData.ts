@@ -37,6 +37,8 @@ export interface Property {
   yearBuilt?: number;
   rating?: number;
   reviewCount?: number;
+  lat: number;
+  lng: number;
 }
 
 export interface ServiceProvider {
