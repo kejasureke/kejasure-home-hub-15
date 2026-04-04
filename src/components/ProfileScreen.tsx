@@ -105,7 +105,6 @@ const ProfileScreen = () => {
             </span>
           )}
         </button>
-        </button>
       </div>
 
       {/* Theme toggle */}
