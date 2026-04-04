@@ -68,7 +68,7 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
             }}
           >
             <img
-              src={isDark ? logoIconGreen : logoIconWhite}
+              src={logoIconWhite}
               alt="KejaSure"
               className="w-full h-full object-contain drop-shadow-lg"
             />
