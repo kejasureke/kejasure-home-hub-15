@@ -83,7 +83,7 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
         {/* Quick Actions */}
         <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
         <div className="space-y-3 mb-6">
-          <button className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
+          <button onClick={() => setShowCRUD(true)} className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
             <div className="w-10 h-10 rounded-xl gradient-trust flex items-center justify-center">
               <Plus className="w-5 h-5 text-primary-foreground" />
             </div>
