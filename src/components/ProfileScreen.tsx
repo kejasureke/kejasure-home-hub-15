@@ -8,6 +8,8 @@ import AdminPanel from "./AdminPanel";
 import DisputeFlow from "./DisputeFlow";
 import NotificationsScreen from "./NotificationsScreen";
 import { useTheme } from "@/hooks/useTheme";
+import { useInAppNotifications } from "@/hooks/useInAppNotifications";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const ProfileScreen = () => {
   const [showDashboard, setShowDashboard] = useState(false);
