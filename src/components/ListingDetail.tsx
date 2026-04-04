@@ -1,7 +1,6 @@
-import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, Lock } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
-import PremiumUnlockModal from "./PremiumUnlockModal";
 import ShareListingSheet from "./ShareListingSheet";
 import ReportListingModal from "./ReportListingModal";
 import ReviewRatingFlow from "./ReviewRatingFlow";
@@ -15,12 +14,10 @@ interface ListingDetailProps {
 
 const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: ListingDetailProps) => {
   const [currentImage, setCurrentImage] = useState(0);
-  const [showUnlock, setShowUnlock] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
-  const [contactUnlocked, setContactUnlocked] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
 
@@ -205,14 +202,14 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
           </ul>
         </div>
 
-        {/* Anti-Scam Banner */}
+        {/* Safety Banner */}
         <div className="p-3 rounded-2xl bg-accent/5 border border-accent/20 mb-4">
           <div className="flex items-start gap-2">
             <ShieldAlert className="w-4 h-4 text-accent shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs font-bold text-accent-foreground mb-0.5">Stay Safe on KejaSure</p>
+              <p className="text-xs font-bold text-accent-foreground mb-0.5">Stay Safe with KejaSure</p>
               <p className="text-[10px] text-muted-foreground leading-relaxed">
-                Never pay rent or deposits outside the app. All genuine landlords are verified with a <ShieldCheck className="w-3 h-3 inline text-trust" /> badge. Report suspicious activity immediately.
+                KejaSure connects you with verified landlords and service providers. Always visit the property in person before making any payment or commitment. Report suspicious profiles immediately.
               </p>
             </div>
           </div>
@@ -243,49 +240,29 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
         </button>
       </div>
 
-      {/* Bottom CTA */}
+      {/* Bottom CTA — Direct contact (no paywall) */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
-        {contactUnlocked ? (
-          <div className="max-w-lg mx-auto">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle2 className="w-4 h-4 text-primary" />
-              <span className="text-xs font-semibold text-primary">Contact Unlocked</span>
-            </div>
-            <div className="flex gap-3">
-              <button className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                <Phone className="w-4 h-4" />
-                +254 712 345 678
-              </button>
-              <button className="flex-1 py-3.5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                <MessageCircle className="w-4 h-4" />
-                Chat Now
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex gap-3 max-w-lg mx-auto">
-            <button
-              onClick={() => setShowBooking(true)}
-              className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98]"
-            >
-              {property.type === "shortstay" ? "Book Stay" : "Schedule Viewing"}
-            </button>
-            <button
-              onClick={() => setShowUnlock(true)}
-              className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
-            >
-              <Lock className="w-4 h-4" />
-              <Phone className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setShowUnlock(true)}
-              className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
-            >
-              <Lock className="w-4 h-4" />
-              <MessageCircle className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+        <div className="flex gap-3 max-w-lg mx-auto">
+          <button
+            onClick={() => setShowBooking(true)}
+            className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98]"
+          >
+            {property.type === "shortstay" ? "Book Stay" : "Schedule Viewing"}
+          </button>
+          <a
+            href="tel:+254712345678"
+            className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
+          >
+            <Phone className="w-4 h-4" />
+            Call
+          </a>
+          <button
+            className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Chat
+          </button>
+        </div>
       </div>
 
       {/* Booking Bottom Sheet */}
@@ -299,7 +276,6 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
               </h3>
             </div>
             <div className="px-6 pb-6 space-y-5">
-              {/* Date selector */}
               <div>
                 <h4 className="text-sm font-semibold mb-3">Select Date</h4>
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
@@ -318,7 +294,6 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
                 </div>
               </div>
 
-              {/* Time selector */}
               <div>
                 <h4 className="text-sm font-semibold mb-3">Select Time</h4>
                 <div className="grid grid-cols-3 gap-2">
@@ -336,7 +311,6 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
                 </div>
               </div>
 
-              {/* Summary */}
               {selectedDate && selectedTime && (
                 <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20 animate-fade-in">
                   <div className="flex items-center gap-2 mb-2">
@@ -374,7 +348,6 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
         </div>
       )}
 
-      {showUnlock && <PremiumUnlockModal onClose={() => { setShowUnlock(false); setContactUnlocked(true); }} />}
       {showShare && <ShareListingSheet property={property} onClose={() => setShowShare(false)} />}
       {showReport && <ReportListingModal listingTitle={property.title} listingId={property.id} onClose={() => setShowReport(false)} />}
       {showReviews && <ReviewRatingFlow onClose={() => setShowReviews(false)} targetName="Landlord" targetType="landlord" listingTitle={property.title} />}
