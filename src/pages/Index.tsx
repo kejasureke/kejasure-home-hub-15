@@ -2,6 +2,8 @@ import { useState } from "react";
 import BottomNav from "@/components/BottomNav";
 import HomeFeed from "@/components/HomeFeed";
 import ChatScreen from "@/components/ChatScreen";
+import ChatList from "@/components/ChatList";
+import type { ChatContact } from "@/components/ChatList";
 import ProfileScreen from "@/components/ProfileScreen";
 import { Heart, Search, MessageCircle } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -11,13 +13,22 @@ import PropertyCard from "@/components/PropertyCard";
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [showChat, setShowChat] = useState(false);
-  const [chatContact, setChatContact] = useState("John Kamau");
+  const [chatContact, setChatContact] = useState<ChatContact | null>(null);
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
 
   const favoriteProperties = properties.filter((p) => favoriteIds.includes(p.id));
 
-  if (showChat) {
-    return <ChatScreen onBack={() => setShowChat(false)} contactName={chatContact} />;
+  if (showChat && chatContact) {
+    return (
+      <ChatScreen
+        onBack={() => setShowChat(false)}
+        contactName={chatContact.name}
+        contactRole={chatContact.role}
+        contactOnline={chatContact.online}
+        contactVerified={chatContact.verified}
+        propertyContext={chatContact.property}
+      />
+    );
   }
 
   return (
@@ -75,38 +86,12 @@ const Index = () => {
       )}
 
       {activeTab === "chats" && (
-        <div className="px-4 pt-6 pb-24">
-          <h1 className="text-xl font-bold mb-4">Messages</h1>
-          <div className="space-y-2">
-            {[
-              { name: "John Kamau", msg: "Saturday at 10 AM works perfectly.", time: "10:35 AM", unread: 1 },
-              { name: "Mary Wanjiku", msg: "The apartment is ready for viewing.", time: "Yesterday", unread: 0 },
-              { name: "SwiftMovers KE", msg: "We can move you on Friday.", time: "Mon", unread: 3 },
-            ].map((chat) => (
-              <button
-                key={chat.name}
-                onClick={() => { setChatContact(chat.name); setShowChat(true); }}
-                className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform"
-              >
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <span className="text-sm font-semibold text-primary">{chat.name.split(" ").map(n => n[0]).join("")}</span>
-                </div>
-                <div className="flex-1 text-left min-w-0">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold truncate">{chat.name}</h3>
-                    <span className="text-[10px] text-muted-foreground shrink-0">{chat.time}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground truncate">{chat.msg}</p>
-                </div>
-                {chat.unread > 0 && (
-                  <div className="w-5 h-5 rounded-full gradient-trust flex items-center justify-center shrink-0">
-                    <span className="text-[10px] font-bold text-primary-foreground">{chat.unread}</span>
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ChatList
+          onOpenChat={(contact) => {
+            setChatContact(contact);
+            setShowChat(true);
+          }}
+        />
       )}
 
       {activeTab === "profile" && <ProfileScreen />}

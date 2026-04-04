@@ -1,9 +1,13 @@
-import { ArrowLeft, Send, Paperclip, Phone, MoreVertical, Check, CheckCheck, ShieldCheck, Image, Camera, X } from "lucide-react";
-import { useState, useRef } from "react";
+import { ArrowLeft, Send, Paperclip, Phone, MoreVertical, Check, CheckCheck, ShieldCheck, Image, Camera, X, Smile, Mic } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 
 interface ChatScreenProps {
   onBack: () => void;
   contactName?: string;
+  contactRole?: string;
+  contactOnline?: boolean;
+  contactVerified?: boolean;
+  propertyContext?: string;
 }
 
 interface Message {
@@ -12,65 +16,122 @@ interface Message {
   image?: string;
   sender: "me" | "other";
   time: string;
-  status?: "sent" | "delivered" | "seen";
+  status?: "sending" | "sent" | "delivered" | "seen";
+  replyTo?: string;
 }
 
-const initialMessages: Message[] = [
-  { id: 1, text: "Hi! I'm interested in the 3BR apartment in Kilimani. Is it still available?", sender: "me", time: "10:30 AM", status: "seen" },
-  { id: 2, text: "Hello! Yes, it's still available. Would you like to schedule a viewing?", sender: "other", time: "10:32 AM" },
-  { id: 3, text: "That would be great! Is Saturday morning okay?", sender: "me", time: "10:33 AM", status: "seen" },
-  { id: 4, text: "Saturday at 10 AM works perfectly. I'll send you the exact location pin.", sender: "other", time: "10:35 AM" },
-];
+const conversationsByContact: Record<string, Message[]> = {
+  "John Kamau": [
+    { id: 1, text: "Hi! I'm interested in the 3BR apartment in Kilimani. Is it still available?", sender: "me", time: "10:30 AM", status: "seen" },
+    { id: 2, text: "Hello! Yes, it's still available. Would you like to schedule a viewing?", sender: "other", time: "10:32 AM" },
+    { id: 3, text: "That would be great! Is Saturday morning okay?", sender: "me", time: "10:33 AM", status: "seen" },
+    { id: 4, text: "Saturday at 10 AM works perfectly. I'll send you the exact location pin.", sender: "other", time: "10:35 AM" },
+  ],
+  "Mary Wanjiku": [
+    { id: 1, text: "Hello, I saw your 2BR listing in Westlands. What floor is it on?", sender: "me", time: "2:15 PM", status: "seen" },
+    { id: 2, text: "Hi! It's on the 5th floor with a great view of Karura Forest.", sender: "other", time: "2:20 PM" },
+    { id: 3, text: "The apartment is ready for viewing. Please bring your ID.", sender: "other", time: "3:00 PM" },
+  ],
+  "SwiftMovers KE": [
+    { id: 1, text: "Hi, I need moving services from Kilimani to Karen. 2BR apartment.", sender: "me", time: "9:00 AM", status: "seen" },
+    { id: 2, text: "Hello! We can help with that. When do you need to move?", sender: "other", time: "9:05 AM" },
+    { id: 3, text: "This Friday morning if possible.", sender: "me", time: "9:07 AM", status: "seen" },
+    { id: 4, text: "We can move you on Friday morning. Confirmed! 🚛", sender: "other", time: "9:10 AM" },
+  ],
+  "Grace Njeri": [
+    { id: 1, text: "Hi, I'm Grace. Is the Studio in Westlands still available?", sender: "other", time: "11:00 AM" },
+    { id: 2, text: "Yes it is! Would you like to view it?", sender: "me", time: "11:15 AM", status: "delivered" },
+    { id: 3, text: "Is the deposit negotiable?", sender: "other", time: "11:30 AM" },
+  ],
+  "KejaPrime Agency": [
+    { id: 1, text: "We have 3 new listings in Kilimani matching your budget.", sender: "other", time: "10:00 AM" },
+  ],
+  "David Ochieng": [
+    { id: 1, text: "I'd like to book your Beach View stay for next weekend.", sender: "me", time: "4:00 PM", status: "seen" },
+    { id: 2, text: "It's available! Booking confirmed for Fri-Sun.", sender: "other", time: "4:10 PM" },
+    { id: 3, text: "Check-in is at 2 PM. I'll leave the keys with the guard.", sender: "other", time: "4:12 PM" },
+  ],
+};
 
-const ChatScreen = ({ onBack, contactName = "John Kamau" }: ChatScreenProps) => {
+const autoReplies: Record<string, string[]> = {
+  "John Kamau": ["Great, see you then!", "I'll prepare the documents for viewing.", "Let me know if you have any other questions."],
+  "Mary Wanjiku": ["The rent includes water and garbage collection.", "Parking is available at KES 3,000/month extra.", "Happy to help!"],
+  "SwiftMovers KE": ["We'll send 2 trucks and 4 movers.", "Packing materials are included in the price.", "We also offer storage services."],
+  default: ["Thanks for your message! I'll get back to you shortly.", "Sure, let me check and confirm.", "Sounds good! 👍"],
+};
+
+const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOnline, contactVerified = true, propertyContext }: ChatScreenProps) => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [isTyping, setIsTyping] = useState(true);
+  const [messages, setMessages] = useState<Message[]>(conversationsByContact[contactName] || conversationsByContact["John Kamau"]);
+  const [isTyping, setIsTyping] = useState(false);
   const [showPhoneReveal, setShowPhoneReveal] = useState(false);
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [lastSeen] = useState(contactOnline ? "Online" : "Last seen today, 2:45 PM");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const replyIdx = useRef(0);
 
   const initials = contactName.split(" ").map((n) => n[0]).join("");
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping]);
+
   const sendMessage = () => {
     if (!message.trim()) return;
+    const now = new Date().toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true });
+
     const newMsg: Message = {
-      id: messages.length + 1,
+      id: Date.now(),
       text: message,
       sender: "me",
-      time: new Date().toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true }),
-      status: "sent",
+      time: now,
+      status: "sending",
     };
-    setMessages([...messages, newMsg]);
+    setMessages((prev) => [...prev, newMsg]);
     setMessage("");
 
-    // Simulate reply
-    setIsTyping(true);
+    // Simulate status progression
+    setTimeout(() => {
+      setMessages((prev) => prev.map((m) => m.id === newMsg.id ? { ...m, status: "sent" as const } : m));
+    }, 500);
+    setTimeout(() => {
+      setMessages((prev) => prev.map((m) => m.id === newMsg.id ? { ...m, status: "delivered" as const } : m));
+    }, 1200);
+
+    // Simulate typing then reply
+    setTimeout(() => setIsTyping(true), 1500);
+    const delay = 2500 + Math.random() * 2000;
     setTimeout(() => {
       setIsTyping(false);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          text: "Thanks for your message! I'll get back to you shortly.",
-          sender: "other",
-          time: new Date().toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true }),
-        },
-      ]);
-    }, 2000);
+      const replies = autoReplies[contactName] || autoReplies["default"];
+      const replyText = replies[replyIdx.current % replies.length];
+      replyIdx.current++;
+
+      setMessages((prev) => {
+        const updated = prev.map((m) => m.id === newMsg.id ? { ...m, status: "seen" as const } : m);
+        return [
+          ...updated,
+          {
+            id: Date.now() + 1,
+            text: replyText,
+            sender: "other" as const,
+            time: new Date().toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true }),
+          },
+        ];
+      });
+    }, delay);
   };
 
   const handleImageSelect = () => {
-    // Simulate image share
     const newMsg: Message = {
-      id: messages.length + 1,
+      id: Date.now(),
       image: "/placeholder.svg",
       sender: "me",
       time: new Date().toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true }),
       status: "sent",
     };
-    setMessages([...messages, newMsg]);
+    setMessages((prev) => [...prev, newMsg]);
     setShowAttachMenu(false);
   };
 
@@ -79,14 +140,11 @@ const ChatScreen = ({ onBack, contactName = "John Kamau" }: ChatScreenProps) => 
     setShowPhoneReveal(false);
   };
 
-  const quickChips = [
-    "📅 Confirm Viewing",
-    "📍 Share Location",
-    "💰 Discuss Price",
-    "✅ Accept Booking",
-    "📸 Request Photos",
-    "🔑 Move-in Date",
-  ];
+  const quickChips = contactRole === "service"
+    ? ["📅 Schedule Service", "💰 Get Quote", "📍 Share Location", "✅ Confirm Booking"]
+    : contactRole === "host"
+    ? ["📅 Confirm Dates", "🔑 Check-in Info", "📍 Share Location", "⭐ Rate Stay"]
+    : ["📅 Confirm Viewing", "📍 Share Location", "💰 Discuss Price", "✅ Accept Booking", "📸 Request Photos", "🔑 Move-in Date"];
 
   return (
     <div className="fixed inset-0 z-40 bg-background flex flex-col animate-slide-up">
@@ -95,20 +153,24 @@ const ChatScreen = ({ onBack, contactName = "John Kamau" }: ChatScreenProps) => 
         <button onClick={onBack} className="p-1">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-          <span className="text-sm font-semibold text-primary">{initials}</span>
+        <div className="relative">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            initials.length <= 2 ? "bg-primary/10" : "bg-secondary"
+          }`}>
+            <span className="text-sm font-semibold text-primary">{initials}</span>
+          </div>
+          {contactOnline && (
+            <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-trust border-2 border-card" />
+          )}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-1.5">
             <h3 className="text-sm font-semibold">{contactName}</h3>
-            <ShieldCheck className="w-3.5 h-3.5 text-trust" />
+            {contactVerified && <ShieldCheck className="w-3.5 h-3.5 text-trust" />}
           </div>
-          <p className="text-xs text-trust">Online now</p>
+          <p className={`text-xs ${contactOnline ? "text-trust" : "text-muted-foreground"}`}>{lastSeen}</p>
         </div>
-        <button
-          onClick={() => setShowPhoneReveal(true)}
-          className="p-2"
-        >
+        <button onClick={() => setShowPhoneReveal(true)} className="p-2">
           <Phone className={`w-4.5 h-4.5 ${phoneRevealed ? "text-trust" : "text-muted-foreground"}`} />
         </button>
         <button className="p-2">
@@ -124,6 +186,14 @@ const ChatScreen = ({ onBack, contactName = "John Kamau" }: ChatScreenProps) => 
             <span className="text-xs font-medium text-trust">+254 712 345 678</span>
           </div>
           <a href="tel:+254712345678" className="text-xs font-semibold text-trust">Call</a>
+        </div>
+      )}
+
+      {/* Property context banner */}
+      {propertyContext && (
+        <div className="px-4 py-2 bg-primary/5 border-b border-primary/10 flex items-center gap-2">
+          <span className="text-xs">🏠</span>
+          <span className="text-xs font-medium text-foreground">Re: {propertyContext}</span>
         </div>
       )}
 
@@ -148,8 +218,15 @@ const ChatScreen = ({ onBack, contactName = "John Kamau" }: ChatScreenProps) => 
           ))}
         </div>
 
+        {/* Date separator */}
+        <div className="flex items-center gap-3 py-2">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-[10px] text-muted-foreground font-medium">Today</span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}>
+          <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"} animate-fade-in`}>
             <div className={`max-w-[80%] ${
               msg.image ? "rounded-2xl overflow-hidden" : `px-4 py-2.5 rounded-2xl ${
                 msg.sender === "me"
@@ -175,9 +252,12 @@ const ChatScreen = ({ onBack, contactName = "John Kamau" }: ChatScreenProps) => 
                     <span className={`text-[10px] ${msg.sender === "me" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
                       {msg.time}
                     </span>
+                    {msg.status === "sending" && (
+                      <div className="w-3 h-3 rounded-full border border-primary-foreground/40 border-t-transparent animate-spin" />
+                    )}
                     {msg.status === "sent" && <Check className="w-3 h-3 text-primary-foreground/50" />}
                     {msg.status === "delivered" && <CheckCheck className="w-3 h-3 text-primary-foreground/50" />}
-                    {msg.status === "seen" && <CheckCheck className="w-3 h-3 text-primary-foreground/70" />}
+                    {msg.status === "seen" && <CheckCheck className="w-3 h-3 text-primary-foreground" />}
                   </div>
                 </>
               )}
@@ -187,16 +267,21 @@ const ChatScreen = ({ onBack, contactName = "John Kamau" }: ChatScreenProps) => 
 
         {/* Typing indicator */}
         {isTyping && (
-          <div className="flex justify-start">
+          <div className="flex justify-start animate-fade-in">
             <div className="px-4 py-3 rounded-2xl bg-card card-shadow rounded-bl-md">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-pulse-soft" />
-                <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-pulse-soft" style={{ animationDelay: "0.2s" }} />
-                <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-pulse-soft" style={{ animationDelay: "0.4s" }} />
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "0ms", animationDuration: "0.6s" }} />
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "150ms", animationDuration: "0.6s" }} />
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "300ms", animationDuration: "0.6s" }} />
+                </div>
+                <span className="text-[10px] text-muted-foreground">{contactName.split(" ")[0]} is typing...</span>
               </div>
             </div>
           </div>
         )}
+
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Attachment menu */}
@@ -233,9 +318,15 @@ const ChatScreen = ({ onBack, contactName = "John Kamau" }: ChatScreenProps) => 
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             className="flex-1 py-2.5 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
-          <button onClick={sendMessage} className="p-2 rounded-xl gradient-trust">
-            <Send className="w-4 h-4 text-primary-foreground" />
-          </button>
+          {message.trim() ? (
+            <button onClick={sendMessage} className="p-2 rounded-xl gradient-trust active:scale-95 transition-transform">
+              <Send className="w-4 h-4 text-primary-foreground" />
+            </button>
+          ) : (
+            <button className="p-2">
+              <Mic className="w-5 h-5 text-muted-foreground" />
+            </button>
+          )}
         </div>
       </div>
 
