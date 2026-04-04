@@ -54,6 +54,7 @@ const ProfileScreen = () => {
     { icon: Shield, label: "Admin Panel", subtitle: "Platform management", action: () => setShowAdmin(true) },
     { icon: Crown, label: "Premium Plan", subtitle: "Active · 5 days left" },
     { icon: ShieldCheck, label: "Verification", subtitle: "ID Verified ✓" },
+    { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
     { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },
     { icon: Settings, label: "Settings", subtitle: "Account preferences" },
     { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact" },
