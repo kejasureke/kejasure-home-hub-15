@@ -20,6 +20,8 @@ const ProfileScreen = () => {
   const [showDispute, setShowDispute] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound } = useInAppNotifications();
+  const { unreadCount: storedUnread } = useNotifications();
 
   const role = typeof window !== "undefined" ? localStorage.getItem("kejasure_role") : null;
 
