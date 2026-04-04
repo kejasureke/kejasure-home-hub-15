@@ -27,6 +27,7 @@ const HomeFeed = () => {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
   const [serviceCategory, setServiceCategory] = useState("All");
+  const [showMap, setShowMap] = useState(false);
   const [filters, setFilters] = useState({
     minPrice: 0,
     maxPrice: 500000,
