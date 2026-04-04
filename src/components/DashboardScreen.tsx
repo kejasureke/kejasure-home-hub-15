@@ -113,15 +113,16 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
         </div>
 
         {/* Active Listings */}
-        <h3 className="text-base font-semibold mb-3">Active Listings</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-semibold">Active Listings</h3>
+          <button onClick={() => setShowCRUD(true)} className="text-xs font-semibold text-primary flex items-center gap-1">
+            <Plus className="w-3.5 h-3.5" /> New
+          </button>
+        </div>
         <div className="space-y-3 pb-8">
-          {[
-            { title: "3BR Kilimani", views: 847, leads: 23 },
-            { title: "2BR Westlands", views: 612, leads: 18 },
-            { title: "Studio Westlands", views: 1203, leads: 45 },
-          ].map((listing) => (
+          {myListings.map((listing, i) => (
             <div key={listing.title} className="flex items-center gap-3 p-3 rounded-xl bg-card card-shadow">
-              <div className="w-12 h-12 rounded-xl bg-secondary" />
+              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-lg">🏠</div>
               <div className="flex-1">
                 <p className="text-sm font-medium">{listing.title}</p>
                 <div className="flex gap-3 text-xs text-muted-foreground">
@@ -129,7 +130,14 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
                   <span className="flex items-center gap-1"><Users className="w-3 h-3" />{listing.leads}</span>
                 </div>
               </div>
-              <TrendingUp className="w-4 h-4 text-trust" />
+              <div className="flex items-center gap-1">
+                <button onClick={() => { setEditIdx(i); setShowCRUD(true); }} className="p-1.5 rounded-lg bg-secondary">
+                  <Edit3 className="w-3.5 h-3.5 text-primary" />
+                </button>
+                <button className="p-1.5 rounded-lg bg-secondary">
+                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                </button>
+              </div>
             </div>
           ))}
         </div>

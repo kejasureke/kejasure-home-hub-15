@@ -160,9 +160,14 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
                 <div key={l.title} className="bg-card rounded-2xl card-shadow p-4">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold">{l.title}</p>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 text-accent fill-accent" />
-                      <span className="text-xs font-semibold">{l.rating}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 text-accent fill-accent" />
+                        <span className="text-xs font-semibold">{l.rating}</span>
+                      </div>
+                      <button onClick={() => setShowCRUD(true)} className="p-1 rounded-lg bg-secondary">
+                        <Edit3 className="w-3 h-3 text-primary" />
+                      </button>
                     </div>
                   </div>
                   <div className="flex gap-4 text-xs text-muted-foreground">
