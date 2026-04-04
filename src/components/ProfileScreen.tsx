@@ -99,7 +99,12 @@ const ProfileScreen = () => {
           className="relative w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
         >
           <Bell className="w-5 h-5 text-primary" />
-          <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-accent border-2 border-card" />
+          {(storedUnread + liveUnread) > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-accent text-accent-foreground text-[10px] font-bold flex items-center justify-center px-1 border-2 border-background">
+              {storedUnread + liveUnread > 99 ? "99+" : storedUnread + liveUnread}
+            </span>
+          )}
+        </button>
         </button>
       </div>
 
