@@ -1,10 +1,11 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
 import StayHostDashboard from "./StayHostDashboard";
 import ServiceProviderDashboard from "./ServiceProviderDashboard";
 import AdminPanel from "./AdminPanel";
+import DisputeFlow from "./DisputeFlow";
 import NotificationsScreen from "./NotificationsScreen";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -14,6 +15,7 @@ const ProfileScreen = () => {
   const [showStayHost, setShowStayHost] = useState(false);
   const [showServiceProvider, setShowServiceProvider] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showDispute, setShowDispute] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -24,6 +26,7 @@ const ProfileScreen = () => {
   if (showStayHost) return <StayHostDashboard onBack={() => setShowStayHost(false)} />;
   if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
   if (showAdmin) return <AdminPanel onBack={() => setShowAdmin(false)} />;
+  if (showDispute) return <DisputeFlow onClose={() => setShowDispute(false)} />;
   if (showNotifications) return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
 
   // Build dashboard menu item based on role
@@ -51,6 +54,7 @@ const ProfileScreen = () => {
     { icon: Shield, label: "Admin Panel", subtitle: "Platform management", action: () => setShowAdmin(true) },
     { icon: Crown, label: "Premium Plan", subtitle: "Active · 5 days left" },
     { icon: ShieldCheck, label: "Verification", subtitle: "ID Verified ✓" },
+    { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
     { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },
     { icon: Settings, label: "Settings", subtitle: "Account preferences" },
     { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact" },
