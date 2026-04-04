@@ -8,6 +8,8 @@ import AdminPanel from "./AdminPanel";
 import DisputeFlow from "./DisputeFlow";
 import NotificationsScreen from "./NotificationsScreen";
 import { useTheme } from "@/hooks/useTheme";
+import { useInAppNotifications } from "@/hooks/useInAppNotifications";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const ProfileScreen = () => {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -18,6 +20,8 @@ const ProfileScreen = () => {
   const [showDispute, setShowDispute] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound } = useInAppNotifications();
+  const { unreadCount: storedUnread } = useNotifications();
 
   const role = typeof window !== "undefined" ? localStorage.getItem("kejasure_role") : null;
 
@@ -27,7 +31,16 @@ const ProfileScreen = () => {
   if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
   if (showAdmin) return <AdminPanel onBack={() => setShowAdmin(false)} />;
   if (showDispute) return <DisputeFlow onClose={() => setShowDispute(false)} />;
-  if (showNotifications) return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
+  if (showNotifications) return (
+    <NotificationsScreen
+      onBack={() => setShowNotifications(false)}
+      liveAlerts={alerts}
+      onMarkAlertRead={markAlertRead}
+      onMarkAllAlertsRead={markAllAlertsRead}
+      soundEnabled={soundEnabled}
+      onToggleSound={toggleSound}
+    />
+  );
 
   // Build dashboard menu item based on role
   const getDashboardItem = () => {
@@ -86,7 +99,11 @@ const ProfileScreen = () => {
           className="relative w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
         >
           <Bell className="w-5 h-5 text-primary" />
-          <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-accent border-2 border-card" />
+          {(storedUnread + liveUnread) > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-accent text-accent-foreground text-[10px] font-bold flex items-center justify-center px-1 border-2 border-background">
+              {storedUnread + liveUnread > 99 ? "99+" : storedUnread + liveUnread}
+            </span>
+          )}
         </button>
       </div>
 

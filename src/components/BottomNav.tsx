@@ -1,9 +1,10 @@
 import { Home, Search, MessageCircle, User, Heart } from "lucide-react";
-import { useState } from "react";
 
 interface BottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  chatBadge?: number;
+  profileBadge?: number;
 }
 
 const tabs = [
@@ -14,25 +15,37 @@ const tabs = [
   { id: "profile", icon: User, label: "Profile" },
 ];
 
-const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
+const BottomNav = ({ activeTab, onTabChange, chatBadge = 0, profileBadge = 0 }: BottomNavProps) => {
+  const getBadge = (id: string) => {
+    if (id === "chats") return chatBadge;
+    if (id === "profile") return profileBadge;
+    return 0;
+  };
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass-surface border-t border-border safe-bottom">
       <div className="flex items-center justify-around px-2 py-2 max-w-lg mx-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
+          const badge = getBadge(tab.id);
           return (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all duration-200"
+              className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all duration-200 relative"
             >
-              <div className={`p-1.5 rounded-xl transition-all duration-200 ${isActive ? "bg-primary/10" : ""}`}>
+              <div className={`p-1.5 rounded-xl transition-all duration-200 relative ${isActive ? "bg-primary/10" : ""}`}>
                 <tab.icon
                   className={`w-5 h-5 transition-colors duration-200 ${
                     isActive ? "text-primary" : "text-muted-foreground"
                   }`}
                   strokeWidth={isActive ? 2.5 : 1.8}
                 />
+                {badge > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-accent text-accent-foreground text-[10px] font-bold flex items-center justify-center px-1 border-2 border-background">
+                    {badge > 99 ? "99+" : badge}
+                  </span>
+                )}
               </div>
               <span
                 className={`text-[10px] font-medium transition-colors duration-200 ${

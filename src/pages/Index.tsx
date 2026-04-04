@@ -5,8 +5,11 @@ import ChatScreen from "@/components/ChatScreen";
 import ChatList from "@/components/ChatList";
 import type { ChatContact } from "@/components/ChatList";
 import ProfileScreen from "@/components/ProfileScreen";
-import { Heart, Search, MessageCircle } from "lucide-react";
+import NotificationToast from "@/components/NotificationToast";
+import { Heart, Search } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { properties } from "@/data/mockData";
 import PropertyCard from "@/components/PropertyCard";
 
@@ -15,8 +18,23 @@ const Index = () => {
   const [showChat, setShowChat] = useState(false);
   const [chatContact, setChatContact] = useState<ChatContact | null>(null);
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
+  const { unreadCount: storedUnread } = useNotifications();
+  const {
+    alerts,
+    toast,
+    unreadCount: liveUnread,
+    soundEnabled,
+    markAlertRead,
+    markAllAlertsRead,
+    dismissToast,
+    toggleSound,
+  } = useInAppNotifications();
 
   const favoriteProperties = properties.filter((p) => favoriteIds.includes(p.id));
+
+  // Badge counts
+  const chatBadge = 2; // simulated unread chats
+  const profileBadge = storedUnread + liveUnread;
 
   if (showChat && chatContact) {
     return (
@@ -33,6 +51,18 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background max-w-lg mx-auto relative">
+      {/* In-app notification toast */}
+      {toast && (
+        <NotificationToast
+          alert={toast}
+          onDismiss={dismissToast}
+          onTap={() => {
+            dismissToast();
+            setActiveTab("profile");
+          }}
+        />
+      )}
+
       {activeTab === "home" && <HomeFeed />}
 
       {activeTab === "search" && (
@@ -96,7 +126,12 @@ const Index = () => {
 
       {activeTab === "profile" && <ProfileScreen />}
 
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNav
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        chatBadge={chatBadge}
+        profileBadge={profileBadge}
+      />
     </div>
   );
 };
