@@ -40,9 +40,9 @@ const pipeline = [
 ];
 
 const topCounties = [
-  { name: "Nairobi", conversions: 156, revenue: "KES 780K" },
-  { name: "Mombasa", conversions: 67, revenue: "KES 335K" },
-  { name: "Kisumu", conversions: 23, revenue: "KES 115K" },
+  { name: "Nairobi", conversions: 156, inquiries: 312 },
+  { name: "Mombasa", conversions: 67, inquiries: 134 },
+  { name: "Kisumu", conversions: 23, inquiries: 58 },
 ];
 
 type Tab = "overview" | "agents" | "leads" | "billing";
