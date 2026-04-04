@@ -19,7 +19,7 @@ const ProfileScreen = () => {
     { icon: BarChart3, label: "Landlord Dashboard", subtitle: "Manage your listings", action: () => setShowDashboard(true) },
     { icon: Crown, label: "Premium Plan", subtitle: "Active · 5 days left" },
     { icon: ShieldCheck, label: "Verification", subtitle: "ID Verified ✓" },
-    { icon: Bell, label: "Notifications", subtitle: "Manage alerts" },
+    { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },
     { icon: Settings, label: "Settings", subtitle: "Account preferences" },
     { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact" },
   ];
