@@ -119,6 +119,9 @@
     @apply backdrop-blur-xl;
     background: hsl(0 0% 100% / 0.85);
   }
+  .dark .glass-surface {
+    background: hsl(150 20% 11% / 0.85);
+  }
   .gradient-trust {
     background: linear-gradient(135deg, hsl(150 60% 26%), hsl(150 60% 18%));
   }
