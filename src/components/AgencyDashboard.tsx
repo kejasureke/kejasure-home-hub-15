@@ -265,7 +265,7 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
                 <Clock className="w-3.5 h-3.5 text-accent" />
                 <span className="text-xs text-accent-foreground font-medium">Renews in 12 days</span>
               </div>
-              <button className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+              <button onClick={() => setShowPayment(true)} className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
                 <RefreshCw className="w-4 h-4" /> Renew Now
               </button>
             </div>
