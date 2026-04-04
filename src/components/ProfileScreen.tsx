@@ -81,11 +81,13 @@ const ProfileScreen = () => {
     ...(role !== "service" ? [{ icon: Wrench, label: "Service Dashboard", subtitle: "Service provider tools", action: () => setShowServiceProvider(true) }] : []),
     { icon: Shield, label: "Admin Panel", subtitle: "Platform management", action: () => setShowAdmin(true) },
     { icon: Crown, label: "Premium Plan", subtitle: "Active · 5 days left" },
-    { icon: ShieldCheck, label: "Verification", subtitle: "ID Verified ✓" },
+    { icon: ShieldCheck, label: "Verification", subtitle: "Verify your identity", action: () => setShowKYC(true) },
     { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
+    { icon: Search, label: "Saved Searches", subtitle: "Manage alerts & filters", action: () => setShowSavedSearches(true) },
+    { icon: Star, label: "Reviews & Ratings", subtitle: "View & write reviews", action: () => setShowReviews(true) },
     { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },
-    { icon: Settings, label: "Settings", subtitle: "Account preferences" },
-    { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact" },
+    { icon: Settings, label: "Settings", subtitle: "Account preferences", action: () => setShowSettings(true) },
+    { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact", action: () => setShowHelp(true) },
   ];
 
   const themeOptions = [
