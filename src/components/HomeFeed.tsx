@@ -1,4 +1,4 @@
-import { Search, Bell, SlidersHorizontal, GitCompare, Bookmark, BookmarkCheck, ChevronRight, Clock } from "lucide-react";
+import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock } from "lucide-react";
 import { useState, useMemo } from "react";
 
 import PropertyCard from "./PropertyCard";
@@ -119,20 +119,7 @@ const HomeFeed = () => {
   return (
     <div className="pb-24">
       {/* Header */}
-      <div className="gradient-trust px-4 pt-5 pb-4">
-        <div className="flex items-center gap-2 mb-2 justify-end">
-          <button
-            onClick={handleSaveSearch}
-            className="w-10 h-10 rounded-full bg-primary-foreground/15 flex items-center justify-center"
-          >
-            <Bookmark className="w-4 h-4 text-primary-foreground" />
-          </button>
-          <button className="relative w-10 h-10 rounded-full bg-primary-foreground/15 flex items-center justify-center">
-            <Bell className="w-5 h-5 text-primary-foreground" />
-            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent" />
-          </button>
-        </div>
-
+      <div className="gradient-trust px-4 pt-4 pb-4">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -140,12 +127,12 @@ const HomeFeed = () => {
             placeholder="Search properties, estates, landmarks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-12 py-3 rounded-xl bg-card text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 card-shadow"
+            className="w-full pl-10 pr-11 py-3 rounded-xl bg-card text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 card-shadow"
           />
-          <button onClick={() => setShowFilters(true)} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-secondary relative">
-            <SlidersHorizontal className="w-4 h-4 text-foreground" />
+          <button onClick={() => setShowFilters(true)} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-secondary/80 transition-colors relative">
+            <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
             {(county || filters.bedrooms.length > 0 || filters.amenities.length > 0 || filters.verified || filters.furnished || filters.petFriendly) && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-accent" />
+              <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-accent" />
             )}
           </button>
         </div>
