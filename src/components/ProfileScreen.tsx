@@ -1,24 +1,50 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
+import AgencyDashboard from "./AgencyDashboard";
+import StayHostDashboard from "./StayHostDashboard";
+import ServiceProviderDashboard from "./ServiceProviderDashboard";
 import NotificationsScreen from "./NotificationsScreen";
 import { useTheme } from "@/hooks/useTheme";
 
 const ProfileScreen = () => {
   const [showDashboard, setShowDashboard] = useState(false);
+  const [showAgency, setShowAgency] = useState(false);
+  const [showStayHost, setShowStayHost] = useState(false);
+  const [showServiceProvider, setShowServiceProvider] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const { theme, setTheme } = useTheme();
 
-  if (showDashboard) {
-    return <DashboardScreen onBack={() => setShowDashboard(false)} />;
-  }
+  const role = typeof window !== "undefined" ? localStorage.getItem("kejasure_role") : null;
 
-  if (showNotifications) {
-    return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
-  }
+  if (showDashboard) return <DashboardScreen onBack={() => setShowDashboard(false)} />;
+  if (showAgency) return <AgencyDashboard onBack={() => setShowAgency(false)} />;
+  if (showStayHost) return <StayHostDashboard onBack={() => setShowStayHost(false)} />;
+  if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
+  if (showNotifications) return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
+
+  // Build dashboard menu item based on role
+  const getDashboardItem = () => {
+    switch (role) {
+      case "agency":
+        return { icon: Building2, label: "Agency Dashboard", subtitle: "Manage agents & listings", action: () => setShowAgency(true) };
+      case "stayhost":
+        return { icon: Home, label: "Stay Host Dashboard", subtitle: "Manage your stays", action: () => setShowStayHost(true) };
+      case "service":
+        return { icon: Wrench, label: "Service Dashboard", subtitle: "Manage your services", action: () => setShowServiceProvider(true) };
+      default:
+        return { icon: BarChart3, label: "Landlord Dashboard", subtitle: "Manage your listings", action: () => setShowDashboard(true) };
+    }
+  };
+
+  const dashboardItem = getDashboardItem();
 
   const menuItems = [
-    { icon: BarChart3, label: "Landlord Dashboard", subtitle: "Manage your listings", action: () => setShowDashboard(true) },
+    { icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action },
+    // Show all dashboards for demo/testing
+    ...(role !== "agency" ? [{ icon: Building2, label: "Agency Dashboard", subtitle: "Multi-agent management", action: () => setShowAgency(true) }] : []),
+    ...(role !== "stayhost" ? [{ icon: Home, label: "Stay Host Dashboard", subtitle: "Short stay management", action: () => setShowStayHost(true) }] : []),
+    ...(role !== "service" ? [{ icon: Wrench, label: "Service Dashboard", subtitle: "Service provider tools", action: () => setShowServiceProvider(true) }] : []),
     { icon: Crown, label: "Premium Plan", subtitle: "Active · 5 days left" },
     { icon: ShieldCheck, label: "Verification", subtitle: "ID Verified ✓" },
     { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },
