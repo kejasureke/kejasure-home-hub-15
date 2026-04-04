@@ -257,6 +257,8 @@ export const properties: Property[] = [
     yearBuilt: 2022,
     rating: 4.9,
     reviewCount: 8,
+    lat: -1.3184,
+    lng: 36.7122,
   },
   {
     id: "7",
