@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ShieldCheck, Wallet, MapPin, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import logoIcon from "@/assets/logo-icon-green.png";
 
 interface WelcomeScreensProps {
   onComplete: () => void;
@@ -7,22 +8,16 @@ interface WelcomeScreensProps {
 
 const slides = [
   {
-    icon: ShieldCheck,
-    iconBg: "gradient-trust",
     title: "Verified Landlords,\nZero Scams",
     description: "Every landlord is ID-verified. Every listing is real. Browse with confidence across all 47 counties.",
     accent: "Keja Safi, Keja Sure.",
   },
   {
-    icon: Wallet,
-    iconBg: "gradient-mpesa",
-    title: "Unlock Contacts\nvia M-Pesa",
-    description: "Securely unlock landlord contacts and chat access through M-Pesa micro-payments. No deposits, no rent collection.",
-    accent: "Simple, safe unlocks.",
+    title: "Direct Contact,\nNo Middlemen",
+    description: "Call or chat with landlords directly. No hidden fees, no brokers. Just you and your next home.",
+    accent: "Simple, direct connections.",
   },
   {
-    icon: MapPin,
-    iconBg: "gradient-premium",
     title: "Find Your Next\nKeja Anywhere",
     description: "From Nairobi to Mombasa, Kisumu to Nakuru. Discover rentals, short stays, and home services nationwide.",
     accent: "47 counties. One app.",
@@ -34,7 +29,6 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
 
   const isLast = current === slides.length - 1;
   const slide = slides[current];
-  const Icon = slide.icon;
 
   return (
     <div className="fixed inset-0 z-[90] bg-background flex flex-col">
@@ -50,9 +44,13 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
 
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
-        {/* Icon */}
-        <div className={`w-24 h-24 rounded-3xl ${slide.iconBg} flex items-center justify-center mb-8 animate-fade-in`}>
-          <Icon className="w-12 h-12 text-primary-foreground" />
+        {/* Logo icon */}
+        <div className="w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center mb-8 animate-fade-in">
+          <img
+            src={logoIcon}
+            alt="KejaSure"
+            className="w-16 h-16 object-contain"
+          />
         </div>
 
         {/* Title */}
