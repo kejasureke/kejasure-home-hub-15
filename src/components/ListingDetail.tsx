@@ -188,7 +188,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
         </div>
 
         {/* Trust Indicators */}
-        <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20 mb-5">
+        <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20 mb-4">
           <div className="flex items-center gap-2 mb-2">
             <ShieldCheck className="w-5 h-5 text-trust" />
             <h3 className="text-sm font-semibold text-trust">Trust & Safety</h3>
@@ -202,9 +202,40 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
           </ul>
         </div>
 
+        {/* Anti-Scam Banner */}
+        <div className="p-3 rounded-2xl bg-accent/5 border border-accent/20 mb-4">
+          <div className="flex items-start gap-2">
+            <ShieldAlert className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-bold text-accent-foreground mb-0.5">Stay Safe on KejaSure</p>
+              <p className="text-[10px] text-muted-foreground leading-relaxed">
+                Never pay rent or deposits outside the app. All genuine landlords are verified with a <ShieldCheck className="w-3 h-3 inline text-trust" /> badge. Report suspicious activity immediately.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Suspicious Profile Flag */}
+        {!property.verified && (
+          <div className="p-3 rounded-2xl bg-destructive/5 border border-destructive/20 mb-4">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-destructive mb-0.5">Unverified Listing</p>
+                <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  This listing has not been verified by our team. Exercise extra caution and verify the property in person before making any commitments.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Report */}
-        <button className="flex items-center gap-2 text-xs text-muted-foreground py-2">
-          <AlertTriangle className="w-3.5 h-3.5" />
+        <button
+          onClick={() => setShowReport(true)}
+          className="flex items-center gap-2 text-xs text-destructive/70 py-2 hover:text-destructive transition-colors"
+        >
+          <Flag className="w-3.5 h-3.5" />
           Report this listing
         </button>
       </div>
