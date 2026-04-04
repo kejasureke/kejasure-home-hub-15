@@ -366,6 +366,11 @@ const HomeFeed = () => {
         onClose={() => setShowFilters(false)}
         filters={filters}
         onApply={setFilters}
+        county={county}
+        subcounty={subcounty}
+        ward={ward}
+        estate={estate}
+        onLocationChange={(c, sc, w, e) => { setCounty(c); setSubcounty(sc); setWard(w); setEstate(e); }}
       />
     </div>
   );
