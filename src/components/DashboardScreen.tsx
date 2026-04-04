@@ -33,6 +33,9 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showCRUD && (
+        <ListingCRUD type="rental" onClose={() => { setShowCRUD(false); setEditIdx(null); }} />
+      )}
       {showPayment && (
         <MpesaPaymentFlow
           plans={landlordPlans}
