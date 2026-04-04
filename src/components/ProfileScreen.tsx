@@ -13,6 +13,7 @@ const ProfileScreen = () => {
   const [showAgency, setShowAgency] = useState(false);
   const [showStayHost, setShowStayHost] = useState(false);
   const [showServiceProvider, setShowServiceProvider] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -22,6 +23,7 @@ const ProfileScreen = () => {
   if (showAgency) return <AgencyDashboard onBack={() => setShowAgency(false)} />;
   if (showStayHost) return <StayHostDashboard onBack={() => setShowStayHost(false)} />;
   if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
+  if (showAdmin) return <AdminPanel onBack={() => setShowAdmin(false)} />;
   if (showNotifications) return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
 
   // Build dashboard menu item based on role
