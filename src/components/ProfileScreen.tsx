@@ -41,6 +41,11 @@ const ProfileScreen = () => {
   if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
   if (showAdmin) return <AdminPanel onBack={() => setShowAdmin(false)} />;
   if (showDispute) return <DisputeFlow onClose={() => setShowDispute(false)} />;
+  if (showKYC) return <KYCVerificationFlow onClose={() => setShowKYC(false)} />;
+  if (showSettings) return <SettingsScreen onBack={() => setShowSettings(false)} />;
+  if (showHelp) return <HelpSupportScreen onBack={() => setShowHelp(false)} />;
+  if (showSavedSearches) return <SavedSearchesScreen onBack={() => setShowSavedSearches(false)} />;
+  if (showReviews) return <ReviewRatingFlow onClose={() => setShowReviews(false)} />;
   if (showNotifications) return (
     <NotificationsScreen
       onBack={() => setShowNotifications(false)}
