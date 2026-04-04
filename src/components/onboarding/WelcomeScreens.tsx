@@ -16,9 +16,9 @@ const slides = [
   {
     icon: Wallet,
     iconBg: "gradient-mpesa",
-    title: "Secure M-Pesa\nPayments",
-    description: "Pay deposits and rent securely through M-Pesa. Every transaction is tracked and protected.",
-    accent: "Your money, always safe.",
+    title: "Unlock Contacts\nvia M-Pesa",
+    description: "Securely unlock landlord contacts and chat access through M-Pesa micro-payments. No deposits, no rent collection.",
+    accent: "Simple, safe unlocks.",
   },
   {
     icon: MapPin,
