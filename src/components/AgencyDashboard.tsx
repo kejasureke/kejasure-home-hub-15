@@ -50,6 +50,7 @@ type Tab = "overview" | "agents" | "leads" | "billing";
 const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
+  const [showCRUD, setShowCRUD] = useState(false);
   const currentPlan = plans.find((p) => p.current)!;
 
   const agencyMpesaPlans = plans.map((p) => ({
