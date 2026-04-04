@@ -43,7 +43,7 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
   if (showPayment) {
     return (
       <MpesaPaymentFlow
-        plans={boostPlans.map(p => ({ name: p.name, price: p.price, features: p.features }))}
+        plans={boostPlans.map(p => ({ name: p.name, price: p.price, duration: p.duration, features: p.features }))}
         selectedPlanIndex={selectedBoost}
         category="Listing Boost"
         onClose={() => setShowPayment(false)}

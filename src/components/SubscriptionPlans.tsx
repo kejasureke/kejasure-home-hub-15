@@ -166,6 +166,7 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
   const mpesaPlans = plans.filter(p => p.price > 0).map(p => ({
     name: p.name,
     price: p.price,
+    duration: p.duration || "/month",
     features: p.features.slice(0, 4),
     current: p.current,
   }));
