@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   ArrowLeft, Users, BarChart3, Shield, AlertTriangle, CheckCircle2, Clock,
   Eye, TrendingUp, MapPin, Search, ChevronRight, Crown, Ban, Flag,
-  FileWarning, RefreshCw, DollarSign, Building2, Home, Wrench, User,
+  FileWarning, RefreshCw, Coins, Building2, Home, Wrench, User,
   MessageCircle, XCircle, Filter, ChevronDown, Star, Zap, Activity
 } from "lucide-react";
 
