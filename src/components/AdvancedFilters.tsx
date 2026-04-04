@@ -35,7 +35,7 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const AdvancedFilters = ({ isOpen, onClose, filters, onApply }: AdvancedFiltersProps) => {
+const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange }: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>(filters);
 
   if (!isOpen) return null;
