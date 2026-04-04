@@ -119,9 +119,9 @@ const HomeFeed = () => {
   return (
     <div className="pb-24">
       {/* Header */}
-      <div className="gradient-trust px-4 pt-4 pb-4">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      <div className="gradient-trust px-4 pt-6 pb-5">
+        <div className="relative flex items-center">
+          <Search className="absolute left-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
           <input
             type="text"
             placeholder="Search properties, estates, landmarks..."
@@ -129,7 +129,7 @@ const HomeFeed = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-11 py-3 rounded-xl bg-card text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 card-shadow"
           />
-          <button onClick={() => setShowFilters(true)} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-secondary/80 transition-colors relative">
+          <button onClick={() => setShowFilters(true)} className="absolute right-1.5 p-2 rounded-lg hover:bg-secondary/80 transition-colors">
             <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
             {(county || filters.bedrooms.length > 0 || filters.amenities.length > 0 || filters.verified || filters.furnished || filters.petFriendly) && (
               <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-accent" />
