@@ -1,4 +1,4 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale, Search, Star } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
@@ -12,6 +12,9 @@ import SettingsScreen from "./SettingsScreen";
 import HelpSupportScreen from "./HelpSupportScreen";
 import SavedSearchesScreen from "./SavedSearchesScreen";
 import ReviewRatingFlow from "./ReviewRatingFlow";
+import SubscriptionPlans from "./SubscriptionPlans";
+import NeighborhoodSafety from "./NeighborhoodSafety";
+import BoostListingFlow from "./BoostListingFlow";
 import { useTheme } from "@/hooks/useTheme";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -29,11 +32,16 @@ const ProfileScreen = () => {
   const [showHelp, setShowHelp] = useState(false);
   const [showSavedSearches, setShowSavedSearches] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
+  const [showSubscription, setShowSubscription] = useState(false);
+  const [showNeighborhood, setShowNeighborhood] = useState(false);
+  const [showBoost, setShowBoost] = useState(false);
   const { theme, setTheme } = useTheme();
   const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
 
   const role = typeof window !== "undefined" ? localStorage.getItem("kejasure_role") : null;
+  const kycStatus = typeof window !== "undefined" ? localStorage.getItem("kejasure_kyc_status") : null;
+  const isVerified = kycStatus === "verified";
 
   if (showDashboard) return <DashboardScreen onBack={() => setShowDashboard(false)} />;
   if (showAgency) return <AgencyDashboard onBack={() => setShowAgency(false)} />;
@@ -46,6 +54,9 @@ const ProfileScreen = () => {
   if (showHelp) return <HelpSupportScreen onBack={() => setShowHelp(false)} />;
   if (showSavedSearches) return <SavedSearchesScreen onBack={() => setShowSavedSearches(false)} />;
   if (showReviews) return <ReviewRatingFlow onClose={() => setShowReviews(false)} />;
+  if (showSubscription) return <SubscriptionPlans onBack={() => setShowSubscription(false)} />;
+  if (showNeighborhood) return <NeighborhoodSafety onBack={() => setShowNeighborhood(false)} />;
+  if (showBoost) return <BoostListingFlow onBack={() => setShowBoost(false)} />;
   if (showNotifications) return (
     <NotificationsScreen
       onBack={() => setShowNotifications(false)}
@@ -72,6 +83,7 @@ const ProfileScreen = () => {
   };
 
   const dashboardItem = getDashboardItem();
+  const showBoostOption = role !== "tenant";
 
   const menuItems = [
     { icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action },
@@ -80,8 +92,10 @@ const ProfileScreen = () => {
     ...(role !== "stayhost" ? [{ icon: Home, label: "Stay Host Dashboard", subtitle: "Short stay management", action: () => setShowStayHost(true) }] : []),
     ...(role !== "service" ? [{ icon: Wrench, label: "Service Dashboard", subtitle: "Service provider tools", action: () => setShowServiceProvider(true) }] : []),
     { icon: Shield, label: "Admin Panel", subtitle: "Platform management", action: () => setShowAdmin(true) },
-    { icon: Crown, label: "Premium Plan", subtitle: "Active · 5 days left" },
-    { icon: ShieldCheck, label: "Verification", subtitle: "Verify your identity", action: () => setShowKYC(true) },
+    { icon: Crown, label: "Subscription Plans", subtitle: "Manage your plan", action: () => setShowSubscription(true) },
+    ...(showBoostOption ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
+    { icon: ShieldCheck, label: "Verification", subtitle: isVerified ? "✓ Verified" : "Verify your identity", action: () => setShowKYC(true) },
+    { icon: MapPin, label: "Neighborhood Safety", subtitle: "Area scores & insights", action: () => setShowNeighborhood(true) },
     { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
     { icon: Search, label: "Saved Searches", subtitle: "Manage alerts & filters", action: () => setShowSavedSearches(true) },
     { icon: Star, label: "Reviews & Ratings", subtitle: "View & write reviews", action: () => setShowReviews(true) },
@@ -100,13 +114,18 @@ const ProfileScreen = () => {
     <div className="pb-24 px-4 pt-5">
       {/* Profile header */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 rounded-2xl gradient-trust flex items-center justify-center">
+        <div className="w-16 h-16 rounded-2xl gradient-trust flex items-center justify-center relative">
           <span className="text-xl font-bold text-primary-foreground">JK</span>
+          {isVerified && (
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center border-2 border-background">
+              <ShieldCheck className="w-3.5 h-3.5 text-primary-foreground" />
+            </div>
+          )}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-1.5">
             <h2 className="text-lg font-bold">John Kamau</h2>
-            <ShieldCheck className="w-4 h-4 text-trust" />
+            {isVerified && <ShieldCheck className="w-4 h-4 text-trust" />}
           </div>
           <p className="text-sm text-muted-foreground">+254 712 345 678</p>
           <div className="tier-badge-premium mt-1 inline-block">Premium Member</div>
