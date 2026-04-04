@@ -1,12 +1,18 @@
 import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
+import NotificationsScreen from "./NotificationsScreen";
 
 const ProfileScreen = () => {
   const [showDashboard, setShowDashboard] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   if (showDashboard) {
     return <DashboardScreen onBack={() => setShowDashboard(false)} />;
+  }
+
+  if (showNotifications) {
+    return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
   }
 
   const menuItems = [
