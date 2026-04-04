@@ -31,7 +31,16 @@ const ProfileScreen = () => {
   if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
   if (showAdmin) return <AdminPanel onBack={() => setShowAdmin(false)} />;
   if (showDispute) return <DisputeFlow onClose={() => setShowDispute(false)} />;
-  if (showNotifications) return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
+  if (showNotifications) return (
+    <NotificationsScreen
+      onBack={() => setShowNotifications(false)}
+      liveAlerts={alerts}
+      onMarkAlertRead={markAlertRead}
+      onMarkAllAlertsRead={markAllAlertsRead}
+      soundEnabled={soundEnabled}
+      onToggleSound={toggleSound}
+    />
+  );
 
   // Build dashboard menu item based on role
   const getDashboardItem = () => {
