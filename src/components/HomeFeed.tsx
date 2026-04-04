@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock } from "lucide-react";
+import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench } from "lucide-react";
 import { useState, useMemo } from "react";
 
 import PropertyCard from "./PropertyCard";
