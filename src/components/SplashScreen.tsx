@@ -72,7 +72,9 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
               alt="KejaSure"
               className="w-full h-full object-contain drop-shadow-lg"
               style={{
-                filter: isDark ? "brightness(1.2) saturate(1.1)" : "brightness(0) invert(1)",
+              filter: isDark
+                ? "brightness(1.4) saturate(1.2)"
+                : "brightness(0) invert(1) brightness(2)",
               }}
             />
           </div>
