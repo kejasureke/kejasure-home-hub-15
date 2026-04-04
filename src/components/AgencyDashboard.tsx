@@ -176,7 +176,7 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
                     <p className="text-sm font-medium">{c.name}</p>
                     <p className="text-xs text-muted-foreground">{c.conversions} conversions</p>
                   </div>
-                  <span className="text-xs font-semibold text-primary">{c.revenue}</span>
+                  <span className="text-xs font-semibold text-primary">{c.inquiries} inquiries</span>
                 </div>
               ))}
             </div>

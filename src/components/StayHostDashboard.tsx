@@ -14,7 +14,7 @@ interface StayHostDashboardProps {
 const plans = [
   { name: "Basic", price: 1000, features: ["2 listings", "Basic calendar", "Guest chat"], current: false },
   { name: "Pro", price: 2500, features: ["10 listings", "Full calendar", "Priority chat", "Featured stays"], current: true },
-  { name: "Premium", price: 5000, features: ["Unlimited listings", "Smart pricing", "Priority support", "County heatmaps", "Revenue analytics"], current: false },
+  { name: "Premium", price: 5000, features: ["Unlimited listings", "Smart pricing", "Priority support", "County heatmaps", "Booking analytics"], current: false },
 ];
 
 const stats = [

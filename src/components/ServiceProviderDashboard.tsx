@@ -196,7 +196,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                     <p className="text-sm font-medium">{c.county}</p>
                     <p className="text-xs text-muted-foreground">{c.bookings} bookings · ⭐ {c.rating}</p>
                   </div>
-                  <span className="text-xs font-bold text-primary">{c.revenue}</span>
+                  <span className="text-xs font-bold text-primary">{c.inquiries} inquiries</span>
                 </div>
               ))}
             </div>

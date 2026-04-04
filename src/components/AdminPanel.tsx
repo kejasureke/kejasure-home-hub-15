@@ -313,7 +313,7 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
                     <p className="text-xs font-semibold">{p.name}</p>
                     <p className="text-[10px] text-muted-foreground">{p.category} · ⭐ {p.rating}</p>
                   </div>
-                  <span className="text-xs font-bold text-primary">{p.revenue}</span>
+                  <span className="text-xs font-bold text-primary">{p.bookings} bookings</span>
                 </div>
               ))}
             </div>
