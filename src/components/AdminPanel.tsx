@@ -83,9 +83,9 @@ const expiringSubscriptions = [
 ];
 
 const topProviders = [
-  { name: "SwiftMovers KE", category: "Movers", revenue: "KES 180K", rating: 4.8 },
-  { name: "CleanPro Solutions", category: "Cleaners", revenue: "KES 145K", rating: 4.6 },
-  { name: "PowerFix Electricals", category: "Electricians", revenue: "KES 120K", rating: 4.9 },
+  { name: "SwiftMovers KE", category: "Movers", bookings: 67, rating: 4.8 },
+  { name: "CleanPro Solutions", category: "Cleaners", bookings: 54, rating: 4.6 },
+  { name: "PowerFix Electricals", category: "Electricians", bookings: 43, rating: 4.9 },
 ];
 
 const AdminPanel = ({ onBack }: AdminPanelProps) => {
