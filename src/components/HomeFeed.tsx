@@ -138,28 +138,8 @@ const HomeFeed = () => {
         </div>
       </div>
 
-      {/* Saved Searches */}
-      {searches.length > 0 && (
-        <div className="px-4 py-2">
-          <div className="flex gap-2 overflow-x-auto scrollbar-none">
-            {searches.slice(0, 5).map((s) => (
-              <button
-                key={s.id}
-                onClick={() => {
-                  setCounty(s.county);
-                  setSubcounty(s.subcounty);
-                  setEstate(s.estate);
-                  setSegment(s.segment as any);
-                }}
-                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 text-xs font-medium text-primary border border-primary/15"
-              >
-                <BookmarkCheck className="w-3 h-3" />
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+
+
 
       {/* Segment Tabs */}
       <div className="px-4 py-3">
