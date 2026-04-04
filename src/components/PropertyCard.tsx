@@ -57,9 +57,9 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         </div>
 
         {/* Price overlay */}
-        <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-foreground/70 backdrop-blur-sm">
-          <span className="text-lg font-bold text-white drop-shadow-sm">{formatPrice(property.price)}</span>
-          <span className="text-sm text-white/80">{property.priceUnit}</span>
+        <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-sm shadow-lg">
+          <span className="text-lg font-bold text-gray-900">{formatPrice(property.price)}</span>
+          <span className="text-sm text-gray-600">{property.priceUnit}</span>
         </div>
 
         {/* Rating */}
