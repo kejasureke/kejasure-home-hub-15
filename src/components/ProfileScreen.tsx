@@ -24,6 +24,11 @@ const ProfileScreen = () => {
   const [showAdmin, setShowAdmin] = useState(false);
   const [showDispute, setShowDispute] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showKYC, setShowKYC] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showSavedSearches, setShowSavedSearches] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const { theme, setTheme } = useTheme();
   const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
