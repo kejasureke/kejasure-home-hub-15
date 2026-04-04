@@ -1,4 +1,4 @@
-import { Heart, Bed, Bath, MapPin, ShieldCheck, Star, GitCompare } from "lucide-react";
+import { Heart, Bed, Bath, MapPin, ShieldCheck, Star, GitCompare, AlertTriangle } from "lucide-react";
 import type { Property } from "@/data/mockData";
 
 interface PropertyCardProps {
