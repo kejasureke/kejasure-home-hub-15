@@ -93,7 +93,7 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
 
   const tabs: { key: Tab; label: string; icon: typeof Users }[] = [
     { key: "users", label: "Users", icon: Users },
-    { key: "revenue", label: "Revenue", icon: DollarSign },
+    { key: "revenue", label: "Revenue", icon: Coins },
     { key: "fraud", label: "Fraud", icon: AlertTriangle },
     { key: "verification", label: "Verify", icon: Shield },
     { key: "moderation", label: "Moderate", icon: Flag },
