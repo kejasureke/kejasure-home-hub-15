@@ -148,7 +148,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
             <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
             <div className="space-y-2 mb-5">
               {[
-                { icon: Plus, label: "Add Service", desc: "List a new service", gradient: "gradient-trust" },
+                { icon: Plus, label: "Add Service", desc: "List a new service", gradient: "gradient-trust", action: () => setShowCRUD(true) },
                 { icon: Zap, label: "Boost Profile", desc: "Appear first in searches", gradient: "gradient-premium" },
                 { icon: Camera, label: "Add Portfolio", desc: "Showcase your work", gradient: "bg-secondary" },
               ].map((a) => (
