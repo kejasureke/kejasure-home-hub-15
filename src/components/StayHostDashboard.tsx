@@ -2,9 +2,10 @@ import { useState } from "react";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
   Calendar, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
-  Home, Star, Clock, CheckCircle2, DollarSign, Bed, Moon as MoonIcon
+  Home, Star, Clock, CheckCircle2, DollarSign, Bed, Moon as MoonIcon, Edit3, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import ListingCRUD from "./ListingCRUD";
 
 interface StayHostDashboardProps {
   onBack: () => void;
