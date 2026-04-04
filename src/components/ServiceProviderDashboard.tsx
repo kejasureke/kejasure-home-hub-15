@@ -42,9 +42,9 @@ const portfolio = [
 ];
 
 const countyStats = [
-  { county: "Nairobi", bookings: 45, revenue: "KES 180K", rating: 4.8 },
-  { county: "Kiambu", bookings: 12, revenue: "KES 48K", rating: 4.7 },
-  { county: "Mombasa", bookings: 10, revenue: "KES 40K", rating: 4.9 },
+  { county: "Nairobi", bookings: 45, inquiries: 128, rating: 4.8 },
+  { county: "Kiambu", bookings: 12, inquiries: 34, rating: 4.7 },
+  { county: "Mombasa", bookings: 10, inquiries: 29, rating: 4.9 },
 ];
 
 type Tab = "overview" | "bookings" | "portfolio" | "billing";
