@@ -79,11 +79,11 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
             <span className="text-2xl font-bold text-foreground">KES {formatPrice(property.price)}</span>
             <span className="text-sm text-muted-foreground">{property.priceUnit}</span>
             {property.rating && (
-              <div className="flex items-center gap-1 ml-auto px-2 py-1 rounded-lg bg-secondary">
+              <button onClick={() => setShowReviews(true)} className="flex items-center gap-1 ml-auto px-2 py-1 rounded-lg bg-secondary active:scale-95 transition-transform">
                 <Star className="w-3.5 h-3.5 fill-gold text-gold" />
                 <span className="text-xs font-semibold">{property.rating}</span>
                 <span className="text-[10px] text-muted-foreground">({property.reviewCount})</span>
-              </div>
+              </button>
             )}
           </div>
           <h1 className="text-lg font-semibold text-foreground mb-2">{property.title}</h1>
