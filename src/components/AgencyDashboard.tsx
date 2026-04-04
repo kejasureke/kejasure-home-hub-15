@@ -48,7 +48,16 @@ type Tab = "overview" | "agents" | "leads" | "billing";
 
 const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
+  const [showPayment, setShowPayment] = useState(false);
   const currentPlan = plans.find((p) => p.current)!;
+
+  const agencyMpesaPlans = plans.map((p) => ({
+    name: p.name,
+    price: p.price,
+    duration: "1 month",
+    features: p.features,
+    popular: p.current,
+  }));
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "overview", label: "Overview" },
@@ -59,6 +68,14 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showPayment && (
+        <MpesaPaymentFlow
+          plans={agencyMpesaPlans}
+          selectedPlanIndex={1}
+          category="Agency Plan"
+          onClose={() => setShowPayment(false)}
+        />
+      )}
       {/* Header */}
       <div className="gradient-trust px-4 pt-5 pb-8">
         <div className="flex items-center gap-3 mb-5">

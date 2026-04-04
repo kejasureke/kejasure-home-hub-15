@@ -51,10 +51,19 @@ type ProviderType = "individual" | "business";
 
 const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
+  const [showPayment, setShowPayment] = useState(false);
   const [providerType] = useState<ProviderType>("individual");
 
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
+
+  const serviceMpesaPlans = [...individualPlans, ...businessPlans].map((p) => ({
+    name: p.name,
+    price: p.price,
+    duration: "1 month",
+    features: p.features,
+    popular: p.current,
+  }));
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "overview", label: "Overview" },
@@ -65,6 +74,14 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showPayment && (
+        <MpesaPaymentFlow
+          plans={serviceMpesaPlans}
+          selectedPlanIndex={1}
+          category="Service Provider Plan"
+          onClose={() => setShowPayment(false)}
+        />
+      )}
       {/* Header */}
       <div className="px-4 pt-5 pb-8" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--trust-light)))" }}>
         <div className="flex items-center gap-3 mb-5">

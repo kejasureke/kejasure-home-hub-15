@@ -52,7 +52,16 @@ type Tab = "overview" | "calendar" | "guests" | "billing";
 
 const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
+  const [showPayment, setShowPayment] = useState(false);
   const currentPlan = plans.find((p) => p.current)!;
+
+  const hostMpesaPlans = plans.map((p) => ({
+    name: p.name,
+    price: p.price,
+    duration: "1 month",
+    features: p.features,
+    popular: p.current,
+  }));
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "overview", label: "Overview" },
@@ -63,6 +72,14 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showPayment && (
+        <MpesaPaymentFlow
+          plans={hostMpesaPlans}
+          selectedPlanIndex={1}
+          category="Stay Host Plan"
+          onClose={() => setShowPayment(false)}
+        />
+      )}
       {/* Header */}
       <div className="gradient-premium px-4 pt-5 pb-8">
         <div className="flex items-center gap-3 mb-5">
