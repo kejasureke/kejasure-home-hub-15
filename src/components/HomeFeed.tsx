@@ -1,6 +1,6 @@
 import { Search, Bell, SlidersHorizontal, GitCompare, Bookmark, BookmarkCheck, ChevronRight, Clock } from "lucide-react";
 import { useState, useMemo } from "react";
-import LocationSelector from "./LocationSelector";
+
 import PropertyCard from "./PropertyCard";
 import ServiceCard from "./ServiceCard";
 import ListingDetail from "./ListingDetail";
@@ -120,31 +120,16 @@ const HomeFeed = () => {
     <div className="pb-24">
       {/* Header */}
       <div className="gradient-trust px-4 pt-5 pb-4">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-xl font-bold text-primary-foreground">KejaSure</h1>
-            <p className="text-xs text-primary-foreground/70">Pata Keja, Be Sure.</p>
-          </div>
+        <div className="flex items-center gap-2 mb-2 justify-end">
+          <button
+            onClick={handleSaveSearch}
+            className="w-10 h-10 rounded-full bg-primary-foreground/15 flex items-center justify-center"
+          >
+            <Bookmark className="w-4 h-4 text-primary-foreground" />
+          </button>
           <button className="relative w-10 h-10 rounded-full bg-primary-foreground/15 flex items-center justify-center">
             <Bell className="w-5 h-5 text-primary-foreground" />
             <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent" />
-          </button>
-        </div>
-
-        {/* Location + Save Search */}
-        <div className="flex items-center gap-2 mb-4">
-          <LocationSelector
-            selectedCounty={county}
-            selectedSubcounty={subcounty}
-            selectedWard={ward}
-            selectedEstate={estate}
-            onSelect={(c, sc, w, e) => { setCounty(c); setSubcounty(sc); setWard(w); setEstate(e); }}
-          />
-          <button
-            onClick={handleSaveSearch}
-            className="w-10 h-10 rounded-xl bg-primary-foreground/15 flex items-center justify-center shrink-0"
-          >
-            <Bookmark className="w-4 h-4 text-primary-foreground" />
           </button>
         </div>
 
@@ -157,8 +142,11 @@ const HomeFeed = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-12 py-3 rounded-xl bg-card text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 card-shadow"
           />
-          <button onClick={() => setShowFilters(true)} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-secondary">
+          <button onClick={() => setShowFilters(true)} className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-secondary relative">
             <SlidersHorizontal className="w-4 h-4 text-foreground" />
+            {(county || filters.bedrooms.length > 0 || filters.amenities.length > 0 || filters.verified || filters.furnished || filters.petFriendly) && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-accent" />
+            )}
           </button>
         </div>
       </div>
@@ -378,6 +366,11 @@ const HomeFeed = () => {
         onClose={() => setShowFilters(false)}
         filters={filters}
         onApply={setFilters}
+        county={county}
+        subcounty={subcounty}
+        ward={ward}
+        estate={estate}
+        onLocationChange={(c, sc, w, e) => { setCounty(c); setSubcounty(sc); setWard(w); setEstate(e); }}
       />
     </div>
   );

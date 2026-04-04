@@ -1,5 +1,6 @@
 import { X, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import LocationSelector from "./LocationSelector";
 
 interface Filters {
   minPrice: number;
@@ -17,6 +18,11 @@ interface AdvancedFiltersProps {
   onClose: () => void;
   filters: Filters;
   onApply: (filters: Filters) => void;
+  county: string;
+  subcounty: string;
+  ward: string;
+  estate: string;
+  onLocationChange: (county: string, subcounty: string, ward: string, estate: string) => void;
 }
 
 const bedroomOptions = [1, 2, 3, 4, 5];
@@ -29,7 +35,7 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const AdvancedFilters = ({ isOpen, onClose, filters, onApply }: AdvancedFiltersProps) => {
+const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange }: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>(filters);
 
   if (!isOpen) return null;
@@ -83,6 +89,18 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply }: AdvancedFiltersP
       </div>
 
       <div className="px-4 py-5 space-y-6 pb-32">
+        {/* Location */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3">Location</h3>
+          <LocationSelector
+            selectedCounty={county}
+            selectedSubcounty={subcounty}
+            selectedWard={ward}
+            selectedEstate={estate}
+            onSelect={(c, sc, w, e) => onLocationChange(c, sc, w, e)}
+          />
+        </div>
+
         {/* Sort */}
         <div>
           <h3 className="text-sm font-semibold mb-3">Sort By</h3>
