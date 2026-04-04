@@ -70,6 +70,7 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showCRUD && <ListingCRUD type="rental" onClose={() => setShowCRUD(false)} />}
       {showPayment && (
         <MpesaPaymentFlow
           plans={agencyMpesaPlans}
