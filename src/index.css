@@ -119,6 +119,9 @@
     @apply backdrop-blur-xl;
     background: hsl(0 0% 100% / 0.85);
   }
+  .dark .glass-surface {
+    background: hsl(150 20% 11% / 0.85);
+  }
   .gradient-trust {
     background: linear-gradient(135deg, hsl(150 60% 26%), hsl(150 60% 18%));
   }
@@ -171,5 +174,8 @@
     @apply px-2 py-0.5 rounded-full text-xs font-semibold;
     background: linear-gradient(135deg, hsl(37 91% 55% / 0.15), hsl(30 85% 48% / 0.15));
     color: hsl(37 80% 38%);
+  }
+  .dark .tier-badge-premium {
+    color: hsl(37 91% 65%);
   }
 }

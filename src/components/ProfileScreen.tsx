@@ -1,11 +1,13 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3 } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import NotificationsScreen from "./NotificationsScreen";
+import { useTheme } from "@/hooks/useTheme";
 
 const ProfileScreen = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   if (showDashboard) {
     return <DashboardScreen onBack={() => setShowDashboard(false)} />;
@@ -22,6 +24,12 @@ const ProfileScreen = () => {
     { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },
     { icon: Settings, label: "Settings", subtitle: "Account preferences" },
     { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact" },
+  ];
+
+  const themeOptions = [
+    { value: "light" as const, icon: Sun, label: "Light" },
+    { value: "dark" as const, icon: Moon, label: "Dark" },
+    { value: "system" as const, icon: Monitor, label: "Auto" },
   ];
 
   return (
@@ -46,6 +54,24 @@ const ProfileScreen = () => {
           <Bell className="w-5 h-5 text-primary" />
           <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-accent border-2 border-card" />
         </button>
+      </div>
+
+      {/* Theme toggle */}
+      <div className="mb-4 p-1 rounded-xl bg-secondary flex gap-1">
+        {themeOptions.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={() => setTheme(opt.value)}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              theme === opt.value
+                ? "bg-card card-shadow text-foreground"
+                : "text-muted-foreground"
+            }`}
+          >
+            <opt.icon className="w-3.5 h-3.5" />
+            {opt.label}
+          </button>
+        ))}
       </div>
 
       {/* Menu */}
