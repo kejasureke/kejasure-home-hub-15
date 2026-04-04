@@ -2,9 +2,10 @@ import { useState } from "react";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
   Upload, UserPlus, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
-  Building2, Target, Clock, CheckCircle2, AlertTriangle
+  Building2, Target, Clock, CheckCircle2, AlertTriangle, Edit3, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import ListingCRUD from "./ListingCRUD";
 
 interface AgencyDashboardProps {
   onBack: () => void;
