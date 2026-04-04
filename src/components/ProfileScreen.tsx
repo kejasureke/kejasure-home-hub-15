@@ -25,7 +25,7 @@ const ProfileScreen = () => {
         <div className="w-16 h-16 rounded-2xl gradient-trust flex items-center justify-center">
           <span className="text-xl font-bold text-primary-foreground">JK</span>
         </div>
-        <div>
+        <div className="flex-1">
           <div className="flex items-center gap-1.5">
             <h2 className="text-lg font-bold">John Kamau</h2>
             <ShieldCheck className="w-4 h-4 text-trust" />
@@ -33,6 +33,10 @@ const ProfileScreen = () => {
           <p className="text-sm text-muted-foreground">+254 712 345 678</p>
           <div className="tier-badge-premium mt-1 inline-block">Premium Member</div>
         </div>
+        <button className="relative w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+          <Bell className="w-5 h-5 text-primary" />
+          <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-accent border-2 border-card" />
+        </button>
       </div>
 
       {/* Menu */}
