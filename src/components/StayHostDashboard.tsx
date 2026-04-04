@@ -136,7 +136,7 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
             <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
             <div className="space-y-2 mb-5">
               {[
-                { icon: Plus, label: "Add New Stay", desc: "List a new short stay", gradient: "gradient-premium" },
+                { icon: Plus, label: "Add New Stay", desc: "List a new short stay", gradient: "gradient-premium", action: () => setShowCRUD(true) },
                 { icon: Zap, label: "Feature Stay", desc: "Boost your listing", gradient: "gradient-trust" },
                 { icon: DollarSign, label: "Set Pricing", desc: "Nightly rates & cleaning fees", gradient: "bg-secondary" },
               ].map((a) => (
