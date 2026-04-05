@@ -1,9 +1,14 @@
-import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
 import ShareListingSheet from "./ShareListingSheet";
 import ReportListingModal from "./ReportListingModal";
 import ReviewRatingFlow from "./ReviewRatingFlow";
+import ScamWarningBadge from "./ScamWarningBadge";
+import PriceAlertButton from "./PriceAlertButton";
+import PriceDropBadge from "./PriceDropBadge";
+import MoveInChecklist from "./MoveInChecklist";
+import { getScamRiskScore } from "@/utils/scamDetection";
 
 interface ListingDetailProps {
   property: Property;
@@ -18,10 +23,13 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
   const [showShare, setShowShare] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
+  const [showMoveIn, setShowMoveIn] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
 
   const formatPrice = (price: number) => new Intl.NumberFormat("en-KE").format(price);
+  const scamRisk = getScamRiskScore(property);
+  const oldPrice = property.priceHistory?.[0]?.price;
 
   const dates = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
@@ -101,6 +109,24 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
               </div>
             )}
           </div>
+
+          {/* Corporate badge */}
+          {property.corporate && (
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-xs font-semibold text-primary mt-2 w-fit">
+              💼 Corporate / Expat Housing
+            </div>
+          )}
+        </div>
+
+        {/* Scam Risk Warning */}
+        <ScamWarningBadge risk={scamRisk} />
+
+        {/* Price Drop + Alert */}
+        <div className="flex items-center gap-3 mb-4">
+          {oldPrice && oldPrice > property.price && (
+            <PriceDropBadge oldPrice={oldPrice} newPrice={property.price} />
+          )}
+          <PriceAlertButton propertyId={property.id} currentPrice={property.price} />
         </div>
 
         {/* Specs */}
@@ -230,6 +256,21 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
           </div>
         )}
 
+        {/* Move-In Checklist CTA */}
+        {property.type === "rental" && (
+          <button
+            onClick={() => setShowMoveIn(true)}
+            className="w-full flex items-center gap-3 p-4 rounded-2xl bg-accent/10 border border-accent/20 mb-4 active:scale-[0.98] transition-transform"
+          >
+            <ClipboardList className="w-6 h-6 text-accent" />
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold">Move-In Checklist</p>
+              <p className="text-[10px] text-muted-foreground">Movers, cleaners, internet & more — all in one place</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
+
         {/* Report */}
         <button
           onClick={() => setShowReport(true)}
@@ -351,6 +392,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
       {showShare && <ShareListingSheet property={property} onClose={() => setShowShare(false)} />}
       {showReport && <ReportListingModal listingTitle={property.title} listingId={property.id} onClose={() => setShowReport(false)} />}
       {showReviews && <ReviewRatingFlow onClose={() => setShowReviews(false)} targetName="Landlord" targetType="landlord" listingTitle={property.title} />}
+      {showMoveIn && <MoveInChecklist property={property} onBack={() => setShowMoveIn(false)} />}
     </div>
   );
 };

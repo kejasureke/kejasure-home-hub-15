@@ -12,7 +12,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 
-const segments = ["Rentals", "Short Stays", "Services"] as const;
+const segments = ["Rentals", "Short Stays", "Corporate", "Services"] as const;
 
 const HomeFeed = () => {
   const [segment, setSegment] = useState<(typeof segments)[number]>("Rentals");
@@ -45,7 +45,10 @@ const HomeFeed = () => {
 
   const filteredProperties = useMemo(() => {
     let result = properties.filter((p) => {
-      const matchType = segment === "Rentals" ? p.type === "rental" : p.type === "shortstay";
+      const matchType = segment === "Rentals" ? (p.type === "rental" && !p.corporate) :
+                        segment === "Short Stays" ? (p.type === "shortstay" && !p.corporate) :
+                        segment === "Corporate" ? !!p.corporate :
+                        true;
       const matchCounty = !county || p.county === county;
       const matchEstate = !estate || p.estate === estate;
       const matchSearch = !searchQuery ||
@@ -384,7 +387,7 @@ const HomeFeed = () => {
             )}
 
             <h2 className="text-base font-semibold">
-              {segment === "Short Stays" ? "All Short Stays" : "All Rentals"}
+              {segment === "Short Stays" ? "All Short Stays" : segment === "Corporate" ? "All Corporate & Expat Listings" : "All Rentals"}
             </h2>
             <div className="space-y-4">
               {filteredProperties.map((p) => (

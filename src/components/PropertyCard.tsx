@@ -1,6 +1,8 @@
 import { Heart, Bed, Bath, MapPin, ShieldCheck, Star, GitCompare, AlertTriangle } from "lucide-react";
 import type { Property } from "@/data/mockData";
-
+import { getScamRiskScore } from "@/utils/scamDetection";
+import ScamWarningBadge from "./ScamWarningBadge";
+import PriceDropBadge from "./PriceDropBadge";
 interface PropertyCardProps {
   property: Property;
   onPress: (id: string) => void;
@@ -12,6 +14,9 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareMode, isComparing, onToggleCompare }: PropertyCardProps) => {
+  const scamRisk = getScamRiskScore(property);
+  const oldPrice = property.priceHistory?.[0]?.price;
+  
   const formatPrice = (price: number) => {
     return price >= 1000 ? `KES ${(price / 1000).toFixed(price % 1000 === 0 ? 0 : 1)}K` : `KES ${price}`;
   };
@@ -57,9 +62,14 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         </div>
 
         {/* Price overlay */}
-        <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-sm shadow-lg">
-          <span className="text-lg font-bold text-gray-900">{formatPrice(property.price)}</span>
-          <span className="text-sm text-gray-600">{property.priceUnit}</span>
+        <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
+          <div className="px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-sm shadow-lg">
+            <span className="text-lg font-bold text-gray-900">{formatPrice(property.price)}</span>
+            <span className="text-sm text-gray-600">{property.priceUnit}</span>
+          </div>
+          {oldPrice && oldPrice > property.price && (
+            <PriceDropBadge oldPrice={oldPrice} newPrice={property.price} compact />
+          )}
         </div>
 
         {/* Rating */}
@@ -75,18 +85,28 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
       <div className="p-3.5">
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="text-sm font-semibold text-foreground leading-tight line-clamp-2">{property.title}</h3>
-          {property.verified ? (
-            <div className="verified-badge shrink-0">
-              <ShieldCheck className="w-3 h-3" />
-              <span>Verified</span>
-            </div>
-          ) : (
-            <div className="shrink-0 flex items-center gap-1 px-2 py-0.5 rounded-full bg-destructive/10 text-[10px] font-medium text-destructive">
-              <AlertTriangle className="w-3 h-3" />
-              <span>Unverified</span>
-            </div>
-          )}
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            {property.verified ? (
+              <div className="verified-badge">
+                <ShieldCheck className="w-3 h-3" />
+                <span>Verified</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-destructive/10 text-[10px] font-medium text-destructive">
+                <AlertTriangle className="w-3 h-3" />
+                <span>Unverified</span>
+              </div>
+            )}
+            <ScamWarningBadge risk={scamRisk} compact />
+          </div>
         </div>
+
+        {/* Corporate badge */}
+        {property.corporate && (
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-[10px] font-semibold text-primary mb-2 w-fit">
+            💼 Corporate / Expat
+          </div>
+        )}
 
         {/* Location */}
         <div className="flex items-center gap-1.5 mb-2.5">
