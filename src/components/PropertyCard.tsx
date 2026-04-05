@@ -71,9 +71,6 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
             <PriceDropBadge oldPrice={oldPrice} newPrice={property.price} compact />
           )}
         </div>
-          <span className="text-lg font-bold text-gray-900">{formatPrice(property.price)}</span>
-          <span className="text-sm text-gray-600">{property.priceUnit}</span>
-        </div>
 
         {/* Rating */}
         {property.rating && (
