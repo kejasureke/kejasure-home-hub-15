@@ -39,6 +39,9 @@ export interface Property {
   reviewCount?: number;
   lat: number;
   lng: number;
+  corporate?: boolean;
+  priceHistory?: { price: number; date: string }[];
+  videoTour?: string;
 }
 
 export interface ServiceProvider {
