@@ -387,7 +387,7 @@ const HomeFeed = () => {
             )}
 
             <h2 className="text-base font-semibold">
-              {segment === "Short Stays" ? "All Short Stays" : "All Rentals"}
+              {segment === "Short Stays" ? "All Short Stays" : segment === "Corporate" ? "All Corporate & Expat Listings" : "All Rentals"}
             </h2>
             <div className="space-y-4">
               {filteredProperties.map((p) => (
