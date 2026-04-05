@@ -109,6 +109,24 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
               </div>
             )}
           </div>
+
+          {/* Corporate badge */}
+          {property.corporate && (
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-xs font-semibold text-primary mt-2 w-fit">
+              💼 Corporate / Expat Housing
+            </div>
+          )}
+        </div>
+
+        {/* Scam Risk Warning */}
+        <ScamWarningBadge risk={scamRisk} />
+
+        {/* Price Drop + Alert */}
+        <div className="flex items-center gap-3 mb-4">
+          {oldPrice && oldPrice > property.price && (
+            <PriceDropBadge oldPrice={oldPrice} newPrice={property.price} />
+          )}
+          <PriceAlertButton propertyId={property.id} currentPrice={property.price} />
         </div>
 
         {/* Specs */}
