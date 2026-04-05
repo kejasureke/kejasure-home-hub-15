@@ -256,6 +256,21 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
           </div>
         )}
 
+        {/* Move-In Checklist CTA */}
+        {property.type === "rental" && (
+          <button
+            onClick={() => setShowMoveIn(true)}
+            className="w-full flex items-center gap-3 p-4 rounded-2xl bg-accent/10 border border-accent/20 mb-4 active:scale-[0.98] transition-transform"
+          >
+            <ClipboardList className="w-6 h-6 text-accent" />
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold">Move-In Checklist</p>
+              <p className="text-[10px] text-muted-foreground">Movers, cleaners, internet & more — all in one place</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
+
         {/* Report */}
         <button
           onClick={() => setShowReport(true)}
