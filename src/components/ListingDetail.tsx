@@ -1,9 +1,14 @@
-import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
 import ShareListingSheet from "./ShareListingSheet";
 import ReportListingModal from "./ReportListingModal";
 import ReviewRatingFlow from "./ReviewRatingFlow";
+import ScamWarningBadge from "./ScamWarningBadge";
+import PriceAlertButton from "./PriceAlertButton";
+import PriceDropBadge from "./PriceDropBadge";
+import MoveInChecklist from "./MoveInChecklist";
+import { getScamRiskScore } from "@/utils/scamDetection";
 
 interface ListingDetailProps {
   property: Property;
@@ -18,10 +23,13 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
   const [showShare, setShowShare] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
+  const [showMoveIn, setShowMoveIn] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
 
   const formatPrice = (price: number) => new Intl.NumberFormat("en-KE").format(price);
+  const scamRisk = getScamRiskScore(property);
+  const oldPrice = property.priceHistory?.[0]?.price;
 
   const dates = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
