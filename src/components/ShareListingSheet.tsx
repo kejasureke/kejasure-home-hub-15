@@ -29,7 +29,7 @@ const ShareListingSheet = ({ property, onClose }: ShareListingSheetProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full bg-card rounded-t-3xl p-6 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-h-[80vh] overflow-y-auto bg-card rounded-t-3xl p-6 animate-slide-up" onClick={(e) => e.stopPropagation()}>
         <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-4" />
         <h3 className="text-lg font-bold mb-1">Share Listing</h3>
         <p className="text-xs text-muted-foreground mb-5 line-clamp-1">{property.title}</p>
@@ -49,7 +49,7 @@ const ShareListingSheet = ({ property, onClose }: ShareListingSheetProps) => {
         </button>
 
         {/* Share options */}
-        <div className="flex justify-around">
+        <div className="flex flex-wrap justify-around gap-3 pb-2">
           {shareOptions.map((opt) => (
             <button
               key={opt.label}
