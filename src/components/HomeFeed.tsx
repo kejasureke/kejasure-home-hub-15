@@ -150,7 +150,7 @@ const HomeFeed = () => {
   };
 
   return (
-    <div className="pb-24">
+    <div className="pb-32">
       {/* Header */}
       <div className="gradient-trust px-4 pt-6 pb-5">
         <div className="relative flex items-center">

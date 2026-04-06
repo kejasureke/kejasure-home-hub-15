@@ -33,7 +33,7 @@ const PriceDropAlertsScreen = ({ onBack, onViewProperty }: PriceDropAlertsScreen
         </div>
       </div>
 
-      <div className="px-4 py-4 space-y-3 pb-24">
+      <div className="px-4 py-4 space-y-3 pb-32">
         {alerts.length === 0 ? (
           <div className="text-center py-16">
             <Bell className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />

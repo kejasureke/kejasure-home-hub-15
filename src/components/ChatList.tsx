@@ -74,7 +74,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   };
 
   return (
-    <div className="pb-24">
+    <div className="pb-32">
       {/* Header */}
       <div className="px-4 pt-6 mb-4">
         <div className="flex items-center justify-between mb-4">
