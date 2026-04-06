@@ -8,6 +8,7 @@ interface Filters {
   bedrooms: number[];
   amenities: string[];
   verified: boolean;
+  smileIdVerified: boolean;
   furnished: boolean;
   petFriendly: boolean;
   sortBy: string;
