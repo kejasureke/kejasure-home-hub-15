@@ -3,6 +3,7 @@ import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, 
 
 interface KYCVerificationFlowProps {
   onClose: () => void;
+  activeRole?: string;
 }
 
 type VerificationType = "individual" | "business";
@@ -11,7 +12,7 @@ type BusinessDocType = "business_cert" | "kra_pin" | "cr12";
 type Step = "type_select" | "doc_select" | "id_upload" | "selfie" | "processing" | "result";
 type VerificationResult = "success" | "failed" | "pending";
 
-const KYCVerificationFlow = ({ onClose }: KYCVerificationFlowProps) => {
+const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerificationFlowProps) => {
   const [step, setStep] = useState<Step>("type_select");
   const [verificationType, setVerificationType] = useState<VerificationType | null>(null);
   const [docType, setDocType] = useState<DocType | BusinessDocType | null>(null);
@@ -35,7 +36,13 @@ const KYCVerificationFlow = ({ onClose }: KYCVerificationFlowProps) => {
   const handleProcessing = () => {
     setStep("processing");
     setTimeout(() => {
-      setResult(Math.random() > 0.2 ? "success" : "failed");
+      const outcome = Math.random() > 0.2 ? "success" : "failed";
+      setResult(outcome);
+      if (outcome === "success") {
+        localStorage.setItem(`kejasure_kyc_status_${activeRole}`, "verified");
+        // Keep legacy key for backward compat
+        localStorage.setItem("kejasure_kyc_status", "verified");
+      }
       setStep("result");
     }, 4000);
   };
