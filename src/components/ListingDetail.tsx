@@ -28,6 +28,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
   const [showMoveIn, setShowMoveIn] = useState(false);
   const [showVideoTour, setShowVideoTour] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
+  const [showSmileIDDetails, setShowSmileIDDetails] = useState(false);
   const [selectedTime, setSelectedTime] = useState("");
 
   const formatPrice = (price: number) => new Intl.NumberFormat("en-KE").format(price);
