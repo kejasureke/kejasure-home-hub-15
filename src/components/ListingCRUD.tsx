@@ -3,6 +3,7 @@ import {
   ArrowLeft, ArrowRight, Camera, Video, X, Check, Zap, MapPin,
   Home, Bed, Bath, DollarSign, FileText, Star, Sparkles, Trash2, Edit3, Image
 } from "lucide-react";
+import AIPhotoVerification from "./AIPhotoVerification";
 import { kenyaCounties } from "@/data/kenyaCounties";
 
 type ListingType = "rental" | "shortstay" | "service";
@@ -514,6 +515,11 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                 </span>
               </button>
             </div>
+
+            {/* AI Photo Verification */}
+            {form.photos.length >= 1 && (
+              <AIPhotoVerification mode="listing" />
+            )}
 
             <div className="p-3 rounded-xl bg-accent/10">
               <p className="text-xs text-muted-foreground">
