@@ -65,7 +65,7 @@ const ProfileScreen = () => {
   if (showHelp) return <HelpSupportScreen onBack={() => setShowHelp(false)} />;
   if (showSavedSearches) return <SavedSearchesScreen onBack={() => setShowSavedSearches(false)} />;
   if (showReviews) return <ReviewRatingFlow onClose={() => setShowReviews(false)} />;
-  if (showSubscription) return <SubscriptionPlans onBack={() => setShowSubscription(false)} />;
+  if (showSubscription) return <SubscriptionPlans onBack={() => setShowSubscription(false)} currentRole={role} />;
   if (showNeighborhood) return <NeighborhoodSafety onBack={() => setShowNeighborhood(false)} />;
   if (showBoost) return <BoostListingFlow onBack={() => setShowBoost(false)} />;
   if (showNotifications) return (
