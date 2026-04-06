@@ -50,7 +50,8 @@ const ProfileScreen = () => {
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();
 
-  const kycStatus = typeof window !== "undefined" ? localStorage.getItem("kejasure_kyc_status") : null;
+  const getKycStatus = (r: string) => typeof window !== "undefined" ? localStorage.getItem(`kejasure_kyc_status_${r}`) : null;
+  const kycStatus = getKycStatus(role);
   const isVerified = kycStatus === "verified";
 
   if (showDashboard) return <DashboardScreen onBack={() => setShowDashboard(false)} />;
@@ -59,7 +60,7 @@ const ProfileScreen = () => {
   if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
   if (showAdmin) return <AdminPanel onBack={() => setShowAdmin(false)} />;
   if (showDispute) return <DisputeFlow onClose={() => setShowDispute(false)} />;
-  if (showKYC) return <KYCVerificationFlow onClose={() => setShowKYC(false)} />;
+  if (showKYC) return <KYCVerificationFlow onClose={() => setShowKYC(false)} activeRole={role} />;
   if (showSettings) return <SettingsScreen onBack={() => setShowSettings(false)} />;
   if (showHelp) return <HelpSupportScreen onBack={() => setShowHelp(false)} />;
   if (showSavedSearches) return <SavedSearchesScreen onBack={() => setShowSavedSearches(false)} />;
@@ -182,16 +183,22 @@ const ProfileScreen = () => {
         <div className="flex gap-1.5">
           {roleConfig.map((r) => {
             const isActive = role === r.id;
+            const roleVerified = getKycStatus(r.id) === "verified";
             return (
               <button
                 key={r.id}
                 onClick={() => setRole(r.id)}
-                className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl transition-all duration-200 ${
+                className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl transition-all duration-200 relative ${
                   isActive
                     ? "gradient-trust text-primary-foreground"
                     : "bg-secondary text-muted-foreground hover:bg-primary/5"
                 }`}
               >
+                {roleVerified && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center border-2 border-background">
+                    <ShieldCheck className="w-2.5 h-2.5 text-primary-foreground" />
+                  </div>
+                )}
                 <r.icon className={`w-4 h-4 ${isActive ? "text-primary-foreground" : ""}`} />
                 <span className="text-[9px] font-semibold leading-tight">{r.label}</span>
               </button>
