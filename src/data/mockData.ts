@@ -42,6 +42,7 @@ export interface Property {
   corporate?: boolean;
   priceHistory?: { price: number; date: string }[];
   videoTour?: string;
+  videoTourRooms?: { label: string; timestamp: number }[];
 }
 
 export interface ServiceProvider {
@@ -97,6 +98,14 @@ export const properties: Property[] = [
     reviewCount: 24,
     lat: -1.2864,
     lng: 36.7834,
+    videoTour: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    videoTourRooms: [
+      { label: "Living Room", timestamp: 0 },
+      { label: "Kitchen", timestamp: 3 },
+      { label: "Bedroom", timestamp: 6 },
+      { label: "Bathroom", timestamp: 9 },
+      { label: "Balcony", timestamp: 12 },
+    ],
   },
   {
     id: "2",
@@ -162,6 +171,12 @@ export const properties: Property[] = [
     reviewCount: 67,
     lat: -1.2650,
     lng: 36.8100,
+    videoTour: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    videoTourRooms: [
+      { label: "Overview", timestamp: 0 },
+      { label: "Kitchenette", timestamp: 4 },
+      { label: "Workspace", timestamp: 8 },
+    ],
   },
   {
     id: "4",
@@ -433,6 +448,13 @@ export const properties: Property[] = [
     lat: -4.3477,
     lng: 39.5882,
     priceHistory: [{ price: 30000, date: "2026-01-01" }, { price: 28000, date: "2026-02-01" }, { price: 25000, date: "2026-03-01" }],
+    videoTour: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+    videoTourRooms: [
+      { label: "Entrance", timestamp: 0 },
+      { label: "Pool Area", timestamp: 3 },
+      { label: "Master Suite", timestamp: 7 },
+      { label: "Beach Access", timestamp: 11 },
+    ],
   },
 ];
 

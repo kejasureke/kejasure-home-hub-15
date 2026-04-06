@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench } from "lucide-react";
+import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench, Sparkles, Building2 } from "lucide-react";
 import { useState, useMemo } from "react";
 
 import PropertyCard from "./PropertyCard";
@@ -6,6 +6,8 @@ import ServiceCard from "./ServiceCard";
 import ListingDetail from "./ListingDetail";
 import AdvancedFilters from "./AdvancedFilters";
 import CompareProperties from "./CompareProperties";
+import AIPropertyMatch from "./AIPropertyMatch";
+import NeighborhoodIntelligence from "./NeighborhoodIntelligence";
 import { properties, serviceProviders } from "@/data/mockData";
 import MapDiscovery from "./MapDiscovery";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -28,6 +30,8 @@ const HomeFeed = () => {
   const [showCompare, setShowCompare] = useState(false);
   const [serviceCategory, setServiceCategory] = useState("All");
   const [showMap, setShowMap] = useState(false);
+  const [showAIMatch, setShowAIMatch] = useState(false);
+  const [showNeighborhood, setShowNeighborhood] = useState(false);
   const [filters, setFilters] = useState({
     minPrice: 0,
     maxPrice: 500000,
@@ -116,6 +120,21 @@ const HomeFeed = () => {
     );
   }
 
+  if (showAIMatch) {
+    return (
+      <AIPropertyMatch
+        onBack={() => setShowAIMatch(false)}
+        onSelectProperty={(id) => { setShowAIMatch(false); handleSelectProperty(id); }}
+      />
+    );
+  }
+
+  if (showNeighborhood) {
+    return (
+      <NeighborhoodIntelligence onBack={() => setShowNeighborhood(false)} />
+    );
+  }
+
   if (showMap) {
     return (
       <MapDiscovery
@@ -150,9 +169,25 @@ const HomeFeed = () => {
             )}
           </button>
         </div>
+
+        {/* Quick Actions */}
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={() => setShowAIMatch(true)}
+            className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-card/20 backdrop-blur-sm active:scale-95 transition-transform"
+          >
+            <Sparkles className="w-4 h-4 text-primary-foreground" />
+            <span className="text-xs font-semibold text-primary-foreground">Keja AI Match</span>
+          </button>
+          <button
+            onClick={() => setShowNeighborhood(true)}
+            className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-card/20 backdrop-blur-sm active:scale-95 transition-transform"
+          >
+            <Building2 className="w-4 h-4 text-primary-foreground" />
+            <span className="text-xs font-semibold text-primary-foreground">Area Intel</span>
+          </button>
+        </div>
       </div>
-
-
 
 
       {/* Segment Tabs */}

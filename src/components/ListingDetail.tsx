@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
 import ShareListingSheet from "./ShareListingSheet";
@@ -8,6 +8,7 @@ import ScamWarningBadge from "./ScamWarningBadge";
 import PriceAlertButton from "./PriceAlertButton";
 import PriceDropBadge from "./PriceDropBadge";
 import MoveInChecklist from "./MoveInChecklist";
+import VideoTourPlayer from "./VideoTourPlayer";
 import { getScamRiskScore } from "@/utils/scamDetection";
 
 interface ListingDetailProps {
@@ -24,6 +25,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
   const [showReport, setShowReport] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [showMoveIn, setShowMoveIn] = useState(false);
+  const [showVideoTour, setShowVideoTour] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
 
@@ -64,9 +66,19 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
           </div>
         </div>
 
-        {/* Image counter */}
-        <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium">
-          {currentImage + 1}/{property.images.length}
+        <div className="absolute bottom-4 right-4 flex gap-2">
+          {property.videoTour && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowVideoTour(true); }}
+              className="px-3 py-1 rounded-full bg-primary/90 text-[10px] font-bold text-primary-foreground flex items-center gap-1"
+            >
+              <Video className="w-3 h-3" />
+              Video Tour
+            </button>
+          )}
+          <div className="px-3 py-1 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium">
+            {currentImage + 1}/{property.images.length}
+          </div>
         </div>
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
@@ -393,6 +405,14 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
       {showReport && <ReportListingModal listingTitle={property.title} listingId={property.id} onClose={() => setShowReport(false)} />}
       {showReviews && <ReviewRatingFlow onClose={() => setShowReviews(false)} targetName="Landlord" targetType="landlord" listingTitle={property.title} />}
       {showMoveIn && <MoveInChecklist property={property} onBack={() => setShowMoveIn(false)} />}
+      {showVideoTour && property.videoTour && (
+        <VideoTourPlayer
+          videoUrl={property.videoTour}
+          title={property.title}
+          onBack={() => setShowVideoTour(false)}
+          rooms={property.videoTourRooms}
+        />
+      )}
     </div>
   );
 };
