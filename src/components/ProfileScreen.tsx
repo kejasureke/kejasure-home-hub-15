@@ -85,7 +85,7 @@ const ProfileScreen = () => {
         return { icon: Building2, label: "Agency Dashboard", subtitle: "Manage agents & listings", action: () => setShowAgency(true) };
       case "stayhost":
         return { icon: Home, label: "Stay Host Dashboard", subtitle: "Manage your stays", action: () => setShowStayHost(true) };
-      case "service":
+      case "serviceprovider":
         return { icon: Wrench, label: "Service Dashboard", subtitle: "Manage your services", action: () => setShowServiceProvider(true) };
       default:
         return { icon: BarChart3, label: "Landlord Dashboard", subtitle: "Manage your listings", action: () => setShowDashboard(true) };
@@ -93,17 +93,12 @@ const ProfileScreen = () => {
   };
 
   const dashboardItem = getDashboardItem();
-  const showBoostOption = role !== "tenant";
+  const showBoostOption = !isTenant;
 
   const menuItems = [
-    { icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action },
-    // Show all dashboards for demo/testing
-    ...(role !== "agency" ? [{ icon: Building2, label: "Agency Dashboard", subtitle: "Multi-agent management", action: () => setShowAgency(true) }] : []),
-    ...(role !== "stayhost" ? [{ icon: Home, label: "Stay Host Dashboard", subtitle: "Short stay management", action: () => setShowStayHost(true) }] : []),
-    ...(role !== "service" ? [{ icon: Wrench, label: "Service Dashboard", subtitle: "Service provider tools", action: () => setShowServiceProvider(true) }] : []),
-    { icon: Shield, label: "Admin Panel", subtitle: "Platform management", action: () => setShowAdmin(true) },
+    ...(!isTenant ? [{ icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action }] : []),
     { icon: Crown, label: "Subscription Plans", subtitle: "Manage your plan", action: () => setShowSubscription(true) },
-    ...(showBoostOption ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
+    ...(!isTenant ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
     { icon: ShieldCheck, label: "Verification", subtitle: isVerified ? "✓ Verified" : "Verify your identity", action: () => setShowKYC(true) },
     { icon: MapPin, label: "Neighborhood Safety", subtitle: "Area scores & insights", action: () => setShowNeighborhood(true) },
     { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
