@@ -1,4 +1,4 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
@@ -18,6 +18,16 @@ import BoostListingFlow from "./BoostListingFlow";
 import { useTheme } from "@/hooks/useTheme";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useUserRole } from "@/hooks/useUserRole";
+import type { UserRole } from "@/components/onboarding/RoleSelection";
+
+const roleConfig: { id: UserRole; icon: any; label: string; short: string }[] = [
+  { id: "tenant", icon: Home, label: "Tenant", short: "🏠" },
+  { id: "landlord", icon: Building2, label: "Landlord", short: "🏢" },
+  { id: "agency", icon: Briefcase, label: "Agency", short: "💼" },
+  { id: "stayhost", icon: Palmtree, label: "Host", short: "🌴" },
+  { id: "serviceprovider", icon: Wrench, label: "Service", short: "🔧" },
+];
 
 const ProfileScreen = () => {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -38,8 +48,8 @@ const ProfileScreen = () => {
   const { theme, setTheme } = useTheme();
   const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
+  const { role, setRole, isTenant } = useUserRole();
 
-  const role = typeof window !== "undefined" ? localStorage.getItem("kejasure_role") : null;
   const kycStatus = typeof window !== "undefined" ? localStorage.getItem("kejasure_kyc_status") : null;
   const isVerified = kycStatus === "verified";
 
