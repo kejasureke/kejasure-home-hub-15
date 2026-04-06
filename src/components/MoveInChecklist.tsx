@@ -91,7 +91,7 @@ const MoveInChecklist = ({ property, onBack }: MoveInChecklistProps) => {
       )}
 
       {/* Checklist items */}
-      <div className="px-4 py-4 space-y-3 pb-24">
+      <div className="px-4 py-4 space-y-3 pb-32">
         {items.map(item => (
           <div key={item.id} className="bg-card rounded-2xl card-shadow overflow-hidden">
             <button

@@ -66,7 +66,7 @@ const Index = () => {
       {activeTab === "home" && <HomeFeed />}
 
       {activeTab === "search" && (
-        <div className="px-4 pt-6 pb-24">
+        <div className="px-4 pt-6 pb-32">
           <h1 className="text-xl font-bold mb-4">Explore</h1>
           <div className="relative mb-6">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -87,7 +87,7 @@ const Index = () => {
       )}
 
       {activeTab === "favorites" && (
-        <div className="px-4 pt-6 pb-24">
+        <div className="px-4 pt-6 pb-32">
           <h1 className="text-xl font-bold mb-4">Saved Properties</h1>
           {favoriteProperties.length > 0 ? (
             <div className="space-y-4">
