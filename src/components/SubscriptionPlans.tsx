@@ -152,7 +152,7 @@ const getPlansForRole = (role: string) => {
     case "landlord": return { plans: landlordPlans, label: "Landlord" };
     case "agency": return { plans: agencyPlans, label: "Agency" };
     case "stayhost": return { plans: stayHostPlans, label: "Stay Host" };
-    case "service": return { plans: serviceProviderPlans, label: "Service Provider" };
+    case "serviceprovider": return { plans: serviceProviderPlans, label: "Service Provider" };
     default: return { plans: tenantPlans, label: "Tenant" };
   }
 };
