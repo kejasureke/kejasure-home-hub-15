@@ -6,10 +6,15 @@ import ChatList from "@/components/ChatList";
 import type { ChatContact } from "@/components/ChatList";
 import ProfileScreen from "@/components/ProfileScreen";
 import NotificationToast from "@/components/NotificationToast";
+import DashboardScreen from "@/components/DashboardScreen";
+import StayHostDashboard from "@/components/StayHostDashboard";
+import AgencyDashboard from "@/components/AgencyDashboard";
+import ServiceProviderDashboard from "@/components/ServiceProviderDashboard";
 import { Heart, Search } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
+import { useUserRole } from "@/hooks/useUserRole";
 import { properties } from "@/data/mockData";
 import PropertyCard from "@/components/PropertyCard";
 
@@ -19,6 +24,7 @@ const Index = () => {
   const [chatContact, setChatContact] = useState<ChatContact | null>(null);
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { unreadCount: storedUnread } = useNotifications();
+  const { role, isTenant } = useUserRole();
   const {
     alerts,
     toast,
@@ -33,7 +39,7 @@ const Index = () => {
   const favoriteProperties = properties.filter((p) => favoriteIds.includes(p.id));
 
   // Badge counts
-  const chatBadge = 2; // simulated unread chats
+  const chatBadge = 2;
   const profileBadge = storedUnread + liveUnread;
 
   if (showChat && chatContact) {
@@ -48,6 +54,22 @@ const Index = () => {
       />
     );
   }
+
+  const renderDashboard = () => {
+    const goHome = () => setActiveTab("home");
+    switch (role) {
+      case "landlord":
+        return <DashboardScreen onBack={goHome} />;
+      case "stayhost":
+        return <StayHostDashboard onBack={goHome} />;
+      case "agency":
+        return <AgencyDashboard onBack={goHome} />;
+      case "serviceprovider":
+        return <ServiceProviderDashboard onBack={goHome} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background max-w-lg mx-auto relative">
@@ -64,6 +86,8 @@ const Index = () => {
       )}
 
       {activeTab === "home" && <HomeFeed />}
+
+      {activeTab === "dashboard" && renderDashboard()}
 
       {activeTab === "search" && (
         <div className="px-4 pt-6 pb-32">
@@ -131,6 +155,7 @@ const Index = () => {
         onTabChange={setActiveTab}
         chatBadge={chatBadge}
         profileBadge={profileBadge}
+        showDashboard={!isTenant}
       />
     </div>
   );

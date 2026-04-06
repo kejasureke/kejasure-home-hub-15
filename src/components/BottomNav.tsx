@@ -1,21 +1,23 @@
-import { Home, Search, MessageCircle, User, Heart } from "lucide-react";
+import { Home, Search, MessageCircle, User, Heart, LayoutDashboard } from "lucide-react";
 
 interface BottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   chatBadge?: number;
   profileBadge?: number;
+  showDashboard?: boolean;
 }
 
-const tabs = [
-  { id: "home", icon: Home, label: "Home" },
-  { id: "search", icon: Search, label: "Search" },
-  { id: "favorites", icon: Heart, label: "Saved" },
-  { id: "chats", icon: MessageCircle, label: "Chats" },
-  { id: "profile", icon: User, label: "Profile" },
-];
+const BottomNav = ({ activeTab, onTabChange, chatBadge = 0, profileBadge = 0, showDashboard = false }: BottomNavProps) => {
+  const tabs = [
+    { id: "home", icon: Home, label: "Home" },
+    ...(showDashboard ? [{ id: "dashboard", icon: LayoutDashboard, label: "Dashboard" }] : []),
+    { id: "search", icon: Search, label: "Search" },
+    { id: "favorites", icon: Heart, label: "Saved" },
+    { id: "chats", icon: MessageCircle, label: "Chats" },
+    { id: "profile", icon: User, label: "Profile" },
+  ];
 
-const BottomNav = ({ activeTab, onTabChange, chatBadge = 0, profileBadge = 0 }: BottomNavProps) => {
   const getBadge = (id: string) => {
     if (id === "chats") return chatBadge;
     if (id === "profile") return profileBadge;
