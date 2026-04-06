@@ -8,6 +8,7 @@ interface Filters {
   bedrooms: number[];
   amenities: string[];
   verified: boolean;
+  smileIdVerified: boolean;
   furnished: boolean;
   petFriendly: boolean;
   sortBy: string;
@@ -59,6 +60,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
     local.minPrice > 0 || local.maxPrice < 500000,
     local.amenities.length > 0,
     local.verified,
+    local.smileIdVerified,
     local.furnished,
     local.petFriendly,
   ].filter(Boolean).length;
@@ -80,7 +82,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
         </h2>
         <button
           onClick={() => {
-            setLocal({ minPrice: 0, maxPrice: 500000, bedrooms: [], amenities: [], verified: false, furnished: false, petFriendly: false, sortBy: "featured" });
+            setLocal({ minPrice: 0, maxPrice: 500000, bedrooms: [], amenities: [], verified: false, smileIdVerified: false, furnished: false, petFriendly: false, sortBy: "featured" });
           }}
           className="text-xs font-medium text-primary"
         >
@@ -175,6 +177,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           <div className="space-y-3">
             {[
               { key: "verified" as const, label: "Verified Only", icon: "✓" },
+              { key: "smileIdVerified" as const, label: "Verified by Smile ID", icon: "😊" },
               { key: "furnished" as const, label: "Furnished", icon: "🏠" },
               { key: "petFriendly" as const, label: "Pet Friendly", icon: "🐾" },
             ].map((toggle) => (

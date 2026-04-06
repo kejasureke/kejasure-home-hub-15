@@ -38,6 +38,7 @@ const HomeFeed = () => {
     bedrooms: [] as number[],
     amenities: [] as string[],
     verified: false,
+    smileIdVerified: false,
     furnished: false,
     petFriendly: false,
     sortBy: "featured",
@@ -63,9 +64,10 @@ const HomeFeed = () => {
       const matchBedrooms = filters.bedrooms.length === 0 || filters.bedrooms.includes(p.bedrooms);
       const matchAmenities = filters.amenities.length === 0 || filters.amenities.every((a) => p.amenities.includes(a));
       const matchVerified = !filters.verified || p.verified;
+      const matchSmileId = !filters.smileIdVerified || p.verified;
       const matchFurnished = !filters.furnished || p.furnished;
       const matchPets = !filters.petFriendly || p.petFriendly;
-      return matchType && matchCounty && matchEstate && matchSearch && matchPrice && matchBedrooms && matchAmenities && matchVerified && matchFurnished && matchPets;
+      return matchType && matchCounty && matchEstate && matchSearch && matchPrice && matchBedrooms && matchAmenities && matchVerified && matchSmileId && matchFurnished && matchPets;
     });
 
     // Sort
