@@ -120,6 +120,21 @@ const HomeFeed = () => {
     );
   }
 
+  if (showAIMatch) {
+    return (
+      <AIPropertyMatch
+        onBack={() => setShowAIMatch(false)}
+        onSelectProperty={(id) => { setShowAIMatch(false); handleSelectProperty(id); }}
+      />
+    );
+  }
+
+  if (showNeighborhood) {
+    return (
+      <NeighborhoodIntelligence onBack={() => setShowNeighborhood(false)} />
+    );
+  }
+
   if (showMap) {
     return (
       <MapDiscovery
