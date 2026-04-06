@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, AlertCircle, User, Building2, Fingerprint, X, ChevronRight } from "lucide-react";
+import AIPhotoVerification from "./AIPhotoVerification";
 
 interface KYCVerificationFlowProps {
   onClose: () => void;
@@ -283,6 +284,11 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 </div>
               ))}
             </div>
+
+            {/* AI Photo Verification */}
+            {selfieCapture === "done" && (
+              <AIPhotoVerification mode="identity" simulateMatch={true} />
+            )}
 
             <button
               onClick={handleProcessing}
