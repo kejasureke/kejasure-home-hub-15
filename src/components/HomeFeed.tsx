@@ -169,9 +169,25 @@ const HomeFeed = () => {
             )}
           </button>
         </div>
+
+        {/* Quick Actions */}
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={() => setShowAIMatch(true)}
+            className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-card/20 backdrop-blur-sm active:scale-95 transition-transform"
+          >
+            <Sparkles className="w-4 h-4 text-primary-foreground" />
+            <span className="text-xs font-semibold text-primary-foreground">Keja AI Match</span>
+          </button>
+          <button
+            onClick={() => setShowNeighborhood(true)}
+            className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-card/20 backdrop-blur-sm active:scale-95 transition-transform"
+          >
+            <Building2 className="w-4 h-4 text-primary-foreground" />
+            <span className="text-xs font-semibold text-primary-foreground">Area Intel</span>
+          </button>
+        </div>
       </div>
-
-
 
 
       {/* Segment Tabs */}
