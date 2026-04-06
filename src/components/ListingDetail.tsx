@@ -218,6 +218,83 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
           </div>
         </div>
 
+        {/* Neighborhood Intelligence Card */}
+        {(() => {
+          const hood = neighborhoodProfiles.find(n => n.estate === property.estate);
+          if (!hood) return null;
+          const formatP = (n: number) => `KES ${new Intl.NumberFormat("en-KE").format(n)}`;
+          const scoreColor = (s: number) => s >= 8 ? "text-primary" : s >= 6 ? "text-accent" : "text-destructive";
+          const scoreBg = (s: number) => s >= 8 ? "bg-primary" : s >= 6 ? "bg-accent" : "bg-destructive";
+          return (
+            <div className="mb-5 p-4 rounded-2xl bg-card card-shadow border border-border">
+              <h2 className="text-base font-semibold mb-1 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-primary" />
+                {hood.estate} Area Intelligence
+              </h2>
+              <p className="text-[10px] text-muted-foreground mb-3">Should I live here?</p>
+
+              {/* Scores row */}
+              <div className="grid grid-cols-4 gap-2 mb-3">
+                {[
+                  { label: "Safety", score: hood.safetyRating },
+                  { label: "Water", score: hood.waterReliability },
+                  { label: "Power", score: hood.electricityReliability },
+                  { label: "Walk", score: hood.walkabilityScore },
+                ].map(s => (
+                  <div key={s.label} className="text-center">
+                    <div className="relative w-10 h-10 mx-auto mb-1">
+                      <svg className="w-10 h-10 -rotate-90" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-secondary" />
+                        <circle cx="18" cy="18" r="15" fill="none" strokeWidth="3" strokeDasharray={`${s.score * 9.42} 94.2`} strokeLinecap="round" className={scoreBg(s.score)} />
+                      </svg>
+                      <span className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${scoreColor(s.score)}`}>{s.score.toFixed(0)}</span>
+                    </div>
+                    <p className="text-[9px] text-muted-foreground">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Quick facts */}
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="px-2.5 py-2 rounded-xl bg-secondary">
+                  <p className="text-[9px] text-muted-foreground">Noise</p>
+                  <p className="text-[11px] font-semibold">{hood.noiseLevel}</p>
+                </div>
+                <div className="px-2.5 py-2 rounded-xl bg-secondary">
+                  <p className="text-[9px] text-muted-foreground">Nightlife</p>
+                  <p className="text-[11px] font-semibold">{hood.nightlife}</p>
+                </div>
+                <div className="px-2.5 py-2 rounded-xl bg-secondary">
+                  <p className="text-[9px] text-muted-foreground">Avg Rent (2BR)</p>
+                  <p className="text-[11px] font-semibold">{formatP(hood.avgRent2BR)}/mo</p>
+                </div>
+                <div className="px-2.5 py-2 rounded-xl bg-secondary">
+                  <p className="text-[9px] text-muted-foreground">Nearest Mall</p>
+                  <p className="text-[11px] font-semibold truncate">{hood.nearestMall}</p>
+                </div>
+              </div>
+
+              {/* Internet & Transport */}
+              <div className="mb-2">
+                <p className="text-[10px] font-semibold text-muted-foreground mb-1">📡 Internet</p>
+                <div className="flex flex-wrap gap-1">
+                  {hood.internetProviders.map(p => (
+                    <span key={p} className="px-2 py-0.5 rounded-full bg-primary/5 text-[9px] font-medium text-primary">{p}</span>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold text-muted-foreground mb-1">🚌 Transport</p>
+                <div className="flex flex-wrap gap-1">
+                  {hood.transportOptions.map(t => (
+                    <span key={t} className="px-2 py-0.5 rounded-full bg-accent/5 text-[9px] font-medium text-accent-foreground">{t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Map placeholder */}
         <div className="mb-5 rounded-2xl bg-secondary h-40 flex items-center justify-center">
           <div className="text-center">
