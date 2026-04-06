@@ -3,6 +3,7 @@ import type { Property } from "@/data/mockData";
 import { getScamRiskScore } from "@/utils/scamDetection";
 import ScamWarningBadge from "./ScamWarningBadge";
 import PriceDropBadge from "./PriceDropBadge";
+import SmileIDBadge from "./SmileIDBadge";
 interface PropertyCardProps {
   property: Property;
   onPress: (id: string) => void;
@@ -135,15 +136,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         {/* Smile ID badge */}
         {property.verified && (
           <div className="flex items-center gap-1.5 mb-2">
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/8 border border-primary/15">
-              <svg viewBox="0 0 20 20" className="w-3 h-3 text-primary" fill="none">
-                <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M6 12.5c0 0 1.5 2.5 4 2.5s4-2.5 4-2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                <circle cx="7.5" cy="9" r="1" fill="currentColor" />
-                <circle cx="12.5" cy="9" r="1" fill="currentColor" />
-              </svg>
-              <span className="text-[9px] font-semibold text-primary">Photos Verified by Smile ID</span>
-            </div>
+            <SmileIDBadge compact propertyId={property.id} imageCount={property.images?.length || 4} />
           </div>
         )}
 
