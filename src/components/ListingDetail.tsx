@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2 } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
