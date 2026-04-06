@@ -1,4 +1,4 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Monitor, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
@@ -18,6 +18,16 @@ import BoostListingFlow from "./BoostListingFlow";
 import { useTheme } from "@/hooks/useTheme";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useUserRole } from "@/hooks/useUserRole";
+import type { UserRole } from "@/components/onboarding/RoleSelection";
+
+const roleConfig: { id: UserRole; icon: any; label: string; short: string }[] = [
+  { id: "tenant", icon: Home, label: "Tenant", short: "🏠" },
+  { id: "landlord", icon: Building2, label: "Landlord", short: "🏢" },
+  { id: "agency", icon: Briefcase, label: "Agency", short: "💼" },
+  { id: "stayhost", icon: Palmtree, label: "Host", short: "🌴" },
+  { id: "serviceprovider", icon: Wrench, label: "Service", short: "🔧" },
+];
 
 const ProfileScreen = () => {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -38,8 +48,8 @@ const ProfileScreen = () => {
   const { theme, setTheme } = useTheme();
   const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
+  const { role, setRole, isTenant } = useUserRole();
 
-  const role = typeof window !== "undefined" ? localStorage.getItem("kejasure_role") : null;
   const kycStatus = typeof window !== "undefined" ? localStorage.getItem("kejasure_kyc_status") : null;
   const isVerified = kycStatus === "verified";
 
@@ -75,7 +85,7 @@ const ProfileScreen = () => {
         return { icon: Building2, label: "Agency Dashboard", subtitle: "Manage agents & listings", action: () => setShowAgency(true) };
       case "stayhost":
         return { icon: Home, label: "Stay Host Dashboard", subtitle: "Manage your stays", action: () => setShowStayHost(true) };
-      case "service":
+      case "serviceprovider":
         return { icon: Wrench, label: "Service Dashboard", subtitle: "Manage your services", action: () => setShowServiceProvider(true) };
       default:
         return { icon: BarChart3, label: "Landlord Dashboard", subtitle: "Manage your listings", action: () => setShowDashboard(true) };
@@ -83,17 +93,12 @@ const ProfileScreen = () => {
   };
 
   const dashboardItem = getDashboardItem();
-  const showBoostOption = role !== "tenant";
+  const showBoostOption = !isTenant;
 
   const menuItems = [
-    { icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action },
-    // Show all dashboards for demo/testing
-    ...(role !== "agency" ? [{ icon: Building2, label: "Agency Dashboard", subtitle: "Multi-agent management", action: () => setShowAgency(true) }] : []),
-    ...(role !== "stayhost" ? [{ icon: Home, label: "Stay Host Dashboard", subtitle: "Short stay management", action: () => setShowStayHost(true) }] : []),
-    ...(role !== "service" ? [{ icon: Wrench, label: "Service Dashboard", subtitle: "Service provider tools", action: () => setShowServiceProvider(true) }] : []),
-    { icon: Shield, label: "Admin Panel", subtitle: "Platform management", action: () => setShowAdmin(true) },
+    ...(!isTenant ? [{ icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action }] : []),
     { icon: Crown, label: "Subscription Plans", subtitle: "Manage your plan", action: () => setShowSubscription(true) },
-    ...(showBoostOption ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
+    ...(!isTenant ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
     { icon: ShieldCheck, label: "Verification", subtitle: isVerified ? "✓ Verified" : "Verify your identity", action: () => setShowKYC(true) },
     { icon: MapPin, label: "Neighborhood Safety", subtitle: "Area scores & insights", action: () => setShowNeighborhood(true) },
     { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
@@ -143,7 +148,7 @@ const ProfileScreen = () => {
       </div>
 
       {/* Theme toggle */}
-      <div className="mb-4 p-1 rounded-xl bg-secondary flex gap-1">
+      <div className="mb-3 p-1 rounded-xl bg-secondary flex gap-1">
         {themeOptions.map((opt) => (
           <button
             key={opt.value}
@@ -158,6 +163,41 @@ const ProfileScreen = () => {
             {opt.label}
           </button>
         ))}
+      </div>
+
+      {/* Role Mode Switcher */}
+      <div className="mb-4 p-4 rounded-2xl bg-card card-shadow">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-xs font-semibold text-foreground">Active Mode</p>
+            <p className="text-[10px] text-muted-foreground">Switch how you use KejaSure</p>
+          </div>
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10">
+            <RefreshCw className="w-3 h-3 text-primary" />
+            <span className="text-[10px] font-semibold text-primary">
+              {roleConfig.find(r => r.id === role)?.label}
+            </span>
+          </div>
+        </div>
+        <div className="flex gap-1.5">
+          {roleConfig.map((r) => {
+            const isActive = role === r.id;
+            return (
+              <button
+                key={r.id}
+                onClick={() => setRole(r.id)}
+                className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl transition-all duration-200 ${
+                  isActive
+                    ? "gradient-trust text-primary-foreground"
+                    : "bg-secondary text-muted-foreground hover:bg-primary/5"
+                }`}
+              >
+                <r.icon className={`w-4 h-4 ${isActive ? "text-primary-foreground" : ""}`} />
+                <span className="text-[9px] font-semibold leading-tight">{r.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Menu */}
