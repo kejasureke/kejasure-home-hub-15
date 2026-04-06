@@ -25,6 +25,12 @@ const FacebookIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const InstagramIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+  </svg>
+);
+
 const ShareListingSheet = ({ property, onClose }: ShareListingSheetProps) => {
   const [copied, setCopied] = useState(false);
 
@@ -38,17 +44,21 @@ const ShareListingSheet = ({ property, onClose }: ShareListingSheetProps) => {
   };
 
   const shareOptions = [
-    { label: "WhatsApp", icon: <WhatsAppIcon className="w-5 h-5" />, color: "bg-[#25D366]", textColor: "text-white", action: () => window.open(`https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`) },
-    { label: "X", icon: <XIcon className="w-4 h-4" />, color: "bg-black dark:bg-white", textColor: "text-white dark:text-black", action: () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`) },
-    { label: "Facebook", icon: <FacebookIcon className="w-5 h-5" />, color: "bg-[#1877F2]", textColor: "text-white", action: () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`) },
-    { label: "SMS", icon: <MessageSquare className="w-4.5 h-4.5" />, color: "bg-primary", textColor: "text-primary-foreground", action: () => window.open(`sms:?body=${encodeURIComponent(shareText + " " + shareUrl)}`) },
-    { label: "Email", icon: <Mail className="w-4.5 h-4.5" />, color: "bg-muted-foreground", textColor: "text-white", action: () => window.open(`mailto:?subject=${encodeURIComponent(property.title)}&body=${encodeURIComponent(shareText + "\n\n" + shareUrl)}`) },
+    { label: "WhatsApp", icon: <WhatsAppIcon className="w-[18px] h-[18px]" />, color: "bg-[#25D366]", action: () => window.open(`https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`) },
+    { label: "X", icon: <XIcon className="w-[16px] h-[16px]" />, color: "bg-black dark:bg-white dark:text-black", action: () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`) },
+    { label: "Facebook", icon: <FacebookIcon className="w-[18px] h-[18px]" />, color: "bg-[#1877F2]", action: () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`) },
+    { label: "Instagram", icon: <InstagramIcon className="w-[18px] h-[18px]" />, color: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", action: () => window.open(`https://www.instagram.com/`) },
+    { label: "SMS", icon: <MessageSquare className="w-[16px] h-[16px]" />, color: "bg-primary text-primary-foreground", action: () => window.open(`sms:?body=${encodeURIComponent(shareText + " " + shareUrl)}`) },
+    { label: "Email", icon: <Mail className="w-[16px] h-[16px]" />, color: "bg-muted-foreground", action: () => window.open(`mailto:?subject=${encodeURIComponent(property.title)}&body=${encodeURIComponent(shareText + "\n\n" + shareUrl)}`) },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
-        <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-4" />
+    <div className="fixed inset-0 z-[60] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="w-full bg-card rounded-t-3xl p-5 pb-24 animate-slide-up"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-3" />
         <h3 className="text-base font-bold mb-1">Share Listing</h3>
         <p className="text-xs text-muted-foreground mb-4 line-clamp-1">{property.title}</p>
 
@@ -67,14 +77,14 @@ const ShareListingSheet = ({ property, onClose }: ShareListingSheetProps) => {
         </button>
 
         {/* Share options - single row */}
-        <div className="flex justify-between px-2">
+        <div className="flex justify-between">
           {shareOptions.map((opt) => (
             <button
               key={opt.label}
               onClick={opt.action}
-              className="flex flex-col items-center gap-1.5"
+              className="flex flex-col items-center gap-1"
             >
-              <div className={`w-10 h-10 rounded-full ${opt.color} ${opt.textColor} flex items-center justify-center`}>
+              <div className={`w-10 h-10 rounded-full ${opt.color} text-white flex items-center justify-center`}>
                 {opt.icon}
               </div>
               <span className="text-[9px] font-medium text-muted-foreground">{opt.label}</span>
