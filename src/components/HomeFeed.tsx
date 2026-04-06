@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench } from "lucide-react";
+import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench, Sparkles, Building2 } from "lucide-react";
 import { useState, useMemo } from "react";
 
 import PropertyCard from "./PropertyCard";
@@ -6,6 +6,8 @@ import ServiceCard from "./ServiceCard";
 import ListingDetail from "./ListingDetail";
 import AdvancedFilters from "./AdvancedFilters";
 import CompareProperties from "./CompareProperties";
+import AIPropertyMatch from "./AIPropertyMatch";
+import NeighborhoodIntelligence from "./NeighborhoodIntelligence";
 import { properties, serviceProviders } from "@/data/mockData";
 import MapDiscovery from "./MapDiscovery";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -28,6 +30,8 @@ const HomeFeed = () => {
   const [showCompare, setShowCompare] = useState(false);
   const [serviceCategory, setServiceCategory] = useState("All");
   const [showMap, setShowMap] = useState(false);
+  const [showAIMatch, setShowAIMatch] = useState(false);
+  const [showNeighborhood, setShowNeighborhood] = useState(false);
   const [filters, setFilters] = useState({
     minPrice: 0,
     maxPrice: 500000,
