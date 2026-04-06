@@ -148,7 +148,7 @@ const ProfileScreen = () => {
       </div>
 
       {/* Theme toggle */}
-      <div className="mb-4 p-1 rounded-xl bg-secondary flex gap-1">
+      <div className="mb-3 p-1 rounded-xl bg-secondary flex gap-1">
         {themeOptions.map((opt) => (
           <button
             key={opt.value}
@@ -163,6 +163,41 @@ const ProfileScreen = () => {
             {opt.label}
           </button>
         ))}
+      </div>
+
+      {/* Role Mode Switcher */}
+      <div className="mb-4 p-4 rounded-2xl bg-card card-shadow">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-xs font-semibold text-foreground">Active Mode</p>
+            <p className="text-[10px] text-muted-foreground">Switch how you use KejaSure</p>
+          </div>
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10">
+            <RefreshCw className="w-3 h-3 text-primary" />
+            <span className="text-[10px] font-semibold text-primary">
+              {roleConfig.find(r => r.id === role)?.label}
+            </span>
+          </div>
+        </div>
+        <div className="flex gap-1.5">
+          {roleConfig.map((r) => {
+            const isActive = role === r.id;
+            return (
+              <button
+                key={r.id}
+                onClick={() => setRole(r.id)}
+                className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl transition-all duration-200 ${
+                  isActive
+                    ? "gradient-trust text-primary-foreground"
+                    : "bg-secondary text-muted-foreground hover:bg-primary/5"
+                }`}
+              >
+                <r.icon className={`w-4 h-4 ${isActive ? "text-primary-foreground" : ""}`} />
+                <span className="text-[9px] font-semibold leading-tight">{r.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Menu */}
