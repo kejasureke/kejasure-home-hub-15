@@ -30,7 +30,6 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
   const [showVideoTour, setShowVideoTour] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
 
   const formatPrice = (price: number) => new Intl.NumberFormat("en-KE").format(price);
   const scamRisk = getScamRiskScore(property);
