@@ -56,6 +56,7 @@ const SwipeableAlertItem = ({ alert, onTap, onDismiss, indented }: Props) => {
 
   const handleTouchEnd = () => {
     if (offsetX < THRESHOLD) {
+      if (navigator.vibrate) navigator.vibrate(30);
       setRemoving(true);
       setTimeout(() => onDismiss?.(alert.id), 250);
     } else {

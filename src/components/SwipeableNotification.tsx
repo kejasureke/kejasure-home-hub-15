@@ -47,6 +47,7 @@ const SwipeableNotification = ({ notification, onDismiss, onTap }: Props) => {
 
   const handleTouchEnd = () => {
     if (offsetX < THRESHOLD) {
+      if (navigator.vibrate) navigator.vibrate(30);
       setRemoving(true);
       setTimeout(() => onDismiss(notification.id), 250);
     } else {
