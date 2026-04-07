@@ -8,8 +8,8 @@ interface HelpSupportScreenProps {
 type Tab = "faq" | "contact" | "feedback";
 
 const faqs = [
-  { q: "How do I unlock a landlord's contact?", a: "Tap the phone or chat icon on any listing, select a plan (KES 50 for 24hrs, KES 100 for 3 days, or KES 200 for 7 days), and pay via M-Pesa. Contacts are revealed instantly after payment." },
-  { q: "Is KejaSure free to use?", a: "Browsing listings is completely free. You only pay when you want to unlock a landlord's contact details or access premium features." },
+  { q: "How do I get a landlord's contact?", a: "Subscribe to a plan, then book a viewing on the listing you're interested in. Once the landlord accepts your booking, their contact details (phone & chat) are revealed to you automatically." },
+  { q: "Is KejaSure free to use?", a: "Browsing listings is completely free. You need a subscription to book viewings, and landlord contacts are shared once your booking is accepted." },
   { q: "How does identity verification work?", a: "Go to your Profile → Verification, upload your National ID or passport, take a selfie, and our Smile ID system will verify your identity within seconds." },
   { q: "Can I list my property on KejaSure?", a: "Yes! Select the 'Landlord' role during signup, verify your identity, and start adding your properties with photos, pricing, and amenities." },
   { q: "How do I report a fake listing?", a: "Tap the flag icon on any listing detail page and select the reason for reporting. Our team reviews all reports within 24 hours." },
