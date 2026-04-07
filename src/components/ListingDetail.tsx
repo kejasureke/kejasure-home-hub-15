@@ -29,24 +29,11 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
   const [showReviews, setShowReviews] = useState(false);
   const [showMoveIn, setShowMoveIn] = useState(false);
   const [showVideoTour, setShowVideoTour] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
 
   const formatPrice = (price: number) => new Intl.NumberFormat("en-KE").format(price);
   const scamRisk = getScamRiskScore(property);
   const oldPrice = property.priceHistory?.[0]?.price;
 
-  const dates = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    return {
-      label: i === 0 ? "Today" : i === 1 ? "Tomorrow" : d.toLocaleDateString("en-KE", { weekday: "short" }),
-      date: d.toLocaleDateString("en-KE", { month: "short", day: "numeric" }),
-      value: d.toISOString().split("T")[0],
-    };
-  });
-
-  const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"];
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
