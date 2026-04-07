@@ -2,6 +2,7 @@ import { ArrowLeft, Bell, MessageCircle, Calendar, Home, TrendingDown, ShieldChe
 import { useNotifications } from "@/hooks/useNotifications";
 import type { InAppAlert } from "@/hooks/useInAppNotifications";
 import SwipeableNotification from "./SwipeableNotification";
+import SwipeableAlertItem from "./SwipeableAlertItem";
 import { useState, useMemo } from "react";
 
 interface NotificationsScreenProps {
@@ -9,6 +10,7 @@ interface NotificationsScreenProps {
   liveAlerts?: InAppAlert[];
   onMarkAlertRead?: (id: string) => void;
   onMarkAllAlertsRead?: () => void;
+  onDismissAlert?: (id: string) => void;
   soundEnabled?: boolean;
   onToggleSound?: () => void;
 }
