@@ -260,7 +260,7 @@ const NotificationsScreen = ({
                         key={alert.id}
                         alert={alert}
                         onTap={(id) => onMarkAlertRead?.(id)}
-                        onDismiss={(id) => onDismissAlert?.(id)}
+                        onDismiss={handleDismissAlert}
                         indented
                       />
                     ))}
