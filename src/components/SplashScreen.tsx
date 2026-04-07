@@ -128,7 +128,7 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
           Pata Keja, Be Sure.
         </p>
         <p
-          className={`mt-1 text-xs font-medium tracking-widest uppercase ${subtitleColor}`}
+          className={`mt-1 text-xs font-medium tracking-widest ${subtitleColor}`}
           style={{
             opacity: phase >= 5 ? 1 : 0,
             transform: phase >= 5 ? "translateY(0)" : "translateY(6px)",
