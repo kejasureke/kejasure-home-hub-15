@@ -1,9 +1,9 @@
-import { ArrowLeft, Bell, MessageCircle, Calendar, Home, TrendingDown, ShieldCheck, Volume2, VolumeX, Clock, ChevronRight, ChevronDown, Trash2 } from "lucide-react";
+import { ArrowLeft, Bell, MessageCircle, Calendar, Home, TrendingDown, ShieldCheck, Volume2, VolumeX, Clock, ChevronRight, ChevronDown, Trash2, Undo2 } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { InAppAlert } from "@/hooks/useInAppNotifications";
 import SwipeableNotification from "./SwipeableNotification";
 import SwipeableAlertItem from "./SwipeableAlertItem";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 
 interface NotificationsScreenProps {
   onBack: () => void;
@@ -11,6 +11,7 @@ interface NotificationsScreenProps {
   onMarkAlertRead?: (id: string) => void;
   onMarkAllAlertsRead?: () => void;
   onDismissAlert?: (id: string) => void;
+  onRestoreAlert?: (alert: InAppAlert) => void;
   soundEnabled?: boolean;
   onToggleSound?: () => void;
 }
@@ -58,12 +59,46 @@ const NotificationsScreen = ({
   onMarkAlertRead,
   onMarkAllAlertsRead,
   onDismissAlert,
+  onRestoreAlert,
   soundEnabled = true,
   onToggleSound,
 }: NotificationsScreenProps) => {
   const { notifications, unreadCount, markRead, markAllRead, dismiss } = useNotifications();
   const [filter, setFilter] = useState<(typeof categoryFilters)[number]>("All");
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [undoItem, setUndoItem] = useState<{ alert: InAppAlert; source: "live" | "stored" } | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearUndo = useCallback(() => {
+    setUndoItem(null);
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+  }, []);
+
+  const handleDismissAlert = useCallback((id: string) => {
+    const alert = liveAlerts.find((a) => a.id === id);
+    if (alert) {
+      setUndoItem({ alert, source: "live" });
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = setTimeout(() => setUndoItem(null), 5000);
+    }
+    onDismissAlert?.(id);
+  }, [liveAlerts, onDismissAlert]);
+
+  const handleDismissStored = useCallback((id: string) => {
+    // Stored notifications don't support restore, just dismiss
+    dismiss(id);
+  }, [dismiss]);
+
+  const handleUndo = useCallback(() => {
+    if (undoItem?.source === "live" && onRestoreAlert) {
+      onRestoreAlert(undoItem.alert);
+    }
+    clearUndo();
+  }, [undoItem, onRestoreAlert, clearUndo]);
+
+  useEffect(() => {
+    return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); };
+  }, []);
 
   const totalUnread = unreadCount + liveAlerts.filter((a) => !a.read).length;
 
@@ -225,7 +260,7 @@ const NotificationsScreen = ({
                         key={alert.id}
                         alert={alert}
                         onTap={(id) => onMarkAlertRead?.(id)}
-                        onDismiss={(id) => onDismissAlert?.(id)}
+                        onDismiss={handleDismissAlert}
                         indented
                       />
                     ))}
@@ -259,6 +294,23 @@ const NotificationsScreen = ({
             <p className="text-[10px] text-muted-foreground/40">Swipe left to dismiss</p>
           </div>
         </>
+      )}
+
+      {/* Undo snackbar */}
+      {undoItem && (
+        <div className="fixed bottom-24 left-4 right-4 z-50 max-w-lg mx-auto animate-in slide-in-from-bottom-4 fade-in duration-200">
+          <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-foreground text-background shadow-lg">
+            <Trash2 className="w-4 h-4 shrink-0 opacity-70" />
+            <p className="text-sm flex-1 truncate">Notification dismissed</p>
+            <button
+              onClick={handleUndo}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background/15 text-sm font-semibold active:scale-95 transition-transform"
+            >
+              <Undo2 className="w-3.5 h-3.5" />
+              Undo
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

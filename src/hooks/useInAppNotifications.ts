@@ -106,6 +106,14 @@ export const useInAppNotifications = () => {
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   }, []);
 
+  const restoreAlert = useCallback((alert: InAppAlert) => {
+    setAlerts((prev) => {
+      if (prev.some((a) => a.id === alert.id)) return prev;
+      const inserted = [...prev, alert].sort((a, b) => b.timestamp - a.timestamp);
+      return inserted;
+    });
+  }, []);
+
   return {
     alerts,
     toast,
@@ -117,5 +125,6 @@ export const useInAppNotifications = () => {
     toggleSound,
     pushAlert: createAndShow,
     dismissAlert,
+    restoreAlert,
   };
 };

@@ -46,7 +46,7 @@ const ProfileScreen = () => {
   const [showNeighborhood, setShowNeighborhood] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound, dismissAlert } = useInAppNotifications();
+  const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound, dismissAlert, restoreAlert } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();
 
@@ -75,6 +75,7 @@ const ProfileScreen = () => {
       onMarkAlertRead={markAlertRead}
       onMarkAllAlertsRead={markAllAlertsRead}
       onDismissAlert={dismissAlert}
+      onRestoreAlert={restoreAlert}
       soundEnabled={soundEnabled}
       onToggleSound={toggleSound}
     />
