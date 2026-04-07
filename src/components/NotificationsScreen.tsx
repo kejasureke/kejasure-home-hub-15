@@ -185,40 +185,70 @@ const NotificationsScreen = ({
         </div>
       ) : (
         <>
-          {/* Live alerts section */}
-          {filteredAlerts.length > 0 && (
+          {/* Live alerts section — grouped by type */}
+          {groupedAlerts.length > 0 && (
             <div className="px-4 pt-4">
               <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                 Live Updates
               </h2>
-              {filteredAlerts.map((alert) => {
-                const Icon = alertIconMap[alert.type] || Bell;
+              {groupedAlerts.map(([type, alerts]) => {
+                const GroupIcon = alertIconMap[type] || Bell;
+                const unreadInGroup = alerts.filter((a) => !a.read).length;
+                const isCollapsed = collapsedGroups.has(type);
+
                 return (
-                  <button
-                    key={alert.id}
-                    onClick={() => onMarkAlertRead?.(alert.id)}
-                    className={`w-full flex items-start gap-3 p-3.5 rounded-2xl mb-2 text-left transition-colors ${
-                      alert.read ? "bg-card" : "bg-primary/5 border border-primary/10"
-                    }`}
-                  >
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${alertColorMap[alert.type]}`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className={`text-sm font-semibold line-clamp-1 ${!alert.read ? "text-foreground" : "text-foreground/80"}`}>
-                          {alert.title}
-                        </p>
-                        {!alert.read && <div className="w-2 h-2 rounded-full bg-accent shrink-0" />}
+                  <div key={type} className="mb-3">
+                    {/* Group header */}
+                    <button
+                      onClick={() => toggleGroup(type)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-card card-shadow mb-1.5"
+                    >
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${alertColorMap[type]}`}>
+                        <GroupIcon className="w-4 h-4" />
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{alert.body}</p>
-                      <div className="flex items-center gap-1 mt-1.5">
-                        <Clock className="w-3 h-3 text-muted-foreground/60" />
-                        <span className="text-[10px] text-muted-foreground/60">{timeAgo(alert.timestamp)}</span>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0 mt-1" />
-                  </button>
+                      <span className="text-sm font-semibold flex-1 text-left">{alertTypeLabel[type] || type}</span>
+                      {unreadInGroup > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                          {unreadInGroup}
+                        </span>
+                      )}
+                      <span className="text-[10px] text-muted-foreground">{alerts.length}</span>
+                      <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isCollapsed ? "-rotate-90" : ""}`} />
+                    </button>
+
+                    {/* Group items */}
+                    {!isCollapsed && alerts.map((alert) => {
+                      const Icon = alertIconMap[alert.type] || Bell;
+                      return (
+                        <button
+                          key={alert.id}
+                          onClick={() => onMarkAlertRead?.(alert.id)}
+                          className={`w-full flex items-start gap-3 p-3.5 rounded-2xl mb-1.5 ml-3 text-left transition-colors ${
+                            alert.read ? "bg-card" : "bg-primary/5 border border-primary/10"
+                          }`}
+                          style={{ width: "calc(100% - 12px)" }}
+                        >
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${alertColorMap[alert.type]}`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className={`text-sm font-semibold line-clamp-1 ${!alert.read ? "text-foreground" : "text-foreground/80"}`}>
+                                {alert.title}
+                              </p>
+                              {!alert.read && <div className="w-2 h-2 rounded-full bg-accent shrink-0" />}
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{alert.body}</p>
+                            <div className="flex items-center gap-1 mt-1.5">
+                              <Clock className="w-3 h-3 text-muted-foreground/60" />
+                              <span className="text-[10px] text-muted-foreground/60">{timeAgo(alert.timestamp)}</span>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0 mt-1" />
+                        </button>
+                      );
+                    })}
+                  </div>
                 );
               })}
             </div>
