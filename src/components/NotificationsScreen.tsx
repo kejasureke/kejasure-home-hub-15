@@ -1,9 +1,9 @@
-import { ArrowLeft, Bell, MessageCircle, Calendar, Home, TrendingDown, ShieldCheck, Volume2, VolumeX, Clock, ChevronRight, ChevronDown, Trash2 } from "lucide-react";
+import { ArrowLeft, Bell, MessageCircle, Calendar, Home, TrendingDown, ShieldCheck, Volume2, VolumeX, Clock, ChevronRight, ChevronDown, Trash2, Undo2 } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { InAppAlert } from "@/hooks/useInAppNotifications";
 import SwipeableNotification from "./SwipeableNotification";
 import SwipeableAlertItem from "./SwipeableAlertItem";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 
 interface NotificationsScreenProps {
   onBack: () => void;
@@ -11,6 +11,7 @@ interface NotificationsScreenProps {
   onMarkAlertRead?: (id: string) => void;
   onMarkAllAlertsRead?: () => void;
   onDismissAlert?: (id: string) => void;
+  onRestoreAlert?: (alert: InAppAlert) => void;
   soundEnabled?: boolean;
   onToggleSound?: () => void;
 }
@@ -58,12 +59,46 @@ const NotificationsScreen = ({
   onMarkAlertRead,
   onMarkAllAlertsRead,
   onDismissAlert,
+  onRestoreAlert,
   soundEnabled = true,
   onToggleSound,
 }: NotificationsScreenProps) => {
   const { notifications, unreadCount, markRead, markAllRead, dismiss } = useNotifications();
   const [filter, setFilter] = useState<(typeof categoryFilters)[number]>("All");
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [undoItem, setUndoItem] = useState<{ alert: InAppAlert; source: "live" | "stored" } | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearUndo = useCallback(() => {
+    setUndoItem(null);
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+  }, []);
+
+  const handleDismissAlert = useCallback((id: string) => {
+    const alert = liveAlerts.find((a) => a.id === id);
+    if (alert) {
+      setUndoItem({ alert, source: "live" });
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = setTimeout(() => setUndoItem(null), 5000);
+    }
+    onDismissAlert?.(id);
+  }, [liveAlerts, onDismissAlert]);
+
+  const handleDismissStored = useCallback((id: string) => {
+    // Stored notifications don't support restore, just dismiss
+    dismiss(id);
+  }, [dismiss]);
+
+  const handleUndo = useCallback(() => {
+    if (undoItem?.source === "live" && onRestoreAlert) {
+      onRestoreAlert(undoItem.alert);
+    }
+    clearUndo();
+  }, [undoItem, onRestoreAlert, clearUndo]);
+
+  useEffect(() => {
+    return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); };
+  }, []);
 
   const totalUnread = unreadCount + liveAlerts.filter((a) => !a.read).length;
 
