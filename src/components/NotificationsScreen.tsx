@@ -57,6 +57,7 @@ const NotificationsScreen = ({
   liveAlerts = [],
   onMarkAlertRead,
   onMarkAllAlertsRead,
+  onDismissAlert,
   soundEnabled = true,
   onToggleSound,
 }: NotificationsScreenProps) => {
