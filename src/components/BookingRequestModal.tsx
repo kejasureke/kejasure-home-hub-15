@@ -1,6 +1,7 @@
 import { X, Calendar, Clock, MapPin, CheckCircle2, Loader2, Phone, MessageCircle, ShieldCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Property } from "@/data/mockData";
+import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 
 interface BookingRequestModalProps {
   property: Property;
@@ -27,16 +28,23 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
     };
   });
 
+  const isShortStay = property.type === "shortstay";
+  const title = isShortStay ? "Book Your Stay" : "Request a Viewing";
+
   // Simulate landlord acceptance after a delay
   useEffect(() => {
     if (step === "pending") {
-      const timer = setTimeout(() => setStep("accepted"), 3500);
+      const timer = setTimeout(() => {
+        setStep("accepted");
+        pushGlobalAlert({
+          type: "booking",
+          title: `${isShortStay ? "Booking" : "Viewing"} Accepted! 🎉`,
+          body: `Your ${isShortStay ? "booking" : "viewing"} for ${property.title} has been confirmed.`,
+        });
+      }, 3500);
       return () => clearTimeout(timer);
     }
-  }, [step]);
-
-  const isShortStay = property.type === "shortstay";
-  const title = isShortStay ? "Book Your Stay" : "Request a Viewing";
+  }, [step, isShortStay, property.title]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
