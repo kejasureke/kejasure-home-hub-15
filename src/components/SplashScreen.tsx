@@ -128,11 +128,12 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
           Pata Keja, Be Sure.
         </p>
         <p
-          className={`mt-1 text-xs font-medium tracking-widest ${subtitleColor}`}
+          className={`mt-3 text-sm font-medium tracking-wide ${subtitleColor}`}
           style={{
             opacity: phase >= 5 ? 1 : 0,
             transform: phase >= 5 ? "translateY(0)" : "translateY(6px)",
             transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
+            letterSpacing: "0.08em",
           }}
         >
           Kenya's Trusted Rental Marketplace
