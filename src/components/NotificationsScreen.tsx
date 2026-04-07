@@ -295,6 +295,23 @@ const NotificationsScreen = ({
           </div>
         </>
       )}
+
+      {/* Undo snackbar */}
+      {undoItem && (
+        <div className="fixed bottom-24 left-4 right-4 z-50 max-w-lg mx-auto animate-in slide-in-from-bottom-4 fade-in duration-200">
+          <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-foreground text-background shadow-lg">
+            <Trash2 className="w-4 h-4 shrink-0 opacity-70" />
+            <p className="text-sm flex-1 truncate">Notification dismissed</p>
+            <button
+              onClick={handleUndo}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background/15 text-sm font-semibold active:scale-95 transition-transform"
+            >
+              <Undo2 className="w-3.5 h-3.5" />
+              Undo
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
