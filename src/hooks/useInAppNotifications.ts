@@ -85,6 +85,19 @@ export const useInAppNotifications = () => {
 
   const toggleSound = useCallback(() => setSoundEnabled((p) => !p), []);
 
+  const pushAlert = useCallback((template: Omit<InAppAlert, "id" | "timestamp" | "read">) => {
+    const newAlert: InAppAlert = {
+      ...template,
+      id: `alert_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      timestamp: Date.now(),
+      read: false,
+    };
+    setAlerts((prev) => [newAlert, ...prev]);
+    setToast(newAlert);
+    if (soundEnabled) playAlertSound();
+    setTimeout(() => setToast(null), 4000);
+  }, [soundEnabled]);
+
   return {
     alerts,
     toast,
@@ -94,5 +107,6 @@ export const useInAppNotifications = () => {
     markAllAlertsRead,
     dismissToast,
     toggleSound,
+    pushAlert,
   };
 };
