@@ -1,8 +1,8 @@
-import { ArrowLeft, Bell, MessageCircle, Calendar, Home, TrendingDown, ShieldCheck, Volume2, VolumeX, Clock, ChevronRight, Trash2 } from "lucide-react";
+import { ArrowLeft, Bell, MessageCircle, Calendar, Home, TrendingDown, ShieldCheck, Volume2, VolumeX, Clock, ChevronRight, ChevronDown, Trash2 } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { InAppAlert } from "@/hooks/useInAppNotifications";
 import SwipeableNotification from "./SwipeableNotification";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface NotificationsScreenProps {
   onBack: () => void;
@@ -14,6 +14,15 @@ interface NotificationsScreenProps {
 }
 
 const categoryFilters = ["All", "Messages", "Bookings", "Listings", "Price", "Verified"] as const;
+
+const alertTypeLabel: Record<string, string> = {
+  message: "Messages",
+  booking: "Bookings",
+  listing: "Listings",
+  price: "Price Alerts",
+  verified: "Verified",
+  system: "System",
+};
 
 const alertIconMap: Record<string, typeof Bell> = {
   message: MessageCircle,
@@ -51,6 +60,7 @@ const NotificationsScreen = ({
 }: NotificationsScreenProps) => {
   const { notifications, unreadCount, markRead, markAllRead, dismiss } = useNotifications();
   const [filter, setFilter] = useState<(typeof categoryFilters)[number]>("All");
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   const totalUnread = unreadCount + liveAlerts.filter((a) => !a.read).length;
 
