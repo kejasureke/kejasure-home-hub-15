@@ -75,6 +75,7 @@ const ProfileScreen = () => {
       onMarkAlertRead={markAlertRead}
       onMarkAllAlertsRead={markAllAlertsRead}
       onDismissAlert={dismissAlert}
+      onRestoreAlert={restoreAlert}
       soundEnabled={soundEnabled}
       onToggleSound={toggleSound}
     />
