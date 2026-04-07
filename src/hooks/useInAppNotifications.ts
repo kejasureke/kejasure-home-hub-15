@@ -9,7 +9,14 @@ export interface InAppAlert {
   read: boolean;
 }
 
-const ALERT_SOUND_URL = "data:audio/wav;base64,UklGRl9vT19teleVBmb3JtYXQAAQABACDdAABAdQAAAgAQAGRhdGEDb...";
+// Global event bus for pushing alerts from any component
+type AlertTemplate = Omit<InAppAlert, "id" | "timestamp" | "read">;
+type AlertListener = (template: AlertTemplate) => void;
+const listeners = new Set<AlertListener>();
+
+export function pushGlobalAlert(template: AlertTemplate) {
+  listeners.forEach((fn) => fn(template));
+}
 
 // Simple beep using Web Audio API
 function playAlertSound() {
@@ -28,7 +35,7 @@ function playAlertSound() {
   } catch {}
 }
 
-const SIMULATED_ALERTS: Omit<InAppAlert, "id" | "timestamp" | "read">[] = [
+const SIMULATED_ALERTS: AlertTemplate[] = [
   { type: "message", title: "New message from Jane Wanjiku", body: "Hi! Is the 2BR in Kilimani still available?" },
   { type: "booking", title: "Viewing confirmed", body: "Your viewing for Modern 3BR is set for tomorrow 10 AM." },
   { type: "listing", title: "New listing matches your search", body: "Furnished studio in Westlands at KES 35,000/mo just listed." },
@@ -43,25 +50,36 @@ export const useInAppNotifications = () => {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const indexRef = useRef(0);
+  const soundRef = useRef(soundEnabled);
+  soundRef.current = soundEnabled;
+
+  const createAndShow = useCallback((template: AlertTemplate) => {
+    const newAlert: InAppAlert = {
+      ...template,
+      id: `alert_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      timestamp: Date.now(),
+      read: false,
+    };
+    setAlerts((prev) => [newAlert, ...prev]);
+    setToast(newAlert);
+    if (soundRef.current) playAlertSound();
+    setTimeout(() => setToast(null), 4000);
+  }, []);
+
+  // Subscribe to global alert bus
+  useEffect(() => {
+    listeners.add(createAndShow);
+    return () => { listeners.delete(createAndShow); };
+  }, [createAndShow]);
 
   // Simulate receiving notifications periodically
   useEffect(() => {
     const scheduleNext = () => {
-      const delay = 15000 + Math.random() * 30000; // 15-45s
+      const delay = 15000 + Math.random() * 30000;
       timerRef.current = setTimeout(() => {
         const template = SIMULATED_ALERTS[indexRef.current % SIMULATED_ALERTS.length];
         indexRef.current++;
-        const newAlert: InAppAlert = {
-          ...template,
-          id: `alert_${Date.now()}`,
-          timestamp: Date.now(),
-          read: false,
-        };
-        setAlerts((prev) => [newAlert, ...prev]);
-        setToast(newAlert);
-        if (soundEnabled) playAlertSound();
-        // Auto-dismiss toast after 4s
-        setTimeout(() => setToast(null), 4000);
+        createAndShow(template);
         scheduleNext();
       }, delay);
     };
@@ -69,7 +87,7 @@ export const useInAppNotifications = () => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [soundEnabled]);
+  }, [createAndShow]);
 
   const unreadCount = alerts.filter((a) => !a.read).length;
 
@@ -82,21 +100,7 @@ export const useInAppNotifications = () => {
   }, []);
 
   const dismissToast = useCallback(() => setToast(null), []);
-
   const toggleSound = useCallback(() => setSoundEnabled((p) => !p), []);
-
-  const pushAlert = useCallback((template: Omit<InAppAlert, "id" | "timestamp" | "read">) => {
-    const newAlert: InAppAlert = {
-      ...template,
-      id: `alert_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-      timestamp: Date.now(),
-      read: false,
-    };
-    setAlerts((prev) => [newAlert, ...prev]);
-    setToast(newAlert);
-    if (soundEnabled) playAlertSound();
-    setTimeout(() => setToast(null), 4000);
-  }, [soundEnabled]);
 
   return {
     alerts,
@@ -107,6 +111,6 @@ export const useInAppNotifications = () => {
     markAllAlertsRead,
     dismissToast,
     toggleSound,
-    pushAlert,
+    pushAlert: createAndShow,
   };
 };
