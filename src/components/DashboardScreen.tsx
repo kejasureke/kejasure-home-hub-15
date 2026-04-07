@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft, Edit3, Trash2, CheckCircle2, X, Clock, MapPin } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import ListingCRUD from "./ListingCRUD";
+import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 
 interface DashboardScreenProps {
   onBack: () => void;
@@ -52,6 +53,18 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
 
   const handleBookingAction = (id: string, action: "accepted" | "declined") => {
     setBookingRequests(prev => prev.map(b => b.id === id ? { ...b, status: action } : b));
+    const booking = bookingRequests.find(b => b.id === id);
+    if (booking) {
+      pushGlobalAlert({
+        type: "booking",
+        title: action === "accepted"
+          ? `Viewing accepted for ${booking.tenantName}`
+          : `Viewing declined for ${booking.tenantName}`,
+        body: action === "accepted"
+          ? `${booking.property} on ${booking.date} at ${booking.time} — contact shared with tenant.`
+          : `${booking.property} viewing request on ${booking.date} has been declined.`,
+      });
+    }
   };
 
   const pendingCount = bookingRequests.filter(b => b.status === "pending").length;
