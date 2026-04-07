@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft, Edit3, Trash2 } from "lucide-react";
+import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft, Edit3, Trash2, CheckCircle2, X, Clock, MapPin } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import ListingCRUD from "./ListingCRUD";
 
@@ -20,16 +20,41 @@ const landlordPlans = [
   { name: "Premium", price: 2000, duration: "1 month", features: ["Unlimited listings", "Featured badge", "County heatmaps", "Priority support"] },
 ];
 
+interface BookingRequest {
+  id: string;
+  tenantName: string;
+  tenantAvatar: string;
+  property: string;
+  date: string;
+  time: string;
+  note?: string;
+  status: "pending" | "accepted" | "declined";
+  requestedAt: string;
+}
+
+const initialBookingRequests: BookingRequest[] = [
+  { id: "b1", tenantName: "Mary Wanjiku", tenantAvatar: "MW", property: "3BR Kilimani", date: "Apr 8", time: "10:00 AM", note: "I'd like to see the master bedroom and parking", status: "pending", requestedAt: "5 mins ago" },
+  { id: "b2", tenantName: "David Ochieng", tenantAvatar: "DO", property: "2BR Westlands", date: "Apr 9", time: "2:00 PM", status: "pending", requestedAt: "1 hr ago" },
+  { id: "b3", tenantName: "Sarah Njeri", tenantAvatar: "SN", property: "Studio Westlands", date: "Apr 7", time: "11:00 AM", note: "Coming with my partner", status: "accepted", requestedAt: "Yesterday" },
+];
+
 const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
   const [showPayment, setShowPayment] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
+  const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>(initialBookingRequests);
 
   const myListings = [
     { title: "3BR Kilimani", views: 847, leads: 23, status: "active" },
     { title: "2BR Westlands", views: 612, leads: 18, status: "active" },
     { title: "Studio Westlands", views: 1203, leads: 45, status: "active" },
   ];
+
+  const handleBookingAction = (id: string, action: "accepted" | "declined") => {
+    setBookingRequests(prev => prev.map(b => b.id === id ? { ...b, status: action } : b));
+  };
+
+  const pendingCount = bookingRequests.filter(b => b.status === "pending").length;
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
@@ -76,6 +101,69 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
               </div>
               <p className="text-xl font-bold text-foreground">{stat.value}</p>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Booking Requests */}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-semibold flex items-center gap-2">
+            Booking Requests
+            {pendingCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                {pendingCount} new
+              </span>
+            )}
+          </h3>
+        </div>
+        <div className="space-y-3 mb-6">
+          {bookingRequests.map((req) => (
+            <div key={req.id} className={`p-4 rounded-2xl bg-card card-shadow border ${
+              req.status === "pending" ? "border-primary/20" : req.status === "accepted" ? "border-trust/20" : "border-border"
+            }`}>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-xs font-bold">
+                  {req.tenantAvatar}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold">{req.tenantName}</p>
+                  <p className="text-xs text-muted-foreground">{req.property} · {req.requestedAt}</p>
+                </div>
+                {req.status === "pending" && (
+                  <span className="px-2 py-0.5 rounded-full bg-accent/10 text-[10px] font-semibold text-accent-foreground">Pending</span>
+                )}
+                {req.status === "accepted" && (
+                  <span className="px-2 py-0.5 rounded-full bg-trust/10 text-[10px] font-semibold text-trust">Accepted</span>
+                )}
+                {req.status === "declined" && (
+                  <span className="px-2 py-0.5 rounded-full bg-destructive/10 text-[10px] font-semibold text-destructive">Declined</span>
+                )}
+              </div>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
+                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{req.date}</span>
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{req.time}</span>
+              </div>
+              {req.note && (
+                <p className="text-xs text-muted-foreground bg-secondary rounded-lg px-3 py-2 mb-3">"{req.note}"</p>
+              )}
+              {req.status === "pending" && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleBookingAction(req.id, "accepted")}
+                    className="flex-1 py-2.5 rounded-xl gradient-trust text-xs font-semibold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => handleBookingAction(req.id, "declined")}
+                    className="flex-1 py-2.5 rounded-xl bg-secondary text-xs font-semibold text-secondary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    Decline
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
