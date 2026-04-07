@@ -2,6 +2,7 @@ import { ArrowLeft, Bell, MessageCircle, Calendar, Home, TrendingDown, ShieldChe
 import { useNotifications } from "@/hooks/useNotifications";
 import type { InAppAlert } from "@/hooks/useInAppNotifications";
 import SwipeableNotification from "./SwipeableNotification";
+import SwipeableAlertItem from "./SwipeableAlertItem";
 import { useState, useMemo } from "react";
 
 interface NotificationsScreenProps {
@@ -9,6 +10,7 @@ interface NotificationsScreenProps {
   liveAlerts?: InAppAlert[];
   onMarkAlertRead?: (id: string) => void;
   onMarkAllAlertsRead?: () => void;
+  onDismissAlert?: (id: string) => void;
   soundEnabled?: boolean;
   onToggleSound?: () => void;
 }
@@ -55,6 +57,7 @@ const NotificationsScreen = ({
   liveAlerts = [],
   onMarkAlertRead,
   onMarkAllAlertsRead,
+  onDismissAlert,
   soundEnabled = true,
   onToggleSound,
 }: NotificationsScreenProps) => {
@@ -217,37 +220,15 @@ const NotificationsScreen = ({
                     </button>
 
                     {/* Group items */}
-                    {!isCollapsed && alerts.map((alert) => {
-                      const Icon = alertIconMap[alert.type] || Bell;
-                      return (
-                        <button
-                          key={alert.id}
-                          onClick={() => onMarkAlertRead?.(alert.id)}
-                          className={`w-full flex items-start gap-3 p-3.5 rounded-2xl mb-1.5 ml-3 text-left transition-colors ${
-                            alert.read ? "bg-card" : "bg-primary/5 border border-primary/10"
-                          }`}
-                          style={{ width: "calc(100% - 12px)" }}
-                        >
-                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${alertColorMap[alert.type]}`}>
-                            <Icon className="w-4 h-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className={`text-sm font-semibold line-clamp-1 ${!alert.read ? "text-foreground" : "text-foreground/80"}`}>
-                                {alert.title}
-                              </p>
-                              {!alert.read && <div className="w-2 h-2 rounded-full bg-accent shrink-0" />}
-                            </div>
-                            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{alert.body}</p>
-                            <div className="flex items-center gap-1 mt-1.5">
-                              <Clock className="w-3 h-3 text-muted-foreground/60" />
-                              <span className="text-[10px] text-muted-foreground/60">{timeAgo(alert.timestamp)}</span>
-                            </div>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0 mt-1" />
-                        </button>
-                      );
-                    })}
+                    {!isCollapsed && alerts.map((alert) => (
+                      <SwipeableAlertItem
+                        key={alert.id}
+                        alert={alert}
+                        onTap={(id) => onMarkAlertRead?.(id)}
+                        onDismiss={(id) => onDismissAlert?.(id)}
+                        indented
+                      />
+                    ))}
                   </div>
                 );
               })}

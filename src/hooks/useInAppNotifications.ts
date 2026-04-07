@@ -102,6 +102,10 @@ export const useInAppNotifications = () => {
   const dismissToast = useCallback(() => setToast(null), []);
   const toggleSound = useCallback(() => setSoundEnabled((p) => !p), []);
 
+  const dismissAlert = useCallback((id: string) => {
+    setAlerts((prev) => prev.filter((a) => a.id !== id));
+  }, []);
+
   return {
     alerts,
     toast,
@@ -112,5 +116,6 @@ export const useInAppNotifications = () => {
     dismissToast,
     toggleSound,
     pushAlert: createAndShow,
+    dismissAlert,
   };
 };
