@@ -85,6 +85,27 @@ const NotificationsScreen = ({
       ? liveAlerts
       : liveAlerts.filter((a) => a.type === filterType(filter));
 
+  // Group alerts by type
+  const groupedAlerts = useMemo(() => {
+    const groups: Record<string, InAppAlert[]> = {};
+    filteredAlerts.forEach((a) => {
+      if (!groups[a.type]) groups[a.type] = [];
+      groups[a.type].push(a);
+    });
+    // Sort groups: most recent first
+    return Object.entries(groups).sort(
+      ([, a], [, b]) => Math.max(...b.map((x) => x.timestamp)) - Math.max(...a.map((x) => x.timestamp))
+    );
+  }, [filteredAlerts]);
+
+  const toggleGroup = (type: string) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      next.has(type) ? next.delete(type) : next.add(type);
+      return next;
+    });
+  };
+
   const todayNotifs = filteredNotifications.filter(
     (n) => !n.time.includes("Yesterday") && !n.time.includes("days")
   );
