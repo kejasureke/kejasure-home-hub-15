@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2 } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2, Lock } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
@@ -11,6 +11,7 @@ import PriceDropBadge from "./PriceDropBadge";
 import MoveInChecklist from "./MoveInChecklist";
 import VideoTourPlayer from "./VideoTourPlayer";
 import SmileIDBadge from "./SmileIDBadge";
+import BookingRequestModal from "./BookingRequestModal";
 import { getScamRiskScore } from "@/utils/scamDetection";
 
 interface ListingDetailProps {
@@ -379,112 +380,41 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
         </button>
       </div>
 
-      {/* Bottom CTA — Direct contact (no paywall) */}
+      {/* Bottom CTA — Book first, contacts after acceptance */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
         <div className="flex gap-3 max-w-lg mx-auto">
           <button
             onClick={() => setShowBooking(true)}
             className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98]"
           >
-            {property.type === "shortstay" ? "Book Stay" : "Schedule Viewing"}
+            {property.type === "shortstay" ? "Book Stay" : "Request Viewing"}
           </button>
-          <a
-            href="tel:+254712345678"
-            className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
-          >
-            <Phone className="w-4 h-4" />
-            Call
-          </a>
           <button
-            className="py-3.5 px-5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground transition-all active:scale-[0.98] flex items-center gap-1.5"
+            className="py-3.5 px-5 rounded-xl bg-muted text-sm font-semibold text-muted-foreground flex items-center gap-1.5 cursor-not-allowed"
+            title="Contact available after booking is accepted"
           >
-            <MessageCircle className="w-4 h-4" />
+            <Lock className="w-3.5 h-3.5" />
+            Call
+          </button>
+          <button
+            className="py-3.5 px-5 rounded-xl bg-muted text-sm font-semibold text-muted-foreground flex items-center gap-1.5 cursor-not-allowed"
+            title="Contact available after booking is accepted"
+          >
+            <Lock className="w-3.5 h-3.5" />
             Chat
           </button>
         </div>
+        <p className="text-[10px] text-muted-foreground text-center mt-2">
+          📋 Contacts are shared once your booking is accepted
+        </p>
       </div>
 
-      {/* Booking Bottom Sheet */}
+      {/* Booking Request Modal */}
       {showBooking && (
-        <div className="fixed inset-0 z-50 flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowBooking(false)}>
-          <div className="w-full max-h-[85vh] bg-card rounded-t-3xl overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-card z-10 p-6 pb-3">
-              <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-4" />
-              <h3 className="text-lg font-bold">
-                {property.type === "shortstay" ? "Book Your Stay" : "Schedule a Viewing"}
-              </h3>
-            </div>
-            <div className="px-6 pb-6 space-y-5">
-              <div>
-                <h4 className="text-sm font-semibold mb-3">Select Date</h4>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-                  {dates.map((d) => (
-                    <button
-                      key={d.value}
-                      onClick={() => setSelectedDate(d.value)}
-                      className={`shrink-0 w-16 py-3 rounded-xl text-center transition-colors ${
-                        selectedDate === d.value ? "gradient-trust text-primary-foreground" : "bg-secondary"
-                      }`}
-                    >
-                      <p className="text-[10px] font-medium">{d.label}</p>
-                      <p className="text-xs font-semibold mt-0.5">{d.date}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-semibold mb-3">Select Time</h4>
-                <div className="grid grid-cols-3 gap-2">
-                  {timeSlots.map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setSelectedTime(t)}
-                      className={`py-2.5 rounded-xl text-xs font-medium transition-colors ${
-                        selectedTime === t ? "gradient-trust text-primary-foreground" : "bg-secondary"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {selectedDate && selectedTime && (
-                <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20 animate-fade-in">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-4 h-4 text-trust" />
-                    <span className="text-sm font-semibold text-trust">Booking Summary</span>
-                  </div>
-                  <div className="space-y-1 text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Property</span>
-                      <span className="font-medium">{property.title}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Date</span>
-                      <span className="font-medium">{dates.find((d) => d.value === selectedDate)?.date}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Time</span>
-                      <span className="font-medium">{selectedTime}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <button
-                className={`w-full py-4 rounded-xl text-sm font-bold active:scale-[0.98] transition-transform ${
-                  selectedDate && selectedTime
-                    ? "gradient-trust text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {selectedDate && selectedTime ? "Confirm Booking" : "Select date & time"}
-              </button>
-            </div>
-          </div>
-        </div>
+        <BookingRequestModal
+          property={property}
+          onClose={() => setShowBooking(false)}
+        />
       )}
 
       {showShare && <ShareListingSheet property={property} onClose={() => setShowShare(false)} />}
