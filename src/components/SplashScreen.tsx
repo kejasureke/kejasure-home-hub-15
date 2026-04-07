@@ -117,7 +117,7 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
 
         {/* Slogan — phase 5 */}
         <p
-          className="mt-2 text-lg font-medium"
+          className="mt-3 text-xl font-semibold italic tracking-tight"
           style={{
             color: "hsl(37 91% 55%)",
             opacity: phase >= 5 ? 1 : 0,
