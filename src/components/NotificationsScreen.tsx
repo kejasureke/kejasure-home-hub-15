@@ -68,21 +68,46 @@ const NotificationsScreen = ({
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const [undoItem, setUndoItem] = useState<{ alert: InAppAlert; source: "live" | "stored" } | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [undoProgress, setUndoProgress] = useState(100);
+  const undoAnimRef = useRef<number | null>(null);
+  const undoStartRef = useRef<number>(0);
+  const UNDO_DURATION = 5000;
+
+  const stopUndoAnim = useCallback(() => {
+    if (undoAnimRef.current) cancelAnimationFrame(undoAnimRef.current);
+  }, []);
+
+  const startUndoAnim = useCallback(() => {
+    undoStartRef.current = Date.now();
+    setUndoProgress(100);
+    const tick = () => {
+      const elapsed = Date.now() - undoStartRef.current;
+      const remaining = Math.max(0, 100 - (elapsed / UNDO_DURATION) * 100);
+      setUndoProgress(remaining);
+      if (remaining > 0) {
+        undoAnimRef.current = requestAnimationFrame(tick);
+      }
+    };
+    undoAnimRef.current = requestAnimationFrame(tick);
+  }, [UNDO_DURATION]);
 
   const clearUndo = useCallback(() => {
     setUndoItem(null);
     if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-  }, []);
+    stopUndoAnim();
+  }, [stopUndoAnim]);
 
   const handleDismissAlert = useCallback((id: string) => {
     const alert = liveAlerts.find((a) => a.id === id);
     if (alert) {
       setUndoItem({ alert, source: "live" });
       if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-      undoTimerRef.current = setTimeout(() => setUndoItem(null), 5000);
+      stopUndoAnim();
+      undoTimerRef.current = setTimeout(() => setUndoItem(null), UNDO_DURATION);
+      startUndoAnim();
     }
     onDismissAlert?.(id);
-  }, [liveAlerts, onDismissAlert]);
+  }, [liveAlerts, onDismissAlert, stopUndoAnim, startUndoAnim, UNDO_DURATION]);
 
   const handleDismissStored = useCallback((id: string) => {
     // Stored notifications don't support restore, just dismiss
@@ -97,8 +122,11 @@ const NotificationsScreen = ({
   }, [undoItem, onRestoreAlert, clearUndo]);
 
   useEffect(() => {
-    return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); };
-  }, []);
+    return () => {
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+      stopUndoAnim();
+    };
+  }, [stopUndoAnim]);
 
   const totalUnread = unreadCount + liveAlerts.filter((a) => !a.read).length;
 
@@ -299,16 +327,24 @@ const NotificationsScreen = ({
       {/* Undo snackbar */}
       {undoItem && (
         <div className="fixed bottom-24 left-4 right-4 z-50 max-w-lg mx-auto animate-in slide-in-from-bottom-4 fade-in duration-200">
-          <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-foreground text-background shadow-lg">
-            <Trash2 className="w-4 h-4 shrink-0 opacity-70" />
-            <p className="text-sm flex-1 truncate">Notification dismissed</p>
-            <button
-              onClick={handleUndo}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background/15 text-sm font-semibold active:scale-95 transition-transform"
-            >
-              <Undo2 className="w-3.5 h-3.5" />
-              Undo
-            </button>
+          <div className="rounded-2xl bg-foreground text-background shadow-lg overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-3.5">
+              <Trash2 className="w-4 h-4 shrink-0 opacity-70" />
+              <p className="text-sm flex-1 truncate">Notification dismissed</p>
+              <button
+                onClick={handleUndo}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background/15 text-sm font-semibold active:scale-95 transition-transform"
+              >
+                <Undo2 className="w-3.5 h-3.5" />
+                Undo
+              </button>
+            </div>
+            <div className="h-1 w-full bg-background/10">
+              <div
+                className="h-full bg-primary transition-none"
+                style={{ width: `${undoProgress}%` }}
+              />
+            </div>
           </div>
         </div>
       )}
