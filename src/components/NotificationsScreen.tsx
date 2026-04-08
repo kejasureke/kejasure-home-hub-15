@@ -73,20 +73,41 @@ const NotificationsScreen = ({
   const undoStartRef = useRef<number>(0);
   const UNDO_DURATION = 5000;
 
+  const stopUndoAnim = useCallback(() => {
+    if (undoAnimRef.current) cancelAnimationFrame(undoAnimRef.current);
+  }, []);
+
+  const startUndoAnim = useCallback(() => {
+    undoStartRef.current = Date.now();
+    setUndoProgress(100);
+    const tick = () => {
+      const elapsed = Date.now() - undoStartRef.current;
+      const remaining = Math.max(0, 100 - (elapsed / UNDO_DURATION) * 100);
+      setUndoProgress(remaining);
+      if (remaining > 0) {
+        undoAnimRef.current = requestAnimationFrame(tick);
+      }
+    };
+    undoAnimRef.current = requestAnimationFrame(tick);
+  }, [UNDO_DURATION]);
+
   const clearUndo = useCallback(() => {
     setUndoItem(null);
     if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-  }, []);
+    stopUndoAnim();
+  }, [stopUndoAnim]);
 
   const handleDismissAlert = useCallback((id: string) => {
     const alert = liveAlerts.find((a) => a.id === id);
     if (alert) {
       setUndoItem({ alert, source: "live" });
       if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-      undoTimerRef.current = setTimeout(() => setUndoItem(null), 5000);
+      stopUndoAnim();
+      undoTimerRef.current = setTimeout(() => setUndoItem(null), UNDO_DURATION);
+      startUndoAnim();
     }
     onDismissAlert?.(id);
-  }, [liveAlerts, onDismissAlert]);
+  }, [liveAlerts, onDismissAlert, stopUndoAnim, startUndoAnim, UNDO_DURATION]);
 
   const handleDismissStored = useCallback((id: string) => {
     // Stored notifications don't support restore, just dismiss
