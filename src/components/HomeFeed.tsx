@@ -94,11 +94,6 @@ const HomeFeed = () => {
     setSelectedProperty(id);
   };
 
-  const toggleCompare = (id: string) => {
-    setCompareIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length < 3 ? [...prev, id] : prev
-    );
-  };
 
   const property = selectedProperty ? properties.find((p) => p.id === selectedProperty) : null;
 
