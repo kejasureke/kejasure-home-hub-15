@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, MapPin, Navigation, Star, Bed, ShieldCheck, Wrench, Home, ChevronRight } from "lucide-react";
+import { useState, useCallback } from "react";
+import { ArrowLeft, MapPin, Navigation, Star, Bed, ShieldCheck, Wrench, Home, ChevronRight, Plus, Minus } from "lucide-react";
 import { properties, serviceProviders, type Property, type ServiceProvider } from "@/data/mockData";
 
 interface MapDiscoveryProps {
@@ -12,12 +12,16 @@ const CENTER = { lat: -1.2864, lng: 36.8172 };
 const MAP_W = 390;
 const MAP_H = 420;
 
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 3;
+const ZOOM_STEP = 0.25;
+
 // Convert lat/lng to pixel position on mock map
-const toPixel = (lat: number, lng: number) => {
-  const scale = 3500;
-  const x = (lng - CENTER.lng) * scale + MAP_W / 2;
-  const y = (CENTER.lat - lat) * scale + MAP_H / 2;
-  return { x: Math.max(12, Math.min(MAP_W - 12, x)), y: Math.max(12, Math.min(MAP_H - 12, y)) };
+const toPixel = (lat: number, lng: number, zoom: number, panX: number, panY: number) => {
+  const scale = 3500 * zoom;
+  const x = (lng - CENTER.lng) * scale + MAP_W / 2 + panX;
+  const y = (CENTER.lat - lat) * scale + MAP_H / 2 + panY;
+  return { x, y };
 };
 
 type PinType = "rental" | "shortstay" | "service";
@@ -36,11 +40,37 @@ interface Pin {
 const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [selectedPin, setSelectedPin] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "rentals" | "shortstays" | "services">("all");
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+
+  const handleZoomIn = useCallback(() => setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP)), []);
+  const handleZoomOut = useCallback(() => setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP)), []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setDragging(true);
+      setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      setPanStart(pan);
+    }
+  }, [pan]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (dragging && e.touches.length === 1) {
+      const dx = e.touches[0].clientX - dragStart.x;
+      const dy = e.touches[0].clientY - dragStart.y;
+      setPan({ x: panStart.x + dx, y: panStart.y + dy });
+    }
+  }, [dragging, dragStart, panStart]);
+
+  const handleTouchEnd = useCallback(() => setDragging(false), []);
 
   const propertyPins: Pin[] = properties
     .filter((p) => p.county === "Nairobi")
     .map((p) => {
-      const pos = toPixel(p.lat, p.lng);
+      const pos = toPixel(p.lat, p.lng, zoom, pan.x, pan.y);
       return {
         id: p.id,
         type: p.type === "rental" ? "rental" : "shortstay",
@@ -55,7 +85,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const servicePins: Pin[] = serviceProviders
     .filter((s) => s.areaServed.includes("Nairobi"))
     .map((s) => {
-      const pos = toPixel(s.lat, s.lng);
+      const pos = toPixel(s.lat, s.lng, zoom, pan.x, pan.y);
       return {
         id: s.id,
         type: "service" as PinType,
@@ -80,7 +110,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const isProperty = selected && "bedrooms" in selected;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+    <div className="fixed inset-0 z-50 bg-background flex flex-col pb-20">
       {/* Header */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
@@ -116,7 +146,12 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
       </div>
 
       {/* Mock Map */}
-      <div className="flex-1 relative bg-muted overflow-hidden mx-4 rounded-2xl">
+      <div
+        className="flex-1 relative bg-muted overflow-hidden mx-4 rounded-2xl touch-none"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {/* Grid lines for map feel */}
         <svg className="absolute inset-0 w-full h-full opacity-[0.08]" viewBox={`0 0 ${MAP_W} ${MAP_H}`}>
           {Array.from({ length: 20 }, (_, i) => (
@@ -179,10 +214,33 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
         {/* User location */}
         <div
           className="absolute z-30"
-          style={{ left: MAP_W / 2, top: MAP_H / 2, transform: "translate(-50%, -50%)" }}
+          style={{ left: MAP_W / 2 + pan.x, top: MAP_H / 2 + pan.y, transform: "translate(-50%, -50%)" }}
         >
           <div className="w-4 h-4 rounded-full bg-blue-500 border-3 border-card shadow-lg animate-pulse" />
           <div className="absolute -inset-3 rounded-full bg-blue-500/20 animate-ping" />
+        </div>
+
+        {/* Zoom controls */}
+        <div className="absolute bottom-3 right-3 z-40 flex flex-col gap-1.5">
+          <button
+            onClick={handleZoomIn}
+            disabled={zoom >= MAX_ZOOM}
+            className="w-9 h-9 rounded-xl bg-card shadow-md flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
+          >
+            <Plus className="w-4 h-4 text-foreground" />
+          </button>
+          <button
+            onClick={handleZoomOut}
+            disabled={zoom <= MIN_ZOOM}
+            className="w-9 h-9 rounded-xl bg-card shadow-md flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
+          >
+            <Minus className="w-4 h-4 text-foreground" />
+          </button>
+        </div>
+
+        {/* Zoom level indicator */}
+        <div className="absolute top-3 right-3 z-40 px-2 py-1 rounded-lg bg-card/80 shadow-sm">
+          <span className="text-[10px] font-medium text-muted-foreground">{zoom.toFixed(1)}x</span>
         </div>
       </div>
 
