@@ -6,6 +6,7 @@ import ServiceCard from "./ServiceCard";
 import ListingDetail from "./ListingDetail";
 import AdvancedFilters from "./AdvancedFilters";
 import CompareProperties from "./CompareProperties";
+import CompareSelectionModal from "./CompareSelectionModal";
 import AIPropertyMatch from "./AIPropertyMatch";
 import NeighborhoodIntelligence from "./NeighborhoodIntelligence";
 import { properties, serviceProviders } from "@/data/mockData";
@@ -25,9 +26,9 @@ const HomeFeed = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [compareMode, setCompareMode] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
+  const [showCompareSelector, setShowCompareSelector] = useState(false);
   const [serviceCategory, setServiceCategory] = useState("All");
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
@@ -93,11 +94,6 @@ const HomeFeed = () => {
     setSelectedProperty(id);
   };
 
-  const toggleCompare = (id: string) => {
-    setCompareIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length < 3 ? [...prev, id] : prev
-    );
-  };
 
   const property = selectedProperty ? properties.find((p) => p.id === selectedProperty) : null;
 
@@ -116,8 +112,22 @@ const HomeFeed = () => {
     return (
       <CompareProperties
         properties={compareProperties}
-        onClose={() => setShowCompare(false)}
+        onClose={() => { setShowCompare(false); setCompareIds([]); }}
         onRemove={(id) => setCompareIds((prev) => prev.filter((x) => x !== id))}
+      />
+    );
+  }
+
+  if (showCompareSelector) {
+    return (
+      <CompareSelectionModal
+        segment={segment}
+        onClose={() => setShowCompareSelector(false)}
+        onCompare={(selected) => {
+          setCompareIds(selected.map((p) => p.id));
+          setShowCompareSelector(false);
+          setShowCompare(true);
+        }}
       />
     );
   }
@@ -251,27 +261,14 @@ const HomeFeed = () => {
                   Map
                 </button>
                 <button
-                  onClick={() => { setCompareMode(!compareMode); if (compareMode) setCompareIds([]); }}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    compareMode ? "gradient-trust text-primary-foreground" : "bg-secondary text-secondary-foreground"
-                  }`}
+                  onClick={() => setShowCompareSelector(true)}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
                 >
                   <GitCompare className="w-3 h-3" />
                   Compare
                 </button>
               </div>
             </div>
-
-            {/* Compare banner */}
-            {compareMode && compareIds.length > 0 && (
-              <button
-                onClick={() => setShowCompare(true)}
-                className="w-full py-3 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground flex items-center justify-center gap-2 animate-fade-in"
-              >
-                Compare {compareIds.length} Properties
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
 
             {/* Recently viewed */}
             {recentProperties.length > 0 && !searchQuery && !county && (
@@ -408,16 +405,13 @@ const HomeFeed = () => {
                 </h2>
                 {filteredProperties
                   .filter((p) => p.featured)
-                  .map((p) => (
+                   .map((p) => (
                     <PropertyCard
                       key={p.id}
                       property={p}
                       onPress={handleSelectProperty}
                       liked={isFavorite(p.id)}
                       onToggleLike={toggleFavorite}
-                      compareMode={compareMode}
-                      isComparing={compareIds.includes(p.id)}
-                      onToggleCompare={toggleCompare}
                     />
                   ))}
               </div>
@@ -434,9 +428,6 @@ const HomeFeed = () => {
                   onPress={handleSelectProperty}
                   liked={isFavorite(p.id)}
                   onToggleLike={toggleFavorite}
-                  compareMode={compareMode}
-                  isComparing={compareIds.includes(p.id)}
-                  onToggleCompare={toggleCompare}
                 />
               ))}
             </div>
