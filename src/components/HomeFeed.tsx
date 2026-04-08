@@ -6,6 +6,7 @@ import ServiceCard from "./ServiceCard";
 import ListingDetail from "./ListingDetail";
 import AdvancedFilters from "./AdvancedFilters";
 import CompareProperties from "./CompareProperties";
+import CompareSelectionModal from "./CompareSelectionModal";
 import AIPropertyMatch from "./AIPropertyMatch";
 import NeighborhoodIntelligence from "./NeighborhoodIntelligence";
 import { properties, serviceProviders } from "@/data/mockData";
