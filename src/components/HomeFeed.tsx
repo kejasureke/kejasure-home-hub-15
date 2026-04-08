@@ -26,9 +26,9 @@ const HomeFeed = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [compareMode, setCompareMode] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
+  const [showCompareSelector, setShowCompareSelector] = useState(false);
   const [serviceCategory, setServiceCategory] = useState("All");
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
