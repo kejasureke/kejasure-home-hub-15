@@ -410,8 +410,7 @@ const HomeFeed = () => {
                 </h2>
                 {filteredProperties
                   .filter((p) => p.featured)
-                  .map((p) => (
-                    <PropertyCard
+                   .map((p) => (
                     <PropertyCard
                       key={p.id}
                       property={p}
