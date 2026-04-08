@@ -266,27 +266,14 @@ const HomeFeed = () => {
                   Map
                 </button>
                 <button
-                  onClick={() => { setCompareMode(!compareMode); if (compareMode) setCompareIds([]); }}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    compareMode ? "gradient-trust text-primary-foreground" : "bg-secondary text-secondary-foreground"
-                  }`}
+                  onClick={() => setShowCompareSelector(true)}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
                 >
                   <GitCompare className="w-3 h-3" />
                   Compare
                 </button>
               </div>
             </div>
-
-            {/* Compare banner */}
-            {compareMode && compareIds.length > 0 && (
-              <button
-                onClick={() => setShowCompare(true)}
-                className="w-full py-3 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground flex items-center justify-center gap-2 animate-fade-in"
-              >
-                Compare {compareIds.length} Properties
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
 
             {/* Recently viewed */}
             {recentProperties.length > 0 && !searchQuery && !county && (
