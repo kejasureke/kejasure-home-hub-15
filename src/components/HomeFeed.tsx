@@ -117,8 +117,22 @@ const HomeFeed = () => {
     return (
       <CompareProperties
         properties={compareProperties}
-        onClose={() => setShowCompare(false)}
+        onClose={() => { setShowCompare(false); setCompareIds([]); }}
         onRemove={(id) => setCompareIds((prev) => prev.filter((x) => x !== id))}
+      />
+    );
+  }
+
+  if (showCompareSelector) {
+    return (
+      <CompareSelectionModal
+        segment={segment}
+        onClose={() => setShowCompareSelector(false)}
+        onCompare={(selected) => {
+          setCompareIds(selected.map((p) => p.id));
+          setShowCompareSelector(false);
+          setShowCompare(true);
+        }}
       />
     );
   }
