@@ -412,14 +412,12 @@ const HomeFeed = () => {
                   .filter((p) => p.featured)
                   .map((p) => (
                     <PropertyCard
+                    <PropertyCard
                       key={p.id}
                       property={p}
                       onPress={handleSelectProperty}
                       liked={isFavorite(p.id)}
                       onToggleLike={toggleFavorite}
-                      compareMode={compareMode}
-                      isComparing={compareIds.includes(p.id)}
-                      onToggleCompare={toggleCompare}
                     />
                   ))}
               </div>
@@ -436,9 +434,6 @@ const HomeFeed = () => {
                   onPress={handleSelectProperty}
                   liked={isFavorite(p.id)}
                   onToggleLike={toggleFavorite}
-                  compareMode={compareMode}
-                  isComparing={compareIds.includes(p.id)}
-                  onToggleCompare={toggleCompare}
                 />
               ))}
             </div>
