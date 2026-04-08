@@ -68,6 +68,10 @@ const NotificationsScreen = ({
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const [undoItem, setUndoItem] = useState<{ alert: InAppAlert; source: "live" | "stored" } | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [undoProgress, setUndoProgress] = useState(100);
+  const undoAnimRef = useRef<number | null>(null);
+  const undoStartRef = useRef<number>(0);
+  const UNDO_DURATION = 5000;
 
   const clearUndo = useCallback(() => {
     setUndoItem(null);
