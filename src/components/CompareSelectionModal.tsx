@@ -166,21 +166,23 @@ const CompareSelectionModal = ({ onClose, onCompare, segment, preSelectedId }: C
         )}
       </div>
 
-      {/* Compare button */}
-      <div className="px-4 py-4 border-t border-border safe-bottom">
+      {/* Compare button — sticky bottom */}
+      <div className="sticky bottom-0 left-0 right-0 px-4 py-4 border-t border-border bg-background safe-bottom">
         <button
           onClick={handleCompare}
           disabled={selectedIds.length !== 2}
           className={`w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
             selectedIds.length === 2
-              ? "gradient-trust text-primary-foreground active:scale-[0.98]"
+              ? "gradient-trust text-primary-foreground active:scale-[0.98] shadow-lg"
               : "bg-muted text-muted-foreground"
           }`}
         >
           <GitCompare className="w-4 h-4" />
           {selectedIds.length === 2
             ? "Compare Now"
-            : `Select ${2 - selectedIds.length} more`}
+            : selectedIds.length === 1
+            ? "Select 1 more property"
+            : "Select 2 properties to compare"}
         </button>
       </div>
     </div>
