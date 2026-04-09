@@ -29,6 +29,7 @@ const HomeFeed = () => {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
   const [showCompareSelector, setShowCompareSelector] = useState(false);
+  const [compareFromProperty, setCompareFromProperty] = useState<string | null>(null);
   const [serviceCategory, setServiceCategory] = useState("All");
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
@@ -104,6 +105,11 @@ const HomeFeed = () => {
         onBack={() => setSelectedProperty(null)}
         liked={isFavorite(property.id)}
         onToggleLike={() => toggleFavorite(property.id)}
+        onCompareWith={(p) => {
+          setCompareFromProperty(p.id);
+          setSelectedProperty(null);
+          setShowCompareSelector(true);
+        }}
       />
     );
   }
