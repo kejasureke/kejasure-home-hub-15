@@ -128,10 +128,12 @@ const HomeFeed = () => {
     return (
       <CompareSelectionModal
         segment={segment}
-        onClose={() => setShowCompareSelector(false)}
+        preSelectedId={compareFromProperty}
+        onClose={() => { setShowCompareSelector(false); setCompareFromProperty(null); }}
         onCompare={(selected) => {
           setCompareIds(selected.map((p) => p.id));
           setShowCompareSelector(false);
+          setCompareFromProperty(null);
           setShowCompare(true);
         }}
       />
