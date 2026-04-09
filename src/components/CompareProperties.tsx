@@ -13,6 +13,84 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
 
   if (properties.length === 0) return null;
 
+  const [a, b] = properties;
+
+  // Helper: returns "better" | "worse" | "equal" for numeric comparisons (lower is better by default)
+  const compareNumeric = (
+    val: number | undefined,
+    other: number | undefined,
+    lowerIsBetter = true
+  ): "better" | "worse" | "equal" => {
+    if (val == null || other == null || val === other) return "equal";
+    if (lowerIsBetter) return val < other ? "better" : "worse";
+    return val > other ? "better" : "worse";
+  };
+
+  const compareBool = (val: boolean | undefined, other: boolean | undefined): "better" | "worse" | "equal" => {
+    if (val === other) return "equal";
+    return val ? "better" : "worse";
+  };
+
+  const highlightClass = (result: "better" | "worse" | "equal") => {
+    if (result === "better") return "bg-primary/10 text-primary ring-1 ring-primary/20";
+    if (result === "worse") return "bg-destructive/10 text-destructive ring-1 ring-destructive/20";
+    return "bg-secondary";
+  };
+
+  type CompareRow = {
+    label: string;
+    render: (p: Property) => string;
+    compare?: (p: Property, other: Property) => "better" | "worse" | "equal";
+  };
+
+  const rows: CompareRow[] = [
+    {
+      label: "Price",
+      render: (p) => `KES ${formatPrice(p.price)}${p.priceUnit}`,
+      compare: (p, o) => compareNumeric(p.price, o.price, true),
+    },
+    { label: "Location", render: (p) => `${p.estate}, ${p.county}` },
+    {
+      label: "Bedrooms",
+      render: (p) => `${p.bedrooms}`,
+      compare: (p, o) => compareNumeric(p.bedrooms, o.bedrooms, false),
+    },
+    {
+      label: "Bathrooms",
+      render: (p) => `${p.bathrooms}`,
+      compare: (p, o) => compareNumeric(p.bathrooms, o.bathrooms, false),
+    },
+    { label: "Size", render: (p) => p.size || "–" },
+    { label: "Floor", render: (p) => p.floor || "–" },
+    {
+      label: "Deposit",
+      render: (p) => p.deposit ? `KES ${formatPrice(p.deposit)}` : "–",
+      compare: (p, o) => compareNumeric(p.deposit, o.deposit, true),
+    },
+    {
+      label: "Furnished",
+      render: (p) => p.furnished ? "Yes ✓" : "No",
+      compare: (p, o) => compareBool(p.furnished, o.furnished),
+    },
+    {
+      label: "Pet Friendly",
+      render: (p) => p.petFriendly ? "Yes 🐾" : "No",
+      compare: (p, o) => compareBool(p.petFriendly, o.petFriendly),
+    },
+    {
+      label: "Verified",
+      render: (p) => p.verified ? "Yes ✓" : "No",
+      compare: (p, o) => compareBool(p.verified, o.verified),
+    },
+    { label: "Response Time", render: (p) => p.landlordResponseTime },
+    {
+      label: "Rating",
+      render: (p) => p.rating ? `${p.rating} ⭐` : "–",
+      compare: (p, o) => compareNumeric(p.rating, o.rating, false),
+    },
+    { label: "Move-in", render: (p) => p.moveInDate || "–" },
+  ];
+
   return (
     <div className="fixed inset-0 z-50 bg-background animate-slide-up overflow-y-auto">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 bg-background z-10">
@@ -44,30 +122,40 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
           ))}
         </div>
 
+        {/* Legend */}
+        {properties.length === 2 && (
+          <div className="flex items-center gap-4 mt-4 mb-2 justify-center">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-sm bg-primary/20 ring-1 ring-primary/30" />
+              <span className="text-[10px] text-muted-foreground">Better</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-sm bg-destructive/20 ring-1 ring-destructive/30" />
+              <span className="text-[10px] text-muted-foreground">Worse</span>
+            </div>
+          </div>
+        )}
+
         {/* Comparison table */}
-        <div className="mt-6 space-y-4">
-          {[
-            { label: "Location", render: (p: Property) => `${p.estate}, ${p.county}` },
-            { label: "Bedrooms", render: (p: Property) => `${p.bedrooms}` },
-            { label: "Bathrooms", render: (p: Property) => `${p.bathrooms}` },
-            { label: "Size", render: (p: Property) => p.size || "–" },
-            { label: "Floor", render: (p: Property) => p.floor || "–" },
-            { label: "Deposit", render: (p: Property) => p.deposit ? `KES ${formatPrice(p.deposit)}` : "–" },
-            { label: "Furnished", render: (p: Property) => p.furnished ? "Yes ✓" : "No" },
-            { label: "Pet Friendly", render: (p: Property) => p.petFriendly ? "Yes 🐾" : "No" },
-            { label: "Verified", render: (p: Property) => p.verified ? "Yes ✓" : "No" },
-            { label: "Response Time", render: (p: Property) => p.landlordResponseTime },
-            { label: "Rating", render: (p: Property) => p.rating ? `${p.rating} ⭐` : "–" },
-            { label: "Move-in", render: (p: Property) => p.moveInDate || "–" },
-          ].map((row) => (
+        <div className="mt-4 space-y-4">
+          {rows.map((row) => (
             <div key={row.label}>
               <p className="text-xs font-semibold text-muted-foreground mb-1.5">{row.label}</p>
               <div className="flex gap-3">
-                {properties.map((p) => (
-                  <div key={p.id} className="w-[200px] shrink-0 px-3 py-2 rounded-xl bg-secondary text-xs font-medium">
-                    {row.render(p)}
-                  </div>
-                ))}
+                {properties.map((p, idx) => {
+                  const other = properties[idx === 0 ? 1 : 0];
+                  const result = row.compare && properties.length === 2 && other
+                    ? row.compare(p, other)
+                    : "equal";
+                  return (
+                    <div
+                      key={p.id}
+                      className={`w-[200px] shrink-0 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${highlightClass(result)}`}
+                    >
+                      {row.render(p)}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -76,15 +164,30 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
           <div>
             <p className="text-xs font-semibold text-muted-foreground mb-1.5">Amenities</p>
             <div className="flex gap-3">
-              {properties.map((p) => (
-                <div key={p.id} className="w-[200px] shrink-0">
-                  <div className="flex flex-wrap gap-1">
-                    {p.amenities.map((a) => (
-                      <span key={a} className="px-2 py-0.5 rounded-md bg-secondary text-[10px] font-medium">{a}</span>
-                    ))}
+              {properties.map((p, idx) => {
+                const other = properties[idx === 0 ? 1 : 0];
+                return (
+                  <div key={p.id} className="w-[200px] shrink-0">
+                    <div className="flex flex-wrap gap-1">
+                      {p.amenities.map((a) => {
+                        const unique = other && !other.amenities.includes(a);
+                        return (
+                          <span
+                            key={a}
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-medium ${
+                              unique
+                                ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                                : "bg-secondary"
+                            }`}
+                          >
+                            {a}
+                          </span>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
