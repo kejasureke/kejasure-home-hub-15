@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2, Lock } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2, Lock, GitCompare } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
@@ -19,9 +19,10 @@ interface ListingDetailProps {
   onBack: () => void;
   liked?: boolean;
   onToggleLike?: () => void;
+  onCompareWith?: (property: Property) => void;
 }
 
-const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: ListingDetailProps) => {
+const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith }: ListingDetailProps) => {
   const [currentImage, setCurrentImage] = useState(0);
   const [showBooking, setShowBooking] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -352,6 +353,21 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike }: Listin
             <div className="flex-1 text-left">
               <p className="text-sm font-semibold">Move-In Checklist</p>
               <p className="text-[10px] text-muted-foreground">Movers, cleaners, internet & more — all in one place</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
+
+        {/* Compare with */}
+        {onCompareWith && (
+          <button
+            onClick={() => onCompareWith(property)}
+            className="w-full flex items-center gap-3 p-4 rounded-2xl bg-primary/5 border border-primary/20 mb-4 active:scale-[0.98] transition-transform"
+          >
+            <GitCompare className="w-6 h-6 text-primary" />
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold">Compare with...</p>
+              <p className="text-[10px] text-muted-foreground">Pick another listing to compare side by side</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>

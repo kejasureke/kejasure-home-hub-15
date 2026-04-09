@@ -6,10 +6,11 @@ interface CompareSelectionModalProps {
   onClose: () => void;
   onCompare: (selected: Property[]) => void;
   segment: string;
+  preSelectedId?: string | null;
 }
 
-const CompareSelectionModal = ({ onClose, onCompare, segment }: CompareSelectionModalProps) => {
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+const CompareSelectionModal = ({ onClose, onCompare, segment, preSelectedId }: CompareSelectionModalProps) => {
+  const [selectedIds, setSelectedIds] = useState<string[]>(preSelectedId ? [preSelectedId] : []);
   const [search, setSearch] = useState("");
 
   const filteredProperties = useMemo(() => {
