@@ -93,7 +93,7 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
   ];
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background animate-slide-up overflow-y-auto pb-32">
+    <div className="fixed inset-0 z-[70] bg-background animate-slide-up overflow-y-auto pb-8">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 bg-background z-10">
         <button onClick={onClose}>
           <X className="w-5 h-5 text-muted-foreground" />
@@ -102,10 +102,10 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
         <div className="w-5" />
       </div>
 
-      <div className="p-4 overflow-x-auto">
-        <div className="flex gap-3" style={{ minWidth: `${properties.length * 200}px` }}>
+      <div className="p-4">
+        <div className="flex gap-3" style={{ minWidth: `${properties.length * 170}px` }}>
           {properties.map((p) => (
-            <div key={p.id} className="w-[200px] shrink-0 bg-card rounded-2xl card-shadow overflow-hidden">
+            <div key={p.id} className="flex-1 min-w-0 bg-card rounded-2xl card-shadow overflow-hidden">
               <div className="relative aspect-[4/3]">
                 <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
                 <button
@@ -197,7 +197,7 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
                   return (
                     <div
                       key={p.id}
-                      className={`w-[200px] shrink-0 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${highlightClass(result)}`}
+                      className={`flex-1 min-w-0 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${highlightClass(result)}`}
                     >
                       {row.render(p)}
                     </div>
@@ -214,7 +214,7 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
               {properties.map((p, idx) => {
                 const other = properties[idx === 0 ? 1 : 0];
                 return (
-                  <div key={p.id} className="w-[200px] shrink-0">
+                  <div key={p.id} className="flex-1 min-w-0">
                     <div className="flex flex-wrap gap-1">
                       {p.amenities.map((a) => {
                         const unique = other && !other.amenities.includes(a);
