@@ -173,7 +173,7 @@ const CompareSelectionModal = ({ onClose, onCompare, segment, preSelectedId }: C
           disabled={selectedIds.length !== 2}
           className={`w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
             selectedIds.length === 2
-              ? "gradient-trust text-primary-foreground active:scale-[0.98] shadow-lg"
+              ? "gradient-trust text-primary-foreground active:scale-[0.98] shadow-lg animate-[bounce_0.4s_ease-out_1]"
               : "bg-muted text-muted-foreground"
           }`}
         >
