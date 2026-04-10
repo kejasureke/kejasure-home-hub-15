@@ -48,7 +48,7 @@ const CompareSelectionModal = ({ onClose, onCompare, segment, preSelectedId }: C
     price >= 1000 ? `KES ${(price / 1000).toFixed(price % 1000 === 0 ? 0 : 1)}K` : `KES ${price}`;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-slide-up">
+    <div className="fixed inset-0 z-[60] bg-background flex flex-col animate-slide-up">
       {/* Header */}
       <div className="px-4 pt-4 pb-3 border-b border-border">
         <div className="flex items-center justify-between mb-3">
