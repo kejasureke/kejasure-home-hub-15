@@ -102,7 +102,7 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
         <div className="w-5" />
       </div>
 
-      <div className="p-4 overflow-x-auto">
+      <div className="p-4">
         <div className="flex gap-3" style={{ minWidth: `${properties.length * 170}px` }}>
           {properties.map((p) => (
             <div key={p.id} className="flex-1 min-w-0 bg-card rounded-2xl card-shadow overflow-hidden">
