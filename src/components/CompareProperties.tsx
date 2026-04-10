@@ -123,19 +123,65 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
           ))}
         </div>
 
-        {/* Legend */}
-        {properties.length === 2 && (
-          <div className="flex items-center gap-4 mt-4 mb-2 justify-center">
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-primary/20 ring-1 ring-primary/30" />
-              <span className="text-[10px] text-muted-foreground">Better</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-destructive/20 ring-1 ring-destructive/30" />
-              <span className="text-[10px] text-muted-foreground">Worse</span>
-            </div>
-          </div>
-        )}
+        {properties.length === 2 && (() => {
+          // Calculate scores
+          let scoresA = 0, scoresB = 0;
+          rows.forEach((row) => {
+            if (!row.compare) return;
+            const rA = row.compare(a, b);
+            if (rA === "better") scoresA++;
+            else if (rA === "worse") scoresB++;
+          });
+          // Amenity unique counts
+          const uniqueA = a.amenities.filter((x) => !b.amenities.includes(x)).length;
+          const uniqueB = b.amenities.filter((x) => !a.amenities.includes(x)).length;
+          scoresA += uniqueA;
+          scoresB += uniqueB;
+
+          const winner = scoresA > scoresB ? a : scoresB > scoresA ? b : null;
+          const winScore = Math.max(scoresA, scoresB);
+          const loseScore = Math.min(scoresA, scoresB);
+
+          return (
+            <>
+              {/* Winner summary */}
+              <div className="mt-4 mx-auto max-w-[420px]">
+                <div className={`rounded-2xl p-4 text-center ${
+                  winner ? "bg-primary/10 ring-1 ring-primary/20" : "bg-secondary"
+                }`}>
+                  <Trophy className={`w-6 h-6 mx-auto mb-1.5 ${winner ? "text-primary" : "text-muted-foreground"}`} />
+                  {winner ? (
+                    <>
+                      <p className="text-sm font-bold text-primary">{winner.title}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Wins in <span className="font-semibold text-primary">{winScore}</span> vs {loseScore} metrics
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-bold">It's a tie!</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Both properties score equally ({scoresA} each)
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div className="flex items-center gap-4 mt-3 mb-2 justify-center">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-sm bg-primary/20 ring-1 ring-primary/30" />
+                  <span className="text-[10px] text-muted-foreground">Better</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-sm bg-destructive/20 ring-1 ring-destructive/30" />
+                  <span className="text-[10px] text-muted-foreground">Worse</span>
+                </div>
+              </div>
+            </>
+          );
+        })()}
 
         {/* Comparison table */}
         <div className="mt-4 space-y-4">
