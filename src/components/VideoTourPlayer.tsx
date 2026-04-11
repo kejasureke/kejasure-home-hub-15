@@ -72,7 +72,7 @@ const VideoTourPlayer = ({ videoUrl, title, onBack, rooms }: VideoTourPlayerProp
       </div>
 
       {/* Video */}
-      <div className="flex-1 flex items-center justify-center bg-foreground" onClick={togglePlay}>
+      <div className="relative flex-1 min-h-0 flex items-center justify-center bg-foreground" onClick={togglePlay}>
         <video
           ref={videoRef}
           src={videoUrl}
@@ -83,7 +83,7 @@ const VideoTourPlayer = ({ videoUrl, title, onBack, rooms }: VideoTourPlayerProp
           playsInline
         />
         {!playing && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
               <Play className="w-7 h-7 text-primary-foreground ml-1" />
             </div>
@@ -92,7 +92,7 @@ const VideoTourPlayer = ({ videoUrl, title, onBack, rooms }: VideoTourPlayerProp
       </div>
 
       {/* Controls */}
-      <div className="bg-foreground/95 px-4 pt-3 pb-24">
+      <div className="relative z-10 bg-foreground/95 px-4 pt-3 pb-24">
         {/* Progress bar */}
         <div className="mb-3 cursor-pointer" onClick={handleProgressClick}>
           <div className="h-1.5 rounded-full bg-background/20 overflow-hidden">
