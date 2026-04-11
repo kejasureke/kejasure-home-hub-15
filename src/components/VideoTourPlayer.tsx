@@ -92,7 +92,7 @@ const VideoTourPlayer = ({ videoUrl, title, onBack, rooms }: VideoTourPlayerProp
       </div>
 
       {/* Controls */}
-      <div className="bg-foreground/95 px-4 pt-3 pb-6">
+      <div className="bg-foreground/95 px-4 pt-3 pb-24">
         {/* Progress bar */}
         <div className="mb-3 cursor-pointer" onClick={handleProgressClick}>
           <div className="h-1.5 rounded-full bg-background/20 overflow-hidden">
