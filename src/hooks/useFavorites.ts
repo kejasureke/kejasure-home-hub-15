@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { toast } from "sonner";
 
 const STORAGE_KEY = "kejasure_favorites";
 
@@ -13,7 +14,6 @@ const getFavorites = (): string[] => {
 export const useFavorites = () => {
   const [favoriteIds, setFavoriteIds] = useState<string[]>(getFavorites);
 
-  // Sync across multiple hook instances via storage event + custom event
   useEffect(() => {
     const sync = () => setFavoriteIds(getFavorites());
     window.addEventListener("storage", sync);
@@ -26,9 +26,17 @@ export const useFavorites = () => {
 
   const toggleFavorite = useCallback((id: string) => {
     setFavoriteIds((prev) => {
-      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      const removing = prev.includes(id);
+      const next = removing ? prev.filter((x) => x !== id) : [...prev, id];
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       window.dispatchEvent(new Event("favorites-updated"));
+
+      if (removing) {
+        toast("Removed from Saved", { description: "Property removed from your favorites" });
+      } else {
+        toast.success("Saved!", { description: "Property added to your favorites" });
+      }
+
       return next;
     });
   }, []);
