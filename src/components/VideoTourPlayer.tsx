@@ -1,5 +1,5 @@
 import { ArrowLeft, Play, Pause, Volume2, VolumeX, Maximize, SkipForward, SkipBack } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 
 interface VideoTourPlayerProps {
   videoUrl: string;
@@ -13,7 +13,9 @@ const VideoTourPlayer = ({ videoUrl, title, onBack, rooms }: VideoTourPlayerProp
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentRoom, setCurrentRoom] = useState(0);
+  const [dragging, setDragging] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -24,7 +26,7 @@ const VideoTourPlayer = ({ videoUrl, title, onBack, rooms }: VideoTourPlayerProp
   };
 
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
+    if (videoRef.current && !dragging) {
       const pct = (videoRef.current.currentTime / videoRef.current.duration) * 100;
       setProgress(isNaN(pct) ? 0 : pct);
 
@@ -45,18 +47,45 @@ const VideoTourPlayer = ({ videoUrl, title, onBack, rooms }: VideoTourPlayerProp
   };
 
   const seekRelative = (sec: number) => {
-    if (videoRef.current) {
+    if (videoRef.current && isFinite(videoRef.current.duration)) {
       videoRef.current.currentTime = Math.max(0, Math.min(videoRef.current.duration, videoRef.current.currentTime + sec));
     }
   };
 
-  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (videoRef.current) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const pct = (e.clientX - rect.left) / rect.width;
+  const seekFromEvent = useCallback((clientX: number) => {
+    if (progressBarRef.current && videoRef.current && isFinite(videoRef.current.duration)) {
+      const rect = progressBarRef.current.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
       videoRef.current.currentTime = pct * videoRef.current.duration;
+      setProgress(pct * 100);
     }
-  };
+  }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    setDragging(true);
+    seekFromEvent(e.touches[0].clientX);
+  }, [seekFromEvent]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (dragging) seekFromEvent(e.touches[0].clientX);
+  }, [dragging, seekFromEvent]);
+
+  const handleTouchEnd = useCallback(() => {
+    setDragging(false);
+  }, []);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    setDragging(true);
+    seekFromEvent(e.clientX);
+    const onMove = (ev: MouseEvent) => seekFromEvent(ev.clientX);
+    const onUp = () => {
+      setDragging(false);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [seekFromEvent]);
 
   return (
     <div className="fixed inset-0 z-[70] bg-foreground flex flex-col">
@@ -93,10 +122,22 @@ const VideoTourPlayer = ({ videoUrl, title, onBack, rooms }: VideoTourPlayerProp
 
       {/* Controls */}
       <div className="relative z-10 bg-foreground/95 px-4 pt-3 pb-24">
-        {/* Progress bar */}
-        <div className="mb-3 cursor-pointer" onClick={handleProgressClick}>
-          <div className="h-1.5 rounded-full bg-background/20 overflow-hidden">
-            <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${progress}%` }} />
+        {/* Progress bar with draggable handle */}
+        <div
+          ref={progressBarRef}
+          className="mb-3 cursor-pointer py-2 -my-2 touch-none"
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="h-1.5 rounded-full bg-background/20 relative">
+            <div className="h-full rounded-full bg-primary transition-[width] duration-75" style={{ width: `${progress}%` }} />
+            {/* Drag handle */}
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary border-2 border-background shadow-lg transition-transform"
+              style={{ left: `calc(${progress}% - 8px)` }}
+            />
           </div>
         </div>
 
