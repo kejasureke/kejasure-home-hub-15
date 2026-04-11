@@ -61,7 +61,7 @@ const SmileIDBadge = ({ compact = false, propertyId, imageCount = 4 }: { compact
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-foreground/40 backdrop-blur-sm animate-fade-in" onClick={() => setOpen(false)}>
-          <div className="w-full max-w-md bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-md max-h-[85vh] bg-card rounded-t-3xl p-5 pb-8 animate-slide-up overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="w-10 h-1 rounded-full bg-muted mx-auto mb-4" />
 
             <div className="flex items-center gap-3 mb-5">
