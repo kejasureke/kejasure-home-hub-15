@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, AlertCircle, User, Building2, Fingerprint, X, ChevronRight } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, AlertCircle, User, Building2, Fingerprint, X, ChevronRight, Phone, Smartphone } from "lucide-react";
 import AIPhotoVerification from "./AIPhotoVerification";
 
 interface KYCVerificationFlowProps {
@@ -7,25 +7,39 @@ interface KYCVerificationFlowProps {
   activeRole?: string;
 }
 
-type VerificationType = "individual" | "business";
+type VerificationCategory = "tenant" | "individual" | "business";
 type DocType = "national_id" | "passport" | "kra_pin";
 type BusinessDocType = "business_cert" | "kra_pin" | "cr12";
-type Step = "type_select" | "doc_select" | "id_upload" | "selfie" | "processing" | "result";
+type Step = "type_select" | "tenant_info" | "tenant_otp" | "doc_select" | "kra_upload" | "id_upload" | "selfie" | "processing" | "result";
 type VerificationResult = "success" | "failed" | "pending";
+
+const categoryBadgeConfig: Record<VerificationCategory, { label: string; color: string; bgColor: string; borderColor: string }> = {
+  tenant: { label: "Phone Verified", color: "text-blue-700", bgColor: "bg-blue-50", borderColor: "border-blue-200" },
+  individual: { label: "ID Verified", color: "text-primary", bgColor: "bg-primary/10", borderColor: "border-primary/20" },
+  business: { label: "Business Verified", color: "text-amber-700", bgColor: "bg-amber-50", borderColor: "border-amber-200" },
+};
 
 const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerificationFlowProps) => {
   const [step, setStep] = useState<Step>("type_select");
-  const [verificationType, setVerificationType] = useState<VerificationType | null>(null);
+  const [verificationCategory, setVerificationCategory] = useState<VerificationCategory | null>(null);
   const [docType, setDocType] = useState<DocType | BusinessDocType | null>(null);
   const [idFrontUploaded, setIdFrontUploaded] = useState(false);
   const [idBackUploaded, setIdBackUploaded] = useState(false);
+  const [kraUploaded, setKraUploaded] = useState(false);
   const [selfieCapture, setSelfieCapture] = useState<"none" | "capturing" | "done">("none");
   const [result, setResult] = useState<VerificationResult>("pending");
+
+  // Tenant-specific state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpVerified, setOtpVerified] = useState(false);
 
   const individualDocs = [
     { type: "national_id" as DocType, label: "National ID", desc: "Kenyan National ID card", icon: FileText },
     { type: "passport" as DocType, label: "Passport", desc: "Valid Kenyan passport", icon: FileText },
-    { type: "kra_pin" as DocType, label: "KRA PIN Certificate", desc: "Tax compliance certificate", icon: FileText },
   ];
 
   const businessDocs = [
@@ -39,17 +53,53 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
     setTimeout(() => {
       const outcome = Math.random() > 0.2 ? "success" : "failed";
       setResult(outcome);
-      if (outcome === "success") {
+      if (outcome === "success" && verificationCategory) {
         localStorage.setItem(`kejasure_kyc_status_${activeRole}`, "verified");
-        // Keep legacy key for backward compat
+        localStorage.setItem(`kejasure_kyc_category_${activeRole}`, verificationCategory);
         localStorage.setItem("kejasure_kyc_status", "verified");
       }
       setStep("result");
     }, 4000);
   };
 
-  const progressSteps = ["Type", "Document", "Upload", "Selfie", "Verify"];
-  const currentProgress = step === "type_select" ? 0 : step === "doc_select" ? 1 : step === "id_upload" ? 2 : step === "selfie" ? 3 : 4;
+  const handleSendOtp = () => {
+    setOtpSent(true);
+    // Mock OTP sent
+  };
+
+  const handleVerifyOtp = () => {
+    if (otp.length === 6) {
+      setOtpVerified(true);
+      setTimeout(() => handleProcessing(), 500);
+    }
+  };
+
+  const getProgressSteps = () => {
+    if (verificationCategory === "tenant") return ["Info", "Phone", "OTP", "Verify"];
+    if (verificationCategory === "business") return ["Type", "Document", "Upload", "Selfie", "Verify"];
+    return ["Type", "Document", "KRA", "Upload", "Selfie", "Verify"];
+  };
+
+  const getCurrentProgress = () => {
+    const stepMap: Record<Step, number> = {
+      type_select: 0,
+      tenant_info: 0,
+      tenant_otp: 1,
+      doc_select: 1,
+      kra_upload: 2,
+      id_upload: verificationCategory === "individual" ? 3 : 2,
+      selfie: verificationCategory === "individual" ? 4 : 3,
+      processing: verificationCategory === "individual" ? 5 : 4,
+      result: verificationCategory === "individual" ? 5 : 4,
+    };
+    return stepMap[step] || 0;
+  };
+
+  const progressSteps = getProgressSteps();
+  const currentProgress = getCurrentProgress();
+
+  // Determine if individual service provider (KRA mandatory)
+  const isIndividualServiceProvider = verificationCategory === "individual" && activeRole === "serviceprovider";
 
   return (
     <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
@@ -65,19 +115,20 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </div>
           <ShieldCheck className="w-5 h-5 text-primary" />
         </div>
-        {/* Progress */}
-        <div className="flex items-center gap-1 mt-3">
-          {progressSteps.map((s, i) => (
-            <div key={s} className="flex-1 flex flex-col items-center gap-1">
-              <div className={`h-1 w-full rounded-full transition-colors ${i <= currentProgress ? "bg-primary" : "bg-muted"}`} />
-              <span className={`text-[9px] font-medium ${i <= currentProgress ? "text-primary" : "text-muted-foreground"}`}>{s}</span>
-            </div>
-          ))}
-        </div>
+        {step !== "type_select" && (
+          <div className="flex items-center gap-1 mt-3">
+            {progressSteps.map((s, i) => (
+              <div key={s} className="flex-1 flex flex-col items-center gap-1">
+                <div className={`h-1 w-full rounded-full transition-colors ${i <= currentProgress ? "bg-primary" : "bg-muted"}`} />
+                <span className={`text-[9px] font-medium ${i <= currentProgress ? "text-primary" : "text-muted-foreground"}`}>{s}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="px-4 py-5 pb-20">
-        {/* Step 1: Type Selection */}
+        {/* Step 1: Category Selection — 3 categories */}
         {step === "type_select" && (
           <div className="space-y-4 animate-fade-in">
             <div className="text-center mb-6">
@@ -88,35 +139,92 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               <p className="text-sm text-muted-foreground mt-1">Choose your verification type to get the trusted badge</p>
             </div>
 
-            {[
-              { type: "individual" as VerificationType, icon: User, label: "Individual", desc: "Landlords, tenants, hosts & service providers", features: ["National ID / Passport", "Selfie verification", "KRA PIN (optional)"] },
-              { type: "business" as VerificationType, icon: Building2, label: "Business / Agency", desc: "Registered companies & agencies", features: ["Business Certificate", "KRA PIN (Business)", "CR12 / Directors form"] },
-            ].map((opt) => (
-              <button
-                key={opt.type}
-                onClick={() => { setVerificationType(opt.type); setStep("doc_select"); }}
-                className="w-full text-left p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <opt.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-base font-bold">{opt.label}</h3>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            {/* Tenant */}
+            <button
+              onClick={() => { setVerificationCategory("tenant"); setStep("tenant_info"); }}
+              className="w-full text-left p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+                  <Phone className="w-6 h-6 text-blue-600" />
                 </div>
-                <div className="space-y-1.5 ml-15">
-                  {opt.features.map((f) => (
-                    <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
-                      <span>{f}</span>
-                    </div>
-                  ))}
+                <div className="flex-1">
+                  <h3 className="text-base font-bold">Tenant</h3>
+                  <p className="text-xs text-muted-foreground">Phone number & name verification</p>
                 </div>
-              </button>
-            ))}
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="space-y-1.5 ml-15">
+                {["Phone number verified via OTP", "Name match to phone data", "Smile ID phone verification"].map((f) => (
+                  <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="w-3 h-3 text-blue-600 shrink-0" />
+                    <span>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <div className={`inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 rounded-full ${categoryBadgeConfig.tenant.bgColor} border ${categoryBadgeConfig.tenant.borderColor}`}>
+                <Phone className="w-3 h-3 text-blue-600" />
+                <span className={`text-[10px] font-semibold ${categoryBadgeConfig.tenant.color}`}>{categoryBadgeConfig.tenant.label}</span>
+              </div>
+            </button>
+
+            {/* Individual */}
+            <button
+              onClick={() => { setVerificationCategory("individual"); setStep("doc_select"); }}
+              className="w-full text-left p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-bold">Individual</h3>
+                  <p className="text-xs text-muted-foreground">Landlords, stay hosts & service providers</p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="space-y-1.5 ml-15">
+                {["National ID / Passport", "KRA PIN Certificate", "Selfie verification"].map((f) => (
+                  <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
+                    <span>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <div className={`inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 rounded-full ${categoryBadgeConfig.individual.bgColor} border ${categoryBadgeConfig.individual.borderColor}`}>
+                <ShieldCheck className="w-3 h-3 text-primary" />
+                <span className={`text-[10px] font-semibold ${categoryBadgeConfig.individual.color}`}>{categoryBadgeConfig.individual.label}</span>
+              </div>
+            </button>
+
+            {/* Business / Agency */}
+            <button
+              onClick={() => { setVerificationCategory("business"); setStep("doc_select"); }}
+              className="w-full text-left p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
+                  <Building2 className="w-6 h-6 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-bold">Business / Agency</h3>
+                  <p className="text-xs text-muted-foreground">Registered companies & agencies</p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="space-y-1.5 ml-15">
+                {["Business Certificate", "KRA PIN (Business)", "CR12 / Directors form"].map((f) => (
+                  <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="w-3 h-3 text-amber-600 shrink-0" />
+                    <span>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <div className={`inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 rounded-full ${categoryBadgeConfig.business.bgColor} border ${categoryBadgeConfig.business.borderColor}`}>
+                <Building2 className="w-3 h-3 text-amber-600" />
+                <span className={`text-[10px] font-semibold ${categoryBadgeConfig.business.color}`}>{categoryBadgeConfig.business.label}</span>
+              </div>
+            </button>
 
             <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
               <div className="flex items-start gap-2">
@@ -129,18 +237,142 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </div>
         )}
 
-        {/* Step 2: Document Selection */}
+        {/* Tenant Flow: Name + Phone Input */}
+        {step === "tenant_info" && (
+          <div className="space-y-4 animate-fade-in">
+            <h2 className="text-lg font-bold mb-1">Your Details</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              We'll verify your name matches the phone number registered with your mobile provider via Smile ID.
+            </p>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">First Name</label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="e.g. John"
+                  className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Last Name</label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="e.g. Kamau"
+                  className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Phone Number</label>
+                <div className="flex items-center gap-2">
+                  <div className="px-3 py-3.5 rounded-xl bg-secondary text-sm font-bold text-muted-foreground">+254</div>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, "").slice(0, 9))}
+                    placeholder="7XX XXX XXX"
+                    className="flex-1 px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-blue-50 border border-blue-200">
+              <div className="flex items-start gap-2">
+                <Smartphone className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-muted-foreground">
+                  Smile ID will verify that the name you provide matches the registered owner of this phone number.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => { handleSendOtp(); setStep("tenant_otp"); }}
+              disabled={!firstName.trim() || !lastName.trim() || phoneNumber.length !== 9}
+              className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
+            >
+              Send OTP to verify
+            </button>
+
+            <button onClick={() => setStep("type_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
+              ← Back
+            </button>
+          </div>
+        )}
+
+        {/* Tenant Flow: OTP Verification */}
+        {step === "tenant_otp" && (
+          <div className="space-y-4 animate-fade-in">
+            <h2 className="text-lg font-bold mb-1">Verify OTP</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Enter the 6-digit code sent to +254{phoneNumber}
+            </p>
+
+            <div className="flex justify-center gap-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-11 h-14 rounded-xl border-2 flex items-center justify-center text-lg font-bold transition-colors ${
+                    otp[i] ? "border-primary bg-primary/5" : "border-border bg-card"
+                  }`}
+                >
+                  {otp[i] || ""}
+                </div>
+              ))}
+            </div>
+
+            <input
+              type="tel"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              className="w-full text-center py-3 rounded-xl bg-card border-2 border-border text-lg font-mono tracking-[0.5em] focus:outline-none focus:border-primary"
+              placeholder="______"
+              autoFocus
+            />
+
+            <div className="text-center">
+              <button onClick={handleSendOtp} className="text-xs font-semibold text-primary">
+                Resend OTP
+              </button>
+            </div>
+
+            <button
+              onClick={handleVerifyOtp}
+              disabled={otp.length !== 6}
+              className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
+            >
+              Verify & Submit
+            </button>
+
+            <button onClick={() => setStep("tenant_info")} className="w-full py-2 text-sm font-medium text-muted-foreground">
+              ← Back
+            </button>
+          </div>
+        )}
+
+        {/* Document Selection (Individual & Business) */}
         {step === "doc_select" && (
           <div className="space-y-3 animate-fade-in">
             <h2 className="text-lg font-bold mb-1">Select Document Type</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              {verificationType === "individual" ? "Choose a valid government-issued ID" : "Choose a business registration document"}
+              {verificationCategory === "individual" ? "Choose a valid government-issued ID" : "Choose a business registration document"}
             </p>
 
-            {(verificationType === "individual" ? individualDocs : businessDocs).map((doc) => (
+            {(verificationCategory === "individual" ? individualDocs : businessDocs).map((doc) => (
               <button
                 key={doc.type}
-                onClick={() => { setDocType(doc.type); setStep("id_upload"); }}
+                onClick={() => {
+                  setDocType(doc.type);
+                  if (verificationCategory === "individual") {
+                    setStep("kra_upload");
+                  } else {
+                    setStep("id_upload");
+                  }
+                }}
                 className="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
               >
                 <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
@@ -160,7 +392,71 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </div>
         )}
 
-        {/* Step 3: ID Upload */}
+        {/* KRA PIN Upload (Individual — mandatory for service providers) */}
+        {step === "kra_upload" && (
+          <div className="space-y-4 animate-fade-in">
+            <h2 className="text-lg font-bold mb-1">KRA PIN Certificate</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              {isIndividualServiceProvider
+                ? "KRA PIN is required for service provider verification."
+                : "Upload your KRA PIN certificate for enhanced verification."}
+            </p>
+
+            <div
+              onClick={() => setKraUploaded(true)}
+              className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
+                kraUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
+              }`}
+            >
+              {kraUploaded ? (
+                <div className="flex flex-col items-center gap-2">
+                  <CheckCircle2 className="w-10 h-10 text-primary" />
+                  <p className="text-sm font-semibold text-primary">KRA PIN uploaded</p>
+                  <p className="text-xs text-muted-foreground">Tap to re-upload</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center">
+                    <FileText className="w-7 h-7 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm font-semibold">KRA PIN Certificate</p>
+                  <p className="text-xs text-muted-foreground">Tap to upload</p>
+                </div>
+              )}
+            </div>
+
+            {isIndividualServiceProvider && (
+              <div className="p-3 rounded-xl bg-destructive/5 border border-destructive/15">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-muted-foreground">
+                    <span className="font-semibold text-destructive">Required:</span> KRA PIN is mandatory for individual service providers.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={() => setStep("id_upload")}
+              disabled={isIndividualServiceProvider && !kraUploaded}
+              className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
+            >
+              {kraUploaded ? "Continue" : isIndividualServiceProvider ? "Upload KRA PIN to continue" : "Skip for now"}
+            </button>
+
+            {!isIndividualServiceProvider && !kraUploaded && (
+              <button onClick={() => setStep("id_upload")} className="w-full py-2 text-sm font-medium text-muted-foreground">
+                Skip →
+              </button>
+            )}
+
+            <button onClick={() => setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
+              ← Back
+            </button>
+          </div>
+        )}
+
+        {/* ID Upload */}
         {step === "id_upload" && (
           <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold mb-1">Upload Your Document</h2>
@@ -232,18 +528,18 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               Continue to Selfie
             </button>
 
-            <button onClick={() => setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
+            <button onClick={() => verificationCategory === "individual" ? setStep("kra_upload") : setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
               ← Back
             </button>
           </div>
         )}
 
-        {/* Step 4: Selfie Capture */}
+        {/* Selfie Capture */}
         {step === "selfie" && (
           <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold mb-1">Selfie Verification</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              {verificationType === "individual" 
+              {verificationCategory === "individual" 
                 ? "Take a selfie to match with your ID photo" 
                 : "Director/representative selfie for business verification"}
             </p>
@@ -285,7 +581,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               ))}
             </div>
 
-            {/* AI Photo Verification */}
             {selfieCapture === "done" && (
               <AIPhotoVerification mode="identity" simulateMatch={true} />
             )}
@@ -304,15 +599,19 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </div>
         )}
 
-        {/* Step 5: Processing */}
+        {/* Processing */}
         {step === "processing" && (
           <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
             <div className="w-20 h-20 rounded-full gradient-trust flex items-center justify-center mb-5 animate-pulse">
               <Fingerprint className="w-10 h-10 text-primary-foreground" />
             </div>
-            <h2 className="text-xl font-bold mb-2">Verifying Your Identity</h2>
+            <h2 className="text-xl font-bold mb-2">
+              {verificationCategory === "tenant" ? "Verifying Your Phone" : "Verifying Your Identity"}
+            </h2>
             <p className="text-sm text-muted-foreground text-center mb-6 max-w-[260px]">
-              Cross-referencing your document with your selfie. This usually takes a few seconds...
+              {verificationCategory === "tenant"
+                ? "Matching your name against phone number registration data..."
+                : "Cross-referencing your document with your selfie. This usually takes a few seconds..."}
             </p>
             <div className="flex items-center gap-2">
               {[0, 1, 2].map((i) => (
@@ -320,7 +619,10 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               ))}
             </div>
             <div className="mt-8 space-y-2 w-full max-w-xs">
-              {["Document quality check", "Face matching", "Database verification"].map((s, i) => (
+              {(verificationCategory === "tenant"
+                ? ["Phone number verification", "Name match check", "Smile ID validation"]
+                : ["Document quality check", "Face matching", "Database verification"]
+              ).map((s, i) => (
                 <div key={s} className="flex items-center gap-2 text-xs text-muted-foreground animate-fade-in" style={{ animationDelay: `${i * 1.2}s` }}>
                   <Clock className="w-3 h-3 text-primary shrink-0 animate-spin" />
                   <span>{s}...</span>
@@ -330,7 +632,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </div>
         )}
 
-        {/* Step 6: Result */}
+        {/* Result */}
         {step === "result" && (
           <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
             {result === "success" ? (
@@ -342,12 +644,21 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
                   Your identity has been verified successfully. You now have the trusted badge on your profile.
                 </p>
-                <div className="verified-badge text-sm px-4 py-2 mb-6">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Verified {verificationType === "business" ? "Business" : "Member"}</span>
-                </div>
+                {verificationCategory && (
+                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 ${categoryBadgeConfig[verificationCategory].bgColor} border ${categoryBadgeConfig[verificationCategory].borderColor}`}>
+                    {verificationCategory === "tenant" && <Phone className="w-4 h-4 text-blue-600" />}
+                    {verificationCategory === "individual" && <ShieldCheck className="w-4 h-4 text-primary" />}
+                    {verificationCategory === "business" && <Building2 className="w-4 h-4 text-amber-600" />}
+                    <span className={`text-sm font-semibold ${categoryBadgeConfig[verificationCategory].color}`}>
+                      {categoryBadgeConfig[verificationCategory].label}
+                    </span>
+                  </div>
+                )}
                 <div className="w-full max-w-xs space-y-2">
-                  {["Trusted badge on profile", "Priority in search results", "Higher response rates", "Access to premium features"].map((b) => (
+                  {(verificationCategory === "tenant"
+                    ? ["Phone verified badge on profile", "Trusted tenant status", "Higher response rates"]
+                    : ["Trusted badge on profile", "Priority in search results", "Higher response rates", "Access to premium features"]
+                  ).map((b) => (
                     <div key={b} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
                       <span>{b}</span>
@@ -362,10 +673,15 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 </div>
                 <h2 className="text-xl font-bold text-foreground mb-2">Verification Failed</h2>
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
-                  We couldn't verify your identity. This could be due to poor image quality or a mismatch. Please try again.
+                  {verificationCategory === "tenant"
+                    ? "We couldn't match your name to the phone number. Please check your details and try again."
+                    : "We couldn't verify your identity. This could be due to poor image quality or a mismatch. Please try again."}
                 </p>
                 <div className="w-full max-w-xs space-y-2 mb-6">
-                  {["Ensure document is not expired", "Use better lighting", "Remove any obstructions from face", "Make sure all text is readable"].map((t) => (
+                  {(verificationCategory === "tenant"
+                    ? ["Check first and last name spelling", "Use the number registered in your name", "Ensure OTP was entered correctly"]
+                    : ["Ensure document is not expired", "Use better lighting", "Remove any obstructions from face", "Make sure all text is readable"]
+                  ).map((t) => (
                     <div key={t} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <AlertCircle className="w-3 h-3 text-destructive shrink-0" />
                       <span>{t}</span>
@@ -376,7 +692,19 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             )}
 
             <button
-              onClick={result === "success" ? onClose : () => { setStep("id_upload"); setIdFrontUploaded(false); setIdBackUploaded(false); setSelfieCapture("none"); }}
+              onClick={result === "success" ? onClose : () => {
+                if (verificationCategory === "tenant") {
+                  setStep("tenant_info");
+                  setOtp("");
+                  setOtpSent(false);
+                  setOtpVerified(false);
+                } else {
+                  setStep("id_upload");
+                  setIdFrontUploaded(false);
+                  setIdBackUploaded(false);
+                  setSelfieCapture("none");
+                }
+              }}
               className="w-full max-w-xs py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all mt-4"
             >
               {result === "success" ? "Done" : "Try Again"}

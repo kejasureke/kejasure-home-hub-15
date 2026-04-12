@@ -11,6 +11,8 @@ interface ProfileSetupProps {
 // ─── Tenant Setup ───
 const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: () => void }) => {
   const [step, setStep] = useState(0);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [counties, setCounties] = useState<string[]>([]);
   const [budget, setBudget] = useState("");
   const [bedrooms, setBedrooms] = useState("");
