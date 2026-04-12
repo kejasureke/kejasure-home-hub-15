@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, MapPin, Wallet, Bed, ChevronRight, Home, Sparkles } from "lucide-react";
+import { ArrowLeft, MapPin, Wallet, Bed, ChevronRight, Home, Sparkles, User, FileText, AlertCircle } from "lucide-react";
 import type { UserRole } from "./RoleSelection";
 
 interface ProfileSetupProps {
@@ -11,6 +11,8 @@ interface ProfileSetupProps {
 // ─── Tenant Setup ───
 const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: () => void }) => {
   const [step, setStep] = useState(0);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [counties, setCounties] = useState<string[]>([]);
   const [budget, setBudget] = useState("");
   const [bedrooms, setBedrooms] = useState("");
@@ -21,6 +23,41 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
   const bedroomOptions = ["Studio", "1 BR", "2 BR", "3 BR", "4+ BR"];
 
   const steps = [
+    {
+      icon: User,
+      title: "What's your name?",
+      subtitle: "Used for phone verification via Smile ID",
+      content: (
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">First Name</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="e.g. John"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Last Name</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="e.g. Kamau"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+            />
+          </div>
+          <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
+            <p className="text-[11px] text-muted-foreground">
+              📱 Your name will be matched against your phone number's registered owner via Smile ID verification.
+            </p>
+          </div>
+        </div>
+      ),
+      valid: firstName.trim().length > 0 && lastName.trim().length > 0,
+    },
     {
       icon: MapPin,
       title: "Where are you looking?",
@@ -351,13 +388,16 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
   const [step, setStep] = useState(0);
   const [type, setType] = useState("");
   const [category, setCategory] = useState("");
+  const [kraUploaded, setKraUploaded] = useState(false);
   const [serviceCounties, setServiceCounties] = useState<string[]>([]);
   const [plan, setPlan] = useState("");
 
   const categories = ["Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers", "Security", "Painters", "Fumigators"];
   const countyOpts = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu", "Uasin Gishu", "Machakos", "Kajiado"];
 
-  const steps = [
+  const isIndividual = type === "Individual";
+
+  const baseSteps = [
     {
       icon: MapPin,
       title: "Service type",
@@ -393,6 +433,50 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
       ),
       valid: !!type && !!category,
     },
+  ];
+
+  const kraStep = {
+    icon: FileText,
+    title: "KRA PIN Certificate",
+    subtitle: "Required for individual service providers",
+    content: (
+      <div className="space-y-4">
+        <div
+          onClick={() => setKraUploaded(true)}
+          className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
+            kraUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
+          }`}
+        >
+          {kraUploaded ? (
+            <div className="flex flex-col items-center gap-2">
+              <FileText className="w-10 h-10 text-primary" />
+              <p className="text-sm font-semibold text-primary">KRA PIN uploaded</p>
+              <p className="text-xs text-muted-foreground">Tap to re-upload</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center">
+                <FileText className="w-7 h-7 text-muted-foreground" />
+              </div>
+              <p className="text-sm font-semibold">Upload KRA PIN Certificate</p>
+              <p className="text-xs text-muted-foreground">Tap to upload</p>
+            </div>
+          )}
+        </div>
+        <div className="p-3 rounded-xl bg-destructive/5 border border-destructive/15">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+            <p className="text-[11px] text-muted-foreground">
+              <span className="font-semibold text-destructive">Required:</span> KRA PIN is mandatory for all individual service providers.
+            </p>
+          </div>
+        </div>
+      </div>
+    ),
+    valid: kraUploaded,
+  };
+
+  const remainingSteps = [
     {
       icon: Home,
       title: "Coverage & portfolio",
@@ -453,6 +537,10 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
       valid: !!plan,
     },
   ];
+
+  const steps = isIndividual
+    ? [...baseSteps, kraStep, ...remainingSteps]
+    : [...baseSteps, ...remainingSteps];
 
   return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={onComplete} onBack={onBack} />;
 };
