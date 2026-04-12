@@ -25,6 +25,41 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
 
   const steps = [
     {
+      icon: User,
+      title: "What's your name?",
+      subtitle: "Used for phone verification via Smile ID",
+      content: (
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">First Name</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="e.g. John"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Last Name</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="e.g. Kamau"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
+            />
+          </div>
+          <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
+            <p className="text-[11px] text-muted-foreground">
+              📱 Your name will be matched against your phone number's registered owner via Smile ID verification.
+            </p>
+          </div>
+        </div>
+      ),
+      valid: firstName.trim().length > 0 && lastName.trim().length > 0,
+    },
+    {
       icon: MapPin,
       title: "Where are you looking?",
       subtitle: "Select preferred counties",
