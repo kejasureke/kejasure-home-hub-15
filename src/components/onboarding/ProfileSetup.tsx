@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { User } from "lucide-react";
-import { ArrowLeft, MapPin, Wallet, Bed, ChevronRight, Home, Sparkles } from "lucide-react";
+import { ArrowLeft, MapPin, Wallet, Bed, ChevronRight, Home, Sparkles, User, FileText, AlertCircle } from "lucide-react";
 import type { UserRole } from "./RoleSelection";
 
 interface ProfileSetupProps {
