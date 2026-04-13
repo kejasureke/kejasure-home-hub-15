@@ -1,4 +1,5 @@
 import { useState } from "react";
+import KYCPromptBanner from "./KYCPromptBanner";
 import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft, Edit3, Trash2, CheckCircle2, X, Clock, MapPin } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import ListingCRUD from "./ListingCRUD";
@@ -103,6 +104,7 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
 
       {/* Stats */}
       <div className="px-4 -mt-4">
+        <KYCPromptBanner role="landlord" />
         <div className="grid grid-cols-2 gap-3 mb-6">
           {stats.map((stat) => (
             <div key={stat.label} className="bg-card rounded-2xl card-shadow p-4">

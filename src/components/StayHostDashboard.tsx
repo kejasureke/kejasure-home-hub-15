@@ -1,4 +1,5 @@
 import { useState } from "react";
+import KYCPromptBanner from "./KYCPromptBanner";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
   Calendar, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
