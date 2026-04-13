@@ -145,82 +145,50 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
 // ─── Landlord Setup ───
 const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: () => void }) => {
   const [step, setStep] = useState(0);
-  const [idType, setIdType] = useState("");
-  const [plan, setPlan] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [propertyCount, setPropertyCount] = useState("");
 
   const steps = [
     {
-      icon: MapPin,
-      title: "Verify your identity",
-      subtitle: "Required for landlord verification badge",
+      icon: User,
+      title: "What's your name?",
+      subtitle: "Used for phone verification via Smile ID",
       content: (
         <div className="space-y-3">
-          {["National ID", "Passport", "Alien ID"].map((t) => (
-            <button
-              key={t}
-              onClick={() => setIdType(t)}
-              className={`w-full p-4 rounded-2xl text-left text-sm font-semibold transition-all ${
-                idType === t ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-          <div className="p-4 rounded-2xl bg-card border-2 border-dashed border-border text-center">
-            <p className="text-sm text-muted-foreground">📷 Upload {idType || "ID"} photo</p>
-            <p className="text-[10px] text-muted-foreground/60 mt-1">Front & back required</p>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">First Name</label>
+            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. John"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
-          <div className="p-4 rounded-2xl bg-card border-2 border-dashed border-border text-center">
-            <p className="text-sm text-muted-foreground">📄 KRA PIN Certificate</p>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Last Name</label>
+            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="e.g. Kamau"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
+            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via Smile ID verification.</p>
           </div>
         </div>
       ),
-      valid: !!idType,
+      valid: firstName.trim().length > 0 && lastName.trim().length > 0,
     },
     {
       icon: Home,
-      title: "Ownership proof",
-      subtitle: "Upload proof of property ownership",
+      title: "How many properties?",
+      subtitle: "Tell us about your portfolio",
       content: (
-        <div className="space-y-3">
-          {["Title Deed", "Sale Agreement", "Rent Agreement (Agent)", "Authorization Letter"].map((d) => (
-            <div key={d} className="p-4 rounded-2xl bg-card border-2 border-dashed border-border text-center">
-              <p className="text-sm text-muted-foreground">📄 {d}</p>
-              <p className="text-[10px] text-muted-foreground/60 mt-1">Tap to upload</p>
-            </div>
-          ))}
-        </div>
-      ),
-      valid: true,
-    },
-    {
-      icon: Sparkles,
-      title: "Choose your plan",
-      subtitle: "Select a subscription to start listing",
-      content: (
-        <div className="space-y-3">
-          {[
-            { name: "Basic", price: "Free", desc: "1 listing, basic features" },
-            { name: "Pro", price: "KES 500/mo", desc: "5 listings, analytics, priority" },
-            { name: "Premium", price: "KES 1,500/mo", desc: "Unlimited listings, top placement" },
-          ].map((p) => (
-            <button
-              key={p.name}
-              onClick={() => setPlan(p.name)}
-              className={`w-full p-4 rounded-2xl text-left transition-all ${
-                plan === p.name ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
+        <div className="space-y-2.5">
+          {["1 property", "2-5 properties", "6-10 properties", "10+ properties"].map((p) => (
+            <button key={p} onClick={() => setPropertyCount(p)}
+              className={`w-full p-4 rounded-2xl text-left text-sm font-semibold transition-all ${
+                propertyCount === p ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
               }`}
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold">{p.name}</p>
-                <p className="text-sm font-bold text-primary">{p.price}</p>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">{p.desc}</p>
-            </button>
+            >{p}</button>
           ))}
         </div>
       ),
-      valid: !!plan,
+      valid: !!propertyCount,
     },
   ];
 
@@ -230,75 +198,45 @@ const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
 // ─── Agency Setup ───
 const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: () => void }) => {
   const [step, setStep] = useState(0);
-  const [teamSize, setTeamSize] = useState("");
-  const [plan, setPlan] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [agencyName, setAgencyName] = useState("");
 
   const steps = [
     {
-      icon: MapPin,
-      title: "Business documents",
-      subtitle: "Verify your agency",
+      icon: User,
+      title: "What's your name?",
+      subtitle: "Used for phone verification via Smile ID",
       content: (
         <div className="space-y-3">
-          {["Business Certificate", "KRA PIN Certificate", "Agency Logo"].map((d) => (
-            <div key={d} className="p-4 rounded-2xl bg-card border-2 border-dashed border-border text-center">
-              <p className="text-sm text-muted-foreground">📄 {d}</p>
-              <p className="text-[10px] text-muted-foreground/60 mt-1">Tap to upload</p>
-            </div>
-          ))}
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">First Name</label>
+            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. John"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Last Name</label>
+            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="e.g. Kamau"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
+            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via Smile ID verification.</p>
+          </div>
         </div>
       ),
-      valid: true,
+      valid: firstName.trim().length > 0 && lastName.trim().length > 0,
     },
     {
       icon: Home,
-      title: "Agency details",
-      subtitle: "Tell us about your team",
+      title: "Agency name",
+      subtitle: "What's your agency called?",
       content: (
         <div className="space-y-3">
-          {["1-5 agents", "6-15 agents", "16-50 agents", "50+"].map((s) => (
-            <button
-              key={s}
-              onClick={() => setTeamSize(s)}
-              className={`w-full p-4 rounded-2xl text-left text-sm font-semibold transition-all ${
-                teamSize === s ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
-              }`}
-            >
-              {s}
-            </button>
-          ))}
+          <input type="text" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} placeholder="e.g. KejaPrime Realtors"
+            className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
         </div>
       ),
-      valid: !!teamSize,
-    },
-    {
-      icon: Sparkles,
-      title: "Choose your plan",
-      subtitle: "Agency subscription",
-      content: (
-        <div className="space-y-3">
-          {[
-            { name: "Starter", price: "KES 2,000/mo", desc: "10 listings, 3 agents" },
-            { name: "Growth", price: "KES 5,000/mo", desc: "50 listings, 10 agents, analytics" },
-            { name: "Enterprise", price: "KES 15,000/mo", desc: "Unlimited everything" },
-          ].map((p) => (
-            <button
-              key={p.name}
-              onClick={() => setPlan(p.name)}
-              className={`w-full p-4 rounded-2xl text-left transition-all ${
-                plan === p.name ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold">{p.name}</p>
-                <p className="text-sm font-bold text-primary">{p.price}</p>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">{p.desc}</p>
-            </button>
-          ))}
-        </div>
-      ),
-      valid: !!plan,
+      valid: agencyName.trim().length > 0,
     },
   ];
 
@@ -308,75 +246,50 @@ const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
 // ─── Stay Host Setup ───
 const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: () => void }) => {
   const [step, setStep] = useState(0);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [propertyType, setPropertyType] = useState("");
-  const [plan, setPlan] = useState("");
 
   const steps = [
     {
-      icon: MapPin,
-      title: "Host verification",
-      subtitle: "Verify your identity to host",
+      icon: User,
+      title: "What's your name?",
+      subtitle: "Used for phone verification via Smile ID",
       content: (
         <div className="space-y-3">
-          {["National ID (front & back)", "KRA PIN Certificate", "Property Photos"].map((d) => (
-            <div key={d} className="p-4 rounded-2xl bg-card border-2 border-dashed border-border text-center">
-              <p className="text-sm text-muted-foreground">📄 {d}</p>
-              <p className="text-[10px] text-muted-foreground/60 mt-1">Tap to upload</p>
-            </div>
-          ))}
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">First Name</label>
+            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. John"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Last Name</label>
+            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="e.g. Kamau"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
+            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via Smile ID verification.</p>
+          </div>
         </div>
       ),
-      valid: true,
+      valid: firstName.trim().length > 0 && lastName.trim().length > 0,
     },
     {
       icon: Home,
-      title: "Your first stay",
-      subtitle: "Set up your property",
+      title: "What type of stay?",
+      subtitle: "What kind of property will you host?",
       content: (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {["Apartment", "Villa", "Cottage", "Penthouse", "Studio"].map((t) => (
-            <button
-              key={t}
-              onClick={() => setPropertyType(t)}
+            <button key={t} onClick={() => setPropertyType(t)}
               className={`w-full p-4 rounded-2xl text-left text-sm font-semibold transition-all ${
                 propertyType === t ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
               }`}
-            >
-              {t}
-            </button>
+            >{t}</button>
           ))}
         </div>
       ),
       valid: !!propertyType,
-    },
-    {
-      icon: Sparkles,
-      title: "Choose your plan",
-      subtitle: "Host subscription",
-      content: (
-        <div className="space-y-3">
-          {[
-            { name: "Starter", price: "Free", desc: "1 property, basic visibility" },
-            { name: "Pro Host", price: "KES 1,000/mo", desc: "3 properties, featured placement" },
-            { name: "Super Host", price: "KES 3,000/mo", desc: "Unlimited, priority booking, analytics" },
-          ].map((p) => (
-            <button
-              key={p.name}
-              onClick={() => setPlan(p.name)}
-              className={`w-full p-4 rounded-2xl text-left transition-all ${
-                plan === p.name ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold">{p.name}</p>
-                <p className="text-sm font-bold text-primary">{p.price}</p>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">{p.desc}</p>
-            </button>
-          ))}
-        </div>
-      ),
-      valid: !!plan,
     },
   ];
 
