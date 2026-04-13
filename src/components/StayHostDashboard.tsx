@@ -103,6 +103,7 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
 
       {/* Tabs */}
       <div className="px-4 -mt-4">
+        <KYCPromptBanner role="stayhost" />
         <div className="flex gap-1 p-1 rounded-xl bg-card card-shadow mb-4">
           {tabs.map((t) => (
             <button
