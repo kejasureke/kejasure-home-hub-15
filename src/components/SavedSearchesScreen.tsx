@@ -7,6 +7,7 @@ interface SavedSearchesScreenProps {
   onRunSearch?: (search: SavedSearch) => void;
 }
 
+
 const SavedSearchesScreen = ({ onBack, onRunSearch }: SavedSearchesScreenProps) => {
   const { searches, removeSearch, saveSearch } = useSavedSearches();
   const [alertsEnabled, setAlertsEnabled] = useState<Record<string, boolean>>({});
