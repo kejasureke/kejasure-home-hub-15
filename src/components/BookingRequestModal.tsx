@@ -40,6 +40,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
           type: "booking",
           title: `${isShortStay ? "Booking" : "Viewing"} Accepted! 🎉`,
           body: `Your ${isShortStay ? "booking" : "viewing"} for ${property.title} has been confirmed.`,
+          action: "open-chats",
         });
       }, 3500);
       return () => clearTimeout(timer);
