@@ -53,11 +53,19 @@ const topCounties = [
 
 type Tab = "overview" | "agents" | "leads" | "billing";
 
-const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
+const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
-  const { isVerified } = useKYCStatus("agency");
+  const [showKYCDirect, setShowKYCDirect] = useState(false);
+  const { isVerified, markVerified } = useKYCStatus("agency");
+
+  useEffect(() => {
+    if (autoOpenKYC && !isVerified) {
+      setShowKYCDirect(true);
+      onKYCOpened?.();
+    }
+  }, [autoOpenKYC, isVerified, onKYCOpened]);
   const currentPlan = plans.find((p) => p.current)!;
 
   const agencyMpesaPlans = plans.map((p) => ({

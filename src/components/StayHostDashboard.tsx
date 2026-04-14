@@ -57,11 +57,19 @@ const countyOccupancy = [
 
 type Tab = "overview" | "calendar" | "guests" | "billing";
 
-const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
+const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
-  const { isVerified } = useKYCStatus("stayhost");
+  const [showKYCDirect, setShowKYCDirect] = useState(false);
+  const { isVerified, markVerified } = useKYCStatus("stayhost");
+
+  useEffect(() => {
+    if (autoOpenKYC && !isVerified) {
+      setShowKYCDirect(true);
+      onKYCOpened?.();
+    }
+  }, [autoOpenKYC, isVerified, onKYCOpened]);
   const currentPlan = plans.find((p) => p.current)!;
 
   const hostMpesaPlans = plans.map((p) => ({
