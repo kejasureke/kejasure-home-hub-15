@@ -215,7 +215,7 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
         </div>
       </div>
 
-      <div className="px-4 -mt-4 pb-8">
+      <div className="px-4 -mt-4 pb-24">
         {/* Trust banner */}
         <div className="flex items-center gap-2 p-3 rounded-xl bg-card card-shadow mb-4">
           <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
@@ -306,15 +306,8 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
             className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2 mb-3"
           >
             <Zap className="w-4 h-4" />
-            {plans[selectedPlan].current
-              ? `Renew ${plans[selectedPlan].name} — KES ${plans[selectedPlan].price.toLocaleString()}/mo`
-              : `Upgrade to ${plans[selectedPlan].name} — KES ${plans[selectedPlan].price.toLocaleString()}/mo`}
+            {`Subscribe — KES ${plans[selectedPlan].price.toLocaleString()}${plans[selectedPlan].duration}`}
           </button>
-        ) : (
-          <div className="w-full py-4 rounded-xl bg-secondary text-sm font-bold text-secondary-foreground text-center mb-3">
-            You're on the Free plan
-          </div>
-        )}
 
         <p className="text-center text-[10px] text-muted-foreground">
           Billed monthly via M-Pesa · Cancel anytime · No auto-renewal
