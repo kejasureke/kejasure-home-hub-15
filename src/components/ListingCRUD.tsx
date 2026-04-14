@@ -321,7 +321,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
               )}
             </div>
 
-            {type !== "service" && (
+            {type !== "service" && form.type !== "commercial" && (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -382,6 +382,29 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                   </button>
                 </div>
               </>
+            )}
+
+            {form.type === "commercial" && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Size (sqft)</label>
+                  <input
+                    value={form.sizeSqft}
+                    onChange={(e) => update({ sizeSqft: e.target.value })}
+                    placeholder="e.g. 1,200"
+                    className="w-full px-3 py-2.5 rounded-xl bg-card card-shadow text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Floor</label>
+                  <input
+                    value={form.floor}
+                    onChange={(e) => update({ floor: e.target.value })}
+                    placeholder="e.g. Ground"
+                    className="w-full px-3 py-2.5 rounded-xl bg-card card-shadow text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                </div>
+              </div>
             )}
 
             {type === "service" && (
