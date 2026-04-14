@@ -17,7 +17,6 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useUserRole } from "@/hooks/useUserRole";
 import { properties } from "@/data/mockData";
-import PropertyCard from "@/components/PropertyCard";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
