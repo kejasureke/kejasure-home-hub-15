@@ -81,6 +81,17 @@ const Index = () => {
   const chatBadge = 2;
   const profileBadge = storedUnread + liveUnread;
 
+  if (selectedProperty) {
+    return (
+      <ListingDetail
+        property={selectedProperty}
+        onBack={() => setSelectedProperty(null)}
+        liked={isFavorite(selectedProperty.id)}
+        onToggleLike={() => toggleFavorite(selectedProperty.id)}
+      />
+    );
+  }
+
   if (showChat && chatContact) {
     return (
       <ChatScreen
