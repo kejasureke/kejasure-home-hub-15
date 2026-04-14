@@ -30,6 +30,7 @@ const Index = () => {
   const { role, isTenant } = useUserRole();
   const [showKYCFromNotification, setShowKYCFromNotification] = useState(false);
   const [exploreSearchQuery, setExploreSearchQuery] = useState("");
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const {
     alerts,
     toast,
