@@ -73,6 +73,7 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
   const handleRemindLater = () => {
     setDismissed(true);
     localStorage.setItem(remindKey, String(Date.now() + TWENTY_FOUR_HOURS));
+    localStorage.removeItem(`kejasure_kyc_snooze_notified_${role}`);
   };
 
   return (
