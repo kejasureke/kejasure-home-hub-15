@@ -369,7 +369,7 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
                 <PropertyCard
                   key={p.id}
                   property={p}
-                  onPress={() => addRecent(p.id)}
+                  onPress={() => { addRecent(p.id); setSelectedProperty(p); }}
                   liked={isFavorite(p.id)}
                   onToggleLike={toggleFavorite}
                 />
