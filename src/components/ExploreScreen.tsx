@@ -198,6 +198,52 @@ const ExploreScreen = () => {
               );
             })}
           </div>
+
+          {/* By Neighborhood */}
+          <h2 className="text-sm font-semibold text-foreground mb-3">By Neighborhood</h2>
+          <div className="space-y-3 mb-6">
+            {neighborhoodProfiles.map((area) => {
+              const listingCount = properties.filter((p) => p.estate === area.estate).length;
+              const avgRent = Math.round((area.avgRent1BR + area.avgRent2BR) / 2 / 1000);
+              return (
+                <button
+                  key={area.estate}
+                  onClick={() => setActiveArea(area.estate)}
+                  className="w-full p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-all text-left"
+                >
+                  <div className="flex items-start justify-between mb-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                        <MapPin className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">{area.estate}</p>
+                        <p className="text-[10px] text-muted-foreground">{area.county} · {listingCount} listings · ~KES {avgRent}K avg</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary">
+                      <Shield className="w-3 h-3 text-trust" />
+                      <span className="text-[10px] font-medium text-muted-foreground">{area.safetyRating}/10</span>
+                    </div>
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary">
+                      <Droplets className="w-3 h-3 text-primary" />
+                      <span className="text-[10px] font-medium text-muted-foreground">{area.waterReliability}/10</span>
+                    </div>
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary">
+                      <Zap className="w-3 h-3 text-accent" />
+                      <span className="text-[10px] font-medium text-muted-foreground">{area.electricityReliability}/10</span>
+                    </div>
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary">
+                      <Footprints className="w-3 h-3 text-trust" />
+                      <span className="text-[10px] font-medium text-muted-foreground">{area.walkabilityScore}/10</span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       ) : (
         /* Results */
