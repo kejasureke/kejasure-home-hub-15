@@ -37,7 +37,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
 
   return (
-    <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
       {/* Image Carousel */}
       <div className="relative aspect-[4/3] bg-muted">
         <img src={property.images[currentImage]} alt={property.title} className="w-full h-full object-cover" />
