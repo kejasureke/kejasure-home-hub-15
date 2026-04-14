@@ -97,7 +97,7 @@ const DisputeFlow = ({ onClose }: DisputeFlowProps) => {
   // Track existing disputes
   if (step === "track") {
     return (
-      <div className="fixed inset-0 z-[60] bg-background overflow-y-auto " + (closing ? "animate-slide-down" : "animate-slide-up") + "">
+      <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
         <div className="px-4 pt-5 pb-8">
           <div className="flex items-center gap-3 mb-5">
             <button onClick={triggerClose} className="p-1"><ArrowLeft className="w-5 h-5 text-foreground" /></button>
@@ -162,7 +162,7 @@ const DisputeFlow = ({ onClose }: DisputeFlowProps) => {
 
   // Main flow: select + details
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto " + (closing ? "animate-slide-down" : "animate-slide-up") + "">
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       <div className="px-4 pt-5 pb-8">
         <div className="flex items-center gap-3 mb-5">
           <button onClick={step === "details" ? () => setStep("select") : onClose} className="p-1">
