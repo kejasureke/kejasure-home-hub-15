@@ -124,11 +124,7 @@ const ExploreScreen = () => {
         <div className="flex items-center gap-3 mb-4">
           {showingResults ? (
             <button
-              onClick={() => {
-                setActiveCategory(null);
-                setActivePriceRange(null);
-                setSearchQuery("");
-              }}
+              onClick={clearFilters}
               className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0"
             >
               <ArrowLeft className="w-4 h-4 text-foreground" />
