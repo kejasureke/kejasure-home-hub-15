@@ -1,5 +1,7 @@
 import { useState } from "react";
 import KYCPromptBanner from "./KYCPromptBanner";
+import VerificationBadge from "./VerificationBadge";
+import { useKYCStatus } from "@/hooks/useKYCStatus";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
   Calendar, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,

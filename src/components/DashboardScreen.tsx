@@ -1,5 +1,7 @@
 import { useState } from "react";
 import KYCPromptBanner from "./KYCPromptBanner";
+import VerificationBadge from "./VerificationBadge";
+import { useKYCStatus } from "@/hooks/useKYCStatus";
 import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft, Edit3, Trash2, CheckCircle2, X, Clock, MapPin } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import ListingCRUD from "./ListingCRUD";
@@ -44,6 +46,8 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
   const [showPayment, setShowPayment] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
+  const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>(initialBookingRequests);
+  const { isVerified } = useKYCStatus("landlord");
   const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>(initialBookingRequests);
 
   const myListings = [
@@ -96,7 +100,10 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
             <span className="text-lg font-bold text-primary-foreground">JK</span>
           </div>
           <div>
-            <h2 className="text-base font-semibold text-primary-foreground">John Kamau</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-semibold text-primary-foreground">John Kamau</h2>
+              <VerificationBadge isVerified={isVerified} variant="light" />
+            </div>
             <p className="text-xs text-primary-foreground/70">Landlord · 4 listings</p>
           </div>
         </div>
