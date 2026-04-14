@@ -79,6 +79,7 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
         body: action === "accepted"
           ? `${booking.property} on ${booking.date} at ${booking.time} — contact shared with tenant.`
           : `${booking.property} viewing request on ${booking.date} has been declined.`,
+        action: "open-dashboard",
       });
     }
   };
