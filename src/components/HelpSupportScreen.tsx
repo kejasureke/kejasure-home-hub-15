@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, HelpCircle, MessageCircle, ChevronDown, ChevronUp, Send, Star, Phone, Mail, ExternalLink } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 
 interface HelpSupportScreenProps {
   onBack: () => void;
