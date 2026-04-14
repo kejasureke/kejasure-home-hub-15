@@ -10,27 +10,27 @@ interface SubscriptionPlansProps {
 
 const tenantPlans = [
   {
-    name: "Free",
-    price: 0,
-    duration: "Forever",
-    features: ["Browse all listings", "Save up to 5 favorites", "Basic search filters", "View landlord ratings"],
-    notIncluded: ["Direct contact info", "In-app chat", "Advanced filters", "Priority alerts"],
+    name: "24 Hours",
+    price: 50,
+    duration: "",
+    features: ["Exact map pin location", "Full landlord phone number", "In-app chat access", "Direct service contact", "Short stay booking confirmation"],
+    notIncluded: ["Unlimited favorites", "Advanced filters", "Verified featured listings first"],
     current: false,
   },
   {
-    name: "Plus",
-    price: 299,
-    duration: "/month",
-    features: ["Everything in Free", "Unlimited favorites", "Direct phone numbers", "In-app chat access", "Advanced filters", "Priority county alerts"],
-    notIncluded: ["Featured listing access", "Neighborhood insights"],
+    name: "3 Days",
+    price: 100,
+    duration: "",
+    features: ["Everything in 24 Hours", "Unlimited favorites", "Advanced filters", "Priority county alerts", "Verified featured listings first"],
+    notIncluded: ["Price drop alerts"],
     popular: true,
-    current: true,
+    current: false,
   },
   {
-    name: "Premium",
-    price: 499,
-    duration: "/month",
-    features: ["Everything in Plus", "Early access to new listings", "Neighborhood safety scores", "Verified-only feed", "Priority support", "Price drop alerts"],
+    name: "7 Days",
+    price: 200,
+    duration: "",
+    features: ["Everything in 3 Days", "Price drop alerts", "Neighborhood safety scores", "Verified-only feed", "Priority support"],
     notIncluded: [],
     current: false,
   },
@@ -42,7 +42,7 @@ const landlordPlans = [
     price: 500,
     duration: "/month",
     features: ["3 active listings", "Basic analytics", "Guest inquiries", "Standard placement"],
-    notIncluded: ["Boost listings", "Priority support", "Heatmaps"],
+    notIncluded: ["Boost listings", "Priority support", "County heatmaps"],
     current: false,
   },
   {
@@ -52,7 +52,7 @@ const landlordPlans = [
     features: ["10 active listings", "Full analytics", "Priority chat", "1 monthly boost", "Lead tracking"],
     notIncluded: ["Unlimited listings", "County heatmaps"],
     popular: true,
-    current: true,
+    current: false,
   },
   {
     name: "Premium",
@@ -70,7 +70,7 @@ const agencyPlans = [
     price: 2000,
     duration: "/month",
     features: ["5 agent accounts", "50 listings", "Basic CRM", "Lead assignment"],
-    notIncluded: ["Advanced CRM", "API access"],
+    notIncluded: ["Advanced CRM", "API access", "White label"],
     current: false,
   },
   {
@@ -80,7 +80,7 @@ const agencyPlans = [
     features: ["15 agent accounts", "200 listings", "Full CRM", "Lead assignment", "Performance analytics", "5 monthly boosts"],
     notIncluded: ["API access", "White label"],
     popular: true,
-    current: true,
+    current: false,
   },
   {
     name: "Enterprise",
@@ -98,7 +98,7 @@ const stayHostPlans = [
     price: 1000,
     duration: "/month",
     features: ["2 stay listings", "Basic calendar", "Guest chat", "Standard placement"],
-    notIncluded: ["Smart pricing", "Priority support"],
+    notIncluded: ["Smart pricing", "Priority support", "County heatmap"],
     current: false,
   },
   {
@@ -108,7 +108,7 @@ const stayHostPlans = [
     features: ["10 stay listings", "Full calendar sync", "Priority chat", "Featured stays", "Booking analytics", "2 monthly boosts"],
     notIncluded: ["Smart pricing"],
     popular: true,
-    current: true,
+    current: false,
   },
   {
     name: "Premium",
@@ -125,6 +125,7 @@ const serviceProviderPlans = [
     name: "Basic",
     price: 500,
     duration: "/month",
+    badge: "Individual",
     features: ["1 service listing", "5 bookings/month", "Basic profile", "Client messaging"],
     notIncluded: ["Portfolio gallery", "Priority placement"],
     current: false,
@@ -133,16 +134,27 @@ const serviceProviderPlans = [
     name: "Pro",
     price: 1000,
     duration: "/month",
+    badge: "Individual",
     features: ["3 service listings", "Unlimited bookings", "Priority chat", "Portfolio gallery", "Client reviews showcase"],
-    notIncluded: ["Team members"],
+    notIncluded: ["Team members", "CRM tools"],
     popular: true,
-    current: true,
+    current: false,
   },
   {
-    name: "Business",
+    name: "Business Pro",
     price: 3000,
     duration: "/month",
+    badge: "Business",
     features: ["10 service listings", "Team members", "CRM tools", "County analytics", "Featured profile", "Priority support"],
+    notIncluded: ["Unlimited listings"],
+    current: false,
+  },
+  {
+    name: "Enterprise",
+    price: 5000,
+    duration: "/month",
+    badge: "Business",
+    features: ["Unlimited listings", "Unlimited team", "Full CRM", "County analytics", "Featured profile", "Priority support", "API access"],
     notIncluded: [],
     current: false,
   },
@@ -203,7 +215,7 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
         </div>
       </div>
 
-      <div className="px-4 -mt-4 pb-8">
+      <div className="px-4 -mt-4 pb-24">
         {/* Trust banner */}
         <div className="flex items-center gap-2 p-3 rounded-xl bg-card card-shadow mb-4">
           <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
@@ -221,16 +233,16 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
               className={`w-full text-left p-4 rounded-2xl border-2 transition-all active:scale-[0.98] relative ${
                 plan.popular
                   ? selectedPlan === i
-                    ? "border-accent gradient-cream-gold card-shadow-hover ring-2 ring-accent/30"
-                    : "border-accent/50 gradient-cream-gold"
+                    ? "border-accent bg-accent/10 dark:bg-accent/20 card-shadow-hover ring-2 ring-accent/30"
+                    : "border-accent/50 bg-accent/5 dark:bg-accent/10"
                   : selectedPlan === i
                     ? "border-primary bg-primary/5 ring-2 ring-primary/20"
                     : "border-border bg-card"
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full gradient-premium text-[9px] font-bold text-accent-foreground uppercase tracking-wider whitespace-nowrap">
-                  ⭐ Most Popular
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-accent text-[9px] font-bold text-white uppercase tracking-wider whitespace-nowrap">
+                  ⭐ Best Value
                 </div>
               )}
               {plan.current && (
@@ -248,8 +260,13 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
                   }`}>
                     {selectedPlan === i && <Check className="w-3 h-3 text-white" />}
                   </div>
-                  <div>
+                   <div>
                     <h3 className="text-lg font-extrabold text-foreground">{plan.name}</h3>
+                    {(plan as any).badge && (
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                        (plan as any).badge === "Business" ? "bg-accent/15 text-accent-foreground" : "bg-primary/10 text-primary"
+                      }`}>{(plan as any).badge}</span>
+                    )}
                   </div>
                 </div>
                 <div className="text-right">
@@ -283,24 +300,16 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
         </div>
 
         {/* CTA */}
-        {plans[selectedPlan].price > 0 ? (
-          <button
-            onClick={() => setShowPayment(true)}
-            className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2 mb-3"
-          >
-            <Zap className="w-4 h-4" />
-            {plans[selectedPlan].current
-              ? `Renew ${plans[selectedPlan].name} — KES ${plans[selectedPlan].price.toLocaleString()}/mo`
-              : `Upgrade to ${plans[selectedPlan].name} — KES ${plans[selectedPlan].price.toLocaleString()}/mo`}
-          </button>
-        ) : (
-          <div className="w-full py-4 rounded-xl bg-secondary text-sm font-bold text-secondary-foreground text-center mb-3">
-            You're on the Free plan
-          </div>
-        )}
+        <button
+          onClick={() => setShowPayment(true)}
+          className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2 mb-3"
+        >
+          <Zap className="w-4 h-4" />
+          {`Subscribe — KES ${plans[selectedPlan].price.toLocaleString()}${plans[selectedPlan].duration}`}
+        </button>
 
         <p className="text-center text-[10px] text-muted-foreground">
-          Billed monthly via M-Pesa · Cancel anytime · No auto-renewal
+          Paid via M-Pesa · Cancel anytime · No auto-renewal
         </p>
       </div>
     </div>
