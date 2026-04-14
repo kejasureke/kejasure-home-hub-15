@@ -1,5 +1,6 @@
 import { useState } from "react";
 import KYCPromptBanner from "./KYCPromptBanner";
+import KYCSnoozeBanner from "./KYCSnoozeBanner";
 import VerificationBadge from "./VerificationBadge";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
 import {
