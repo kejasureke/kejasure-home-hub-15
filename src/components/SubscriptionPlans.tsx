@@ -300,17 +300,16 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
         </div>
 
         {/* CTA */}
-        {plans[selectedPlan].price > 0 ? (
-          <button
-            onClick={() => setShowPayment(true)}
-            className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2 mb-3"
-          >
-            <Zap className="w-4 h-4" />
-            {`Subscribe — KES ${plans[selectedPlan].price.toLocaleString()}${plans[selectedPlan].duration}`}
-          </button>
+        <button
+          onClick={() => setShowPayment(true)}
+          className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2 mb-3"
+        >
+          <Zap className="w-4 h-4" />
+          {`Subscribe — KES ${plans[selectedPlan].price.toLocaleString()}${plans[selectedPlan].duration}`}
+        </button>
 
         <p className="text-center text-[10px] text-muted-foreground">
-          Billed monthly via M-Pesa · Cancel anytime · No auto-renewal
+          Paid via M-Pesa · Cancel anytime · No auto-renewal
         </p>
       </div>
     </div>
