@@ -48,7 +48,6 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>(initialBookingRequests);
   const { isVerified } = useKYCStatus("landlord");
-  const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>(initialBookingRequests);
 
   const myListings = [
     { title: "3BR Kilimani", views: 847, leads: 23, status: "active" },
