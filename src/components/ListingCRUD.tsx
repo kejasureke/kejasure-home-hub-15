@@ -6,7 +6,7 @@ import {
 import AIPhotoVerification from "./AIPhotoVerification";
 import { kenyaCounties } from "@/data/kenyaCounties";
 
-type ListingType = "rental" | "shortstay" | "service";
+type ListingType = "rental" | "shortstay" | "service" | "commercial";
 
 interface ListingCRUDProps {
   type: ListingType;
@@ -17,7 +17,8 @@ interface ListingCRUDProps {
 interface ListingFormData {
   title: string;
   description: string;
-  type: "rental" | "shortstay" | "service";
+  type: "rental" | "shortstay" | "commercial" | "service";
+  commercialType: string;
   price: string;
   priceUnit: string;
   bedrooms: number;
@@ -33,6 +34,7 @@ interface ListingFormData {
   deposit: string;
   moveInDate: string;
   size: string;
+  sizeSqft: string;
   floor: string;
   featured: boolean;
   boostDays: number;
@@ -41,25 +43,61 @@ interface ListingFormData {
   availability: string;
 }
 
+const commercialTypes = [
+  { value: "shop", label: "🏪 Shop/Retail", desc: "Retail store, boutique, duka" },
+  { value: "office", label: "🏢 Office", desc: "Office suite, co-working" },
+  { value: "godown", label: "🏭 Godown/Warehouse", desc: "Storage, distribution" },
+  { value: "showroom", label: "🏬 Showroom", desc: "Display, gallery space" },
+];
+
 const defaultForm: ListingFormData = {
-  title: "", description: "", type: "rental", price: "", priceUnit: "/mo",
+  title: "", description: "", type: "rental", commercialType: "", price: "", priceUnit: "/mo",
   bedrooms: 1, bathrooms: 1, county: "", subcounty: "", estate: "",
   amenities: [], photos: [], videoUrl: "", furnished: false, petFriendly: false,
-  deposit: "", moveInDate: "", size: "", floor: "", featured: false, boostDays: 0,
+  deposit: "", moveInDate: "", size: "", sizeSqft: "", floor: "", featured: false, boostDays: 0,
   serviceCategory: "", availability: "",
 };
 
 const rentalAmenities = [
-  "Parking", "Swimming Pool", "Gym", "Security", "CCTV", "Elevator",
-  "Backup Generator", "Borehole", "Water Tank", "Fiber Internet",
-  "Balcony", "Garden", "Rooftop Terrace", "Servant Quarter", "Smart Home",
-  "AC", "Solar Panels", "Playground", "Laundry Room", "Pet Area",
+  // Internet & Connectivity
+  "WiFi (Safaricom)", "WiFi (Airtel/Faiba)", "Fiber Internet", "Starlink",
+  // Security
+  "24hr Security Guard", "CCTV", "Electric Fence", "Perimeter Wall", "Intercom", "Alarm System",
+  // Water & Power
+  "Borehole", "Water Tank", "Backup Generator", "Solar Panels", "Prepaid Meter",
+  // Facilities
+  "Parking", "Swimming Pool", "Gym", "Elevator", "Rooftop Terrace", "Garden",
+  "Playground", "Laundry Room", "BBQ Area", "Servant Quarter",
+  // Unit Features
+  "Balcony", "AC", "Hot Shower", "Bathtub", "Walk-in Closet", "Smart Home",
+  "Tiled Floors", "Wooden Floors", "DSQ", "Store Room",
+  // Pet & Misc
+  "Pet Area", "Wheelchair Access", "Garbage Collection",
 ];
 
 const stayAmenities = [
-  "WiFi", "Smart TV", "Kitchen", "Workspace", "Parking", "Pool",
-  "AC", "Washing Machine", "BBQ Area", "Ocean View", "City View",
+  "WiFi (Safaricom)", "WiFi (Airtel/Faiba)", "Starlink",
+  "Smart TV", "Netflix/DSTV", "Kitchen", "Workspace", "Parking",
+  "Swimming Pool", "AC", "Washing Machine", "BBQ Area",
+  "Ocean View", "City View", "Mountain View",
   "Jacuzzi", "Concierge", "Beach Access", "Gym", "Self Check-in",
+  "Hot Shower", "Iron & Board", "Coffee Machine", "Balcony",
+  "24hr Security Guard", "CCTV", "Backup Generator",
+];
+
+const commercialAmenities = [
+  // Connectivity
+  "Fiber Internet", "WiFi (Safaricom)", "WiFi (Airtel/Faiba)",
+  // Security
+  "24hr Security Guard", "CCTV", "Alarm System", "Electric Fence",
+  // Power & Water
+  "Backup Generator", "Solar Panels", "Borehole", "Water Tank", "3-Phase Power",
+  // Facilities
+  "Parking", "Loading Bay", "Elevator/Goods Lift", "Warehouse Space",
+  "Reception Area", "Meeting Room", "Kitchen/Pantry", "Washrooms",
+  // Features
+  "Street Frontage", "High Foot Traffic", "Ground Floor", "Corner Unit",
+  "Signage Space", "AC/HVAC", "Fire Safety System", "Wheelchair Access",
 ];
 
 const serviceCategories = [
@@ -90,7 +128,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
 
   const selectedCounty = kenyaCounties.find((c) => c.name === form.county);
-  const amenitiesList = type === "shortstay" ? stayAmenities : rentalAmenities;
+  const amenitiesList = form.type === "commercial" ? commercialAmenities : form.type === "shortstay" ? stayAmenities : rentalAmenities;
 
   const toggleAmenity = (a: string) => {
     update({
@@ -198,17 +236,39 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
               <div>
                 <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Listing Type</label>
                 <div className="flex gap-2">
-                  {(["rental", "shortstay"] as const).map((t) => (
+                  {(["rental", "shortstay", "commercial"] as const).map((t) => (
                     <button
                       key={t}
-                      onClick={() => update({ type: t, priceUnit: t === "shortstay" ? "/night" : "/mo" })}
-                      className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all ${
+                      onClick={() => update({ type: t, priceUnit: t === "shortstay" ? "/night" : "/mo", amenities: [] })}
+                      className={`flex-1 py-3 rounded-xl text-xs font-semibold transition-all ${
                         form.type === t
                           ? "bg-primary text-primary-foreground"
                           : "bg-card card-shadow text-foreground"
                       }`}
                     >
-                      {t === "rental" ? "🏠 Rental" : "🌙 Short Stay"}
+                      {t === "rental" ? "🏠 Rental" : t === "shortstay" ? "🌙 Short Stay" : "🏢 Commercial"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {form.type === "commercial" && (
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Commercial Type</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {commercialTypes.map((ct) => (
+                    <button
+                      key={ct.value}
+                      onClick={() => update({ commercialType: ct.value })}
+                      className={`py-3 px-3 rounded-xl text-left transition-all ${
+                        form.commercialType === ct.value
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card card-shadow text-foreground"
+                      }`}
+                    >
+                      <p className="text-sm font-semibold">{ct.label}</p>
+                      <p className={`text-[10px] mt-0.5 ${form.commercialType === ct.value ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{ct.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -261,7 +321,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
               )}
             </div>
 
-            {type !== "service" && (
+            {type !== "service" && form.type !== "commercial" && (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -322,6 +382,29 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                   </button>
                 </div>
               </>
+            )}
+
+            {form.type === "commercial" && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Size (sqft)</label>
+                  <input
+                    value={form.sizeSqft}
+                    onChange={(e) => update({ sizeSqft: e.target.value })}
+                    placeholder="e.g. 1,200"
+                    className="w-full px-3 py-2.5 rounded-xl bg-card card-shadow text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Floor</label>
+                  <input
+                    value={form.floor}
+                    onChange={(e) => update({ floor: e.target.value })}
+                    placeholder="e.g. Ground"
+                    className="w-full px-3 py-2.5 rounded-xl bg-card card-shadow text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                </div>
+              </div>
             )}
 
             {type === "service" && (

@@ -15,7 +15,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 
-const segments = ["Rentals", "Short Stays", "Corporate", "Services"] as const;
+const segments = ["Rentals", "Short Stays", "Commercial", "Corporate", "Services"] as const;
 
 const HomeFeed = () => {
   const [segment, setSegment] = useState<(typeof segments)[number]>("Rentals");
@@ -54,6 +54,7 @@ const HomeFeed = () => {
     let result = properties.filter((p) => {
       const matchType = segment === "Rentals" ? (p.type === "rental" && !p.corporate) :
                         segment === "Short Stays" ? (p.type === "shortstay" && !p.corporate) :
+                        segment === "Commercial" ? p.type === "commercial" :
                         segment === "Corporate" ? !!p.corporate :
                         true;
       const matchCounty = !county || p.county === county;
