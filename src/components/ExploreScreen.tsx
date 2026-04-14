@@ -83,6 +83,7 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
   const [activeArea, setActiveArea] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [insightsCollapsed, setInsightsCollapsed] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { addRecent } = useRecentlyViewed();
 
