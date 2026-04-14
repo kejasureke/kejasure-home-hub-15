@@ -20,6 +20,7 @@ import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useUserRole } from "@/hooks/useUserRole";
 import { properties } from "@/data/mockData";
 import PropertyCard from "@/components/PropertyCard";
+import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -165,11 +166,11 @@ const Index = () => {
           {favoriteProperties.length > 0 ? (
             <div className="space-y-4">
               {favoriteProperties.map((p) => (
-                <PropertyCard
+                <SwipeablePropertyCard
                   key={p.id}
                   property={p}
                   onPress={() => setSelectedProperty(p)}
-                  liked={true}
+                  onRemove={toggleFavorite}
                   onToggleLike={toggleFavorite}
                 />
               ))}
