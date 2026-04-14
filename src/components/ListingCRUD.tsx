@@ -6,7 +6,7 @@ import {
 import AIPhotoVerification from "./AIPhotoVerification";
 import { kenyaCounties } from "@/data/kenyaCounties";
 
-type ListingType = "rental" | "shortstay" | "service";
+type ListingType = "rental" | "shortstay" | "service" | "commercial";
 
 interface ListingCRUDProps {
   type: ListingType;
@@ -17,7 +17,8 @@ interface ListingCRUDProps {
 interface ListingFormData {
   title: string;
   description: string;
-  type: "rental" | "shortstay" | "service";
+  type: "rental" | "shortstay" | "commercial" | "service";
+  commercialType: string;
   price: string;
   priceUnit: string;
   bedrooms: number;
@@ -33,6 +34,7 @@ interface ListingFormData {
   deposit: string;
   moveInDate: string;
   size: string;
+  sizeSqft: string;
   floor: string;
   featured: boolean;
   boostDays: number;
@@ -41,11 +43,18 @@ interface ListingFormData {
   availability: string;
 }
 
+const commercialTypes = [
+  { value: "shop", label: "🏪 Shop/Retail", desc: "Retail store, boutique, duka" },
+  { value: "office", label: "🏢 Office", desc: "Office suite, co-working" },
+  { value: "godown", label: "🏭 Godown/Warehouse", desc: "Storage, distribution" },
+  { value: "showroom", label: "🏬 Showroom", desc: "Display, gallery space" },
+];
+
 const defaultForm: ListingFormData = {
-  title: "", description: "", type: "rental", price: "", priceUnit: "/mo",
+  title: "", description: "", type: "rental", commercialType: "", price: "", priceUnit: "/mo",
   bedrooms: 1, bathrooms: 1, county: "", subcounty: "", estate: "",
   amenities: [], photos: [], videoUrl: "", furnished: false, petFriendly: false,
-  deposit: "", moveInDate: "", size: "", floor: "", featured: false, boostDays: 0,
+  deposit: "", moveInDate: "", size: "", sizeSqft: "", floor: "", featured: false, boostDays: 0,
   serviceCategory: "", availability: "",
 };
 
