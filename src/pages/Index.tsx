@@ -143,7 +143,7 @@ const Index = () => {
 
       {activeTab === "dashboard" && renderDashboard()}
 
-      {activeTab === "search" && <ExploreScreen />}
+      {activeTab === "search" && <ExploreScreen initialSearch={exploreSearchQuery} key={exploreSearchQuery} />}
 
       {activeTab === "favorites" && (
         <div className="px-4 pt-6 pb-32">
