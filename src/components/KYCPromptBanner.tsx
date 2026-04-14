@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShieldCheck, ChevronRight, X, FileText, Building2, AlertTriangle } from "lucide-react";
+import { ShieldCheck, ChevronRight, X, FileText, Building2, AlertTriangle, Clock } from "lucide-react";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
 
@@ -33,10 +33,20 @@ const roleConfig: Record<KYCRole, { title: string; subtitle: string; badge: stri
   },
 };
 
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
 const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
   const dismissKey = `kejasure_kyc_banner_dismissed_${role}`;
+  const remindKey = `kejasure_kyc_banner_remind_${role}`;
+
   const [dismissed, setDismissed] = useState(() => {
-    try { return localStorage.getItem(dismissKey) === "true"; } catch { return false; }
+    try {
+      // Check remind-later timestamp first
+      const remindAt = localStorage.getItem(remindKey);
+      if (remindAt && Date.now() < Number(remindAt)) return true;
+      if (remindAt && Date.now() >= Number(remindAt)) localStorage.removeItem(remindKey);
+      return localStorage.getItem(dismissKey) === "true";
+    } catch { return false; }
   });
   const [showKYC, setShowKYC] = useState(false);
   const { isVerified, markVerified } = useKYCStatus(role);
@@ -45,6 +55,16 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
 
   const config = roleConfig[role];
   const Icon = config.icon;
+
+  const handleDismiss = () => {
+    setDismissed(true);
+    localStorage.setItem(dismissKey, "true");
+  };
+
+  const handleRemindLater = () => {
+    setDismissed(true);
+    localStorage.setItem(remindKey, String(Date.now() + TWENTY_FOUR_HOURS));
+  };
 
   return (
     <>
@@ -55,6 +75,7 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
             if (completed) {
               markVerified();
               localStorage.removeItem(dismissKey);
+              localStorage.removeItem(remindKey);
             }
           }}
           activeRole={role === "agency" ? "agency" : role === "stayhost" ? "stayhost" : "landlord"}
@@ -62,7 +83,7 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
       )}
       <div className="relative p-4 rounded-2xl border-2 border-amber-300/50 bg-amber-50/50 dark:bg-amber-950/20 dark:border-amber-700/30 mb-4">
         <button
-          onClick={() => { setDismissed(true); localStorage.setItem(dismissKey, "true"); }}
+          onClick={handleDismiss}
           className="absolute top-3 right-3 w-6 h-6 rounded-full bg-secondary flex items-center justify-center"
         >
           <X className="w-3 h-3 text-muted-foreground" />
@@ -87,14 +108,23 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
           ))}
         </div>
 
-        <button
-          onClick={() => setShowKYC(true)}
-          className="w-full py-3 rounded-xl gradient-trust text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-        >
-          <Icon className="w-4 h-4" />
-          Start Verification
-          <ChevronRight className="w-4 h-4" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleRemindLater}
+            className="flex-1 py-3 rounded-xl bg-secondary text-muted-foreground text-sm font-medium flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
+          >
+            <Clock className="w-4 h-4" />
+            Remind Later
+          </button>
+          <button
+            onClick={() => setShowKYC(true)}
+            className="flex-[2] py-3 rounded-xl gradient-trust text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          >
+            <Icon className="w-4 h-4" />
+            Start Verification
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </>
   );
