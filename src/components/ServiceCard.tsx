@@ -57,7 +57,18 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
             </div>
 
             <div className="flex gap-2">
-              <button className="flex-1 py-2 rounded-xl gradient-trust text-xs font-semibold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1">
+              <button
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent("open-service-chat", {
+                    detail: {
+                      name: provider.name,
+                      role: provider.category,
+                      avatar: provider.avatar,
+                    },
+                  }));
+                }}
+                className="flex-1 py-2 rounded-xl gradient-trust text-xs font-semibold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1"
+              >
                 <MessageCircle className="w-3.5 h-3.5" />
                 Chat
               </button>
