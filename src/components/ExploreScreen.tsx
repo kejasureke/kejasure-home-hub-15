@@ -248,6 +248,85 @@ const ExploreScreen = () => {
       ) : (
         /* Results */
         <div className="px-4">
+          {/* Neighborhood insights panel */}
+          {activeArea && (() => {
+            const area = neighborhoodProfiles.find((n) => n.estate === activeArea);
+            if (!area) return null;
+            return (
+              <div className="mb-4 rounded-2xl bg-card card-shadow overflow-hidden">
+                <div className="p-4 pb-3">
+                  <p className="text-xs text-muted-foreground mb-2">{area.summary}</p>
+
+                  {/* Score badges row */}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary text-[10px] font-medium text-muted-foreground">
+                      <Shield className="w-3 h-3 text-trust" /> Safety {area.safetyRating}
+                    </span>
+                    <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary text-[10px] font-medium text-muted-foreground">
+                      <Droplets className="w-3 h-3 text-primary" /> Water {area.waterReliability}
+                    </span>
+                    <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary text-[10px] font-medium text-muted-foreground">
+                      <Zap className="w-3 h-3 text-accent" /> Power {area.electricityReliability}
+                    </span>
+                    <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary text-[10px] font-medium text-muted-foreground">
+                      <Footprints className="w-3 h-3 text-trust" /> Walk {area.walkabilityScore}
+                    </span>
+                    <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary text-[10px] font-medium text-muted-foreground">
+                      <Volume2 className="w-3 h-3 text-muted-foreground" /> {area.noiseLevel}
+                    </span>
+                  </div>
+
+                  {/* Details grid */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
+                    <div className="flex items-start gap-1.5">
+                      <Bus className="w-3 h-3 text-primary mt-0.5 shrink-0" />
+                      <span className="text-muted-foreground">{area.transportOptions.slice(0, 3).join(", ")}</span>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <ShoppingBag className="w-3 h-3 text-accent mt-0.5 shrink-0" />
+                      <span className="text-muted-foreground">{area.nearestMall}</span>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <GraduationCap className="w-3 h-3 text-trust mt-0.5 shrink-0" />
+                      <span className="text-muted-foreground">{area.nearbySchools.slice(0, 2).join(", ")}</span>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <Cross className="w-3 h-3 text-destructive mt-0.5 shrink-0" />
+                      <span className="text-muted-foreground">{area.nearbyHospitals.slice(0, 2).join(", ")}</span>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <Wifi className="w-3 h-3 text-primary mt-0.5 shrink-0" />
+                      <span className="text-muted-foreground">{area.internetProviders.slice(0, 3).join(", ")}</span>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <TreePine className="w-3 h-3 text-trust mt-0.5 shrink-0" />
+                      <span className="text-muted-foreground">{area.greenSpaces.slice(0, 2).join(", ")}</span>
+                    </div>
+                  </div>
+
+                  {/* Avg rents */}
+                  <div className="flex gap-2 mt-3 pt-3 border-t border-border">
+                    <div className="flex-1 text-center">
+                      <p className="text-[10px] text-muted-foreground">1BR</p>
+                      <p className="text-xs font-bold text-foreground">KES {(area.avgRent1BR / 1000).toFixed(0)}K</p>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <p className="text-[10px] text-muted-foreground">2BR</p>
+                      <p className="text-xs font-bold text-foreground">KES {(area.avgRent2BR / 1000).toFixed(0)}K</p>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <p className="text-[10px] text-muted-foreground">3BR</p>
+                      <p className="text-xs font-bold text-foreground">KES {(area.avgRent3BR / 1000).toFixed(0)}K</p>
+                    </div>
+                    <div className="flex-1 text-center">
+                      <p className="text-[10px] text-muted-foreground">Roads</p>
+                      <p className="text-xs font-bold text-foreground">{area.roadAccess}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
           {filteredProperties.length > 0 ? (
             <div className="space-y-4">
               {filteredProperties.map((p) => (
