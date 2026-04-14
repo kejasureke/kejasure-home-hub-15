@@ -1,4 +1,6 @@
 import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw } from "lucide-react";
+import VerificationBadge from "./VerificationBadge";
+import { useKYCStatus } from "@/hooks/useKYCStatus";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
@@ -50,9 +52,7 @@ const ProfileScreen = () => {
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();
 
-  const getKycStatus = (r: string) => typeof window !== "undefined" ? localStorage.getItem(`kejasure_kyc_status_${r}`) : null;
-  const kycStatus = getKycStatus(role);
-  const isVerified = kycStatus === "verified";
+  const { isVerified } = useKYCStatus(role);
 
   if (showDashboard) return <DashboardScreen onBack={() => setShowDashboard(false)} />;
   if (showAgency) return <AgencyDashboard onBack={() => setShowAgency(false)} />;
