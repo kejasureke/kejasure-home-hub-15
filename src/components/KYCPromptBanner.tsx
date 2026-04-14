@@ -34,7 +34,10 @@ const roleConfig: Record<KYCRole, { title: string; subtitle: string; badge: stri
 };
 
 const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
-  const [dismissed, setDismissed] = useState(false);
+  const dismissKey = `kejasure_kyc_banner_dismissed_${role}`;
+  const [dismissed, setDismissed] = useState(() => {
+    try { return localStorage.getItem(dismissKey) === "true"; } catch { return false; }
+  });
   const [showKYC, setShowKYC] = useState(false);
   const { isVerified, markVerified } = useKYCStatus(role);
 
