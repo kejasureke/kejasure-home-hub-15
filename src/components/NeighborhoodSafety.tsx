@@ -1,5 +1,6 @@
 import { ArrowLeft, Shield, Droplets, Zap, Lightbulb, AlertTriangle, TrendingUp, TrendingDown, MapPin, Star, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 
 interface NeighborhoodSafetyProps {
   onBack: () => void;

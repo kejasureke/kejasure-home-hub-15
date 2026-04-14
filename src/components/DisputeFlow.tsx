@@ -3,6 +3,7 @@ import {
   ArrowLeft, MessageCircle, Send, CheckCircle2, Clock, AlertTriangle,
   ShieldCheck, ChevronRight, FileText, Scale, X
 } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 
 interface DisputeFlowProps {
   onClose: () => void;
@@ -25,6 +26,7 @@ const existingDisputes = [
 ];
 
 const DisputeFlow = ({ onClose }: DisputeFlowProps) => {
+  const { closing, triggerClose } = useOverlayClose(onClose);
   const [step, setStep] = useState<DisputeStep>("select");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [description, setDescription] = useState("");
