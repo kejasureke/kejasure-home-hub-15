@@ -233,8 +233,8 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
               className={`w-full text-left p-4 rounded-2xl border-2 transition-all active:scale-[0.98] relative ${
                 plan.popular
                   ? selectedPlan === i
-                    ? "border-accent gradient-cream-gold card-shadow-hover ring-2 ring-accent/30"
-                    : "border-accent/50 gradient-cream-gold"
+                    ? "border-accent bg-accent/10 dark:bg-accent/20 card-shadow-hover ring-2 ring-accent/30"
+                    : "border-accent/50 bg-accent/5 dark:bg-accent/10"
                   : selectedPlan === i
                     ? "border-primary bg-primary/5 ring-2 ring-primary/20"
                     : "border-border bg-card"
