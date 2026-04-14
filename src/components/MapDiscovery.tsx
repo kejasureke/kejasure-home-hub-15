@@ -110,7 +110,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const isProperty = selected && "bedrooms" in selected;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col pb-20">
+    <div className="fixed inset-0 z-[60] bg-background flex flex-col pb-20">
       {/* Header */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
