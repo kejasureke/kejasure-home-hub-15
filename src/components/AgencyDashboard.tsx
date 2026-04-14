@@ -9,6 +9,7 @@ import {
   Building2, Target, Clock, CheckCircle2, AlertTriangle, Edit3, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 
 interface AgencyDashboardProps {
@@ -85,6 +86,15 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showKYCDirect && (
+        <KYCVerificationFlow
+          onClose={(completed?: boolean) => {
+            setShowKYCDirect(false);
+            if (completed) markVerified();
+          }}
+          activeRole="agency"
+        />
+      )}
       {showCRUD && <ListingCRUD type="rental" onClose={() => setShowCRUD(false)} />}
       {showPayment && (
         <MpesaPaymentFlow
