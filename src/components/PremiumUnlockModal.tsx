@@ -62,7 +62,7 @@ const PremiumUnlockModal = ({ onClose }: PremiumUnlockModalProps) => {
     else expiry.setDate(expiry.getDate() + 7);
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-foreground/50 backdrop-blur-sm">
         <div className="w-[90%] max-w-sm bg-card rounded-3xl p-6 animate-scale-in">
           {/* Success animation */}
           <div className="flex flex-col items-center mb-6">
@@ -123,7 +123,7 @@ const PremiumUnlockModal = ({ onClose }: PremiumUnlockModalProps) => {
   // Processing state
   if (state === "processing") {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-foreground/50 backdrop-blur-sm">
         <div className="w-[85%] max-w-xs bg-card rounded-3xl p-8 text-center animate-scale-in">
           <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: "hsl(var(--mpesa-green))" }}>
             <Phone className="w-7 h-7 text-white animate-[pulse_1.2s_ease-in-out_infinite]" />
@@ -146,7 +146,7 @@ const PremiumUnlockModal = ({ onClose }: PremiumUnlockModalProps) => {
 
   // Selection state
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-foreground/40 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end bg-foreground/40 backdrop-blur-sm" onClick={onClose}>
       <div
         className="w-full bg-card rounded-t-3xl p-5 pb-6 animate-slide-up max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
@@ -189,8 +189,8 @@ const PremiumUnlockModal = ({ onClose }: PremiumUnlockModalProps) => {
               }`}
             >
               {tier.popular && (
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full gradient-premium text-[9px] font-bold text-accent-foreground uppercase tracking-wider">
-                  ⭐ Most Popular
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-accent text-[9px] font-bold text-white uppercase tracking-wider">
+                  ⭐ Best Value
                 </div>
               )}
               <div className="flex items-center justify-between">

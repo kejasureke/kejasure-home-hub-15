@@ -140,6 +140,9 @@
   .gradient-cream-gold {
     background: linear-gradient(135deg, hsl(40 60% 96%), hsl(38 50% 92%));
   }
+  .dark .gradient-cream-gold {
+    background: linear-gradient(135deg, hsl(38 40% 18%), hsl(35 35% 14%));
+  }
   .text-balance {
     text-wrap: balance;
   }

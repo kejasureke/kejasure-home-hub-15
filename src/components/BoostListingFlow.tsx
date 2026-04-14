@@ -55,7 +55,7 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
 
   return (
     <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
-      <div className="px-4 pt-5 pb-8">
+      <div className="px-4 pt-5 pb-24">
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
           <button onClick={step === "select-boost" ? () => setStep("select-listing") : triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
@@ -158,7 +158,7 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
                   }`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full gradient-premium text-[9px] font-bold text-accent-foreground uppercase tracking-wider">
+                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-accent text-[9px] font-bold text-white uppercase tracking-wider">
                       ⭐ Best Value
                     </div>
                   )}
