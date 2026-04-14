@@ -40,7 +40,8 @@ const KYCSnoozeBanner = ({ role }: KYCSnoozeBannerProps) => {
             pushGlobalAlert({
               type: "verified",
               title: `${roleLabels[role]} verification reminder`,
-              body: "Your verification snooze has expired. Complete your KYC to unlock all features and earn a trust badge.",
+              body: "Your verification snooze has expired. Tap to complete your KYC now.",
+              action: `open-kyc-${role}`,
             });
           }
           return;

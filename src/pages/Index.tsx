@@ -25,6 +25,7 @@ const Index = () => {
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { unreadCount: storedUnread } = useNotifications();
   const { role, isTenant } = useUserRole();
+  const [showKYCFromNotification, setShowKYCFromNotification] = useState(false);
   const {
     alerts,
     toast,

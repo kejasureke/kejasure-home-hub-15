@@ -7,6 +7,7 @@ export interface InAppAlert {
   body: string;
   timestamp: number;
   read: boolean;
+  action?: string;
 }
 
 // Global event bus for pushing alerts from any component
