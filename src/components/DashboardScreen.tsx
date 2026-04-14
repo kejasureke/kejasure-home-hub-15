@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import KYCPromptBanner from "./KYCPromptBanner";
 import KYCSnoozeBanner from "./KYCSnoozeBanner";
 import VerificationBadge from "./VerificationBadge";
@@ -10,6 +10,8 @@ import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 
 interface DashboardScreenProps {
   onBack: () => void;
+  autoOpenKYC?: boolean;
+  onKYCOpened?: () => void;
 }
 
 const stats = [

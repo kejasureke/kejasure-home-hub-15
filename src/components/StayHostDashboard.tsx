@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import KYCPromptBanner from "./KYCPromptBanner";
 import KYCSnoozeBanner from "./KYCSnoozeBanner";
 import VerificationBadge from "./VerificationBadge";
@@ -13,6 +13,8 @@ import ListingCRUD from "./ListingCRUD";
 
 interface StayHostDashboardProps {
   onBack: () => void;
+  autoOpenKYC?: boolean;
+  onKYCOpened?: () => void;
 }
 
 const plans = [
