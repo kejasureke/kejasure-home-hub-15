@@ -4,6 +4,7 @@ import { useSavedSearches, type SavedSearch } from "@/hooks/useSavedSearches";
 
 interface SavedSearchesScreenProps {
   onBack: () => void;
+  onRunSearch?: (search: SavedSearch) => void;
 }
 
 const SavedSearchesScreen = ({ onBack }: SavedSearchesScreenProps) => {
