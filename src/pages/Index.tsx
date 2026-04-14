@@ -168,7 +168,7 @@ const Index = () => {
                 <PropertyCard
                   key={p.id}
                   property={p}
-                  onPress={() => {}}
+                  onPress={() => setSelectedProperty(p)}
                   liked={true}
                   onToggleLike={toggleFavorite}
                 />
