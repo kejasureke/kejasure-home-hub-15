@@ -52,7 +52,10 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
         <KYCVerificationFlow
           onClose={(completed?: boolean) => {
             setShowKYC(false);
-            if (completed) markVerified();
+            if (completed) {
+              markVerified();
+              localStorage.removeItem(dismissKey);
+            }
           }}
           activeRole={role === "agency" ? "agency" : role === "stayhost" ? "stayhost" : "landlord"}
         />
