@@ -27,6 +27,7 @@ const Index = () => {
   const { unreadCount: storedUnread } = useNotifications();
   const { role, isTenant } = useUserRole();
   const [showKYCFromNotification, setShowKYCFromNotification] = useState(false);
+  const [exploreSearchQuery, setExploreSearchQuery] = useState("");
   const {
     alerts,
     toast,
