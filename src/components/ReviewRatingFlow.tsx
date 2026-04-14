@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Star, Camera, X, Send, ThumbsUp, ShieldCheck, Clock, CheckCircle2 } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 
 interface ReviewRatingFlowProps {
   onClose: () => void;

@@ -20,6 +20,7 @@ const faqs = [
 ];
 
 const HelpSupportScreen = ({ onBack }: HelpSupportScreenProps) => {
+  const { closing, triggerClose } = useOverlayClose(onBack);
   const [tab, setTab] = useState<Tab>("faq");
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [feedbackRating, setFeedbackRating] = useState(0);
