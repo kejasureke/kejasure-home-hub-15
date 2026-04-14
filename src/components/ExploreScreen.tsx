@@ -132,9 +132,7 @@ const ExploreScreen = () => {
           ) : null}
           <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground">
-              {showingResults
-                ? activeCategory?.label || activePriceRange?.label || "Search Results"
-                : "Explore"}
+              {showingResults ? activeLabel : "Explore"}
             </h1>
             {showingResults && (
               <p className="text-xs text-muted-foreground">
