@@ -74,6 +74,7 @@ const priceRanges = [
 const ExploreScreen = () => {
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [activePriceRange, setActivePriceRange] = useState<typeof priceRanges[number] | null>(null);
+  const [activeArea, setActiveArea] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { addRecent } = useRecentlyViewed();
@@ -89,6 +90,10 @@ const ExploreScreen = () => {
       results = results.filter((p) => p.price >= activePriceRange.min && p.price < activePriceRange.max);
     }
 
+    if (activeArea) {
+      results = results.filter((p) => p.estate === activeArea);
+    }
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       results = results.filter(
@@ -100,9 +105,17 @@ const ExploreScreen = () => {
     }
 
     return results;
-  }, [activeCategory, activePriceRange, searchQuery]);
+  }, [activeCategory, activePriceRange, activeArea, searchQuery]);
 
-  const showingResults = activeCategory || activePriceRange || searchQuery;
+  const activeLabel = activeCategory?.label || activePriceRange?.label || activeArea || "Search Results";
+  const showingResults = activeCategory || activePriceRange || activeArea || searchQuery;
+
+  const clearFilters = () => {
+    setActiveCategory(null);
+    setActivePriceRange(null);
+    setActiveArea(null);
+    setSearchQuery("");
+  };
 
   return (
     <div className="pb-32">
