@@ -189,8 +189,8 @@ const PremiumUnlockModal = ({ onClose }: PremiumUnlockModalProps) => {
               }`}
             >
               {tier.popular && (
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full gradient-premium text-[9px] font-bold text-accent-foreground uppercase tracking-wider">
-                  ⭐ Most Popular
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-accent text-[9px] font-bold text-white uppercase tracking-wider">
+                  ⭐ Best Value
                 </div>
               )}
               <div className="flex items-center justify-between">
