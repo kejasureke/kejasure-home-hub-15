@@ -209,7 +209,7 @@ const ExploreScreen = () => {
               return (
                 <button
                   key={area.estate}
-                  onClick={() => setActiveArea(area.estate)}
+                  onClick={() => { setActiveArea(area.estate); setInsightsCollapsed(false); }}
                   className="w-full p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-all text-left"
                 >
                   <div className="flex items-start justify-between mb-2.5">
