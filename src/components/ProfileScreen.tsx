@@ -185,7 +185,7 @@ const ProfileScreen = () => {
         <div className="flex gap-1.5">
           {roleConfig.map((r) => {
             const isActive = role === r.id;
-            const roleVerified = getKycStatus(r.id) === "verified";
+            const roleVerified = localStorage.getItem(`kejasure_kyc_verified_${r.id}`) === "true";
             return (
               <button
                 key={r.id}
