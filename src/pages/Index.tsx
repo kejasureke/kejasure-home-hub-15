@@ -11,6 +11,8 @@ import StayHostDashboard from "@/components/StayHostDashboard";
 import AgencyDashboard from "@/components/AgencyDashboard";
 import ServiceProviderDashboard from "@/components/ServiceProviderDashboard";
 import ExploreScreen from "@/components/ExploreScreen";
+import ListingDetail from "@/components/ListingDetail";
+import type { Property } from "@/data/mockData";
 import { Heart } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useNotifications } from "@/hooks/useNotifications";
