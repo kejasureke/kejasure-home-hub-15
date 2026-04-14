@@ -76,6 +76,7 @@ const ExploreScreen = () => {
   const [activePriceRange, setActivePriceRange] = useState<typeof priceRanges[number] | null>(null);
   const [activeArea, setActiveArea] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [insightsCollapsed, setInsightsCollapsed] = useState(false);
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { addRecent } = useRecentlyViewed();
 
