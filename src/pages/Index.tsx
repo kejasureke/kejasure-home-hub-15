@@ -58,13 +58,17 @@ const Index = () => {
 
   const renderDashboard = () => {
     const goHome = () => setActiveTab("home");
+    const kycProps = {
+      autoOpenKYC: showKYCFromNotification,
+      onKYCOpened: () => setShowKYCFromNotification(false),
+    };
     switch (role) {
       case "landlord":
-        return <DashboardScreen onBack={goHome} />;
+        return <DashboardScreen onBack={goHome} {...kycProps} />;
       case "stayhost":
-        return <StayHostDashboard onBack={goHome} />;
+        return <StayHostDashboard onBack={goHome} {...kycProps} />;
       case "agency":
-        return <AgencyDashboard onBack={goHome} />;
+        return <AgencyDashboard onBack={goHome} {...kycProps} />;
       case "serviceprovider":
         return <ServiceProviderDashboard onBack={goHome} />;
       default:
