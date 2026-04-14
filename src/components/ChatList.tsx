@@ -36,6 +36,8 @@ type FilterType = "all" | "unread" | "landlords" | "services";
 const ChatList = ({ onOpenChat }: ChatListProps) => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
+  const [showNewChat, setShowNewChat] = useState(false);
+  const [newChatSearch, setNewChatSearch] = useState("");
 
   const filters: { key: FilterType; label: string }[] = [
     { key: "all", label: "All" },
