@@ -50,6 +50,17 @@ const HomeFeed = () => {
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { searches, saveSearch, removeSearch } = useSavedSearches();
 
+  // Listen for explore category selections
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { category } = (e as CustomEvent).detail;
+      setSegment("Rentals");
+      setSearchQuery(category);
+    };
+    window.addEventListener("explore-category", handler);
+    return () => window.removeEventListener("explore-category", handler);
+  }, []);
+
   const filteredProperties = useMemo(() => {
     let result = properties.filter((p) => {
       const matchType = segment === "Rentals" ? (p.type === "rental" && !p.corporate) :
