@@ -37,7 +37,7 @@ const DisputeFlow = ({ onClose }: DisputeFlowProps) => {
   // Submitted
   if (step === "submitted") {
     return (
-      <div className="fixed inset-0 z-[60] bg-background overflow-y-auto " + (closing ? "animate-slide-down" : "animate-slide-up") + "">
+      <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
         <div className="px-4 pt-6 pb-8 flex flex-col items-center text-center min-h-screen justify-center">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-[pulse_1s_ease-in-out_2]">
             <CheckCircle2 className="w-10 h-10 text-primary" />
