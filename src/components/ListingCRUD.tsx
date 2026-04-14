@@ -128,7 +128,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
 
   const selectedCounty = kenyaCounties.find((c) => c.name === form.county);
-  const amenitiesList = type === "shortstay" ? stayAmenities : rentalAmenities;
+  const amenitiesList = form.type === "commercial" ? commercialAmenities : form.type === "shortstay" ? stayAmenities : rentalAmenities;
 
   const toggleAmenity = (a: string) => {
     update({
@@ -236,17 +236,39 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
               <div>
                 <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Listing Type</label>
                 <div className="flex gap-2">
-                  {(["rental", "shortstay"] as const).map((t) => (
+                  {(["rental", "shortstay", "commercial"] as const).map((t) => (
                     <button
                       key={t}
-                      onClick={() => update({ type: t, priceUnit: t === "shortstay" ? "/night" : "/mo" })}
-                      className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all ${
+                      onClick={() => update({ type: t, priceUnit: t === "shortstay" ? "/night" : "/mo", amenities: [] })}
+                      className={`flex-1 py-3 rounded-xl text-xs font-semibold transition-all ${
                         form.type === t
                           ? "bg-primary text-primary-foreground"
                           : "bg-card card-shadow text-foreground"
                       }`}
                     >
-                      {t === "rental" ? "🏠 Rental" : "🌙 Short Stay"}
+                      {t === "rental" ? "🏠 Rental" : t === "shortstay" ? "🌙 Short Stay" : "🏢 Commercial"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {form.type === "commercial" && (
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Commercial Type</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {commercialTypes.map((ct) => (
+                    <button
+                      key={ct.value}
+                      onClick={() => update({ commercialType: ct.value })}
+                      className={`py-3 px-3 rounded-xl text-left transition-all ${
+                        form.commercialType === ct.value
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card card-shadow text-foreground"
+                      }`}
+                    >
+                      <p className="text-sm font-semibold">{ct.label}</p>
+                      <p className={`text-[10px] mt-0.5 ${form.commercialType === ct.value ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{ct.desc}</p>
                     </button>
                   ))}
                 </div>
