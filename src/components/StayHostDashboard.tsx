@@ -58,6 +58,7 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
+  const { isVerified } = useKYCStatus("stayhost");
   const currentPlan = plans.find((p) => p.current)!;
 
   const hostMpesaPlans = plans.map((p) => ({
@@ -97,7 +98,10 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
             <Home className="w-6 h-6 text-accent-foreground" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-accent-foreground">John Kamau</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-semibold text-accent-foreground">John Kamau</h2>
+              <VerificationBadge isVerified={isVerified} variant="light" />
+            </div>
             <p className="text-xs text-accent-foreground/70">Pro Host · 3 stays</p>
           </div>
         </div>
