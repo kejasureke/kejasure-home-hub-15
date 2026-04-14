@@ -50,16 +50,45 @@ const defaultForm: ListingFormData = {
 };
 
 const rentalAmenities = [
-  "Parking", "Swimming Pool", "Gym", "Security", "CCTV", "Elevator",
-  "Backup Generator", "Borehole", "Water Tank", "Fiber Internet",
-  "Balcony", "Garden", "Rooftop Terrace", "Servant Quarter", "Smart Home",
-  "AC", "Solar Panels", "Playground", "Laundry Room", "Pet Area",
+  // Internet & Connectivity
+  "WiFi (Safaricom)", "WiFi (Airtel/Faiba)", "Fiber Internet", "Starlink",
+  // Security
+  "24hr Security Guard", "CCTV", "Electric Fence", "Perimeter Wall", "Intercom", "Alarm System",
+  // Water & Power
+  "Borehole", "Water Tank", "Backup Generator", "Solar Panels", "Prepaid Meter",
+  // Facilities
+  "Parking", "Swimming Pool", "Gym", "Elevator", "Rooftop Terrace", "Garden",
+  "Playground", "Laundry Room", "BBQ Area", "Servant Quarter",
+  // Unit Features
+  "Balcony", "AC", "Hot Shower", "Bathtub", "Walk-in Closet", "Smart Home",
+  "Tiled Floors", "Wooden Floors", "DSQ", "Store Room",
+  // Pet & Misc
+  "Pet Area", "Wheelchair Access", "Garbage Collection",
 ];
 
 const stayAmenities = [
-  "WiFi", "Smart TV", "Kitchen", "Workspace", "Parking", "Pool",
-  "AC", "Washing Machine", "BBQ Area", "Ocean View", "City View",
+  "WiFi (Safaricom)", "WiFi (Airtel/Faiba)", "Starlink",
+  "Smart TV", "Netflix/DSTV", "Kitchen", "Workspace", "Parking",
+  "Swimming Pool", "AC", "Washing Machine", "BBQ Area",
+  "Ocean View", "City View", "Mountain View",
   "Jacuzzi", "Concierge", "Beach Access", "Gym", "Self Check-in",
+  "Hot Shower", "Iron & Board", "Coffee Machine", "Balcony",
+  "24hr Security Guard", "CCTV", "Backup Generator",
+];
+
+const commercialAmenities = [
+  // Connectivity
+  "Fiber Internet", "WiFi (Safaricom)", "WiFi (Airtel/Faiba)",
+  // Security
+  "24hr Security Guard", "CCTV", "Alarm System", "Electric Fence",
+  // Power & Water
+  "Backup Generator", "Solar Panels", "Borehole", "Water Tank", "3-Phase Power",
+  // Facilities
+  "Parking", "Loading Bay", "Elevator/Goods Lift", "Warehouse Space",
+  "Reception Area", "Meeting Room", "Kitchen/Pantry", "Washrooms",
+  // Features
+  "Street Frontage", "High Foot Traffic", "Ground Floor", "Corner Unit",
+  "Signage Space", "AC/HVAC", "Fire Safety System", "Wheelchair Access",
 ];
 
 const serviceCategories = [

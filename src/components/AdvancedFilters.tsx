@@ -27,7 +27,16 @@ interface AdvancedFiltersProps {
 }
 
 const bedroomOptions = [1, 2, 3, 4, 5];
-const amenityOptions = ["Parking", "Swimming Pool", "Gym", "Security", "Fiber Internet", "Backup Generator", "Elevator", "Balcony", "Garden", "CCTV", "Water Tank", "Borehole"];
+const amenityOptions = [
+  "WiFi (Safaricom)", "WiFi (Airtel/Faiba)", "Fiber Internet", "Starlink",
+  "24hr Security Guard", "CCTV", "Electric Fence", "Alarm System",
+  "Parking", "Swimming Pool", "Gym", "Elevator",
+  "Backup Generator", "Solar Panels", "Borehole", "Water Tank",
+  "Balcony", "Garden", "AC", "Hot Shower", "Servant Quarter",
+  "Rooftop Terrace", "Playground", "Pet Area", "Wheelchair Access",
+  // Commercial-specific
+  "Loading Bay", "Warehouse Space", "Street Frontage", "3-Phase Power",
+];
 const sortOptions = [
   { value: "featured", label: "Featured First" },
   { value: "price-asc", label: "Price: Low to High" },
