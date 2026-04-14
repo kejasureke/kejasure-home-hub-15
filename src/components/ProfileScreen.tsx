@@ -1,4 +1,6 @@
 import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw } from "lucide-react";
+import VerificationBadge from "./VerificationBadge";
+import { useKYCStatus } from "@/hooks/useKYCStatus";
 import { useState } from "react";
 import DashboardScreen from "./DashboardScreen";
 import AgencyDashboard from "./AgencyDashboard";
@@ -50,9 +52,7 @@ const ProfileScreen = () => {
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();
 
-  const getKycStatus = (r: string) => typeof window !== "undefined" ? localStorage.getItem(`kejasure_kyc_status_${r}`) : null;
-  const kycStatus = getKycStatus(role);
-  const isVerified = kycStatus === "verified";
+  const { isVerified } = useKYCStatus(role);
 
   if (showDashboard) return <DashboardScreen onBack={() => setShowDashboard(false)} />;
   if (showAgency) return <AgencyDashboard onBack={() => setShowAgency(false)} />;
@@ -132,7 +132,7 @@ const ProfileScreen = () => {
         <div className="flex-1">
           <div className="flex items-center gap-1.5">
             <h2 className="text-lg font-bold">John Kamau</h2>
-            {isVerified && <ShieldCheck className="w-4 h-4 text-trust" />}
+            <VerificationBadge isVerified={isVerified} variant="dark" />
           </div>
           <p className="text-sm text-muted-foreground">+254 712 345 678</p>
           <div className="tier-badge-premium mt-1 inline-block">Premium Member</div>
@@ -185,7 +185,7 @@ const ProfileScreen = () => {
         <div className="flex gap-1.5">
           {roleConfig.map((r) => {
             const isActive = role === r.id;
-            const roleVerified = getKycStatus(r.id) === "verified";
+            const roleVerified = localStorage.getItem(`kejasure_kyc_verified_${r.id}`) === "true";
             return (
               <button
                 key={r.id}
