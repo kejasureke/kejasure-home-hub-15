@@ -255,7 +255,23 @@ const ExploreScreen = () => {
             if (!area) return null;
             return (
               <div className="mb-4 rounded-2xl bg-card card-shadow overflow-hidden">
-                <div className="p-4 pb-3">
+                <button
+                  onClick={() => setInsightsCollapsed((p) => !p)}
+                  className="w-full flex items-center justify-between px-4 py-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-semibold text-foreground">Area Insights</span>
+                  </div>
+                  {insightsCollapsed ? (
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </button>
+
+                {!insightsCollapsed && (
+                <div className="px-4 pb-3">
                   <p className="text-xs text-muted-foreground mb-2">{area.summary}</p>
 
                   {/* Score badges row */}
@@ -325,6 +341,7 @@ const ExploreScreen = () => {
                     </div>
                   </div>
                 </div>
+                )}
               </div>
             );
           })()}
