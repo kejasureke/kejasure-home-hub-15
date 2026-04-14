@@ -32,6 +32,7 @@ const mockReviews: Review[] = [
 const ratingLabels = ["", "Terrible", "Poor", "Average", "Good", "Excellent"];
 
 const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "landlord", listingTitle = "2BR Apartment, Kilimani" }: ReviewRatingFlowProps) => {
+  const { closing, triggerClose } = useOverlayClose(onClose);
   const [tab, setTab] = useState<Tab>("reviews");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
