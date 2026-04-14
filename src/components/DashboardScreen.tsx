@@ -112,6 +112,7 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
       {/* Stats */}
       <div className="px-4 -mt-4">
         <KYCPromptBanner role="landlord" />
+        <KYCSnoozeBanner role="landlord" />
         <div className="grid grid-cols-2 gap-3 mb-6">
           {stats.map((stat) => (
             <div key={stat.label} className="bg-card rounded-2xl card-shadow p-4">
