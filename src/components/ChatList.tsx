@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff } from "lucide-react";
+import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users } from "lucide-react";
 
 interface ChatContact {
   id: string;
