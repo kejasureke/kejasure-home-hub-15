@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint } from "lucide-react";
+import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints } from "lucide-react";
 import { properties } from "@/data/mockData";
+import { neighborhoodProfiles } from "@/data/neighborhoodData";
 import PropertyCard from "./PropertyCard";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -73,6 +74,7 @@ const priceRanges = [
 const ExploreScreen = () => {
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [activePriceRange, setActivePriceRange] = useState<typeof priceRanges[number] | null>(null);
+  const [activeArea, setActiveArea] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { addRecent } = useRecentlyViewed();
@@ -88,6 +90,10 @@ const ExploreScreen = () => {
       results = results.filter((p) => p.price >= activePriceRange.min && p.price < activePriceRange.max);
     }
 
+    if (activeArea) {
+      results = results.filter((p) => p.estate === activeArea);
+    }
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       results = results.filter(
@@ -99,9 +105,17 @@ const ExploreScreen = () => {
     }
 
     return results;
-  }, [activeCategory, activePriceRange, searchQuery]);
+  }, [activeCategory, activePriceRange, activeArea, searchQuery]);
 
-  const showingResults = activeCategory || activePriceRange || searchQuery;
+  const activeLabel = activeCategory?.label || activePriceRange?.label || activeArea || "Search Results";
+  const showingResults = activeCategory || activePriceRange || activeArea || searchQuery;
+
+  const clearFilters = () => {
+    setActiveCategory(null);
+    setActivePriceRange(null);
+    setActiveArea(null);
+    setSearchQuery("");
+  };
 
   return (
     <div className="pb-32">
@@ -110,11 +124,7 @@ const ExploreScreen = () => {
         <div className="flex items-center gap-3 mb-4">
           {showingResults ? (
             <button
-              onClick={() => {
-                setActiveCategory(null);
-                setActivePriceRange(null);
-                setSearchQuery("");
-              }}
+              onClick={clearFilters}
               className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0"
             >
               <ArrowLeft className="w-4 h-4 text-foreground" />
@@ -122,9 +132,7 @@ const ExploreScreen = () => {
           ) : null}
           <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground">
-              {showingResults
-                ? activeCategory?.label || activePriceRange?.label || "Search Results"
-                : "Explore"}
+              {showingResults ? activeLabel : "Explore"}
             </h1>
             {showingResults && (
               <p className="text-xs text-muted-foreground">
@@ -186,6 +194,52 @@ const ExploreScreen = () => {
                 >
                   <p className="text-sm font-bold text-primary">{range.label}</p>
                   <p className="text-[10px] text-muted-foreground">{count} listings</p>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* By Neighborhood */}
+          <h2 className="text-sm font-semibold text-foreground mb-3">By Neighborhood</h2>
+          <div className="space-y-3 mb-6">
+            {neighborhoodProfiles.map((area) => {
+              const listingCount = properties.filter((p) => p.estate === area.estate).length;
+              const avgRent = Math.round((area.avgRent1BR + area.avgRent2BR) / 2 / 1000);
+              return (
+                <button
+                  key={area.estate}
+                  onClick={() => setActiveArea(area.estate)}
+                  className="w-full p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-all text-left"
+                >
+                  <div className="flex items-start justify-between mb-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                        <MapPin className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">{area.estate}</p>
+                        <p className="text-[10px] text-muted-foreground">{area.county} · {listingCount} listings · ~KES {avgRent}K avg</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary">
+                      <Shield className="w-3 h-3 text-trust" />
+                      <span className="text-[10px] font-medium text-muted-foreground">{area.safetyRating}/10</span>
+                    </div>
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary">
+                      <Droplets className="w-3 h-3 text-primary" />
+                      <span className="text-[10px] font-medium text-muted-foreground">{area.waterReliability}/10</span>
+                    </div>
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary">
+                      <Zap className="w-3 h-3 text-accent" />
+                      <span className="text-[10px] font-medium text-muted-foreground">{area.electricityReliability}/10</span>
+                    </div>
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary">
+                      <Footprints className="w-3 h-3 text-trust" />
+                      <span className="text-[10px] font-medium text-muted-foreground">{area.walkabilityScore}/10</span>
+                    </div>
+                  </div>
                 </button>
               );
             })}
