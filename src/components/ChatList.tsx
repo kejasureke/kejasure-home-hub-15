@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff } from "lucide-react";
+import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users } from "lucide-react";
 
 interface ChatContact {
   id: string;
@@ -36,6 +36,8 @@ type FilterType = "all" | "unread" | "landlords" | "services";
 const ChatList = ({ onOpenChat }: ChatListProps) => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
+  const [showNewChat, setShowNewChat] = useState(false);
+  const [newChatSearch, setNewChatSearch] = useState("");
 
   const filters: { key: FilterType; label: string }[] = [
     { key: "all", label: "All" },
@@ -84,7 +86,10 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
               <p className="text-xs text-muted-foreground">{totalUnread} unread message{totalUnread > 1 ? "s" : ""}</p>
             )}
           </div>
-          <button className="w-10 h-10 rounded-xl gradient-trust flex items-center justify-center active:scale-95 transition-transform">
+          <button
+            onClick={() => setShowNewChat(true)}
+            className="w-10 h-10 rounded-xl gradient-trust flex items-center justify-center active:scale-95 transition-transform"
+          >
             <Plus className="w-5 h-5 text-primary-foreground" />
           </button>
         </div>
@@ -191,6 +196,94 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
           </button>
         ))}
       </div>
+
+      {/* New Chat Modal */}
+      {showNewChat && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-end justify-center">
+          <div className="w-full max-w-lg bg-card rounded-t-3xl card-shadow max-h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-300">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-4 pt-5 pb-3">
+              <h2 className="text-lg font-bold text-foreground">New Message</h2>
+              <button
+                onClick={() => { setShowNewChat(false); setNewChatSearch(""); }}
+                className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="px-4 pb-3">
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search contacts..."
+                  value={newChatSearch}
+                  onChange={(e) => setNewChatSearch(e.target.value)}
+                  autoFocus
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            </div>
+
+            {/* Contact List */}
+            <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-1">
+              {contacts
+                .filter((c) => {
+                  if (!newChatSearch) return true;
+                  const q = newChatSearch.toLowerCase();
+                  return c.name.toLowerCase().includes(q) || c.role.includes(q);
+                })
+                .map((contact) => (
+                  <button
+                    key={contact.id}
+                    onClick={() => {
+                      setShowNewChat(false);
+                      setNewChatSearch("");
+                      onOpenChat(contact);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary active:scale-[0.98] transition-all"
+                  >
+                    <div className="relative shrink-0">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        contact.avatar.length > 2 ? "bg-secondary text-base" : "bg-primary/10"
+                      }`}>
+                        {contact.avatar.length > 2 ? (
+                          <span>{contact.avatar}</span>
+                        ) : (
+                          <span className="text-xs font-semibold text-primary">{contact.avatar}</span>
+                        )}
+                      </div>
+                      {contact.online && (
+                        <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-trust border-2 border-card" />
+                      )}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-medium text-foreground">{contact.name}</span>
+                        {contact.verified && <ShieldCheck className="w-3.5 h-3.5 text-trust" />}
+                      </div>
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${roleColor(contact.role)}`}>
+                        {contact.role}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+
+              {contacts.filter((c) => {
+                if (!newChatSearch) return true;
+                return c.name.toLowerCase().includes(newChatSearch.toLowerCase());
+              }).length === 0 && (
+                <div className="flex flex-col items-center py-10">
+                  <Users className="w-8 h-8 text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">No contacts found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
