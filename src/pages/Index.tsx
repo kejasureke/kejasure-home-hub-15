@@ -11,6 +11,8 @@ import StayHostDashboard from "@/components/StayHostDashboard";
 import AgencyDashboard from "@/components/AgencyDashboard";
 import ServiceProviderDashboard from "@/components/ServiceProviderDashboard";
 import ExploreScreen from "@/components/ExploreScreen";
+import ListingDetail from "@/components/ListingDetail";
+import type { Property } from "@/data/mockData";
 import { Heart } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -28,6 +30,7 @@ const Index = () => {
   const { role, isTenant } = useUserRole();
   const [showKYCFromNotification, setShowKYCFromNotification] = useState(false);
   const [exploreSearchQuery, setExploreSearchQuery] = useState("");
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const {
     alerts,
     toast,
@@ -77,6 +80,17 @@ const Index = () => {
   // Badge counts
   const chatBadge = 2;
   const profileBadge = storedUnread + liveUnread;
+
+  if (selectedProperty) {
+    return (
+      <ListingDetail
+        property={selectedProperty}
+        onBack={() => setSelectedProperty(null)}
+        liked={isFavorite(selectedProperty.id)}
+        onToggleLike={() => toggleFavorite(selectedProperty.id)}
+      />
+    );
+  }
 
   if (showChat && chatContact) {
     return (
@@ -154,7 +168,7 @@ const Index = () => {
                 <PropertyCard
                   key={p.id}
                   property={p}
-                  onPress={() => {}}
+                  onPress={() => setSelectedProperty(p)}
                   liked={true}
                   onToggleLike={toggleFavorite}
                 />
