@@ -10,7 +10,8 @@ import DashboardScreen from "@/components/DashboardScreen";
 import StayHostDashboard from "@/components/StayHostDashboard";
 import AgencyDashboard from "@/components/AgencyDashboard";
 import ServiceProviderDashboard from "@/components/ServiceProviderDashboard";
-import { Heart, Search } from "lucide-react";
+import ExploreScreen from "@/components/ExploreScreen";
+import { Heart } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
@@ -129,33 +130,7 @@ const Index = () => {
 
       {activeTab === "dashboard" && renderDashboard()}
 
-      {activeTab === "search" && (
-        <div className="px-4 pt-6 pb-32">
-          <h1 className="text-xl font-bold mb-4">Explore</h1>
-          <div className="relative mb-6">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search properties, estates, services..."
-              className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-card card-shadow text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {["Bedsitters", "1 Bedroom", "2 Bedroom", "3 Bedroom", "Studio", "Furnished", "Unfurnished", "With Parking"].map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent("explore-category", { detail: { category: cat } }));
-                  setActiveTab("home");
-                }}
-                className="p-4 rounded-2xl bg-card card-shadow text-sm font-medium text-foreground hover:bg-primary/5 active:scale-[0.97] transition-all"
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {activeTab === "search" && <ExploreScreen />}
 
       {activeTab === "favorites" && (
         <div className="px-4 pt-6 pb-32">
