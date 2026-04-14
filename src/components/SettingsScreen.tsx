@@ -47,7 +47,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   );
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
+    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
       <div className="sticky top-0 z-10 glass-surface border-b border-border px-4 py-3 flex items-center gap-3">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
           <ArrowLeft className="w-4 h-4" />

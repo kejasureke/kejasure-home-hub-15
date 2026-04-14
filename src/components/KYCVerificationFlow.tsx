@@ -102,7 +102,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const isIndividualServiceProvider = verificationCategory === "individual" && activeRole === "serviceprovider";
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
+    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
       {/* Header */}
       <div className="sticky top-0 z-10 glass-surface border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
