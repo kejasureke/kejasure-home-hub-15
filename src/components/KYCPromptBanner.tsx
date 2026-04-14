@@ -34,7 +34,10 @@ const roleConfig: Record<KYCRole, { title: string; subtitle: string; badge: stri
 };
 
 const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
-  const [dismissed, setDismissed] = useState(false);
+  const dismissKey = `kejasure_kyc_banner_dismissed_${role}`;
+  const [dismissed, setDismissed] = useState(() => {
+    try { return localStorage.getItem(dismissKey) === "true"; } catch { return false; }
+  });
   const [showKYC, setShowKYC] = useState(false);
   const { isVerified, markVerified } = useKYCStatus(role);
 
@@ -49,14 +52,17 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
         <KYCVerificationFlow
           onClose={(completed?: boolean) => {
             setShowKYC(false);
-            if (completed) markVerified();
+            if (completed) {
+              markVerified();
+              localStorage.removeItem(dismissKey);
+            }
           }}
           activeRole={role === "agency" ? "agency" : role === "stayhost" ? "stayhost" : "landlord"}
         />
       )}
       <div className="relative p-4 rounded-2xl border-2 border-amber-300/50 bg-amber-50/50 dark:bg-amber-950/20 dark:border-amber-700/30 mb-4">
         <button
-          onClick={() => setDismissed(true)}
+          onClick={() => { setDismissed(true); localStorage.setItem(dismissKey, "true"); }}
           className="absolute top-3 right-3 w-6 h-6 rounded-full bg-secondary flex items-center justify-center"
         >
           <X className="w-3 h-3 text-muted-foreground" />
