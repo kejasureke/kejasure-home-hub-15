@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Clock } from "lucide-react";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
+import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 
 type KYCRole = "landlord" | "agency" | "stayhost";
 
@@ -8,9 +9,17 @@ interface KYCSnoozeBannerProps {
   role: KYCRole;
 }
 
+const roleLabels: Record<KYCRole, string> = {
+  landlord: "Landlord",
+  agency: "Agency",
+  stayhost: "Host",
+};
+
 const KYCSnoozeBanner = ({ role }: KYCSnoozeBannerProps) => {
   const remindKey = `kejasure_kyc_banner_remind_${role}`;
+  const notifiedKey = `kejasure_kyc_snooze_notified_${role}`;
   const { isVerified } = useKYCStatus(role);
+  const hasNotified = useRef(false);
 
   const [timeLeft, setTimeLeft] = useState<string | null>(null);
 
@@ -23,6 +32,17 @@ const KYCSnoozeBanner = ({ role }: KYCSnoozeBannerProps) => {
         if (diff <= 0) {
           localStorage.removeItem(remindKey);
           setTimeLeft(null);
+
+          // Fire in-app notification when snooze expires
+          if (!hasNotified.current && !isVerified && localStorage.getItem(notifiedKey) !== "true") {
+            hasNotified.current = true;
+            localStorage.setItem(notifiedKey, "true");
+            pushGlobalAlert({
+              type: "verified",
+              title: `${roleLabels[role]} verification reminder`,
+              body: "Your verification snooze has expired. Complete your KYC to unlock all features and earn a trust badge.",
+            });
+          }
           return;
         }
         const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -36,12 +56,13 @@ const KYCSnoozeBanner = ({ role }: KYCSnoozeBannerProps) => {
     update();
     const interval = setInterval(update, 60_000);
     return () => clearInterval(interval);
-  }, [remindKey]);
+  }, [remindKey, isVerified, notifiedKey, role]);
 
   if (isVerified || !timeLeft) return null;
 
   const cancelSnooze = () => {
     localStorage.removeItem(remindKey);
+    localStorage.removeItem(notifiedKey);
     setTimeLeft(null);
     window.dispatchEvent(new CustomEvent("kyc-snooze-cancelled", { detail: { role } }));
   };
