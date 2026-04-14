@@ -166,11 +166,11 @@ const Index = () => {
           {favoriteProperties.length > 0 ? (
             <div className="space-y-4">
               {favoriteProperties.map((p) => (
-                <PropertyCard
+                <SwipeablePropertyCard
                   key={p.id}
                   property={p}
                   onPress={() => setSelectedProperty(p)}
-                  liked={true}
+                  onRemove={toggleFavorite}
                   onToggleLike={toggleFavorite}
                 />
               ))}
