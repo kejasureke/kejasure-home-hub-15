@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ShieldCheck, ChevronRight, X, FileText, Building2, AlertTriangle } from "lucide-react";
 import KYCVerificationFlow from "./KYCVerificationFlow";
+import { useKYCStatus } from "@/hooks/useKYCStatus";
 
 type KYCRole = "landlord" | "agency" | "stayhost";
 
@@ -35,8 +36,9 @@ const roleConfig: Record<KYCRole, { title: string; subtitle: string; badge: stri
 const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
   const [dismissed, setDismissed] = useState(false);
   const [showKYC, setShowKYC] = useState(false);
+  const { isVerified, markVerified } = useKYCStatus(role);
 
-  if (dismissed) return null;
+  if (dismissed || isVerified) return null;
 
   const config = roleConfig[role];
   const Icon = config.icon;
@@ -45,7 +47,10 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
     <>
       {showKYC && (
         <KYCVerificationFlow
-          onClose={() => setShowKYC(false)}
+          onClose={(completed?: boolean) => {
+            setShowKYC(false);
+            if (completed) markVerified();
+          }}
           activeRole={role === "agency" ? "agency" : role === "stayhost" ? "stayhost" : "landlord"}
         />
       )}
