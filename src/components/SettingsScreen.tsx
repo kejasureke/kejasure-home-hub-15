@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Eye, Shield, ChevronRight, ToggleLeft, ToggleRight, Smartphone, MapPin, Volume2 } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 
 interface SettingsScreenProps {
   onBack: () => void;
 }
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
+  const { closing, triggerClose } = useOverlayClose(onBack);
   const [pushEnabled, setPushEnabled] = useState(true);
   const [emailEnabled, setEmailEnabled] = useState(false);
   const [smsEnabled, setSmsEnabled] = useState(true);
