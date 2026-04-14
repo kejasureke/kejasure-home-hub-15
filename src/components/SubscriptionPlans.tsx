@@ -260,8 +260,13 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
                   }`}>
                     {selectedPlan === i && <Check className="w-3 h-3 text-white" />}
                   </div>
-                  <div>
+                   <div>
                     <h3 className="text-lg font-extrabold text-foreground">{plan.name}</h3>
+                    {(plan as any).badge && (
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                        (plan as any).badge === "Business" ? "bg-accent/15 text-accent-foreground" : "bg-primary/10 text-primary"
+                      }`}>{(plan as any).badge}</span>
+                    )}
                   </div>
                 </div>
                 <div className="text-right">
