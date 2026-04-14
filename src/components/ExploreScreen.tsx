@@ -71,11 +71,15 @@ const priceRanges = [
   { label: "70K+", min: 70000, max: Infinity },
 ];
 
-const ExploreScreen = () => {
+interface ExploreScreenProps {
+  initialSearch?: string;
+}
+
+const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [activePriceRange, setActivePriceRange] = useState<typeof priceRanges[number] | null>(null);
   const [activeArea, setActiveArea] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [insightsCollapsed, setInsightsCollapsed] = useState(false);
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { addRecent } = useRecentlyViewed();

@@ -63,7 +63,15 @@ const ProfileScreen = () => {
   if (showKYC) return <KYCVerificationFlow onClose={() => setShowKYC(false)} activeRole={role} />;
   if (showSettings) return <SettingsScreen onBack={() => setShowSettings(false)} />;
   if (showHelp) return <HelpSupportScreen onBack={() => setShowHelp(false)} />;
-  if (showSavedSearches) return <SavedSearchesScreen onBack={() => setShowSavedSearches(false)} />;
+  if (showSavedSearches) return (
+    <SavedSearchesScreen
+      onBack={() => setShowSavedSearches(false)}
+      onRunSearch={(search) => {
+        setShowSavedSearches(false);
+        window.dispatchEvent(new CustomEvent("run-saved-search", { detail: search }));
+      }}
+    />
+  );
   if (showReviews) return <ReviewRatingFlow onClose={() => setShowReviews(false)} />;
   if (showSubscription) return <SubscriptionPlans onBack={() => setShowSubscription(false)} currentRole={role} />;
   if (showNeighborhood) return <NeighborhoodSafety onBack={() => setShowNeighborhood(false)} />;

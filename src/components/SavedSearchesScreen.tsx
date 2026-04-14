@@ -4,9 +4,11 @@ import { useSavedSearches, type SavedSearch } from "@/hooks/useSavedSearches";
 
 interface SavedSearchesScreenProps {
   onBack: () => void;
+  onRunSearch?: (search: SavedSearch) => void;
 }
 
-const SavedSearchesScreen = ({ onBack }: SavedSearchesScreenProps) => {
+
+const SavedSearchesScreen = ({ onBack, onRunSearch }: SavedSearchesScreenProps) => {
   const { searches, removeSearch, saveSearch } = useSavedSearches();
   const [alertsEnabled, setAlertsEnabled] = useState<Record<string, boolean>>({});
   const [showAdd, setShowAdd] = useState(false);
@@ -70,7 +72,11 @@ const SavedSearchesScreen = ({ onBack }: SavedSearchesScreenProps) => {
         ) : (
           <div className="space-y-3">
             {demoSearches.map((s) => (
-              <div key={s.id} className="bg-card rounded-2xl card-shadow p-4">
+              <div
+                key={s.id}
+                className="bg-card rounded-2xl card-shadow p-4 cursor-pointer active:scale-[0.98] transition-transform"
+                onClick={() => onRunSearch?.(s)}
+              >
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                     <Search className="w-5 h-5 text-primary" />

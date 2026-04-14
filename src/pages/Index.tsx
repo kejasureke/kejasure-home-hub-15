@@ -27,6 +27,7 @@ const Index = () => {
   const { unreadCount: storedUnread } = useNotifications();
   const { role, isTenant } = useUserRole();
   const [showKYCFromNotification, setShowKYCFromNotification] = useState(false);
+  const [exploreSearchQuery, setExploreSearchQuery] = useState("");
   const {
     alerts,
     toast,
@@ -43,7 +44,7 @@ const Index = () => {
   // Listen for service chat open events
   useEffect(() => {
     const handler = (e: Event) => {
-    const { name, avatar } = (e as CustomEvent).detail;
+      const { name, avatar } = (e as CustomEvent).detail;
       setChatContact({
         id: `service-${name}`,
         name,
@@ -59,6 +60,18 @@ const Index = () => {
     };
     window.addEventListener("open-service-chat", handler);
     return () => window.removeEventListener("open-service-chat", handler);
+  }, []);
+
+  // Listen for saved search navigation
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const search = (e as CustomEvent).detail;
+      const query = search.label || search.estate || search.county || "";
+      setExploreSearchQuery(query);
+      setActiveTab("search");
+    };
+    window.addEventListener("run-saved-search", handler);
+    return () => window.removeEventListener("run-saved-search", handler);
   }, []);
 
   // Badge counts
@@ -130,7 +143,7 @@ const Index = () => {
 
       {activeTab === "dashboard" && renderDashboard()}
 
-      {activeTab === "search" && <ExploreScreen />}
+      {activeTab === "search" && <ExploreScreen initialSearch={exploreSearchQuery} key={exploreSearchQuery} />}
 
       {activeTab === "favorites" && (
         <div className="px-4 pt-6 pb-32">
