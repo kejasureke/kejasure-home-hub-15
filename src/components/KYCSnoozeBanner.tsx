@@ -40,12 +40,26 @@ const KYCSnoozeBanner = ({ role }: KYCSnoozeBannerProps) => {
 
   if (isVerified || !timeLeft) return null;
 
+  const cancelSnooze = () => {
+    localStorage.removeItem(remindKey);
+    setTimeLeft(null);
+    window.dispatchEvent(new CustomEvent("kyc-snooze-cancelled", { detail: { role } }));
+  };
+
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50 border border-border mb-3">
-      <Clock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-      <p className="text-xs text-muted-foreground">
-        Verification reminder snoozed · returns in <span className="font-semibold text-foreground">{timeLeft}</span>
-      </p>
+    <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-muted/50 border border-border mb-3">
+      <div className="flex items-center gap-2">
+        <Clock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+        <p className="text-xs text-muted-foreground">
+          Reminder snoozed · returns in <span className="font-semibold text-foreground">{timeLeft}</span>
+        </p>
+      </div>
+      <button
+        onClick={cancelSnooze}
+        className="text-xs font-medium text-primary hover:underline shrink-0 ml-2"
+      >
+        Verify now
+      </button>
     </div>
   );
 };

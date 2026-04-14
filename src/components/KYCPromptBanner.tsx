@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShieldCheck, ChevronRight, X, FileText, Building2, AlertTriangle, Clock } from "lucide-react";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
@@ -50,6 +50,15 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
   });
   const [showKYC, setShowKYC] = useState(false);
   const { isVerified, markVerified } = useKYCStatus(role);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.role === role) setDismissed(false);
+    };
+    window.addEventListener("kyc-snooze-cancelled", handler);
+    return () => window.removeEventListener("kyc-snooze-cancelled", handler);
+  }, [role]);
 
   if (dismissed || isVerified) return null;
 
