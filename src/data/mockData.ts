@@ -6,7 +6,9 @@ import property4 from "@/assets/property4.jpg";
 export interface Property {
   id: string;
   title: string;
-  type: "rental" | "shortstay";
+  type: "rental" | "shortstay" | "commercial";
+  commercialType?: "shop" | "office" | "godown" | "warehouse" | "showroom";
+  sizeSqft?: string;
   county: string;
   subcounty: string;
   ward: string;
