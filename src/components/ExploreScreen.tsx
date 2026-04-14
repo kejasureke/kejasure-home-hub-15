@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint } from "lucide-react";
+import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints } from "lucide-react";
 import { properties } from "@/data/mockData";
+import { neighborhoodProfiles } from "@/data/neighborhoodData";
 import PropertyCard from "./PropertyCard";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
