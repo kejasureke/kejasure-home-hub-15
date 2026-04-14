@@ -10,6 +10,7 @@ interface SavedSearchesScreenProps {
 
 
 const SavedSearchesScreen = ({ onBack, onRunSearch }: SavedSearchesScreenProps) => {
+  const { closing, triggerClose } = useOverlayClose(onBack);
   const { searches, removeSearch, saveSearch } = useSavedSearches();
   const [alertsEnabled, setAlertsEnabled] = useState<Record<string, boolean>>({});
   const [showAdd, setShowAdd] = useState(false);
