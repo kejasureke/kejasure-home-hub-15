@@ -76,6 +76,7 @@ const ExploreScreen = () => {
   const [activePriceRange, setActivePriceRange] = useState<typeof priceRanges[number] | null>(null);
   const [activeArea, setActiveArea] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [insightsCollapsed, setInsightsCollapsed] = useState(false);
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { addRecent } = useRecentlyViewed();
 
@@ -208,7 +209,7 @@ const ExploreScreen = () => {
               return (
                 <button
                   key={area.estate}
-                  onClick={() => setActiveArea(area.estate)}
+                  onClick={() => { setActiveArea(area.estate); setInsightsCollapsed(false); }}
                   className="w-full p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-all text-left"
                 >
                   <div className="flex items-start justify-between mb-2.5">
@@ -254,7 +255,23 @@ const ExploreScreen = () => {
             if (!area) return null;
             return (
               <div className="mb-4 rounded-2xl bg-card card-shadow overflow-hidden">
-                <div className="p-4 pb-3">
+                <button
+                  onClick={() => setInsightsCollapsed((p) => !p)}
+                  className="w-full flex items-center justify-between px-4 py-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-semibold text-foreground">Area Insights</span>
+                  </div>
+                  {insightsCollapsed ? (
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </button>
+
+                {!insightsCollapsed && (
+                <div className="px-4 pb-3">
                   <p className="text-xs text-muted-foreground mb-2">{area.summary}</p>
 
                   {/* Score badges row */}
@@ -324,6 +341,7 @@ const ExploreScreen = () => {
                     </div>
                   </div>
                 </div>
+                )}
               </div>
             );
           })()}
