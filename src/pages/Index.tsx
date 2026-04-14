@@ -84,10 +84,19 @@ const Index = () => {
           alert={toast}
           onDismiss={dismissToast}
           onTap={() => {
+            const action = toast.action;
             dismissToast();
-            if (toast.action?.startsWith("open-kyc-")) {
+            if (action?.startsWith("open-kyc-")) {
               setActiveTab("dashboard");
               setShowKYCFromNotification(true);
+            } else if (action === "open-chats") {
+              setActiveTab("chats");
+            } else if (action === "open-dashboard") {
+              setActiveTab("dashboard");
+            } else if (action === "open-home") {
+              setActiveTab("home");
+            } else if (action === "open-favorites") {
+              setActiveTab("favorites");
             } else {
               setActiveTab("profile");
             }

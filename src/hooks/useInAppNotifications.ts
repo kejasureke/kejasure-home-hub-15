@@ -37,12 +37,12 @@ function playAlertSound() {
 }
 
 const SIMULATED_ALERTS: AlertTemplate[] = [
-  { type: "message", title: "New message from Jane Wanjiku", body: "Hi! Is the 2BR in Kilimani still available?" },
-  { type: "booking", title: "Viewing confirmed", body: "Your viewing for Modern 3BR is set for tomorrow 10 AM." },
-  { type: "listing", title: "New listing matches your search", body: "Furnished studio in Westlands at KES 35,000/mo just listed." },
-  { type: "price", title: "Price drop alert", body: "3BR in Lavington dropped from KES 95K to KES 80K/mo." },
-  { type: "verified", title: "Landlord verified", body: "The landlord for Cozy Studio has been ID-verified." },
-  { type: "system", title: "Payment received", body: "KES 45,000 rent payment confirmed via M-Pesa." },
+  { type: "message", title: "New message from Jane Wanjiku", body: "Hi! Is the 2BR in Kilimani still available?", action: "open-chats" },
+  { type: "booking", title: "Viewing confirmed", body: "Your viewing for Modern 3BR is set for tomorrow 10 AM.", action: "open-dashboard" },
+  { type: "listing", title: "New listing matches your search", body: "Furnished studio in Westlands at KES 35,000/mo just listed.", action: "open-home" },
+  { type: "price", title: "Price drop alert", body: "3BR in Lavington dropped from KES 95K to KES 80K/mo.", action: "open-home" },
+  { type: "verified", title: "Landlord verified", body: "The landlord for Cozy Studio has been ID-verified.", action: "open-profile" },
+  { type: "system", title: "Payment received", body: "KES 45,000 rent payment confirmed via M-Pesa.", action: "open-dashboard" },
 ];
 
 export const useInAppNotifications = () => {
