@@ -118,6 +118,17 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
   const activeLabel = activeCategory?.label || activePriceRange?.label || activeArea || "Search Results";
   const showingResults = activeCategory || activePriceRange || activeArea || searchQuery;
 
+  if (selectedProperty) {
+    return (
+      <ListingDetail
+        property={selectedProperty}
+        onBack={() => setSelectedProperty(null)}
+        liked={isFavorite(selectedProperty.id)}
+        onToggleLike={() => toggleFavorite(selectedProperty.id)}
+      />
+    );
+  }
+
   const clearFilters = () => {
     setActiveCategory(null);
     setActivePriceRange(null);
