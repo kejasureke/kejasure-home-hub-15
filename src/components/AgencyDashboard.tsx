@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import KYCPromptBanner from "./KYCPromptBanner";
 import KYCSnoozeBanner from "./KYCSnoozeBanner";
 import VerificationBadge from "./VerificationBadge";
@@ -9,10 +9,13 @@ import {
   Building2, Target, Clock, CheckCircle2, AlertTriangle, Edit3, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 
 interface AgencyDashboardProps {
   onBack: () => void;
+  autoOpenKYC?: boolean;
+  onKYCOpened?: () => void;
 }
 
 const plans = [
@@ -51,11 +54,19 @@ const topCounties = [
 
 type Tab = "overview" | "agents" | "leads" | "billing";
 
-const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
+const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
-  const { isVerified } = useKYCStatus("agency");
+  const [showKYCDirect, setShowKYCDirect] = useState(false);
+  const { isVerified, markVerified } = useKYCStatus("agency");
+
+  useEffect(() => {
+    if (autoOpenKYC && !isVerified) {
+      setShowKYCDirect(true);
+      onKYCOpened?.();
+    }
+  }, [autoOpenKYC, isVerified, onKYCOpened]);
   const currentPlan = plans.find((p) => p.current)!;
 
   const agencyMpesaPlans = plans.map((p) => ({
@@ -75,6 +86,15 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showKYCDirect && (
+        <KYCVerificationFlow
+          onClose={(completed?: boolean) => {
+            setShowKYCDirect(false);
+            if (completed) markVerified();
+          }}
+          activeRole="agency"
+        />
+      )}
       {showCRUD && <ListingCRUD type="rental" onClose={() => setShowCRUD(false)} />}
       {showPayment && (
         <MpesaPaymentFlow

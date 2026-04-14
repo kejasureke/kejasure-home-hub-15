@@ -25,6 +25,7 @@ const Index = () => {
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { unreadCount: storedUnread } = useNotifications();
   const { role, isTenant } = useUserRole();
+  const [showKYCFromNotification, setShowKYCFromNotification] = useState(false);
   const {
     alerts,
     toast,
@@ -57,13 +58,17 @@ const Index = () => {
 
   const renderDashboard = () => {
     const goHome = () => setActiveTab("home");
+    const kycProps = {
+      autoOpenKYC: showKYCFromNotification,
+      onKYCOpened: () => setShowKYCFromNotification(false),
+    };
     switch (role) {
       case "landlord":
-        return <DashboardScreen onBack={goHome} />;
+        return <DashboardScreen onBack={goHome} {...kycProps} />;
       case "stayhost":
-        return <StayHostDashboard onBack={goHome} />;
+        return <StayHostDashboard onBack={goHome} {...kycProps} />;
       case "agency":
-        return <AgencyDashboard onBack={goHome} />;
+        return <AgencyDashboard onBack={goHome} {...kycProps} />;
       case "serviceprovider":
         return <ServiceProviderDashboard onBack={goHome} />;
       default:
@@ -80,7 +85,12 @@ const Index = () => {
           onDismiss={dismissToast}
           onTap={() => {
             dismissToast();
-            setActiveTab("profile");
+            if (toast.action?.startsWith("open-kyc-")) {
+              setActiveTab("dashboard");
+              setShowKYCFromNotification(true);
+            } else {
+              setActiveTab("profile");
+            }
           }}
         />
       )}

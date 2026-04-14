@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import KYCPromptBanner from "./KYCPromptBanner";
 import KYCSnoozeBanner from "./KYCSnoozeBanner";
 import VerificationBadge from "./VerificationBadge";
@@ -9,10 +9,13 @@ import {
   Home, Star, Clock, CheckCircle2, Bed, Moon as MoonIcon, Edit3, Trash2, MessageCircle as MsgIcon
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 
 interface StayHostDashboardProps {
   onBack: () => void;
+  autoOpenKYC?: boolean;
+  onKYCOpened?: () => void;
 }
 
 const plans = [
@@ -55,11 +58,19 @@ const countyOccupancy = [
 
 type Tab = "overview" | "calendar" | "guests" | "billing";
 
-const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
+const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
-  const { isVerified } = useKYCStatus("stayhost");
+  const [showKYCDirect, setShowKYCDirect] = useState(false);
+  const { isVerified, markVerified } = useKYCStatus("stayhost");
+
+  useEffect(() => {
+    if (autoOpenKYC && !isVerified) {
+      setShowKYCDirect(true);
+      onKYCOpened?.();
+    }
+  }, [autoOpenKYC, isVerified, onKYCOpened]);
   const currentPlan = plans.find((p) => p.current)!;
 
   const hostMpesaPlans = plans.map((p) => ({
@@ -79,6 +90,15 @@ const StayHostDashboard = ({ onBack }: StayHostDashboardProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showKYCDirect && (
+        <KYCVerificationFlow
+          onClose={(completed?: boolean) => {
+            setShowKYCDirect(false);
+            if (completed) markVerified();
+          }}
+          activeRole="stayhost"
+        />
+      )}
       {showCRUD && <ListingCRUD type="shortstay" onClose={() => setShowCRUD(false)} />}
       {showPayment && (
         <MpesaPaymentFlow

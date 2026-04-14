@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import KYCPromptBanner from "./KYCPromptBanner";
 import KYCSnoozeBanner from "./KYCSnoozeBanner";
 import VerificationBadge from "./VerificationBadge";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
 import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft, Edit3, Trash2, CheckCircle2, X, Clock, MapPin } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 
 interface DashboardScreenProps {
   onBack: () => void;
+  autoOpenKYC?: boolean;
+  onKYCOpened?: () => void;
 }
 
 const stats = [
@@ -43,12 +46,20 @@ const initialBookingRequests: BookingRequest[] = [
   { id: "b3", tenantName: "Sarah Njeri", tenantAvatar: "SN", property: "Studio Westlands", date: "Apr 7", time: "11:00 AM", note: "Coming with my partner", status: "accepted", requestedAt: "Yesterday" },
 ];
 
-const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
+const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenProps) => {
   const [showPayment, setShowPayment] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
+  const [showKYCDirect, setShowKYCDirect] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>(initialBookingRequests);
-  const { isVerified } = useKYCStatus("landlord");
+  const { isVerified, markVerified } = useKYCStatus("landlord");
+
+  useEffect(() => {
+    if (autoOpenKYC && !isVerified) {
+      setShowKYCDirect(true);
+      onKYCOpened?.();
+    }
+  }, [autoOpenKYC, isVerified, onKYCOpened]);
 
   const myListings = [
     { title: "3BR Kilimani", views: 847, leads: 23, status: "active" },
@@ -76,6 +87,15 @@ const DashboardScreen = ({ onBack }: DashboardScreenProps) => {
 
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+      {showKYCDirect && (
+        <KYCVerificationFlow
+          onClose={(completed?: boolean) => {
+            setShowKYCDirect(false);
+            if (completed) markVerified();
+          }}
+          activeRole="landlord"
+        />
+      )}
       {showCRUD && (
         <ListingCRUD type="rental" onClose={() => { setShowCRUD(false); setEditIdx(null); }} />
       )}
