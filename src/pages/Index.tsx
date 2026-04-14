@@ -42,11 +42,11 @@ const Index = () => {
   // Listen for service chat open events
   useEffect(() => {
     const handler = (e: Event) => {
-      const { name, role: contactRole, avatar } = (e as CustomEvent).detail;
+    const { name, avatar } = (e as CustomEvent).detail;
       setChatContact({
         id: `service-${name}`,
         name,
-        role: contactRole || "Service Provider",
+        role: "service",
         lastMessage: "",
         time: "Now",
         unread: 0,
