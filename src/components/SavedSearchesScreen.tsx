@@ -1,5 +1,6 @@
 import { ArrowLeft, Search, Bell, BellOff, Trash2, MapPin, Clock, Plus, Filter } from "lucide-react";
 import { useState } from "react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useSavedSearches, type SavedSearch } from "@/hooks/useSavedSearches";
 
 interface SavedSearchesScreenProps {

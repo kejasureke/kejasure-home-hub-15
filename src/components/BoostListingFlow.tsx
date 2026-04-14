@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Zap, TrendingUp, Eye, Clock, Check, Star, Crown, Sparkles } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface BoostListingFlowProps {

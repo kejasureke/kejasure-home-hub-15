@@ -1,5 +1,6 @@
 import { ArrowLeft, Bell, BellOff, TrendingDown, Trash2 } from "lucide-react";
 import { usePriceAlerts } from "@/hooks/usePriceAlerts";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 
 interface PriceDropAlertsScreenProps {
   onBack: () => void;

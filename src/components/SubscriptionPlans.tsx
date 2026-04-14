@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Crown, Check, ShieldCheck, Zap, Star, MapPin, Phone, MessageCircle, BarChart3, Bell, Heart, SlidersHorizontal, TrendingUp, Sparkles, Receipt, Clock } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface SubscriptionPlansProps {

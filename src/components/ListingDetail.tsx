@@ -1,5 +1,6 @@
 import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2, Lock, GitCompare } from "lucide-react";
 import { useState } from "react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
 import ShareListingSheet from "./ShareListingSheet";
