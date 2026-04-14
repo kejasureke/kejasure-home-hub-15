@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import HomeFeed from "@/components/HomeFeed";
 import ChatScreen from "@/components/ChatScreen";
@@ -38,6 +38,27 @@ const Index = () => {
   } = useInAppNotifications();
 
   const favoriteProperties = properties.filter((p) => favoriteIds.includes(p.id));
+
+  // Listen for service chat open events
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { name, role: contactRole, avatar } = (e as CustomEvent).detail;
+      setChatContact({
+        id: `service-${name}`,
+        name,
+        role: contactRole || "Service Provider",
+        lastMessage: "",
+        time: "Now",
+        unread: 0,
+        online: true,
+        verified: false,
+        avatar: avatar || "🔧",
+      });
+      setShowChat(true);
+    };
+    window.addEventListener("open-service-chat", handler);
+    return () => window.removeEventListener("open-service-chat", handler);
+  }, []);
 
   // Badge counts
   const chatBadge = 2;
