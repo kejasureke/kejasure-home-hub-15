@@ -89,7 +89,7 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
   ];
 
   return (
-    <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
+    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
       {showKYCDirect && (
         <KYCVerificationFlow
           onClose={(completed?: boolean) => {

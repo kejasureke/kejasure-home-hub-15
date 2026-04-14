@@ -65,7 +65,7 @@ const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "la
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto">
       <div className="sticky top-0 z-10 glass-surface border-b border-border px-4 py-3">
         <div className="flex items-center gap-3 mb-3">
           <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
