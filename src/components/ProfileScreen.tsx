@@ -132,7 +132,7 @@ const ProfileScreen = () => {
         <div className="flex-1">
           <div className="flex items-center gap-1.5">
             <h2 className="text-lg font-bold">John Kamau</h2>
-            {isVerified && <ShieldCheck className="w-4 h-4 text-trust" />}
+            <VerificationBadge isVerified={isVerified} variant="dark" />
           </div>
           <p className="text-sm text-muted-foreground">+254 712 345 678</p>
           <div className="tier-badge-premium mt-1 inline-block">Premium Member</div>
