@@ -142,7 +142,14 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {["Bedsitters", "1 Bedroom", "2 Bedroom", "3 Bedroom", "Studio", "Furnished", "Unfurnished", "With Parking"].map((cat) => (
-              <button key={cat} className="p-4 rounded-2xl bg-card card-shadow text-sm font-medium text-foreground hover:bg-primary/5 transition-colors">
+              <button
+                key={cat}
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent("explore-category", { detail: { category: cat } }));
+                  setActiveTab("home");
+                }}
+                className="p-4 rounded-2xl bg-card card-shadow text-sm font-medium text-foreground hover:bg-primary/5 active:scale-[0.97] transition-all"
+              >
                 {cat}
               </button>
             ))}

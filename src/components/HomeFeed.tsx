@@ -1,5 +1,5 @@
 import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench, Sparkles, Building2 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 import PropertyCard from "./PropertyCard";
 import ServiceCard from "./ServiceCard";
@@ -49,6 +49,17 @@ const HomeFeed = () => {
   const { recentIds, addRecent } = useRecentlyViewed();
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { searches, saveSearch, removeSearch } = useSavedSearches();
+
+  // Listen for explore category selections
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { category } = (e as CustomEvent).detail;
+      setSegment("Rentals");
+      setSearchQuery(category);
+    };
+    window.addEventListener("explore-category", handler);
+    return () => window.removeEventListener("explore-category", handler);
+  }, []);
 
   const filteredProperties = useMemo(() => {
     let result = properties.filter((p) => {
