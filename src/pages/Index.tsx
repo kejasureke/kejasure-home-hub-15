@@ -81,7 +81,12 @@ const Index = () => {
           onDismiss={dismissToast}
           onTap={() => {
             dismissToast();
-            setActiveTab("profile");
+            if (toast.action?.startsWith("open-kyc-")) {
+              setActiveTab("dashboard");
+              setShowKYCFromNotification(true);
+            } else {
+              setActiveTab("profile");
+            }
           }}
         />
       )}
