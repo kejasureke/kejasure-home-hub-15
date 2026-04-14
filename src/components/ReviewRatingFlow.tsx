@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Star, Camera, X, Send, ThumbsUp, ShieldCheck, Clock, CheckCircle2 } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 
 interface ReviewRatingFlowProps {
   onClose: () => void;
@@ -31,6 +32,7 @@ const mockReviews: Review[] = [
 const ratingLabels = ["", "Terrible", "Poor", "Average", "Good", "Excellent"];
 
 const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "landlord", listingTitle = "2BR Apartment, Kilimani" }: ReviewRatingFlowProps) => {
+  const { closing, triggerClose } = useOverlayClose(onClose);
   const [tab, setTab] = useState<Tab>("reviews");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -65,10 +67,10 @@ const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "la
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       <div className="sticky top-0 z-10 glass-surface border-b border-border px-4 py-3">
         <div className="flex items-center gap-3 mb-3">
-          <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+          <button onClick={triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex-1">

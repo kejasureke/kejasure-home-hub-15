@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Zap, TrendingUp, Eye, Clock, Check, Star, Crown, Sparkles } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface BoostListingFlowProps {
@@ -35,6 +36,7 @@ const myListings = [
 ];
 
 const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
+  const { closing, triggerClose } = useOverlayClose(onBack);
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const [selectedBoost, setSelectedBoost] = useState(1);
   const [showPayment, setShowPayment] = useState(false);
@@ -52,11 +54,11 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
   }
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       <div className="px-4 pt-5 pb-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
-          <button onClick={step === "select-boost" ? () => setStep("select-listing") : onBack} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+          <button onClick={step === "select-boost" ? () => setStep("select-listing") : triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
             <ArrowLeft className="w-4 h-4 text-foreground" />
           </button>
           <div>

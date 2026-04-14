@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Crown, Check, ShieldCheck, Zap, Star, MapPin, Phone, MessageCircle, BarChart3, Bell, Heart, SlidersHorizontal, TrendingUp, Sparkles, Receipt, Clock } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface SubscriptionPlansProps {
@@ -158,6 +159,7 @@ const getPlansForRole = (role: string) => {
 };
 
 const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
+  const { closing, triggerClose } = useOverlayClose(onBack);
   const role = currentRole || localStorage.getItem("kejasure_role") || "tenant";
   const { plans, label } = getPlansForRole(role);
   const [selectedPlan, setSelectedPlan] = useState(() => plans.findIndex(p => p.popular) ?? 1);
@@ -183,11 +185,11 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
   }
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       {/* Header */}
       <div className="gradient-premium px-4 pt-5 pb-8">
         <div className="flex items-center gap-3 mb-5">
-          <button onClick={onBack} className="p-1">
+          <button onClick={triggerClose} className="p-1">
             <ArrowLeft className="w-5 h-5 text-accent-foreground" />
           </button>
           <h1 className="text-lg font-bold text-accent-foreground">Subscription Plans</h1>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, AlertCircle, User, Building2, Fingerprint, X, ChevronRight, Phone, Smartphone } from "lucide-react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 import AIPhotoVerification from "./AIPhotoVerification";
 
 interface KYCVerificationFlowProps {
@@ -20,6 +21,7 @@ const categoryBadgeConfig: Record<VerificationCategory, { label: string; color: 
 };
 
 const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerificationFlowProps) => {
+  const { closing, triggerClose } = useOverlayClose(onClose);
   const [step, setStep] = useState<Step>("type_select");
   const [verificationCategory, setVerificationCategory] = useState<VerificationCategory | null>(null);
   const [docType, setDocType] = useState<DocType | BusinessDocType | null>(null);
@@ -102,11 +104,11 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const isIndividualServiceProvider = verificationCategory === "individual" && activeRole === "serviceprovider";
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       {/* Header */}
       <div className="sticky top-0 z-10 glass-surface border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
-          <button onClick={() => onClose()} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+          <button onClick={triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex-1">

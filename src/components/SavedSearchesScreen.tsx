@@ -1,5 +1,6 @@
 import { ArrowLeft, Search, Bell, BellOff, Trash2, MapPin, Clock, Plus, Filter } from "lucide-react";
 import { useState } from "react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useSavedSearches, type SavedSearch } from "@/hooks/useSavedSearches";
 
 interface SavedSearchesScreenProps {
@@ -9,6 +10,7 @@ interface SavedSearchesScreenProps {
 
 
 const SavedSearchesScreen = ({ onBack, onRunSearch }: SavedSearchesScreenProps) => {
+  const { closing, triggerClose } = useOverlayClose(onBack);
   const { searches, removeSearch, saveSearch } = useSavedSearches();
   const [alertsEnabled, setAlertsEnabled] = useState<Record<string, boolean>>({});
   const [showAdd, setShowAdd] = useState(false);
@@ -41,9 +43,9 @@ const SavedSearchesScreen = ({ onBack, onRunSearch }: SavedSearchesScreenProps) 
   ];
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       <div className="sticky top-0 z-10 glass-surface border-b border-border px-4 py-3 flex items-center gap-3">
-        <button onClick={onBack} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+        <button onClick={triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div className="flex-1">

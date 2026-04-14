@@ -1,5 +1,6 @@
 import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2, Lock, GitCompare } from "lucide-react";
 import { useState } from "react";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
 import ShareListingSheet from "./ShareListingSheet";
@@ -23,6 +24,7 @@ interface ListingDetailProps {
 }
 
 const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith }: ListingDetailProps) => {
+  const { closing, triggerClose } = useOverlayClose(onBack);
   const [currentImage, setCurrentImage] = useState(0);
   const [showBooking, setShowBooking] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -37,14 +39,14 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       {/* Image Carousel */}
       <div className="relative aspect-[4/3] bg-muted">
         <img src={property.images[currentImage]} alt={property.title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 via-transparent to-foreground/20" />
 
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4">
-          <button onClick={onBack} className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center">
+          <button onClick={triggerClose} className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <div className="flex gap-2">

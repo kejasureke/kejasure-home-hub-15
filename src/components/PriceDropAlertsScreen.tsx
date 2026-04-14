@@ -1,5 +1,6 @@
 import { ArrowLeft, Bell, BellOff, TrendingDown, Trash2 } from "lucide-react";
 import { usePriceAlerts } from "@/hooks/usePriceAlerts";
+import { useOverlayClose } from "@/hooks/useOverlayClose";
 
 interface PriceDropAlertsScreenProps {
   onBack: () => void;
@@ -7,13 +8,14 @@ interface PriceDropAlertsScreenProps {
 }
 
 const PriceDropAlertsScreen = ({ onBack, onViewProperty }: PriceDropAlertsScreenProps) => {
+  const { closing, triggerClose } = useOverlayClose(onBack);
   const { alerts, markSeen, markAllSeen, clearAlerts } = usePriceAlerts();
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       <div className="gradient-trust px-4 pt-6 pb-5">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="w-10 h-10 rounded-full bg-card/20 backdrop-blur-sm flex items-center justify-center">
+          <button onClick={triggerClose} className="w-10 h-10 rounded-full bg-card/20 backdrop-blur-sm flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-primary-foreground" />
           </button>
           <div className="flex-1">
