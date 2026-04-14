@@ -1,5 +1,7 @@
 import { useState } from "react";
 import KYCPromptBanner from "./KYCPromptBanner";
+import VerificationBadge from "./VerificationBadge";
+import { useKYCStatus } from "@/hooks/useKYCStatus";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
   Upload, UserPlus, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
@@ -52,6 +54,7 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
+  const { isVerified } = useKYCStatus("agency");
   const currentPlan = plans.find((p) => p.current)!;
 
   const agencyMpesaPlans = plans.map((p) => ({
@@ -91,7 +94,10 @@ const AgencyDashboard = ({ onBack }: AgencyDashboardProps) => {
             <Building2 className="w-6 h-6 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-primary-foreground">KejaPrime Agency</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-semibold text-primary-foreground">KejaPrime Agency</h2>
+              <VerificationBadge isVerified={isVerified} variant="light" />
+            </div>
             <p className="text-xs text-primary-foreground/70">Growth Plan · 4 agents</p>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, 
 import AIPhotoVerification from "./AIPhotoVerification";
 
 interface KYCVerificationFlowProps {
-  onClose: () => void;
+  onClose: (completed?: boolean) => void;
   activeRole?: string;
 }
 
@@ -106,7 +106,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
       {/* Header */}
       <div className="sticky top-0 z-10 glass-surface border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
-          <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+          <button onClick={() => onClose()} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex-1">
@@ -692,7 +692,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             )}
 
             <button
-              onClick={result === "success" ? onClose : () => {
+              onClick={result === "success" ? () => onClose(true) : () => {
                 if (verificationCategory === "tenant") {
                   setStep("tenant_info");
                   setOtp("");
