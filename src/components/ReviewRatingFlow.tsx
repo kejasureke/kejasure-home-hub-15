@@ -67,10 +67,10 @@ const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "la
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       <div className="sticky top-0 z-10 glass-surface border-b border-border px-4 py-3">
         <div className="flex items-center gap-3 mb-3">
-          <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+          <button onClick={triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex-1">
