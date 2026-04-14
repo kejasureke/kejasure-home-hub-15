@@ -59,7 +59,7 @@ const KYCPromptBanner = ({ role }: KYCPromptBannerProps) => {
       )}
       <div className="relative p-4 rounded-2xl border-2 border-amber-300/50 bg-amber-50/50 dark:bg-amber-950/20 dark:border-amber-700/30 mb-4">
         <button
-          onClick={() => setDismissed(true)}
+          onClick={() => { setDismissed(true); localStorage.setItem(dismissKey, "true"); }}
           className="absolute top-3 right-3 w-6 h-6 rounded-full bg-secondary flex items-center justify-center"
         >
           <X className="w-3 h-3 text-muted-foreground" />
