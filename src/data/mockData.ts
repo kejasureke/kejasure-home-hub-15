@@ -602,7 +602,7 @@ export const properties: Property[] = [
     available: true,
     amenities: ["Street Frontage", "24hr Security", "Loading Zone"],
     landlordResponseTime: "< 2 hours",
-    landlordResponseSpeed: "medium",
+    landlordResponseSpeed: "moderate",
     lastActive: "1 hour ago",
     nearbyLandmarks: ["Gikomba Market", "Muthurwa Market"],
     description: "Affordable container shop in the bustling Gikomba market area. High foot traffic, ideal for retail or wholesale.",
