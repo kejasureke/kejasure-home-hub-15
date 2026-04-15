@@ -15,7 +15,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 
-const segments = ["Rentals", "Short Stays", "Commercial", "Corporate", "Services"] as const;
+const segments = ["Rentals", "Short Stays", "Commercial", "Corporate Stay", "Services"] as const;
 
 const HomeFeed = () => {
   const [segment, setSegment] = useState<(typeof segments)[number]>("Rentals");
@@ -55,7 +55,7 @@ const HomeFeed = () => {
       const matchType = segment === "Rentals" ? (p.type === "rental" && !p.corporate) :
                         segment === "Short Stays" ? (p.type === "shortstay" && !p.corporate) :
                         segment === "Commercial" ? p.type === "commercial" :
-                        segment === "Corporate" ? !!p.corporate :
+                        segment === "Corporate Stay" ? !!p.corporate :
                         true;
       const matchCounty = !county || p.county === county;
       const matchEstate = !estate || p.estate === estate;
@@ -427,7 +427,7 @@ const HomeFeed = () => {
             )}
 
             <h2 className="text-base font-semibold">
-              {segment === "Short Stays" ? "All Short Stays" : segment === "Corporate" ? "All Corporate & Expat Listings" : "All Rentals"}
+              {segment === "Short Stays" ? "All Short Stays" : segment === "Corporate Stay" ? "All Corporate & Expat Listings" : segment === "Commercial" ? "All Commercial Listings" : "All Rentals"}
             </h2>
             <div className="space-y-4">
               {filteredProperties.map((p) => (

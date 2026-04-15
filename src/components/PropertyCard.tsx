@@ -65,8 +65,8 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         {/* Price overlay */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
           <div className="px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-sm shadow-lg">
-            <span className="text-lg font-bold text-gray-900">{formatPrice(property.price)}</span>
-            <span className="text-sm text-gray-600">{property.priceUnit}</span>
+            <span className="text-lg font-bold text-foreground">{formatPrice(property.price)}</span>
+            <span className="text-sm text-muted-foreground">{property.priceUnit}</span>
           </div>
           {oldPrice && oldPrice > property.price && (
             <PriceDropBadge oldPrice={oldPrice} newPrice={property.price} compact />
@@ -83,10 +83,12 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
       </div>
 
       {/* Content */}
-      <div className="p-3.5">
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="text-sm font-semibold text-foreground leading-tight line-clamp-2">{property.title}</h3>
-          <div className="flex flex-col items-end gap-1 shrink-0">
+      {/* Content */}
+      <div className="p-4 space-y-2.5">
+        {/* Title + Badge row */}
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-sm font-bold text-foreground leading-snug line-clamp-2 flex-1">{property.title}</h3>
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
             {property.verified ? (
               <div className="verified-badge">
                 <ShieldCheck className="w-3 h-3" />
@@ -104,27 +106,27 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
 
         {/* Corporate badge */}
         {property.corporate && (
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-[10px] font-semibold text-primary mb-2 w-fit">
-            💼 Corporate / Expat
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-[11px] font-semibold text-primary w-fit">
+            💼 Corporate Stay
           </div>
         )}
 
         {/* Location */}
-        <div className="flex items-center gap-1.5 mb-2.5">
-          <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+        <div className="flex items-center gap-2">
+          <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
           <div className="flex gap-1.5">
             <span className="location-chip">{property.county}</span>
             <span className="location-chip">{property.estate}</span>
           </div>
         </div>
 
-        {/* Specs + Response */}
-        <div className="flex items-center gap-4 mb-2.5">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        {/* Specs */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Bed className="w-3.5 h-3.5" />
             <span>{property.bedrooms} Bed{property.bedrooms > 1 ? "s" : ""}</span>
           </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Bath className="w-3.5 h-3.5" />
             <span>{property.bathrooms} Bath{property.bathrooms > 1 ? "s" : ""}</span>
           </div>
@@ -135,13 +137,11 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
 
         {/* Smile ID badge */}
         {property.verified && (
-          <div className="flex items-center gap-1.5 mb-2">
-            <SmileIDBadge compact propertyId={property.id} imageCount={property.images?.length || 4} />
-          </div>
+          <SmileIDBadge compact propertyId={property.id} imageCount={property.images?.length || 4} />
         )}
 
-        {/* Amenities teaser */}
-        <div className="flex flex-wrap gap-1">
+        {/* Amenities */}
+        <div className="flex flex-wrap gap-1.5 pt-0.5">
           {property.amenities.slice(0, 3).map((a) => (
             <span key={a} className="px-2 py-0.5 rounded-md bg-secondary text-[10px] font-medium text-secondary-foreground">{a}</span>
           ))}
