@@ -461,6 +461,7 @@ const HomeFeed = () => {
         ward={ward}
         estate={estate}
         onLocationChange={(c, sc, w, e) => { setCounty(c); setSubcounty(sc); setWard(w); setEstate(e); }}
+        segment={segment}
       />
     </div>
   );

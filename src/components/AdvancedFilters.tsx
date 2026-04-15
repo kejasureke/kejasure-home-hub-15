@@ -1,4 +1,4 @@
-import { X, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { X, SlidersHorizontal, Building2, Ruler } from "lucide-react";
 import { useState } from "react";
 import LocationSelector from "./LocationSelector";
 
@@ -12,6 +12,9 @@ interface Filters {
   furnished: boolean;
   petFriendly: boolean;
   sortBy: string;
+  commercialTypes?: string[];
+  minSqft?: number;
+  maxSqft?: number;
 }
 
 interface AdvancedFiltersProps {
@@ -24,19 +27,36 @@ interface AdvancedFiltersProps {
   ward: string;
   estate: string;
   onLocationChange: (county: string, subcounty: string, ward: string, estate: string) => void;
+  segment?: string;
 }
 
 const bedroomOptions = [1, 2, 3, 4, 5];
-const amenityOptions = [
+
+const residentialAmenities = [
   "WiFi (Safaricom)", "WiFi (Airtel/Faiba)", "Fiber Internet", "Starlink",
   "24hr Security Guard", "CCTV", "Electric Fence", "Alarm System",
   "Parking", "Swimming Pool", "Gym", "Elevator",
   "Backup Generator", "Solar Panels", "Borehole", "Water Tank",
   "Balcony", "Garden", "AC", "Hot Shower", "Servant Quarter",
   "Rooftop Terrace", "Playground", "Pet Area", "Wheelchair Access",
-  // Commercial-specific
-  "Loading Bay", "Warehouse Space", "Street Frontage", "3-Phase Power",
 ];
+
+const commercialAmenities = [
+  "Fiber Internet", "AC/HVAC", "Parking", "CCTV", "Elevator",
+  "Backup Generator", "3-Phase Power", "Loading Bay", "Street Frontage",
+  "Signage Space", "Warehouse Space", "Truck Access", "Roller Shutter",
+  "High Ceiling", "Meeting Room", "Reception Area", "Kitchen",
+  "24hr Access", "Wheelchair Access", "Perimeter Wall", "Night Watchman",
+  "Water Supply", "Solar Panels",
+];
+
+const commercialTypeOptions = [
+  { value: "shop", label: "Shop", icon: "🏪" },
+  { value: "office", label: "Office", icon: "🏢" },
+  { value: "godown", label: "Godown / Warehouse", icon: "🏭" },
+  { value: "showroom", label: "Showroom", icon: "🏬" },
+];
+
 const sortOptions = [
   { value: "featured", label: "Featured First" },
   { value: "price-asc", label: "Price: Low to High" },
@@ -45,8 +65,9 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange }: AdvancedFiltersProps) => {
-  const [local, setLocal] = useState<Filters>(filters);
+const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange, segment }: AdvancedFiltersProps) => {
+  const [local, setLocal] = useState<Filters>({ commercialTypes: [], minSqft: 0, maxSqft: 0, ...filters });
+  const isCommercial = segment === "Commercial";
 
   if (!isOpen) return null;
 
@@ -64,6 +85,15 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
     }));
   };
 
+  const toggleCommercialType = (t: string) => {
+    setLocal((f) => ({
+      ...f,
+      commercialTypes: (f.commercialTypes || []).includes(t)
+        ? (f.commercialTypes || []).filter((x) => x !== t)
+        : [...(f.commercialTypes || []), t],
+    }));
+  };
+
   const activeCount = [
     local.bedrooms.length > 0,
     local.minPrice > 0 || local.maxPrice < 500000,
@@ -72,7 +102,11 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
     local.smileIdVerified,
     local.furnished,
     local.petFriendly,
+    (local.commercialTypes || []).length > 0,
+    (local.minSqft || 0) > 0 || (local.maxSqft || 0) > 0,
   ].filter(Boolean).length;
+
+  const amenityList = isCommercial ? commercialAmenities : residentialAmenities;
 
   return (
     <div className="fixed inset-0 z-50 bg-background animate-slide-up overflow-y-auto">
@@ -82,7 +116,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
         </button>
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4" />
-          Filters
+          {isCommercial ? "Commercial Filters" : "Filters"}
           {activeCount > 0 && (
             <span className="w-5 h-5 rounded-full gradient-trust text-[10px] font-bold text-primary-foreground flex items-center justify-center">
               {activeCount}
@@ -91,7 +125,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
         </h2>
         <button
           onClick={() => {
-            setLocal({ minPrice: 0, maxPrice: 500000, bedrooms: [], amenities: [], verified: false, smileIdVerified: false, furnished: false, petFriendly: false, sortBy: "featured" });
+            setLocal({ minPrice: 0, maxPrice: 500000, bedrooms: [], amenities: [], verified: false, smileIdVerified: false, furnished: false, petFriendly: false, sortBy: "featured", commercialTypes: [], minSqft: 0, maxSqft: 0 });
           }}
           className="text-xs font-medium text-primary"
         >
@@ -111,6 +145,65 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
             onSelect={(c, sc, w, e) => onLocationChange(c, sc, w, e)}
           />
         </div>
+
+        {/* Commercial Type filter */}
+        {isCommercial && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-primary" />
+              Commercial Type
+            </h3>
+            <div className="grid grid-cols-2 gap-2">
+              {commercialTypeOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => toggleCommercialType(opt.value)}
+                  className={`flex items-center gap-2.5 p-3 rounded-xl text-sm font-medium transition-all ${
+                    (local.commercialTypes || []).includes(opt.value)
+                      ? "gradient-trust text-primary-foreground ring-2 ring-primary/30"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  <span className="text-lg">{opt.icon}</span>
+                  <span>{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Size Range (Commercial) */}
+        {isCommercial && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+              <Ruler className="w-4 h-4 text-primary" />
+              Size Range (sqft)
+            </h3>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="text-xs text-muted-foreground mb-1 block">Min sqft</label>
+                <input
+                  type="number"
+                  value={local.minSqft || ""}
+                  onChange={(e) => setLocal((f) => ({ ...f, minSqft: Number(e.target.value) || 0 }))}
+                  placeholder="0"
+                  className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+              <div className="flex items-end pb-2.5 text-muted-foreground">–</div>
+              <div className="flex-1">
+                <label className="text-xs text-muted-foreground mb-1 block">Max sqft</label>
+                <input
+                  type="number"
+                  value={local.maxSqft || ""}
+                  onChange={(e) => setLocal((f) => ({ ...f, maxSqft: Number(e.target.value) || 0 }))}
+                  placeholder="No limit"
+                  className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Sort */}
         <div>
@@ -160,36 +253,38 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           </div>
         </div>
 
-        {/* Bedrooms */}
-        <div>
-          <h3 className="text-sm font-semibold mb-3">Bedrooms</h3>
-          <div className="flex gap-2">
-            {bedroomOptions.map((b) => (
-              <button
-                key={b}
-                onClick={() => toggleBedroom(b)}
-                className={`w-12 h-12 rounded-xl text-sm font-semibold transition-colors ${
-                  local.bedrooms.includes(b)
-                    ? "gradient-trust text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {b}{b === 5 ? "+" : ""}
-              </button>
-            ))}
+        {/* Bedrooms (hide for commercial) */}
+        {!isCommercial && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Bedrooms</h3>
+            <div className="flex gap-2">
+              {bedroomOptions.map((b) => (
+                <button
+                  key={b}
+                  onClick={() => toggleBedroom(b)}
+                  className={`w-12 h-12 rounded-xl text-sm font-semibold transition-colors ${
+                    local.bedrooms.includes(b)
+                      ? "gradient-trust text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {b}{b === 5 ? "+" : ""}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Quick toggles */}
         <div>
           <h3 className="text-sm font-semibold mb-3">Property Features</h3>
           <div className="space-y-3">
             {[
-              { key: "verified" as const, label: "Verified Only", icon: "✓" },
-              { key: "smileIdVerified" as const, label: "Verified by Smile ID", icon: "😊" },
-              { key: "furnished" as const, label: "Furnished", icon: "🏠" },
-              { key: "petFriendly" as const, label: "Pet Friendly", icon: "🐾" },
-            ].map((toggle) => (
+              { key: "verified" as const, label: "Verified Only", icon: "✓", show: true },
+              { key: "smileIdVerified" as const, label: "Verified by Smile ID", icon: "😊", show: true },
+              { key: "furnished" as const, label: "Furnished", icon: "🏠", show: !isCommercial },
+              { key: "petFriendly" as const, label: "Pet Friendly", icon: "🐾", show: !isCommercial },
+            ].filter(t => t.show).map((toggle) => (
               <button
                 key={toggle.key}
                 onClick={() => setLocal((f) => ({ ...f, [toggle.key]: !f[toggle.key] }))}
@@ -217,9 +312,9 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
 
         {/* Amenities */}
         <div>
-          <h3 className="text-sm font-semibold mb-3">Amenities</h3>
+          <h3 className="text-sm font-semibold mb-3">{isCommercial ? "Commercial Features" : "Amenities"}</h3>
           <div className="flex flex-wrap gap-2">
-            {amenityOptions.map((a) => (
+            {amenityList.map((a) => (
               <button
                 key={a}
                 onClick={() => toggleAmenity(a)}
