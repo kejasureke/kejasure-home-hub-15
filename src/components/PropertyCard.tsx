@@ -1,4 +1,4 @@
-import { Heart, Bed, Bath, MapPin, ShieldCheck, Star, GitCompare, AlertTriangle } from "lucide-react";
+import { Heart, Bed, Bath, MapPin, ShieldCheck, Star, GitCompare, AlertTriangle, Building2, Ruler } from "lucide-react";
 import type { Property } from "@/data/mockData";
 import { getScamRiskScore } from "@/utils/scamDetection";
 import ScamWarningBadge from "./ScamWarningBadge";
@@ -111,6 +111,24 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
           </div>
         )}
 
+        {/* Commercial type + sqft badges */}
+        {property.type === "commercial" && (
+          <div className="flex items-center gap-2">
+            {property.commercialType && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent text-[11px] font-bold text-accent-foreground w-fit">
+                <Building2 className="w-3.5 h-3.5" />
+                {property.commercialType}
+              </div>
+            )}
+            {property.sizeSqft && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary text-[11px] font-semibold text-secondary-foreground w-fit">
+                <Ruler className="w-3.5 h-3.5" />
+                {property.sizeSqft.toLocaleString()} sqft
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Location */}
         <div className="flex items-center gap-2">
           <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
@@ -122,14 +140,24 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
 
         {/* Specs */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Bed className="w-3.5 h-3.5" />
-            <span>{property.bedrooms} Bed{property.bedrooms > 1 ? "s" : ""}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Bath className="w-3.5 h-3.5" />
-            <span>{property.bathrooms} Bath{property.bathrooms > 1 ? "s" : ""}</span>
-          </div>
+          {property.type !== "commercial" && (
+            <>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Bed className="w-3.5 h-3.5" />
+                <span>{property.bedrooms} Bed{property.bedrooms > 1 ? "s" : ""}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Bath className="w-3.5 h-3.5" />
+                <span>{property.bathrooms} Bath{property.bathrooms > 1 ? "s" : ""}</span>
+              </div>
+            </>
+          )}
+          {property.type === "commercial" && property.sizeSqft && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Ruler className="w-3.5 h-3.5" />
+              <span>{property.sizeSqft.toLocaleString()} sqft</span>
+            </div>
+          )}
           {property.landlordResponseSpeed === "fast" && (
             <span className="text-[10px] font-medium text-trust">⚡ Fast reply</span>
           )}
