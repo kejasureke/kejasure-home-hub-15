@@ -82,7 +82,7 @@ const sortOptions = [
 ];
 
 const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange, segment }: AdvancedFiltersProps) => {
-  const [local, setLocal] = useState<Filters>({ commercialTypes: [], minSqft: 0, maxSqft: 0, ...filters });
+  const [local, setLocal] = useState<Filters>({ ...filters });
   const isCommercial = segment === "Business Spaces";
 
   if (!isOpen) return null;
