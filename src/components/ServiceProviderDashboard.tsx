@@ -37,10 +37,31 @@ const bookings = [
   { client: "Peter M.", service: "Deep Cleaning", date: "Sat, 8 AM", status: "pending", amount: "KES 4,500" },
 ];
 
-const portfolio = [
-  { title: "Kitchen Renovation", category: "Plumbing", rating: 5.0, reviews: 12 },
-  { title: "Office Wiring", category: "Electrical", rating: 4.9, reviews: 8 },
-  { title: "Full House Move", category: "Moving", rating: 4.8, reviews: 23 },
+const initialPortfolio = [
+  {
+    id: "p1", title: "Kitchen Renovation", category: "Plumbing", rating: 5.0, reviews: 12,
+    photos: [
+      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=400&h=300&fit=crop",
+    ],
+  },
+  {
+    id: "p2", title: "Office Wiring", category: "Electrical", rating: 4.9, reviews: 8,
+    photos: [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop",
+    ],
+  },
+  {
+    id: "p3", title: "Full House Move", category: "Moving", rating: 4.8, reviews: 23,
+    photos: [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1600566753376-12c8ab7c3376?w=400&h=300&fit=crop",
+    ],
+  },
 ];
 
 const countyStats = [
