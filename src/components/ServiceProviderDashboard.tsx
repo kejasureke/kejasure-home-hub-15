@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
+import BeforeAfterSlider from "./BeforeAfterSlider";
 import ListingCRUD from "./ListingCRUD";
 
 interface ServiceProviderDashboardProps {
@@ -45,6 +46,10 @@ const initialPortfolio = [
       "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop",
       "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=400&h=300&fit=crop",
     ],
+    beforeAfter: {
+      before: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop",
+      after: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop",
+    },
   },
   {
     id: "p2", title: "Office Wiring", category: "Electrical", rating: 4.9, reviews: 8,
@@ -52,6 +57,10 @@ const initialPortfolio = [
       "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400&h=300&fit=crop",
       "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop",
     ],
+    beforeAfter: {
+      before: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400&h=300&fit=crop",
+      after: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop",
+    },
   },
   {
     id: "p3", title: "Full House Move", category: "Moving", rating: 4.8, reviews: 23,
@@ -363,6 +372,17 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                       </span>
                     </div>
                   </div>
+                  {/* Before/After slider */}
+                  {p.beforeAfter && (
+                    <div className="px-4 pt-3">
+                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Before / After</p>
+                      <BeforeAfterSlider
+                        beforeImage={p.beforeAfter.before}
+                        afterImage={p.beforeAfter.after}
+                        height="h-36"
+                      />
+                    </div>
+                  )}
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-semibold">{p.title}</p>
