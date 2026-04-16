@@ -1,4 +1,4 @@
-import { X, Clock, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon, MapPin } from "lucide-react";
+import { X, Clock, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon, MapPin, Star, Send } from "lucide-react";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
@@ -13,7 +13,7 @@ interface ServiceBookingModalProps {
   onChat: () => void;
 }
 
-type BookingStep = "details" | "confirm" | "pending" | "accepted";
+type BookingStep = "details" | "confirm" | "pending" | "accepted" | "review" | "reviewed";
 
 const timeSlots = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 
@@ -23,6 +23,9 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [step, setStep] = useState<BookingStep>("details");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
 
   // Simulate provider acceptance
   useEffect(() => {
@@ -336,6 +339,134 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 </div>
               </div>
 
+              <div className="flex gap-3">
+                <button
+                  onClick={onClose}
+                  className="flex-1 py-4 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground active:scale-[0.98] transition-transform"
+                >
+                  Done
+                </button>
+                <button
+                  onClick={() => setStep("review")}
+                  className="flex-1 py-4 rounded-xl gradient-premium text-sm font-bold text-accent-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+                >
+                  <Star className="w-4 h-4" />
+                  Rate Service
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === "review" && (
+            <div className="py-6 space-y-5 animate-fade-in">
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-3xl">{provider.avatar}</span>
+                </div>
+                <h4 className="text-lg font-bold mb-1">Rate {provider.name}</h4>
+                <p className="text-xs text-muted-foreground">How was your {provider.category.toLowerCase()} experience?</p>
+              </div>
+
+              {/* Star rating */}
+              <div className="flex justify-center gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    onClick={() => setReviewRating(star)}
+                    className="transition-transform active:scale-90"
+                  >
+                    <Star
+                      className={`w-10 h-10 transition-colors ${
+                        star <= (hoverRating || reviewRating)
+                          ? "fill-accent text-accent"
+                          : "text-muted-foreground/30"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+              {reviewRating > 0 && (
+                <p className="text-center text-sm font-medium text-accent">
+                  {["", "Terrible", "Poor", "Average", "Good", "Excellent"][reviewRating]}
+                </p>
+              )}
+
+              {/* Review text */}
+              <textarea
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                placeholder="Tell others about your experience..."
+                className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none h-28"
+                maxLength={500}
+              />
+              <p className="text-[10px] text-muted-foreground text-right -mt-3">{reviewText.length}/500</p>
+
+              {/* Quick tags */}
+              <div className="flex flex-wrap gap-1.5">
+                {["On time", "Professional", "Great value", "Friendly", "Skilled", "Would recommend"].map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setReviewText((prev) => prev ? `${prev}, ${tag}` : tag)}
+                    className="px-3 py-1.5 rounded-lg bg-secondary text-[11px] font-medium text-secondary-foreground active:scale-95 transition-transform"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => {
+                  if (reviewRating > 0) {
+                    setStep("reviewed");
+                    pushGlobalAlert({
+                      type: "system",
+                      title: "Review submitted!",
+                      body: `You rated ${provider.name} ${reviewRating}/5 stars. Thank you!`,
+                      action: "open-home",
+                    });
+                  }
+                }}
+                className={`w-full py-4 rounded-xl text-sm font-bold active:scale-[0.98] transition-transform flex items-center justify-center gap-2 ${
+                  reviewRating > 0
+                    ? "gradient-trust text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                <Send className="w-4 h-4" />
+                Submit Review
+              </button>
+              <button
+                onClick={() => setStep("accepted")}
+                className="w-full py-3 rounded-xl bg-secondary text-sm font-medium text-secondary-foreground"
+              >
+                ← Go Back
+              </button>
+            </div>
+          )}
+
+          {step === "reviewed" && (
+            <div className="py-10 text-center space-y-5 animate-fade-in">
+              <div className="w-20 h-20 rounded-full bg-trust/10 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-10 h-10 text-trust" />
+              </div>
+              <div>
+                <h4 className="text-lg font-bold mb-1 text-trust">Thanks for your review! 🙏</h4>
+                <p className="text-sm text-muted-foreground">
+                  Your feedback helps other users find great service providers
+                </p>
+              </div>
+              <div className="flex justify-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-6 h-6 ${
+                      star <= reviewRating ? "fill-accent text-accent" : "text-muted-foreground/20"
+                    }`}
+                  />
+                ))}
+              </div>
               <button
                 onClick={onClose}
                 className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
