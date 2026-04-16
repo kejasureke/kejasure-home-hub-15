@@ -1,5 +1,9 @@
-import { X, Calendar, Clock, MapPin, ChevronRight, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck } from "lucide-react";
+import { X, Clock, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon } from "lucide-react";
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import type { ServiceProvider } from "@/data/mockData";
 
 interface ServiceBookingModalProps {
@@ -13,20 +17,10 @@ type BookingStep = "details" | "confirm" | "pending" | "accepted";
 const timeSlots = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 
 const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalProps) => {
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [description, setDescription] = useState("");
   const [step, setStep] = useState<BookingStep>("details");
-
-  const dates = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    return {
-      label: i === 0 ? "Today" : i === 1 ? "Tomorrow" : d.toLocaleDateString("en-KE", { weekday: "short" }),
-      date: d.toLocaleDateString("en-KE", { month: "short", day: "numeric" }),
-      value: d.toISOString().split("T")[0],
-    };
-  });
 
   // Simulate provider acceptance
   useEffect(() => {
