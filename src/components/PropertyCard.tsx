@@ -113,17 +113,42 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
 
         {/* Commercial type + sqft badges */}
         {property.type === "commercial" && (
-          <div className="flex items-center gap-2">
-            {property.commercialType && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent text-[11px] font-bold text-accent-foreground w-fit capitalize">
-                <Building2 className="w-3.5 h-3.5" />
-                {property.commercialType.replace(/_/g, " ")}
-              </div>
-            )}
+          <div className="flex items-center gap-2 flex-wrap">
+            {property.commercialType && (() => {
+              const typeConfig: Record<string, { icon: React.ReactNode; bg: string; text: string }> = {
+                shop: { icon: <Store className="w-3.5 h-3.5" />, bg: "bg-blue-500/15", text: "text-blue-600" },
+                office: { icon: <Building2 className="w-3.5 h-3.5" />, bg: "bg-slate-500/15", text: "text-slate-600" },
+                godown: { icon: <Factory className="w-3.5 h-3.5" />, bg: "bg-amber-500/15", text: "text-amber-700" },
+                showroom: { icon: <Building2 className="w-3.5 h-3.5" />, bg: "bg-purple-500/15", text: "text-purple-600" },
+                clinic: { icon: <Pill className="w-3.5 h-3.5" />, bg: "bg-red-500/15", text: "text-red-600" },
+                hotel: { icon: <Hotel className="w-3.5 h-3.5" />, bg: "bg-indigo-500/15", text: "text-indigo-600" },
+                restaurant: { icon: <UtensilsCrossed className="w-3.5 h-3.5" />, bg: "bg-orange-500/15", text: "text-orange-600" },
+                salon: { icon: <Scissors className="w-3.5 h-3.5" />, bg: "bg-pink-500/15", text: "text-pink-600" },
+                pharmacy: { icon: <Pill className="w-3.5 h-3.5" />, bg: "bg-emerald-500/15", text: "text-emerald-600" },
+                gym: { icon: <Dumbbell className="w-3.5 h-3.5" />, bg: "bg-cyan-500/15", text: "text-cyan-600" },
+                school: { icon: <GraduationCap className="w-3.5 h-3.5" />, bg: "bg-yellow-500/15", text: "text-yellow-700" },
+                church: { icon: <Church className="w-3.5 h-3.5" />, bg: "bg-violet-500/15", text: "text-violet-600" },
+                petrol_station: { icon: <Fuel className="w-3.5 h-3.5" />, bg: "bg-lime-500/15", text: "text-lime-700" },
+                bar: { icon: <Music className="w-3.5 h-3.5" />, bg: "bg-rose-500/15", text: "text-rose-600" },
+                club: { icon: <Music className="w-3.5 h-3.5" />, bg: "bg-fuchsia-500/15", text: "text-fuchsia-600" },
+                supermarket: { icon: <ShoppingCart className="w-3.5 h-3.5" />, bg: "bg-teal-500/15", text: "text-teal-600" },
+                hardware: { icon: <Wrench className="w-3.5 h-3.5" />, bg: "bg-stone-500/15", text: "text-stone-600" },
+                garage: { icon: <Wrench className="w-3.5 h-3.5" />, bg: "bg-zinc-500/15", text: "text-zinc-600" },
+                studio: { icon: <Palette className="w-3.5 h-3.5" />, bg: "bg-sky-500/15", text: "text-sky-600" },
+                coworking: { icon: <Laptop className="w-3.5 h-3.5" />, bg: "bg-emerald-500/15", text: "text-emerald-600" },
+              };
+              const cfg = typeConfig[property.commercialType] || { icon: <Building2 className="w-3.5 h-3.5" />, bg: "bg-accent", text: "text-accent-foreground" };
+              return (
+                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${cfg.bg} ${cfg.text} text-[11px] font-bold w-fit capitalize`}>
+                  {cfg.icon}
+                  {property.commercialType.replace(/_/g, " ")}
+                </div>
+              );
+            })()}
             {property.sizeSqft && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary text-[11px] font-semibold text-secondary-foreground w-fit">
                 <Ruler className="w-3.5 h-3.5" />
-                {property.sizeSqft.toLocaleString()} sqft
+                {property.sizeSqft}
               </div>
             )}
           </div>
