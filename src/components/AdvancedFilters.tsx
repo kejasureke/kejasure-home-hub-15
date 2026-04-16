@@ -12,9 +12,9 @@ interface Filters {
   furnished: boolean;
   petFriendly: boolean;
   sortBy: string;
-  commercialTypes?: string[];
-  minSqft?: number;
-  maxSqft?: number;
+  commercialTypes: string[];
+  minSqft: number;
+  maxSqft: number;
 }
 
 interface AdvancedFiltersProps {
