@@ -67,7 +67,7 @@ const sortOptions = [
 
 const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange, segment }: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>({ commercialTypes: [], minSqft: 0, maxSqft: 0, ...filters });
-  const isCommercial = segment === "Commercial";
+  const isCommercial = segment === "Business Spaces";
 
   if (!isOpen) return null;
 
@@ -116,7 +116,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
         </button>
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4" />
-          {isCommercial ? "Commercial Filters" : "Filters"}
+          {isCommercial ? "Business Space Filters" : "Filters"}
           {activeCount > 0 && (
             <span className="w-5 h-5 rounded-full gradient-trust text-[10px] font-bold text-primary-foreground flex items-center justify-center">
               {activeCount}
@@ -151,7 +151,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           <div>
             <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
               <Building2 className="w-4 h-4 text-primary" />
-              Commercial Type
+              Space Type
             </h3>
             <div className="grid grid-cols-2 gap-2">
               {commercialTypeOptions.map((opt) => (
@@ -312,7 +312,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
 
         {/* Amenities */}
         <div>
-          <h3 className="text-sm font-semibold mb-3">{isCommercial ? "Commercial Features" : "Amenities"}</h3>
+          <h3 className="text-sm font-semibold mb-3">{isCommercial ? "Space Features" : "Amenities"}</h3>
           <div className="flex flex-wrap gap-2">
             {amenityList.map((a) => (
               <button
