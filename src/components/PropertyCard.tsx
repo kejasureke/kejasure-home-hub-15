@@ -1,4 +1,4 @@
-import { Heart, Bed, Bath, MapPin, ShieldCheck, Star, GitCompare, AlertTriangle, Building2, Ruler } from "lucide-react";
+import { Heart, Bed, Bath, MapPin, ShieldCheck, Star, GitCompare, AlertTriangle, Ruler, Store, Building2, Factory, Hotel, UtensilsCrossed, Scissors, Pill, Dumbbell, GraduationCap, Church, Fuel, Music, ShoppingCart, Wrench, Palette, Laptop } from "lucide-react";
 import type { Property } from "@/data/mockData";
 import { getScamRiskScore } from "@/utils/scamDetection";
 import ScamWarningBadge from "./ScamWarningBadge";
