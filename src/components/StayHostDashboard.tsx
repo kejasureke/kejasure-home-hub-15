@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import KYCPromptBanner from "./KYCPromptBanner";
 import KYCSnoozeBanner from "./KYCSnoozeBanner";
 import VerificationBadge from "./VerificationBadge";
