@@ -139,9 +139,9 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                   Chat First
                 </button>
                 <button
-                  onClick={() => selectedDate && selectedTime && setStep("confirm")}
+                  onClick={() => selectedDate && selectedTime && location.trim() && setStep("confirm")}
                   className={`flex-1 py-3.5 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform ${
-                    selectedDate && selectedTime
+                    selectedDate && selectedTime && location.trim()
                       ? "gradient-trust text-primary-foreground"
                       : "bg-muted text-muted-foreground"
                   }`}
