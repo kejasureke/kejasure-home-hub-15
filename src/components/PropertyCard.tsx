@@ -115,9 +115,9 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         {property.type === "commercial" && (
           <div className="flex items-center gap-2">
             {property.commercialType && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent text-[11px] font-bold text-accent-foreground w-fit">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent text-[11px] font-bold text-accent-foreground w-fit capitalize">
                 <Building2 className="w-3.5 h-3.5" />
-                {property.commercialType}
+                {property.commercialType.replace(/_/g, " ")}
               </div>
             )}
             {property.sizeSqft && (
