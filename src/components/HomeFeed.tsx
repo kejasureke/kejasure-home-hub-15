@@ -217,12 +217,30 @@ const HomeFeed = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-11 py-3 rounded-xl bg-card text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 card-shadow"
           />
-          <button onClick={() => setShowFilters(true)} className="absolute right-1.5 p-2 rounded-lg hover:bg-secondary/80 transition-colors">
-            <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
-            {(county || filters.bedrooms.length > 0 || filters.amenities.length > 0 || filters.verified || filters.furnished || filters.petFriendly) && (
-              <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-accent" />
-            )}
-          </button>
+          {(() => {
+            const count = [
+              commCategory !== "All",
+              !!county,
+              filters.bedrooms.length > 0,
+              filters.amenities.length > 0,
+              filters.commercialTypes.length > 0,
+              filters.verified,
+              filters.furnished,
+              filters.petFriendly,
+              filters.minPrice > 0 || filters.maxPrice < 500000,
+              filters.minSqft > 0 || filters.maxSqft < 100000,
+            ].filter(Boolean).length;
+            return (
+              <button onClick={() => setShowFilters(true)} className="absolute right-1.5 p-2 rounded-lg hover:bg-secondary/80 transition-colors">
+                <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+                {count > 0 && (
+                  <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full gradient-trust flex items-center justify-center px-1">
+                    <span className="text-[9px] font-bold text-primary-foreground">{count}</span>
+                  </div>
+                )}
+              </button>
+            );
+          })()}
         </div>
 
         {/* Active Filter Chips */}
