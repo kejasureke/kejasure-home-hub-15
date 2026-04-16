@@ -182,7 +182,9 @@ const HomeFeed = () => {
             ? "Start your day with fresh listings ☀️"
             : hour < 17
             ? "Great spaces are waiting for you 🏡"
-            : "Wind down with great listings 🌙";
+            : hour < 21
+            ? "Wind down with great listings 🌙"
+            : "Browse listings before bed 🛏️";
           const name = (() => { try { const n = localStorage.getItem("kejasure_first_name"); return n || "there"; } catch { return "there"; } })();
           return (
             <div className="mb-3 animate-fade-in">
