@@ -161,7 +161,7 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
               </div>
             )}
 
-
+            <div className="flex gap-2">
               <button
                 onClick={() => {
                   window.dispatchEvent(new CustomEvent("open-service-chat", {
