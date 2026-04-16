@@ -151,7 +151,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Date</span>
-                    <span className="font-medium">{dates.find(d => d.value === selectedDate)?.date}</span>
+                    <span className="font-medium">{selectedDate ? format(selectedDate, "MMM d") : ""}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Time</span>
@@ -203,7 +203,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               <div className="p-4 rounded-2xl bg-secondary">
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span className="text-muted-foreground">Date</span>
-                  <span className="font-medium">{dates.find(d => d.value === selectedDate)?.date}</span>
+                  <span className="font-medium">{selectedDate ? format(selectedDate, "MMM d") : ""}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Time</span>
@@ -235,7 +235,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Date</span>
-                    <span className="font-medium">{dates.find(d => d.value === selectedDate)?.date}</span>
+                    <span className="font-medium">{selectedDate ? format(selectedDate, "MMM d") : ""}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Time</span>
