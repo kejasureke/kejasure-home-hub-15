@@ -48,6 +48,13 @@ export interface Property {
   videoTourRooms?: { label: string; timestamp: number }[];
 }
 
+export interface ServiceReview {
+  author: string;
+  rating: number;
+  text: string;
+  date: string;
+}
+
 export interface ServiceProvider {
   id: string;
   name: string;
@@ -64,6 +71,7 @@ export interface ServiceProvider {
   availability?: string;
   lat: number;
   lng: number;
+  recentReviews?: ServiceReview[];
 }
 
 export const properties: Property[] = [
