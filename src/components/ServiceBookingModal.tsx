@@ -29,6 +29,35 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
   const [submitProgress, setSubmitProgress] = useState(0);
   const [submitStep, setSubmitStep] = useState(0);
 
+  const submitSteps = ["Validating booking details...", "Finding available slot...", "Sending request to provider..."];
+
+  // Submitting animation
+  useEffect(() => {
+    if (step !== "submitting") return;
+    setSubmitProgress(0);
+    setSubmitStep(0);
+    const progressTimer = setInterval(() => setSubmitProgress((p) => Math.min(p + 5, 100)), 90);
+    const stepTimer = setInterval(() => setSubmitStep((s) => Math.min(s + 1, submitSteps.length - 1)), 700);
+    const completeTimer = setTimeout(() => {
+      setStep("pending");
+      pushGlobalAlert({
+        type: "booking",
+        title: "New booking request sent",
+        body: `Your request to ${provider.name} for ${selectedDate ? format(selectedDate, "MMM d") : ""} at ${selectedTime} has been submitted.`,
+        action: "open-dashboard",
+      });
+      setTimeout(() => {
+        pushGlobalAlert({
+          type: "booking",
+          title: `Booking accepted by ${provider.name}`,
+          body: `${provider.name} accepted your ${provider.category} booking. Contact details unlocked!`,
+          action: "open-dashboard",
+        });
+      }, 3800);
+    }, 2200);
+    return () => { clearInterval(progressTimer); clearInterval(stepTimer); clearTimeout(completeTimer); };
+  }, [step]);
+
   // Simulate provider acceptance
   useEffect(() => {
     if (step === "pending") {
