@@ -6,6 +6,7 @@ import {
   Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import BoostProcessingOverlay from "./BoostProcessingOverlay";
 import ListingCRUD from "./ListingCRUD";
 
 interface ServiceProviderDashboardProps {
@@ -57,6 +58,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [providerType] = useState<ProviderType>("individual");
   const [showCRUD, setShowCRUD] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
+  const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
 
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
@@ -94,7 +96,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                 { name: "7-Day Boost", price: "KES 400", desc: "5x more views + badge" },
                 { name: "30-Day Boost", price: "KES 1,200", desc: "10x views + featured" },
               ].map((b) => (
-                <button key={b.name} onClick={() => { setShowBoost(false); setShowPayment(true); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
+                <button key={b.name} onClick={() => { setShowBoost(false); setBoostProcessing(b.name); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
                   <div>
                     <p className="text-sm font-semibold">{b.name}</p>
                     <p className="text-xs text-muted-foreground">{b.desc}</p>
@@ -105,6 +107,12 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
             </div>
           </div>
         </div>
+      )}
+      {boostProcessing && (
+        <BoostProcessingOverlay
+          boostName={boostProcessing}
+          onComplete={() => { setBoostProcessing(null); setShowPayment(true); }}
+        />
       )}
       {showPayment && (
         <MpesaPaymentFlow

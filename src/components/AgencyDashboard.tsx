@@ -10,6 +10,7 @@ import {
   Building2, Target, Clock, CheckCircle2, AlertTriangle, Edit3, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import BoostProcessingOverlay from "./BoostProcessingOverlay";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 
@@ -59,6 +60,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
+  const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
   const [showAddAgent, setShowAddAgent] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
@@ -112,7 +114,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                 { name: "30-Day Boost", price: "KES 3,000", desc: "Featured agency + badge" },
                 { name: "90-Day Boost", price: "KES 7,500", desc: "Top placement + priority leads" },
               ].map((b) => (
-                <button key={b.name} onClick={() => { setShowBoost(false); setShowPayment(true); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
+                <button key={b.name} onClick={() => { setShowBoost(false); setBoostProcessing(b.name); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
                   <div>
                     <p className="text-sm font-semibold text-left">{b.name}</p>
                     <p className="text-xs text-muted-foreground">{b.desc}</p>
@@ -154,6 +156,12 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
             </div>
           </div>
         </div>
+      )}
+      {boostProcessing && (
+        <BoostProcessingOverlay
+          boostName={boostProcessing}
+          onComplete={() => { setBoostProcessing(null); setShowPayment(true); }}
+        />
       )}
       {showPayment && (
         <MpesaPaymentFlow

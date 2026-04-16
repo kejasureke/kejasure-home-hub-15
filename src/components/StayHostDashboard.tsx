@@ -10,6 +10,7 @@ import {
   Home, Star, Clock, CheckCircle2, Bed, Moon as MoonIcon, Edit3, Trash2, MessageCircle as MsgIcon
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import BoostProcessingOverlay from "./BoostProcessingOverlay";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 
@@ -63,6 +64,7 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
+  const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("stayhost");
@@ -115,7 +117,7 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
                 { name: "7-Day Feature", price: "KES 500", desc: "5x views + Featured badge" },
                 { name: "30-Day Feature", price: "KES 1,500", desc: "Top placement + badge" },
               ].map((b) => (
-                <button key={b.name} onClick={() => { setShowBoost(false); setShowPayment(true); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
+                <button key={b.name} onClick={() => { setShowBoost(false); setBoostProcessing(b.name); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
                   <div>
                     <p className="text-sm font-semibold text-left">{b.name}</p>
                     <p className="text-xs text-muted-foreground">{b.desc}</p>
@@ -126,6 +128,12 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
             </div>
           </div>
         </div>
+      )}
+      {boostProcessing && (
+        <BoostProcessingOverlay
+          boostName={boostProcessing}
+          onComplete={() => { setBoostProcessing(null); setShowPayment(true); }}
+        />
       )}
       {showPayment && (
         <MpesaPaymentFlow
