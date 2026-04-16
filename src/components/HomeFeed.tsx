@@ -180,9 +180,13 @@ const HomeFeed = () => {
           const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
           const name = (() => { try { const n = localStorage.getItem("kejasure_first_name"); return n || "there"; } catch { return "there"; } })();
           return (
-            <p className="text-sm font-semibold text-white mb-3">
-              {greeting}, {name}! 👋
-            </p>
+            <div className="mb-3 animate-fade-in">
+              <p className="text-base font-bold text-white">
+                {greeting}, {name}!{" "}
+                <span className="inline-block animate-[wave_1.5s_ease-in-out_infinite] origin-[70%_70%]">👋</span>
+              </p>
+              <p className="text-xs text-white/70 mt-0.5">Find your perfect space today</p>
+            </div>
           );
         })()}
         <div className="relative flex items-center">
