@@ -331,28 +331,68 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           <div className="pb-8">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold">Your Work</h3>
-              <button className="text-xs font-semibold text-primary flex items-center gap-1">
-                <Camera className="w-3.5 h-3.5" /> Add
+              <button onClick={() => setShowAddProject(true)} className="text-xs font-semibold text-primary flex items-center gap-1 active:scale-95 transition-transform">
+                <Plus className="w-3.5 h-3.5" /> Add Project
               </button>
             </div>
-            <div className="space-y-3 mb-6">
-              {portfolio.map((p) => (
-                <div key={p.title} className="bg-card rounded-2xl card-shadow overflow-hidden">
-                  <div className="h-32 bg-secondary flex items-center justify-center">
-                    <Camera className="w-8 h-8 text-muted-foreground/30" />
+
+            {/* Portfolio projects */}
+            <div className="space-y-4 mb-6">
+              {portfolioItems.map((p) => (
+                <div key={p.id} className="bg-card rounded-2xl card-shadow overflow-hidden">
+                  {/* Photo gallery */}
+                  <div className="relative">
+                    <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+                      {p.photos.map((photo, i) => (
+                        <img
+                          key={i}
+                          src={photo}
+                          alt={`${p.title} ${i + 1}`}
+                          className="w-full h-40 object-cover shrink-0 snap-center cursor-pointer"
+                          onClick={() => {
+                            setLightboxPhotos(p.photos);
+                            setLightboxIndex(i);
+                            setLightboxPhoto(photo);
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm">
+                      <span className="text-[10px] font-medium text-white flex items-center gap-1">
+                        <Image className="w-3 h-3" /> {p.photos.length}
+                      </span>
+                    </div>
                   </div>
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-semibold">{p.title}</p>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-accent fill-accent" />
-                        <span className="text-xs font-semibold">{p.rating}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-accent fill-accent" />
+                          <span className="text-xs font-semibold">{p.rating}</span>
+                        </div>
+                        <button
+                          onClick={() => setPortfolioItems((prev) => prev.filter((item) => item.id !== p.id))}
+                          className="p-1 rounded-lg bg-destructive/10 active:scale-90 transition-transform"
+                        >
+                          <Trash2 className="w-3 h-3 text-destructive" />
+                        </button>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">{p.category} · {p.reviews} reviews</p>
                   </div>
                 </div>
               ))}
+
+              {portfolioItems.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
+                    <Camera className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm font-medium mb-1">No projects yet</p>
+                  <p className="text-xs text-muted-foreground text-center">Add your best work to showcase to potential clients</p>
+                </div>
+              )}
             </div>
 
             {/* Ratings Summary */}
