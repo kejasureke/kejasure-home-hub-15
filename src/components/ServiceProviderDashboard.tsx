@@ -372,6 +372,17 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                       </span>
                     </div>
                   </div>
+                  {/* Before/After slider */}
+                  {p.beforeAfter && (
+                    <div className="px-4 pt-3">
+                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Before / After</p>
+                      <BeforeAfterSlider
+                        beforeImage={p.beforeAfter.before}
+                        afterImage={p.beforeAfter.after}
+                        height="h-36"
+                      />
+                    </div>
+                  )}
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-semibold">{p.title}</p>
