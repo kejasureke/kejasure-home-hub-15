@@ -50,6 +50,7 @@ const initialBookingRequests: BookingRequest[] = [
 const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenProps) => {
   const [showPayment, setShowPayment] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
+  const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
