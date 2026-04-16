@@ -98,7 +98,70 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
               </div>
             )}
 
-            <div className="flex gap-2">
+            {/* Portfolio preview toggle */}
+            {hasPortfolio && (
+              <button
+                onClick={() => { setShowPortfolio(!showPortfolio); setActiveProject(0); }}
+                className="flex items-center gap-1 text-[11px] font-medium text-primary mb-2 active:opacity-70"
+              >
+                <Image className="w-3 h-3" />
+                {showPortfolio ? "Hide portfolio" : `View ${provider.portfolio!.length} project${provider.portfolio!.length > 1 ? "s" : ""}`}
+              </button>
+            )}
+
+            {showPortfolio && provider.portfolio && (
+              <div className="mb-3 animate-fade-in">
+                {provider.portfolio.length > 1 && (
+                  <div className="flex gap-1.5 mb-2 overflow-x-auto scrollbar-hide">
+                    {provider.portfolio.map((p, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveProject(i)}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium whitespace-nowrap transition-colors ${
+                          i === activeProject
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-muted-foreground"
+                        }`}
+                      >
+                        {p.title}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {(() => {
+                  const project = provider.portfolio[activeProject];
+                  if (!project) return null;
+                  return (
+                    <div>
+                      {provider.portfolio.length <= 1 && (
+                        <p className="text-[10px] font-semibold text-foreground mb-1.5">{project.title}</p>
+                      )}
+                      {project.beforeAfter ? (
+                        <BeforeAfterSlider
+                          beforeImage={project.beforeAfter.before}
+                          afterImage={project.beforeAfter.after}
+                          height="h-36"
+                        />
+                      ) : (
+                        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide snap-x">
+                          {project.photos.map((photo, i) => (
+                            <img
+                              key={i}
+                              src={photo}
+                              alt={`${project.title} ${i + 1}`}
+                              className="w-28 h-20 rounded-lg object-cover snap-center shrink-0"
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
+
               <button
                 onClick={() => {
                   window.dispatchEvent(new CustomEvent("open-service-chat", {
