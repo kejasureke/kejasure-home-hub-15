@@ -174,6 +174,17 @@ const HomeFeed = () => {
     <div className="pb-32">
       {/* Header */}
       <div className="gradient-trust px-4 pt-6 pb-5">
+        {/* Greeting */}
+        {(() => {
+          const hour = new Date().getHours();
+          const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+          const name = (() => { try { const n = localStorage.getItem("kejasure_first_name"); return n || "there"; } catch { return "there"; } })();
+          return (
+            <p className="text-sm font-semibold text-white mb-3">
+              {greeting}, {name}! 👋
+            </p>
+          );
+        })()}
         <div className="relative flex items-center">
           <Search className="absolute left-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
           <input
