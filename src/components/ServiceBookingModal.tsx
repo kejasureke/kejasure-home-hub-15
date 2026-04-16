@@ -263,6 +263,66 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
             </div>
           )}
 
+          {step === "submitting" && (
+            <div className="py-8 text-center space-y-5 animate-fade-in">
+              {/* Animated icon */}
+              <div className="relative w-20 h-20 mx-auto">
+                <div className="absolute inset-0 rounded-full border-3 border-primary/20" />
+                <div className="absolute inset-0 rounded-full border-3 border-transparent border-t-trust animate-spin" style={{ animationDuration: "1s" }} />
+                <div className="absolute inset-2 rounded-full bg-trust/10 flex items-center justify-center">
+                  <Send className="w-8 h-8 text-trust animate-pulse" />
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-bold mb-1">Submitting Request</h4>
+                <p className="text-sm text-muted-foreground">Connecting you with {provider.name}…</p>
+              </div>
+
+              {/* Progress bar */}
+              <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className="h-full rounded-full gradient-trust transition-all duration-200 ease-out"
+                  style={{ width: `${submitProgress}%` }}
+                />
+              </div>
+
+              {/* Animated steps */}
+              <div className="space-y-2 text-left px-4">
+                {submitSteps.map((s, i) => (
+                  <div
+                    key={s}
+                    className={`flex items-center gap-2 text-xs transition-all duration-300 ${
+                      i <= submitStep ? "opacity-100" : "opacity-0 translate-y-2"
+                    }`}
+                  >
+                    {i < submitStep ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-trust shrink-0" />
+                    ) : i === submitStep ? (
+                      <div className="w-3.5 h-3.5 rounded-full border-2 border-primary border-t-transparent animate-spin shrink-0" />
+                    ) : (
+                      <div className="w-3.5 h-3.5 shrink-0" />
+                    )}
+                    <span className={i <= submitStep ? "text-foreground font-medium" : "text-muted-foreground"}>
+                      {s}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bouncing dots */}
+              <div className="flex items-center justify-center gap-1.5">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full bg-trust animate-bounce"
+                    style={{ animationDelay: `${i * 0.15}s`, animationDuration: "0.8s" }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {step === "pending" && (
             <div className="py-8 text-center space-y-5 animate-fade-in">
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
