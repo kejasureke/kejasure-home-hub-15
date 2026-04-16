@@ -178,15 +178,16 @@ const HomeFeed = () => {
         {(() => {
           const hour = new Date().getHours();
           const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+          const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
           const tagline = hour < 6
-            ? "Up early? Catch the best deals 🌅"
+            ? pick(["Up early? Catch the best deals 🌅", "Early bird gets the best keja 🐦", "Fresh listings just for you 🌄"])
             : hour < 12
-            ? "Start your day with fresh listings ☀️"
+            ? pick(["Start your day with fresh listings ☀️", "Morning vibes, new spaces 🏠", "Your dream keja awaits ✨"])
             : hour < 17
-            ? "Great spaces are waiting for you 🏡"
+            ? pick(["Great spaces are waiting for you 🏡", "Afternoon hunt? Let's go! 🔍", "Perfect time to find your spot 📍"])
             : hour < 21
-            ? "Wind down with great listings 🌙"
-            : "Browse listings before bed 🛏️";
+            ? pick(["Wind down with great listings 🌙", "Evening browsing, smart choices 🌆", "Relax and explore new spaces 🛋️"])
+            : pick(["Browse listings before bed 🛏️", "Late-night deals are the best 🌜", "Can't sleep? Find your next keja 🏘️"]);
           const name = (() => { try { const n = localStorage.getItem("kejasure_first_name"); return n || "there"; } catch { return "there"; } })();
           return (
             <div className="mb-3 animate-fade-in">
