@@ -57,6 +57,8 @@ type Tab = "overview" | "agents" | "leads" | "billing";
 const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
+  const [showBoost, setShowBoost] = useState(false);
+  const [showAddAgent, setShowAddAgent] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("agency");

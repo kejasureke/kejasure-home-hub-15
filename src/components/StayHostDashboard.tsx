@@ -61,6 +61,7 @@ type Tab = "overview" | "calendar" | "guests" | "billing";
 const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
+  const [showBoost, setShowBoost] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("stayhost");
