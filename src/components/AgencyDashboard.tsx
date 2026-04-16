@@ -165,8 +165,8 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
             <div className="space-y-2 mb-5">
               {[
                 { icon: Plus, label: "Add Listing", desc: "Create a new listing", gradient: "gradient-trust", action: () => setShowCRUD(true) },
-                { icon: UserPlus, label: "Add Agent", desc: "Invite a team member", gradient: "gradient-premium" },
-                { icon: Zap, label: "Boost Agency", desc: "Increase visibility", gradient: "bg-secondary" },
+                { icon: UserPlus, label: "Add Agent", desc: "Invite a team member", gradient: "gradient-premium", action: () => setShowAddAgent(true) },
+                { icon: Zap, label: "Boost Agency", desc: "Increase visibility", gradient: "bg-secondary", action: () => setShowBoost(true) },
               ].map((a) => (
                 <button key={a.label} onClick={(a as any).action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
                   <div className={`w-10 h-10 rounded-xl ${a.gradient} flex items-center justify-center`}>
