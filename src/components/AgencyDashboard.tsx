@@ -148,7 +148,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                   ))}
                 </div>
               </div>
-              <button onClick={() => setShowAddAgent(false)} className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
+              <button onClick={() => { setShowAddAgent(false); toast.success("Invitation sent!", { description: "Your agent will receive an SMS invite shortly." }); }} className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
                 Send Invitation
               </button>
             </div>
