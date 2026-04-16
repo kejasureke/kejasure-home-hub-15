@@ -10,6 +10,7 @@ import {
   Building2, Target, Clock, CheckCircle2, AlertTriangle, Edit3, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import BoostProcessingOverlay from "./BoostProcessingOverlay";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 

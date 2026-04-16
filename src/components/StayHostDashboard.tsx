@@ -10,6 +10,7 @@ import {
   Home, Star, Clock, CheckCircle2, Bed, Moon as MoonIcon, Edit3, Trash2, MessageCircle as MsgIcon
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import BoostProcessingOverlay from "./BoostProcessingOverlay";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 

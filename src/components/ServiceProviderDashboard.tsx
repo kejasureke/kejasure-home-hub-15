@@ -6,6 +6,7 @@ import {
   Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
+import BoostProcessingOverlay from "./BoostProcessingOverlay";
 import ListingCRUD from "./ListingCRUD";
 
 interface ServiceProviderDashboardProps {
