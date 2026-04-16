@@ -2,8 +2,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
-  Calendar, BarChart3, RefreshCw, MapPin, ChevronRight,
-  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2
+  Calendar, BarChart3, RefreshCw, MapPin, ChevronRight, ChevronLeft,
+  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
@@ -37,10 +37,31 @@ const bookings = [
   { client: "Peter M.", service: "Deep Cleaning", date: "Sat, 8 AM", status: "pending", amount: "KES 4,500" },
 ];
 
-const portfolio = [
-  { title: "Kitchen Renovation", category: "Plumbing", rating: 5.0, reviews: 12 },
-  { title: "Office Wiring", category: "Electrical", rating: 4.9, reviews: 8 },
-  { title: "Full House Move", category: "Moving", rating: 4.8, reviews: 23 },
+const initialPortfolio = [
+  {
+    id: "p1", title: "Kitchen Renovation", category: "Plumbing", rating: 5.0, reviews: 12,
+    photos: [
+      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=400&h=300&fit=crop",
+    ],
+  },
+  {
+    id: "p2", title: "Office Wiring", category: "Electrical", rating: 4.9, reviews: 8,
+    photos: [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop",
+    ],
+  },
+  {
+    id: "p3", title: "Full House Move", category: "Moving", rating: 4.8, reviews: 23,
+    photos: [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1600566753376-12c8ab7c3376?w=400&h=300&fit=crop",
+    ],
+  },
 ];
 
 const countyStats = [
@@ -59,6 +80,14 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [showCRUD, setShowCRUD] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
   const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
+  const [portfolioItems, setPortfolioItems] = useState(initialPortfolio);
+  const [showAddProject, setShowAddProject] = useState(false);
+  const [newProjectTitle, setNewProjectTitle] = useState("");
+  const [newProjectCategory, setNewProjectCategory] = useState("");
+  const [newProjectPhotos, setNewProjectPhotos] = useState<string[]>([]);
+  const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
+  const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
@@ -302,28 +331,68 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           <div className="pb-8">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold">Your Work</h3>
-              <button className="text-xs font-semibold text-primary flex items-center gap-1">
-                <Camera className="w-3.5 h-3.5" /> Add
+              <button onClick={() => setShowAddProject(true)} className="text-xs font-semibold text-primary flex items-center gap-1 active:scale-95 transition-transform">
+                <Plus className="w-3.5 h-3.5" /> Add Project
               </button>
             </div>
-            <div className="space-y-3 mb-6">
-              {portfolio.map((p) => (
-                <div key={p.title} className="bg-card rounded-2xl card-shadow overflow-hidden">
-                  <div className="h-32 bg-secondary flex items-center justify-center">
-                    <Camera className="w-8 h-8 text-muted-foreground/30" />
+
+            {/* Portfolio projects */}
+            <div className="space-y-4 mb-6">
+              {portfolioItems.map((p) => (
+                <div key={p.id} className="bg-card rounded-2xl card-shadow overflow-hidden">
+                  {/* Photo gallery */}
+                  <div className="relative">
+                    <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+                      {p.photos.map((photo, i) => (
+                        <img
+                          key={i}
+                          src={photo}
+                          alt={`${p.title} ${i + 1}`}
+                          className="w-full h-40 object-cover shrink-0 snap-center cursor-pointer"
+                          onClick={() => {
+                            setLightboxPhotos(p.photos);
+                            setLightboxIndex(i);
+                            setLightboxPhoto(photo);
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm">
+                      <span className="text-[10px] font-medium text-white flex items-center gap-1">
+                        <Image className="w-3 h-3" /> {p.photos.length}
+                      </span>
+                    </div>
                   </div>
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-semibold">{p.title}</p>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-accent fill-accent" />
-                        <span className="text-xs font-semibold">{p.rating}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-accent fill-accent" />
+                          <span className="text-xs font-semibold">{p.rating}</span>
+                        </div>
+                        <button
+                          onClick={() => setPortfolioItems((prev) => prev.filter((item) => item.id !== p.id))}
+                          className="p-1 rounded-lg bg-destructive/10 active:scale-90 transition-transform"
+                        >
+                          <Trash2 className="w-3 h-3 text-destructive" />
+                        </button>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">{p.category} · {p.reviews} reviews</p>
                   </div>
                 </div>
               ))}
+
+              {portfolioItems.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
+                    <Camera className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm font-medium mb-1">No projects yet</p>
+                  <p className="text-xs text-muted-foreground text-center">Add your best work to showcase to potential clients</p>
+                </div>
+              )}
             </div>
 
             {/* Ratings Summary */}
@@ -445,6 +514,162 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           </div>
         )}
       </div>
+
+      {/* Add Project Modal */}
+      {showAddProject && (
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowAddProject(false)}>
+          <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">📸 Add Project</h3>
+              <button onClick={() => setShowAddProject(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Project Title</label>
+                <input
+                  value={newProjectTitle}
+                  onChange={(e) => setNewProjectTitle(e.target.value)}
+                  placeholder="e.g., Living Room Painting"
+                  className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  maxLength={100}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Category</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {["Plumbing", "Electrical", "Moving", "Cleaning", "Painting", "Carpentry", "Other"].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setNewProjectCategory(cat)}
+                      className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
+                        newProjectCategory === cat ? "gradient-trust text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Photos</label>
+                <div className="flex gap-2 flex-wrap">
+                  {newProjectPhotos.map((photo, i) => (
+                    <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden">
+                      <img src={photo} alt="" className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => setNewProjectPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center"
+                      >
+                        <X className="w-3 h-3 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => {
+                      // Simulate photo upload with random Unsplash images
+                      const mockPhotos = [
+                        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+                        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
+                        "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=400&h=300&fit=crop",
+                        "https://images.unsplash.com/photo-1560185008-b033106af5c8?w=400&h=300&fit=crop",
+                        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop",
+                      ];
+                      const available = mockPhotos.filter((p) => !newProjectPhotos.includes(p));
+                      if (available.length > 0) {
+                        setNewProjectPhotos((prev) => [...prev, available[Math.floor(Math.random() * available.length)]]);
+                        toast.success("Photo added!");
+                      }
+                    }}
+                    className="w-20 h-20 rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform"
+                  >
+                    <Camera className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-[9px] text-muted-foreground">Upload</span>
+                  </button>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">Add up to 5 photos of your work</p>
+              </div>
+              <button
+                onClick={() => {
+                  if (newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0) {
+                    setPortfolioItems((prev) => [
+                      {
+                        id: `p_${Date.now()}`,
+                        title: newProjectTitle.trim(),
+                        category: newProjectCategory,
+                        rating: 0,
+                        reviews: 0,
+                        photos: newProjectPhotos,
+                      },
+                      ...prev,
+                    ]);
+                    setNewProjectTitle("");
+                    setNewProjectCategory("");
+                    setNewProjectPhotos([]);
+                    setShowAddProject(false);
+                    toast.success("Project added!", { description: "Your portfolio has been updated." });
+                  }
+                }}
+                className={`w-full py-4 rounded-xl text-sm font-bold active:scale-[0.98] transition-transform ${
+                  newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0
+                    ? "gradient-trust text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                Add to Portfolio
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightboxPhoto && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90" onClick={() => setLightboxPhoto(null)}>
+          <button onClick={() => setLightboxPhoto(null)} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+            <X className="w-5 h-5 text-white" />
+          </button>
+          {lightboxPhotos.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newIdx = (lightboxIndex - 1 + lightboxPhotos.length) % lightboxPhotos.length;
+                  setLightboxIndex(newIdx);
+                  setLightboxPhoto(lightboxPhotos[newIdx]);
+                }}
+                className="absolute left-3 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+              >
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newIdx = (lightboxIndex + 1) % lightboxPhotos.length;
+                  setLightboxIndex(newIdx);
+                  setLightboxPhoto(lightboxPhotos[newIdx]);
+                }}
+                className="absolute right-3 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+              >
+                <ChevronRight className="w-5 h-5 text-white" />
+              </button>
+            </>
+          )}
+          <img
+            src={lightboxPhoto}
+            alt="Portfolio photo"
+            className="max-w-[90%] max-h-[80vh] object-contain rounded-xl animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="absolute bottom-6 flex items-center gap-1.5">
+            {lightboxPhotos.map((_, i) => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full transition-colors ${i === lightboxIndex ? "bg-white" : "bg-white/30"}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
