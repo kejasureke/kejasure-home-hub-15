@@ -1,4 +1,4 @@
-import { Star, Clock, MapPin, MessageCircle, Calendar } from "lucide-react";
+import { Star, Clock, MapPin, MessageCircle, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import type { ServiceProvider } from "@/data/mockData";
 import ServiceBookingModal from "./ServiceBookingModal";
@@ -9,9 +9,12 @@ interface ServiceCardProps {
 
 const ServiceCard = ({ provider }: ServiceCardProps) => {
   const [showBooking, setShowBooking] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const tierClass =
     provider.tier === "Premium" ? "tier-badge-premium" :
     provider.tier === "Pro" ? "tier-badge-pro" : "tier-badge-basic";
+
+  const hasReviews = provider.recentReviews && provider.recentReviews.length > 0;
 
   return (
     <>
@@ -55,6 +58,41 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
                 <span className="ml-auto text-[10px] font-medium text-trust">📅 {provider.availability}</span>
               )}
             </div>
+
+            {/* Recent reviews toggle */}
+            {hasReviews && (
+              <button
+                onClick={() => setShowReviews(!showReviews)}
+                className="flex items-center gap-1 text-[11px] font-medium text-primary mb-2 active:opacity-70"
+              >
+                {showReviews ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                {showReviews ? "Hide reviews" : `See ${provider.recentReviews!.length} recent review${provider.recentReviews!.length > 1 ? "s" : ""}`}
+              </button>
+            )}
+
+            {showReviews && provider.recentReviews && (
+              <div className="space-y-2 mb-3 animate-fade-in">
+                {provider.recentReviews.map((review, i) => (
+                  <div key={i} className="p-2.5 rounded-xl bg-secondary/60">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-semibold text-foreground">{review.author}</span>
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star
+                              key={s}
+                              className={`w-2.5 h-2.5 ${s <= review.rating ? "fill-gold text-gold" : "text-muted-foreground/20"}`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <span className="text-[9px] text-muted-foreground">{review.date}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{review.text}</p>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="flex gap-2">
               <button
