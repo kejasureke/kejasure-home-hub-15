@@ -25,6 +25,8 @@ export interface Property {
   amenities: string[];
   landlordResponseTime: string;
   landlordResponseSpeed: "fast" | "moderate" | "slow";
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
   lastActive: string;
   nearbyLandmarks: string[];
   description: string;
@@ -86,6 +88,8 @@ export const properties: Property[] = [
     amenities: ["Parking", "Gym", "Swimming Pool", "Security", "Backup Generator", "Fiber Internet"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "2 mins ago",
     nearbyLandmarks: ["Yaya Centre", "Junction Mall", "Nairobi Hospital"],
     description: "Spacious 3-bedroom apartment in the heart of Kilimani with stunning city views. Modern finishes, 24/7 security, and all amenities included.",
@@ -129,6 +133,8 @@ export const properties: Property[] = [
     amenities: ["Parking", "Swimming Pool", "CCTV", "Elevator", "Rooftop Terrace"],
     landlordResponseTime: "< 30 mins",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "5 mins ago",
     nearbyLandmarks: ["Sarit Centre", "The Hub", "Westgate"],
     description: "Beautiful 2-bedroom apartment in a secure complex with pool, gym, and rooftop terrace. Walking distance to Sarit Centre.",
@@ -164,6 +170,8 @@ export const properties: Property[] = [
     amenities: ["WiFi", "Smart TV", "Kitchen", "Workspace", "Parking"],
     landlordResponseTime: "Instant",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "Online",
     nearbyLandmarks: ["Sarit Centre", "Westlands CBD"],
     description: "Fully furnished studio perfect for short stays. Fast WiFi, smart TV, and fully equipped kitchen.",
@@ -200,6 +208,8 @@ export const properties: Property[] = [
     amenities: ["Rooftop Terrace", "Jacuzzi", "BBQ Area", "WiFi", "Smart Home", "Concierge"],
     landlordResponseTime: "< 15 mins",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "1 min ago",
     nearbyLandmarks: ["Prestige Plaza", "T-Mall", "Galleria"],
     description: "Stunning penthouse with 360° city views. Perfect for luxury getaways with rooftop jacuzzi and BBQ.",
@@ -230,6 +240,8 @@ export const properties: Property[] = [
     amenities: ["Parking", "Security", "Water Tank", "Balcony"],
     landlordResponseTime: "< 2 hours",
     landlordResponseSpeed: "moderate",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "30 mins ago",
     nearbyLandmarks: ["Capital Centre", "Mater Hospital", "South B Shopping Centre"],
     description: "Well-maintained 1-bedroom apartment in a quiet neighborhood. Spacious rooms with ample natural light.",
@@ -265,6 +277,8 @@ export const properties: Property[] = [
     amenities: ["Garden", "Parking", "Security", "Servant Quarter", "Backup Generator", "Borehole"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "15 mins ago",
     nearbyLandmarks: ["Karen Country Club", "The Hub Karen", "Galleria"],
     description: "Executive 2-bedroom apartment in serene Karen. Lush gardens, spacious rooms, and premium finishes.",
@@ -300,6 +314,8 @@ export const properties: Property[] = [
     amenities: ["Ocean View", "WiFi", "Pool", "Beach Access", "AC", "Kitchen"],
     landlordResponseTime: "< 30 mins",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "Online",
     nearbyLandmarks: ["Nyali Beach", "City Mall Nyali", "Mombasa Marine Park"],
     description: "Wake up to ocean views in this beautifully furnished studio. Steps from Nyali Beach.",
@@ -330,6 +346,8 @@ export const properties: Property[] = [
     amenities: ["Water", "Security", "Tiled"],
     landlordResponseTime: "< 4 hours",
     landlordResponseSpeed: "slow",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "2 hours ago",
     nearbyLandmarks: ["TRM", "Thika Road", "USIU"],
     description: "Clean and affordable bedsitter near TRM. Good for students and young professionals.",
@@ -367,6 +385,8 @@ export const properties: Property[] = [
     amenities: ["Furnished", "Fiber Internet", "Backup Generator", "CCTV", "Concierge", "Gym", "Swimming Pool", "Servant Quarter"],
     landlordResponseTime: "< 30 mins",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "Online",
     nearbyLandmarks: ["UN Complex", "US Embassy", "Village Market"],
     description: "Fully serviced executive apartment in the heart of Gigiri diplomatic zone. Perfect for diplomats, NGO staff, and corporate expats. Includes weekly housekeeping and 24/7 concierge.",
@@ -404,6 +424,8 @@ export const properties: Property[] = [
     amenities: ["Furnished", "Business Center", "Fiber Internet", "Gym", "Parking", "Backup Generator", "Rooftop Lounge"],
     landlordResponseTime: "< 15 mins",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "5 mins ago",
     nearbyLandmarks: ["KICC", "Kenyatta National Hospital", "Integrity Centre"],
     description: "Modern serviced apartment designed for corporate professionals. Fully furnished with business center access, meeting rooms, and premium amenities.",
@@ -440,6 +462,8 @@ export const properties: Property[] = [
     amenities: ["Ocean View", "Private Pool", "Chef", "WiFi", "AC", "Beach Access", "Security", "Parking"],
     landlordResponseTime: "Instant",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "Online",
     nearbyLandmarks: ["Diani Beach", "Leopard Beach Resort", "Ukunda Airstrip"],
     description: "Luxury beachfront villa perfect for corporate retreats, diplomat vacations, and high-end getaways. Private pool, in-house chef, and direct beach access.",
@@ -480,6 +504,8 @@ export const properties: Property[] = [
     amenities: ["Street Frontage", "High Foot Traffic", "CCTV", "24hr Security Guard", "Signage Space", "Ground Floor", "Parking"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "10 mins ago",
     nearbyLandmarks: ["Kencom", "Archives", "City Market"],
     description: "High-visibility retail shop on Moi Avenue with excellent foot traffic. Ground floor, corner unit with large signage space. Ideal for fashion, electronics, or services.",
@@ -511,6 +537,8 @@ export const properties: Property[] = [
     amenities: ["Fiber Internet", "Elevator/Goods Lift", "Parking", "Reception Area", "Meeting Room", "AC/HVAC", "Backup Generator", "CCTV", "Fire Safety System", "Kitchen/Pantry"],
     landlordResponseTime: "< 30 mins",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "5 mins ago",
     nearbyLandmarks: ["Sarit Centre", "Delta Towers", "Westlands Roundabout"],
     description: "Premium Grade A office space in the heart of Westlands. Open plan layout, fiber-ready, with dedicated parking. Perfect for tech companies, consultancies, and startups.",
@@ -542,6 +570,8 @@ export const properties: Property[] = [
     amenities: ["Loading Bay", "Warehouse Space", "3-Phase Power", "Parking", "24hr Security Guard", "CCTV", "Fire Safety System", "Washrooms"],
     landlordResponseTime: "< 2 hours",
     landlordResponseSpeed: "moderate",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "1 hour ago",
     nearbyLandmarks: ["Enterprise Road", "Likoni Road", "ICD Embakasi"],
     description: "Spacious godown in Industrial Area with large loading bay, high ceiling, and 3-phase power. Suitable for storage, distribution, and light manufacturing.",
@@ -573,6 +603,8 @@ export const properties: Property[] = [
     amenities: ["Street Frontage", "Parking", "AC/HVAC", "CCTV", "Signage Space", "Wheelchair Access", "Reception Area", "Fiber Internet"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "30 mins ago",
     nearbyLandmarks: ["The Hub Karen", "Karen Country Club", "Galleria"],
     description: "Elegant showroom space in Karen's prime commercial strip. High ceilings, excellent natural light, ample parking. Ideal for furniture, art, automotive, or luxury retail.",
@@ -604,6 +636,8 @@ export const properties: Property[] = [
     amenities: ["Street Frontage", "24hr Security", "Loading Zone"],
     landlordResponseTime: "< 2 hours",
     landlordResponseSpeed: "moderate",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "1 hour ago",
     nearbyLandmarks: ["Gikomba Market", "Muthurwa Market"],
     description: "Affordable container shop in the bustling Gikomba market area. High foot traffic, ideal for retail or wholesale.",
@@ -635,6 +669,8 @@ export const properties: Property[] = [
     amenities: ["Fiber Internet", "AC/HVAC", "Elevator", "Parking", "Meeting Room", "Kitchen", "24hr Access", "Backup Power"],
     landlordResponseTime: "< 30 mins",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "10 mins ago",
     nearbyLandmarks: ["Yaya Centre", "Prestige Plaza", "Junction Mall"],
     description: "Fully serviced co-working desk or private office in modern Kilimani complex. Fiber internet, meeting rooms, and 24/7 access included.",
@@ -666,6 +702,8 @@ export const properties: Property[] = [
     amenities: ["Loading Bay", "3-Phase Power", "Perimeter Wall", "CCTV", "Night Watchman", "Truck Access", "Water Supply"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "2 hours ago",
     nearbyLandmarks: ["EPZ", "Mombasa Road", "Mlolongo"],
     description: "Large warehouse near EPZ with loading bays, truck access, and 24hr security. Suitable for distribution, manufacturing, or cold storage.",
@@ -697,6 +735,8 @@ export const properties: Property[] = [
     amenities: ["Water Supply", "Street Frontage", "Signage Space", "Parking"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "45 mins ago",
     nearbyLandmarks: ["Mombasa CBD", "Fort Jesus", "Old Town"],
     description: "Ready-to-use salon space in Tudor with plumbing, mirrors, and street-facing signage. Walk-in traffic from busy Mombasa road.",
@@ -728,6 +768,8 @@ export const properties: Property[] = [
     amenities: ["Fiber Internet", "AC/HVAC", "Elevator", "Parking", "Generator", "Boardroom", "Reception", "Kitchen", "Wheelchair Access"],
     landlordResponseTime: "< 30 mins",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "5 mins ago",
     nearbyLandmarks: ["NHIF Building", "Kenyatta Hospital", "Upperhill Business Park"],
     description: "Grade A open-plan office in Upperhill tower. Panoramic views, dedicated parking, high-speed fiber, and premium finishes.",
@@ -759,6 +801,8 @@ export const properties: Property[] = [
     amenities: ["Street Frontage", "Parking", "CCTV", "Generator", "Signage Space", "High Ceiling", "Roller Shutter"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "3 hours ago",
     nearbyLandmarks: ["Prestige Mall", "Ngong Racecourse", "Nairobi West"],
     description: "High-visibility showroom on Ngong Road. Double-height glass frontage, 10+ car display capacity, and excellent signage opportunities.",
@@ -791,6 +835,8 @@ export const properties: Property[] = [
     amenities: ["Fiber Internet", "Backup Generator", "Elevator", "Parking", "Wheelchair Access", "Water Supply", "AC/HVAC", "24hr Access"],
     landlordResponseTime: "< 2 hours",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "30 mins ago",
     nearbyLandmarks: ["Yaya Centre", "Nairobi Hospital"],
     description: "Ground floor medical suite ideal for a clinic, dental practice, or diagnostic lab. Plumbed for medical use with wheelchair access and ample parking.",
@@ -823,6 +869,8 @@ export const properties: Property[] = [
     amenities: ["Swimming Pool", "AC/HVAC", "Backup Generator", "Parking", "CCTV", "24hr Security Guard", "Kitchen", "Reception Area", "Water Supply"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "1 hour ago",
     nearbyLandmarks: ["Diani Beach", "Ukunda Airstrip"],
     description: "Fully operational boutique hotel with 12 rooms, restaurant area, swimming pool, and beachfront access. Turnkey hospitality business opportunity.",
@@ -855,6 +903,8 @@ export const properties: Property[] = [
     amenities: ["Kitchen", "AC/HVAC", "Parking", "Street Frontage", "Signage Space", "Water Supply", "3-Phase Power", "Backup Generator"],
     landlordResponseTime: "< 3 hours",
     landlordResponseSpeed: "moderate",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "2 hours ago",
     nearbyLandmarks: ["Yaya Centre", "Prestige Plaza"],
     description: "Ready-to-use restaurant space with commercial kitchen, exhaust system, and outdoor seating area. High-traffic location near Yaya Centre.",
@@ -887,6 +937,8 @@ export const properties: Property[] = [
     amenities: ["Water Supply", "Signage Space", "Street Frontage", "CCTV", "Parking"],
     landlordResponseTime: "< 4 hours",
     landlordResponseSpeed: "moderate",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "5 hours ago",
     nearbyLandmarks: ["Eastleigh Mall", "Garissa Lodge"],
     description: "Compact salon space on a busy street with plumbing for wash basins. Ideal for hair salon, barbershop, or beauty parlour.",
@@ -919,6 +971,8 @@ export const properties: Property[] = [
     amenities: ["AC/HVAC", "CCTV", "24hr Security Guard", "Street Frontage", "Signage Space", "Backup Generator"],
     landlordResponseTime: "< 2 hours",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "1 hour ago",
     nearbyLandmarks: ["Mombasa Hospital", "Fort Jesus"],
     description: "Street-level pharmacy space near Mombasa Hospital. Fitted with shelving and counter space. High foot traffic medical area.",
@@ -951,6 +1005,8 @@ export const properties: Property[] = [
     amenities: ["Parking", "AC/HVAC", "3-Phase Power", "High Ceiling", "Water Supply", "Backup Generator", "24hr Access", "CCTV"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "45 mins ago",
     nearbyLandmarks: ["Lavington Mall", "Valley Arcade"],
     description: "Open-plan ground floor space perfect for a gym or fitness studio. High ceilings, reinforced floors, and ample natural light. Includes changing rooms.",
@@ -983,6 +1039,8 @@ export const properties: Property[] = [
     amenities: ["Loading Bay", "Parking", "3-Phase Power", "CCTV", "24hr Security Guard", "Roller Shutter", "Water Supply", "Backup Generator"],
     landlordResponseTime: "< 2 hours",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "3 hours ago",
     nearbyLandmarks: ["TRM", "USIU"],
     description: "Large retail floor space ideal for a supermarket or mini-mart. Ground floor with loading bay and cold room provision. High-density residential area.",
@@ -1015,6 +1073,8 @@ export const properties: Property[] = [
     amenities: ["AC/HVAC", "CCTV", "Parking", "Signage Space", "24hr Security Guard", "Street Frontage", "Kitchen", "Perimeter Wall"],
     landlordResponseTime: "< 1 hour",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "2 hours ago",
     nearbyLandmarks: ["Sarit Centre", "The Mall Westlands"],
     description: "Entertainment space fitted for a bar, pub, or nightclub. Sound-insulated walls, bar counter installed, and outdoor patio area. Prime nightlife zone.",
@@ -1047,6 +1107,8 @@ export const properties: Property[] = [
     amenities: ["Loading Bay", "Truck Access", "Parking", "High Ceiling", "Roller Shutter", "3-Phase Power", "Perimeter Wall"],
     landlordResponseTime: "< 6 hours",
     landlordResponseSpeed: "moderate",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "1 day ago",
     nearbyLandmarks: ["Ngong Racecourse", "The Hub Karen"],
     description: "Ground-level space with wide roller shutter entry, ideal for a hardware or building materials shop. Easy truck access for deliveries.",
@@ -1079,6 +1141,8 @@ export const properties: Property[] = [
     amenities: ["3-Phase Power", "Truck Access", "High Ceiling", "Water Supply", "Roller Shutter", "Perimeter Wall", "Night Watchman"],
     landlordResponseTime: "< 3 hours",
     landlordResponseSpeed: "moderate",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "4 hours ago",
     nearbyLandmarks: ["Sameer Park", "Enterprise Road"],
     description: "Spacious garage with hydraulic pit provision, high ceilings, and 3-phase power. Ideal for auto repair, body work, or mechanical workshop.",
@@ -1111,6 +1175,8 @@ export const properties: Property[] = [
     amenities: ["Fiber Internet", "AC/HVAC", "Meeting Room", "Kitchen", "Parking", "Backup Generator", "24hr Access", "Reception Area"],
     landlordResponseTime: "< 30 mins",
     landlordResponseSpeed: "fast",
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     lastActive: "15 mins ago",
     nearbyLandmarks: ["The Hub Karen", "Karen Blixen Museum"],
     description: "Stylish co-working space with hot desks, private offices, and meeting rooms. Serene Karen setting with garden views and reliable fiber internet.",
@@ -1145,6 +1211,8 @@ export const properties: Property[] = [
     available: true,
     amenities: ["Parking", "AC/HVAC", "Backup Generator", "Water Supply", "Night Watchman"],
     landlordResponseSpeed: "moderate" as const,
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     nearbyLandmarks: ["Umoja Inner Core", "Tuskys Umoja"],
     description: "Spacious church hall ideal for worship, seminars, and community events. High ceiling with good acoustics, parking for 40+ cars.",
     images: [property1, property3, property2, property4],
@@ -1177,6 +1245,8 @@ export const properties: Property[] = [
     available: true,
     amenities: ["Street Frontage", "24hr Access", "CCTV", "Perimeter Wall", "Water Supply", "Night Watchman"],
     landlordResponseSpeed: "fast" as const,
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     nearbyLandmarks: ["Mombasa Road", "GM South B"],
     description: "Prime petrol station location on busy Mombasa Road with high traffic flow. Includes car wash bay and mini-mart space.",
     images: [property2, property4, property1, property3],
@@ -1209,6 +1279,8 @@ export const properties: Property[] = [
     available: true,
     amenities: ["AC/HVAC", "CCTV", "Parking", "3-Phase Power", "High Ceiling", "24hr Access", "Signage Space"],
     landlordResponseSpeed: "moderate" as const,
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     nearbyLandmarks: ["Sarit Centre", "Westgate Mall"],
     description: "Ready-to-operate nightclub and lounge in the heart of Westlands nightlife district. Sound-proofed with VIP sections and DJ booth.",
     images: [property3, property1, property4, property2],
@@ -1241,6 +1313,8 @@ export const properties: Property[] = [
     available: true,
     amenities: ["Parking", "Water Supply", "Perimeter Wall", "Playground", "Backup Generator", "Water Tank", "CCTV"],
     landlordResponseSpeed: "fast" as const,
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     nearbyLandmarks: ["Langata Road", "Nairobi National Park"],
     description: "Established school premises with 12 classrooms, admin block, playground, and kitchen. Ideal for primary or academy setup.",
     images: [property4, property2, property3, property1],
@@ -1273,6 +1347,8 @@ export const properties: Property[] = [
     available: true,
     amenities: ["Fiber Internet", "AC/HVAC", "High Ceiling", "24hr Access", "Parking", "Kitchen"],
     landlordResponseSpeed: "fast" as const,
+    landlordResponseTime: "< 2 hours",
+    lastActive: "Online",/
     nearbyLandmarks: ["Lavington Mall", "Valley Arcade"],
     description: "Bright, open-plan creative studio perfect for photography, art, podcasting, or content creation. Natural light with industrial finishes.",
     images: [property1, property4, property2, property3],
