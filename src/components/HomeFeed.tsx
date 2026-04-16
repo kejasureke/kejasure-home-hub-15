@@ -97,9 +97,14 @@ const HomeFeed = () => {
   const recentProperties = properties.filter((p) => recentIds.includes(p.id));
   const compareProperties = properties.filter((p) => compareIds.includes(p.id));
 
-  const filteredServices = serviceCategory === "All"
-    ? serviceProviders
-    : serviceProviders.filter((s) => s.category === serviceCategory);
+  const filteredServices = (() => {
+    let list = serviceCategory === "All"
+      ? [...serviceProviders]
+      : serviceProviders.filter((s) => s.category === serviceCategory);
+    if (serviceSort === "rating") list.sort((a, b) => b.rating - a.rating);
+    else if (serviceSort === "reviews") list.sort((a, b) => b.reviews - a.reviews);
+    return list;
+  })();
 
   const handleSelectProperty = (id: string) => {
     addRecent(id);
