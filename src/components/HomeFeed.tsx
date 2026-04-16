@@ -31,6 +31,7 @@ const HomeFeed = () => {
   const [showCompareSelector, setShowCompareSelector] = useState(false);
   const [compareFromProperty, setCompareFromProperty] = useState<string | null>(null);
   const [serviceCategory, setServiceCategory] = useState("All");
+  const [serviceSort, setServiceSort] = useState<"featured" | "rating" | "reviews">("featured");
   const [commCategory, setCommCategory] = useState("All");
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
