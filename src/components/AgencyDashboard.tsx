@@ -5,7 +5,7 @@ import VerificationBadge from "./VerificationBadge";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
-  Upload, UserPlus, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
+  Upload, UserPlus, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight, X,
   Building2, Target, Clock, CheckCircle2, AlertTriangle, Edit3, Trash2
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
@@ -57,6 +57,8 @@ type Tab = "overview" | "agents" | "leads" | "billing";
 const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
+  const [showBoost, setShowBoost] = useState(false);
+  const [showAddAgent, setShowAddAgent] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("agency");
@@ -96,6 +98,62 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
         />
       )}
       {showCRUD && <ListingCRUD type="rental" onClose={() => setShowCRUD(false)} />}
+      {showBoost && (
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowBoost(false)}>
+          <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">⚡ Boost Your Agency</h3>
+              <button onClick={() => setShowBoost(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+            </div>
+            <div className="space-y-3">
+              {[
+                { name: "7-Day Boost", price: "KES 1,000", desc: "5x visibility for all listings" },
+                { name: "30-Day Boost", price: "KES 3,000", desc: "Featured agency + badge" },
+                { name: "90-Day Boost", price: "KES 7,500", desc: "Top placement + priority leads" },
+              ].map((b) => (
+                <button key={b.name} onClick={() => { setShowBoost(false); setShowPayment(true); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
+                  <div>
+                    <p className="text-sm font-semibold text-left">{b.name}</p>
+                    <p className="text-xs text-muted-foreground">{b.desc}</p>
+                  </div>
+                  <span className="text-sm font-bold text-primary">{b.price}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      {showAddAgent && (
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowAddAgent(false)}>
+          <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">👤 Invite Agent</h3>
+              <button onClick={() => setShowAddAgent(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Agent Name</label>
+                <input placeholder="e.g., Jane Wanjiku" className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Phone Number</label>
+                <input placeholder="0712 345 678" className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Role</label>
+                <div className="flex gap-2">
+                  {["Agent", "Senior Agent", "Manager"].map((r) => (
+                    <button key={r} className="flex-1 py-2.5 rounded-xl bg-secondary text-xs font-medium text-secondary-foreground active:scale-[0.98]">{r}</button>
+                  ))}
+                </div>
+              </div>
+              <button onClick={() => setShowAddAgent(false)} className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
+                Send Invitation
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {showPayment && (
         <MpesaPaymentFlow
           plans={agencyMpesaPlans}
@@ -163,8 +221,8 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
             <div className="space-y-2 mb-5">
               {[
                 { icon: Plus, label: "Add Listing", desc: "Create a new listing", gradient: "gradient-trust", action: () => setShowCRUD(true) },
-                { icon: UserPlus, label: "Add Agent", desc: "Invite a team member", gradient: "gradient-premium" },
-                { icon: Zap, label: "Boost Agency", desc: "Increase visibility", gradient: "bg-secondary" },
+                { icon: UserPlus, label: "Add Agent", desc: "Invite a team member", gradient: "gradient-premium", action: () => setShowAddAgent(true) },
+                { icon: Zap, label: "Boost Agency", desc: "Increase visibility", gradient: "bg-secondary", action: () => setShowBoost(true) },
               ].map((a) => (
                 <button key={a.label} onClick={(a as any).action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
                   <div className={`w-10 h-10 rounded-xl ${a.gradient} flex items-center justify-center`}>

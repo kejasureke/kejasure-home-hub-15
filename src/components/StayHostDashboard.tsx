@@ -5,7 +5,7 @@ import VerificationBadge from "./VerificationBadge";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Crown, Zap, Plus,
-  Calendar, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight,
+  Calendar, BarChart3, Receipt, RefreshCw, MapPin, ChevronRight, X,
   Home, Star, Clock, CheckCircle2, Bed, Moon as MoonIcon, Edit3, Trash2, MessageCircle as MsgIcon
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
@@ -61,6 +61,7 @@ type Tab = "overview" | "calendar" | "guests" | "billing";
 const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboardProps) => {
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
+  const [showBoost, setShowBoost] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("stayhost");
@@ -100,6 +101,31 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
         />
       )}
       {showCRUD && <ListingCRUD type="shortstay" onClose={() => setShowCRUD(false)} />}
+      {showBoost && (
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowBoost(false)}>
+          <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">⚡ Feature Your Stay</h3>
+              <button onClick={() => setShowBoost(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+            </div>
+            <div className="space-y-3">
+              {[
+                { name: "3-Day Feature", price: "KES 250", desc: "3x more bookings" },
+                { name: "7-Day Feature", price: "KES 500", desc: "5x views + Featured badge" },
+                { name: "30-Day Feature", price: "KES 1,500", desc: "Top placement + badge" },
+              ].map((b) => (
+                <button key={b.name} onClick={() => { setShowBoost(false); setShowPayment(true); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
+                  <div>
+                    <p className="text-sm font-semibold text-left">{b.name}</p>
+                    <p className="text-xs text-muted-foreground">{b.desc}</p>
+                  </div>
+                  <span className="text-sm font-bold text-primary">{b.price}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       {showPayment && (
         <MpesaPaymentFlow
           plans={hostMpesaPlans}
@@ -167,8 +193,8 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
             <div className="space-y-2 mb-5">
               {[
                 { icon: Plus, label: "Add New Stay", desc: "List a new short stay", gradient: "gradient-premium", action: () => setShowCRUD(true) },
-                { icon: Zap, label: "Feature Stay", desc: "Boost your listing", gradient: "gradient-trust" },
-                { icon: Edit3, label: "Set Pricing", desc: "Nightly rates & cleaning fees", gradient: "bg-secondary" },
+                { icon: Zap, label: "Feature Stay", desc: "Boost your listing", gradient: "gradient-trust", action: () => setShowBoost(true) },
+                { icon: Edit3, label: "Set Pricing", desc: "Nightly rates & cleaning fees", gradient: "bg-secondary", action: () => setShowCRUD(true) },
               ].map((a) => (
                 <button key={a.label} onClick={(a as any).action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
                   <div className={`w-10 h-10 rounded-xl ${a.gradient} flex items-center justify-center`}>
