@@ -31,6 +31,7 @@ const HomeFeed = () => {
   const [showCompareSelector, setShowCompareSelector] = useState(false);
   const [compareFromProperty, setCompareFromProperty] = useState<string | null>(null);
   const [serviceCategory, setServiceCategory] = useState("All");
+  const [serviceSort, setServiceSort] = useState<"featured" | "rating" | "reviews">("featured");
   const [commCategory, setCommCategory] = useState("All");
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
@@ -96,9 +97,14 @@ const HomeFeed = () => {
   const recentProperties = properties.filter((p) => recentIds.includes(p.id));
   const compareProperties = properties.filter((p) => compareIds.includes(p.id));
 
-  const filteredServices = serviceCategory === "All"
-    ? serviceProviders
-    : serviceProviders.filter((s) => s.category === serviceCategory);
+  const filteredServices = (() => {
+    let list = serviceCategory === "All"
+      ? [...serviceProviders]
+      : serviceProviders.filter((s) => s.category === serviceCategory);
+    if (serviceSort === "rating") list.sort((a, b) => b.rating - a.rating);
+    else if (serviceSort === "reviews") list.sort((a, b) => b.reviews - a.reviews);
+    return list;
+  })();
 
   const handleSelectProperty = (id: string) => {
     addRecent(id);
@@ -459,6 +465,29 @@ const HomeFeed = () => {
                 </button>
               ))}
             </div>
+
+            {/* Sort controls */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-muted-foreground font-medium">Sort:</span>
+              {([
+                { value: "featured", label: "Featured" },
+                { value: "rating", label: "Top Rated" },
+                { value: "reviews", label: "Most Reviews" },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setServiceSort(opt.value)}
+                  className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
+                    serviceSort === opt.value
+                      ? "gradient-trust text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
             {filteredServices.map((sp) => (
               <ServiceCard key={sp.id} provider={sp} />
             ))}
