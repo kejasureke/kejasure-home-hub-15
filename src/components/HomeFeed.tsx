@@ -426,17 +426,28 @@ const HomeFeed = () => {
           <div className="space-y-3">
             <h2 className="text-base font-semibold">Popular Services</h2>
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-              {["All", "Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers", "Security"].map((cat) => (
+              {[
+                { value: "All", icon: "🔧", label: "All" },
+                { value: "Movers", icon: "🚛", label: "Movers" },
+                { value: "Cleaners", icon: "🧹", label: "Cleaners" },
+                { value: "Electricians", icon: "⚡", label: "Electricians" },
+                { value: "Plumbers", icon: "🔧", label: "Plumbers" },
+                { value: "Internet Installers", icon: "📡", label: "Internet" },
+                { value: "Security", icon: "🛡️", label: "Security" },
+              ].map((cat) => (
                 <button
-                  key={cat}
-                  onClick={() => setServiceCategory(cat)}
-                  className={`shrink-0 px-3.5 py-2 rounded-full text-xs font-medium transition-colors ${
-                    serviceCategory === cat
-                      ? "gradient-trust text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground"
+                  key={cat.value}
+                  onClick={() => setServiceCategory(cat.value)}
+                  className={`shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-center transition-all duration-200 ${
+                    serviceCategory === cat.value
+                      ? "bg-primary/15 ring-1 ring-primary/30 scale-105"
+                      : "bg-secondary hover:bg-secondary/80"
                   }`}
                 >
-                  {cat}
+                  <span className="text-lg">{cat.icon}</span>
+                  <span className={`text-[10px] font-semibold leading-none ${
+                    serviceCategory === cat.value ? "text-primary" : "text-muted-foreground"
+                  }`}>{cat.label}</span>
                 </button>
               ))}
             </div>
