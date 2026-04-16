@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
+import BeforeAfterSlider from "./BeforeAfterSlider";
 import ListingCRUD from "./ListingCRUD";
 
 interface ServiceProviderDashboardProps {
