@@ -1,4 +1,5 @@
 import { X, Clock, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon } from "lucide-react";
+import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
