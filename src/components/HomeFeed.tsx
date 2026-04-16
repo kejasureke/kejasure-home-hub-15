@@ -44,6 +44,9 @@ const HomeFeed = () => {
     furnished: false,
     petFriendly: false,
     sortBy: "featured",
+    commercialTypes: [] as string[],
+    minSqft: 0,
+    maxSqft: 100000,
   });
 
   const { recentIds, addRecent } = useRecentlyViewed();
