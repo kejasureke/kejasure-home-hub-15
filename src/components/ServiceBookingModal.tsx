@@ -115,7 +115,21 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 />
               </div>
 
-              {/* Actions */}
+              {/* Location */}
+              <div>
+                <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  Service Location
+                </h4>
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g., Kilimani, Argwings Kodhek Rd, Apt 4B"
+                  className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  maxLength={200}
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">Where should the provider come?</p>
+              </div>
               <div className="flex gap-3">
                 <button
                   onClick={onChat}
