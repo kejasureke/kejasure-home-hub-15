@@ -171,8 +171,14 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Time</span>
-                    <span className="font-medium">{selectedTime}</span>
+                   <span className="font-medium">{selectedTime}</span>
                   </div>
+                  {location.trim() && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Location</span>
+                      <span className="font-medium text-right max-w-[60%] truncate">{location.trim()}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Estimated Cost</span>
                     <span className="font-semibold text-primary">{provider.price}</span>
