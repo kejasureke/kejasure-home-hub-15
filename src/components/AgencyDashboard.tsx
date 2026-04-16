@@ -157,6 +157,12 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
           </div>
         </div>
       )}
+      {boostProcessing && (
+        <BoostProcessingOverlay
+          boostName={boostProcessing}
+          onComplete={() => { setBoostProcessing(null); setShowPayment(true); }}
+        />
+      )}
       {showPayment && (
         <MpesaPaymentFlow
           plans={agencyMpesaPlans}

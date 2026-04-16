@@ -104,6 +104,12 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
       {showCRUD && (
         <ListingCRUD type="rental" onClose={() => { setShowCRUD(false); setEditIdx(null); }} />
       )}
+      {boostProcessing && (
+        <BoostProcessingOverlay
+          boostName={boostProcessing}
+          onComplete={() => { setBoostProcessing(null); setShowPayment(true); }}
+        />
+      )}
       {showPayment && (
         <MpesaPaymentFlow
           plans={landlordPlans}

@@ -108,6 +108,12 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           </div>
         </div>
       )}
+      {boostProcessing && (
+        <BoostProcessingOverlay
+          boostName={boostProcessing}
+          onComplete={() => { setBoostProcessing(null); setShowPayment(true); }}
+        />
+      )}
       {showPayment && (
         <MpesaPaymentFlow
           plans={serviceMpesaPlans}

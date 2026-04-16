@@ -129,6 +129,12 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
           </div>
         </div>
       )}
+      {boostProcessing && (
+        <BoostProcessingOverlay
+          boostName={boostProcessing}
+          onComplete={() => { setBoostProcessing(null); setShowPayment(true); }}
+        />
+      )}
       {showPayment && (
         <MpesaPaymentFlow
           plans={hostMpesaPlans}
