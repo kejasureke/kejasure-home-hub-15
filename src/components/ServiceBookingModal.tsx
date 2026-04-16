@@ -59,22 +59,27 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               {/* Select Date */}
               <div>
                 <h4 className="text-sm font-semibold mb-3">Select Date</h4>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-                  {dates.map((d) => (
-                    <button
-                      key={d.value}
-                      onClick={() => setSelectedDate(d.value)}
-                      className={`shrink-0 w-16 py-3 rounded-xl text-center transition-colors ${
-                        selectedDate === d.value
-                          ? "gradient-trust text-primary-foreground"
-                          : "bg-secondary text-secondary-foreground"
-                      }`}
-                    >
-                      <p className="text-[10px] font-medium">{d.label}</p>
-                      <p className="text-xs font-semibold mt-0.5">{d.date}</p>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className={cn(
+                      "w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm text-left transition-colors",
+                      selectedDate ? "bg-trust/10 text-foreground font-medium" : "bg-secondary text-muted-foreground"
+                    )}>
+                      <CalendarIcon className="w-4 h-4 shrink-0" />
+                      {selectedDate ? format(selectedDate, "EEEE, MMMM d, yyyy") : "Pick a date"}
                     </button>
-                  ))}
-                </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 z-[70]" align="center">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Select Time */}
