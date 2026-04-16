@@ -80,6 +80,14 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [showCRUD, setShowCRUD] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
   const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
+  const [portfolioItems, setPortfolioItems] = useState(initialPortfolio);
+  const [showAddProject, setShowAddProject] = useState(false);
+  const [newProjectTitle, setNewProjectTitle] = useState("");
+  const [newProjectCategory, setNewProjectCategory] = useState("");
+  const [newProjectPhotos, setNewProjectPhotos] = useState<string[]>([]);
+  const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
+  const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
