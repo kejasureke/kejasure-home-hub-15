@@ -31,6 +31,7 @@ const HomeFeed = () => {
   const [showCompareSelector, setShowCompareSelector] = useState(false);
   const [compareFromProperty, setCompareFromProperty] = useState<string | null>(null);
   const [serviceCategory, setServiceCategory] = useState("All");
+  const [commCategory, setCommCategory] = useState("All");
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
   const [showNeighborhood, setShowNeighborhood] = useState(false);
@@ -74,10 +75,11 @@ const HomeFeed = () => {
       const matchFurnished = !filters.furnished || p.furnished;
       const matchPets = !filters.petFriendly || p.petFriendly;
       const matchCommType = filters.commercialTypes.length === 0 || (p.commercialType && filters.commercialTypes.includes(p.commercialType));
+      const matchCommCategory = commCategory === "All" || p.commercialType === commCategory;
       const parseSqft = (s?: string) => parseInt((s || "0").replace(/,/g, ""), 10) || 0;
       const sqft = parseSqft(p.sizeSqft);
       const matchSqft = filters.minSqft === 0 && filters.maxSqft >= 100000 || !p.sizeSqft || (sqft >= filters.minSqft && sqft <= filters.maxSqft);
-      return matchType && matchCounty && matchEstate && matchSearch && matchPrice && matchBedrooms && matchAmenities && matchVerified && matchSmileId && matchFurnished && matchPets && matchCommType && matchSqft;
+      return matchType && matchCounty && matchEstate && matchSearch && matchPrice && matchBedrooms && matchAmenities && matchVerified && matchSmileId && matchFurnished && matchPets && matchCommType && matchCommCategory && matchSqft;
     });
 
     // Sort
@@ -267,6 +269,52 @@ const HomeFeed = () => {
           ))}
         </div>
       </div>
+
+      {/* Business Spaces Category Carousel */}
+      {segment === "Business Spaces" && (
+        <div className="px-4 pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {[
+              { value: "All", icon: "🏢", label: "All" },
+              { value: "shop", icon: "🏪", label: "Shop" },
+              { value: "office", icon: "🏢", label: "Office" },
+              { value: "godown", icon: "🏭", label: "Godown" },
+              { value: "showroom", icon: "🏬", label: "Showroom" },
+              { value: "clinic", icon: "🏥", label: "Clinic" },
+              { value: "hotel", icon: "🏨", label: "Hotel" },
+              { value: "restaurant", icon: "🍽️", label: "Restaurant" },
+              { value: "salon", icon: "💇", label: "Salon" },
+              { value: "pharmacy", icon: "💊", label: "Pharmacy" },
+              { value: "gym", icon: "🏋️", label: "Gym" },
+              { value: "school", icon: "🏫", label: "School" },
+              { value: "church", icon: "⛪", label: "Church" },
+              { value: "petrol_station", icon: "⛽", label: "Petrol" },
+              { value: "bar", icon: "🍺", label: "Bar" },
+              { value: "club", icon: "🎵", label: "Club" },
+              { value: "supermarket", icon: "🛒", label: "Market" },
+              { value: "hardware", icon: "🔧", label: "Hardware" },
+              { value: "garage", icon: "🔩", label: "Garage" },
+              { value: "studio", icon: "🎨", label: "Studio" },
+              { value: "coworking", icon: "💻", label: "Co-Work" },
+            ].map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => setCommCategory(cat.value)}
+                className={`shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-center transition-all duration-200 ${
+                  commCategory === cat.value
+                    ? "bg-primary/15 ring-1 ring-primary/30 scale-105"
+                    : "bg-secondary hover:bg-secondary/80"
+                }`}
+              >
+                <span className="text-lg">{cat.icon}</span>
+                <span className={`text-[10px] font-semibold leading-none ${
+                  commCategory === cat.value ? "text-primary" : "text-muted-foreground"
+                }`}>{cat.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className="px-4">
