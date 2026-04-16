@@ -1,4 +1,4 @@
-import { X, Clock, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon } from "lucide-react";
+import { X, Clock, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon, MapPin } from "lucide-react";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
@@ -21,6 +21,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
   const [step, setStep] = useState<BookingStep>("details");
 
   // Simulate provider acceptance
@@ -114,7 +115,21 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 />
               </div>
 
-              {/* Actions */}
+              {/* Location */}
+              <div>
+                <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  Service Location
+                </h4>
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g., Kilimani, Argwings Kodhek Rd, Apt 4B"
+                  className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  maxLength={200}
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">Where should the provider come?</p>
+              </div>
               <div className="flex gap-3">
                 <button
                   onClick={onChat}
@@ -124,9 +139,9 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                   Chat First
                 </button>
                 <button
-                  onClick={() => selectedDate && selectedTime && setStep("confirm")}
+                  onClick={() => selectedDate && selectedTime && location.trim() && setStep("confirm")}
                   className={`flex-1 py-3.5 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform ${
-                    selectedDate && selectedTime
+                    selectedDate && selectedTime && location.trim()
                       ? "gradient-trust text-primary-foreground"
                       : "bg-muted text-muted-foreground"
                   }`}
@@ -156,8 +171,14 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Time</span>
-                    <span className="font-medium">{selectedTime}</span>
+                   <span className="font-medium">{selectedTime}</span>
                   </div>
+                  {location.trim() && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Location</span>
+                      <span className="font-medium text-right max-w-[60%] truncate">{location.trim()}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Estimated Cost</span>
                     <span className="font-semibold text-primary">{provider.price}</span>
