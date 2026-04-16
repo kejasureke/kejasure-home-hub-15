@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus,
+  ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight,
   Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2
 } from "lucide-react";
@@ -55,6 +55,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [showPayment, setShowPayment] = useState(false);
   const [providerType] = useState<ProviderType>("individual");
   const [showCRUD, setShowCRUD] = useState(false);
+  const [showBoost, setShowBoost] = useState(false);
 
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
@@ -77,6 +78,33 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   return (
     <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
       {showCRUD && <ListingCRUD type="service" onClose={() => setShowCRUD(false)} />}
+      {showBoost && (
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowBoost(false)}>
+          <div className="w-full bg-card rounded-t-3xl p-6 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-4" />
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">⚡ Boost Your Profile</h3>
+              <button onClick={() => setShowBoost(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">Get 5x more visibility and appear at the top of search results for 7 days.</p>
+            <div className="space-y-3 mb-5">
+              {[
+                { name: "3-Day Boost", price: "KES 200", desc: "3x more views" },
+                { name: "7-Day Boost", price: "KES 400", desc: "5x more views + badge" },
+                { name: "30-Day Boost", price: "KES 1,200", desc: "10x views + featured" },
+              ].map((b) => (
+                <button key={b.name} onClick={() => { setShowBoost(false); setShowPayment(true); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
+                  <div>
+                    <p className="text-sm font-semibold">{b.name}</p>
+                    <p className="text-xs text-muted-foreground">{b.desc}</p>
+                  </div>
+                  <span className="text-sm font-bold text-primary">{b.price}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       {showPayment && (
         <MpesaPaymentFlow
           plans={serviceMpesaPlans}
@@ -149,10 +177,10 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
             <div className="space-y-2 mb-5">
               {[
                 { icon: Plus, label: "Add Service", desc: "List a new service", gradient: "gradient-trust", action: () => setShowCRUD(true) },
-                { icon: Zap, label: "Boost Profile", desc: "Appear first in searches", gradient: "gradient-premium" },
-                { icon: Camera, label: "Add Portfolio", desc: "Showcase your work", gradient: "bg-secondary" },
+                { icon: Zap, label: "Boost Profile", desc: "Appear first in searches", gradient: "gradient-premium", action: () => setShowBoost(true) },
+                { icon: Camera, label: "Add Portfolio", desc: "Showcase your work", gradient: "bg-secondary", action: () => setTab("portfolio") },
               ].map((a) => (
-                <button key={a.label} onClick={(a as any).action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
+                <button key={a.label} onClick={a.action} className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
                   <div className={`w-10 h-10 rounded-xl ${a.gradient} flex items-center justify-center`}>
                     <a.icon className="w-5 h-5 text-primary-foreground" />
                   </div>
@@ -224,10 +252,16 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                     <span className="text-xs font-bold text-foreground">{b.amount}</span>
                   </div>
                   <div className="flex gap-2 mt-3">
-                    <button className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold">
+                    <button
+                      onClick={() => window.dispatchEvent(new CustomEvent("open-service-chat", { detail: { name: b.client, avatar: "👤" } }))}
+                      className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold active:scale-[0.98] transition-transform"
+                    >
                       <MessageCircle className="w-3 h-3 inline mr-1" /> Chat
                     </button>
-                    <button className="flex-1 py-2 rounded-lg bg-secondary text-foreground text-xs font-semibold">
+                    <button
+                      onClick={() => setTab("bookings")}
+                      className="flex-1 py-2 rounded-lg bg-secondary text-foreground text-xs font-semibold active:scale-[0.98] transition-transform"
+                    >
                       View Details
                     </button>
                   </div>
