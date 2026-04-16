@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench, Sparkles, Building2 } from "lucide-react";
+import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench, Sparkles, Building2, X } from "lucide-react";
 import { useState, useMemo } from "react";
 
 import PropertyCard from "./PropertyCard";
@@ -224,6 +224,67 @@ const HomeFeed = () => {
             )}
           </button>
         </div>
+
+        {/* Active Filter Chips */}
+        {(commCategory !== "All" || county || filters.commercialTypes.length > 0 || filters.bedrooms.length > 0 || filters.amenities.length > 0 || filters.verified || filters.furnished) && (
+          <div className="flex gap-1.5 mt-2.5 overflow-x-auto scrollbar-none">
+            {commCategory !== "All" && (
+              <button
+                onClick={() => setCommCategory("All")}
+                className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/15 text-primary text-[11px] font-semibold animate-scale-in"
+              >
+                {commCategory.replace(/_/g, " ")}
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            {county && (
+              <button
+                onClick={() => { setCounty(""); setSubcounty(""); setWard(""); setEstate(""); }}
+                className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/15 text-primary text-[11px] font-semibold animate-scale-in"
+              >
+                {estate || county}
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            {filters.commercialTypes.map((t) => (
+              <button
+                key={t}
+                onClick={() => setFilters(f => ({ ...f, commercialTypes: f.commercialTypes.filter(x => x !== t) }))}
+                className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/20 text-accent-foreground text-[11px] font-semibold animate-scale-in capitalize"
+              >
+                {t.replace(/_/g, " ")}
+                <X className="w-3 h-3" />
+              </button>
+            ))}
+            {filters.bedrooms.length > 0 && (
+              <button
+                onClick={() => setFilters(f => ({ ...f, bedrooms: [] }))}
+                className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold animate-scale-in"
+              >
+                {filters.bedrooms.join(",")} Bed
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            {filters.verified && (
+              <button
+                onClick={() => setFilters(f => ({ ...f, verified: false }))}
+                className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold animate-scale-in"
+              >
+                Verified
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            {filters.furnished && (
+              <button
+                onClick={() => setFilters(f => ({ ...f, furnished: false }))}
+                className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold animate-scale-in"
+              >
+                Furnished
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div className="flex gap-2 mt-3">
