@@ -15,7 +15,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 
-const segments = ["Rentals", "Short Stays", "Commercial", "Corporate Stay", "Services"] as const;
+const segments = ["Rentals", "Short Stays", "Business Spaces", "Corporate Stay", "Services"] as const;
 
 const HomeFeed = () => {
   const [segment, setSegment] = useState<(typeof segments)[number]>("Rentals");
