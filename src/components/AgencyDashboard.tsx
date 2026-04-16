@@ -112,7 +112,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                 { name: "30-Day Boost", price: "KES 3,000", desc: "Featured agency + badge" },
                 { name: "90-Day Boost", price: "KES 7,500", desc: "Top placement + priority leads" },
               ].map((b) => (
-                <button key={b.name} onClick={() => { setShowBoost(false); setShowPayment(true); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
+                <button key={b.name} onClick={() => { setShowBoost(false); setShowPayment(true); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
                   <div>
                     <p className="text-sm font-semibold text-left">{b.name}</p>
                     <p className="text-xs text-muted-foreground">{b.desc}</p>
