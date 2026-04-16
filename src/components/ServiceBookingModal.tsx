@@ -23,6 +23,9 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [step, setStep] = useState<BookingStep>("details");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
 
   // Simulate provider acceptance
   useEffect(() => {
