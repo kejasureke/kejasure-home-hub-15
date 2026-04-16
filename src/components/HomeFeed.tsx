@@ -178,7 +178,9 @@ const HomeFeed = () => {
         {(() => {
           const hour = new Date().getHours();
           const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
-          const tagline = hour < 12
+          const tagline = hour < 6
+            ? "Up early? Catch the best deals 🌅"
+            : hour < 12
             ? "Start your day with fresh listings ☀️"
             : hour < 17
             ? "Great spaces are waiting for you 🏡"
