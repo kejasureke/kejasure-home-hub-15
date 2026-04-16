@@ -21,6 +21,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
   const [step, setStep] = useState<BookingStep>("details");
 
   // Simulate provider acceptance
