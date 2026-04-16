@@ -312,7 +312,7 @@ const HomeFeed = () => {
           {segments.map((seg) => (
             <button
               key={seg}
-              onClick={() => setSegment(seg)}
+              onClick={() => { setSegment(seg); if (seg !== "Business Spaces") setCommCategory("All"); }}
               className={`flex-1 py-2 rounded-lg text-[10px] leading-tight font-semibold transition-all duration-200 text-center ${
                 segment === seg
                   ? "bg-card card-shadow text-foreground"
