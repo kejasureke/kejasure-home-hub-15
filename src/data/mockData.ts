@@ -7,7 +7,7 @@ export interface Property {
   id: string;
   title: string;
   type: "rental" | "shortstay" | "commercial";
-  commercialType?: "shop" | "office" | "godown" | "warehouse" | "showroom";
+  commercialType?: "shop" | "office" | "godown" | "warehouse" | "showroom" | "clinic" | "hotel" | "restaurant" | "salon" | "pharmacy" | "gym" | "school" | "church" | "petrol_station" | "bar" | "club" | "supermarket" | "hardware" | "garage" | "studio" | "coworking";
   sizeSqft?: string;
   county: string;
   subcounty: string;

@@ -51,10 +51,26 @@ const commercialAmenities = [
 ];
 
 const commercialTypeOptions = [
-  { value: "shop", label: "Shop", icon: "🏪" },
+  { value: "shop", label: "Shop / Retail", icon: "🏪" },
   { value: "office", label: "Office", icon: "🏢" },
   { value: "godown", label: "Godown / Warehouse", icon: "🏭" },
   { value: "showroom", label: "Showroom", icon: "🏬" },
+  { value: "clinic", label: "Clinic / Medical", icon: "🏥" },
+  { value: "hotel", label: "Hotel / Lodge", icon: "🏨" },
+  { value: "restaurant", label: "Restaurant / Eatery", icon: "🍽️" },
+  { value: "salon", label: "Salon / Barbershop", icon: "💇" },
+  { value: "pharmacy", label: "Pharmacy", icon: "💊" },
+  { value: "gym", label: "Gym / Fitness", icon: "🏋️" },
+  { value: "school", label: "School / Academy", icon: "🏫" },
+  { value: "church", label: "Church / Worship", icon: "⛪" },
+  { value: "petrol_station", label: "Petrol Station", icon: "⛽" },
+  { value: "bar", label: "Bar / Pub", icon: "🍺" },
+  { value: "club", label: "Club / Lounge", icon: "🎵" },
+  { value: "supermarket", label: "Supermarket", icon: "🛒" },
+  { value: "hardware", label: "Hardware Store", icon: "🔧" },
+  { value: "garage", label: "Garage / Workshop", icon: "🔩" },
+  { value: "studio", label: "Studio Space", icon: "🎨" },
+  { value: "coworking", label: "Co-Working", icon: "💻" },
 ];
 
 const sortOptions = [
