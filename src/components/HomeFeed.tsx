@@ -75,10 +75,11 @@ const HomeFeed = () => {
       const matchFurnished = !filters.furnished || p.furnished;
       const matchPets = !filters.petFriendly || p.petFriendly;
       const matchCommType = filters.commercialTypes.length === 0 || (p.commercialType && filters.commercialTypes.includes(p.commercialType));
+      const matchCommCategory = commCategory === "All" || p.commercialType === commCategory;
       const parseSqft = (s?: string) => parseInt((s || "0").replace(/,/g, ""), 10) || 0;
       const sqft = parseSqft(p.sizeSqft);
       const matchSqft = filters.minSqft === 0 && filters.maxSqft >= 100000 || !p.sizeSqft || (sqft >= filters.minSqft && sqft <= filters.maxSqft);
-      return matchType && matchCounty && matchEstate && matchSearch && matchPrice && matchBedrooms && matchAmenities && matchVerified && matchSmileId && matchFurnished && matchPets && matchCommType && matchSqft;
+      return matchType && matchCounty && matchEstate && matchSearch && matchPrice && matchBedrooms && matchAmenities && matchVerified && matchSmileId && matchFurnished && matchPets && matchCommType && matchCommCategory && matchSqft;
     });
 
     // Sort
