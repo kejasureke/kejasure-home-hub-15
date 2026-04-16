@@ -434,6 +434,14 @@ const HomeFeed = () => {
                 { value: "Plumbers", icon: "🔧", label: "Plumbers" },
                 { value: "Internet Installers", icon: "📡", label: "Internet" },
                 { value: "Security", icon: "🛡️", label: "Security" },
+                { value: "Painters", icon: "🎨", label: "Painters" },
+                { value: "Fumigators", icon: "🪲", label: "Fumigators" },
+                { value: "Carpenters", icon: "🪚", label: "Carpenters" },
+                { value: "Gardeners", icon: "🌿", label: "Gardeners" },
+                { value: "AC Repair", icon: "❄️", label: "AC Repair" },
+                { value: "Locksmiths", icon: "🔑", label: "Locksmiths" },
+                { value: "Welders", icon: "🔥", label: "Welders" },
+                { value: "Masons", icon: "🧱", label: "Masons" },
               ].map((cat) => (
                 <button
                   key={cat.value}
