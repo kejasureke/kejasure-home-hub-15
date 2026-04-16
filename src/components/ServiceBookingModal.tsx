@@ -39,6 +39,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
     const progressTimer = setInterval(() => setSubmitProgress((p) => Math.min(p + 5, 100)), 90);
     const stepTimer = setInterval(() => setSubmitStep((s) => Math.min(s + 1, submitSteps.length - 1)), 700);
     const completeTimer = setTimeout(() => {
+      if (navigator.vibrate) navigator.vibrate([50, 30, 100]);
       setStep("pending");
       pushGlobalAlert({
         type: "booking",
