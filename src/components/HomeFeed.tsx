@@ -218,13 +218,19 @@ const HomeFeed = () => {
             <button
               key={seg}
               onClick={() => setSegment(seg)}
-              className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              className={`flex-1 py-2 rounded-lg text-[10px] leading-tight font-semibold transition-all duration-200 text-center ${
                 segment === seg
                   ? "bg-card card-shadow text-foreground"
                   : "text-muted-foreground"
               }`}
             >
-              {seg}
+              {seg.includes(" ") ? (
+                <>
+                  {seg.split(" ")[0]}
+                  <br />
+                  {seg.split(" ").slice(1).join(" ")}
+                </>
+              ) : seg}
             </button>
           ))}
         </div>
