@@ -178,6 +178,11 @@ const HomeFeed = () => {
         {(() => {
           const hour = new Date().getHours();
           const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+          const tagline = hour < 12
+            ? "Start your day with fresh listings ☀️"
+            : hour < 17
+            ? "Great spaces are waiting for you 🏡"
+            : "Wind down with great listings 🌙";
           const name = (() => { try { const n = localStorage.getItem("kejasure_first_name"); return n || "there"; } catch { return "there"; } })();
           return (
             <div className="mb-3 animate-fade-in">
@@ -185,7 +190,7 @@ const HomeFeed = () => {
                 {greeting}, {name}!{" "}
                 <span className="inline-block animate-[wave_1.5s_ease-in-out_infinite] origin-[70%_70%]">👋</span>
               </p>
-              <p className="text-xs text-white/70 mt-0.5">Find your perfect space today</p>
+              <p className="text-xs text-white/70 mt-0.5">{tagline}</p>
             </div>
           );
         })()}
