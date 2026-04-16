@@ -351,8 +351,40 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
           )}
 
           {step === "accepted" && (
-            <div className="py-6 space-y-5 animate-fade-in">
-              <div className="text-center">
+            <div className="py-6 space-y-5 animate-fade-in relative overflow-hidden">
+              {/* Confetti burst */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {Array.from({ length: 30 }).map((_, i) => {
+                  const colors = ["#1A6B3C", "#F5A623", "#4CAF50", "#FF6B6B", "#42A5F5", "#AB47BC", "#FF7043"];
+                  const color = colors[i % colors.length];
+                  const left = 10 + Math.random() * 80;
+                  const delay = Math.random() * 0.5;
+                  const duration = 1.5 + Math.random() * 1.5;
+                  const size = 4 + Math.random() * 6;
+                  const rotation = Math.random() * 360;
+                  const xDrift = -30 + Math.random() * 60;
+                  return (
+                    <div
+                      key={i}
+                      className="absolute animate-confetti-fall"
+                      style={{
+                        left: `${left}%`,
+                        top: "-10px",
+                        width: `${size}px`,
+                        height: `${size * (Math.random() > 0.5 ? 1 : 0.6)}px`,
+                        backgroundColor: color,
+                        borderRadius: Math.random() > 0.5 ? "50%" : "1px",
+                        animationDelay: `${delay}s`,
+                        animationDuration: `${duration}s`,
+                        transform: `rotate(${rotation}deg)`,
+                        ["--x-drift" as any]: `${xDrift}px`,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              <div className="text-center relative z-10">
                 <div className="w-20 h-20 rounded-full bg-trust/10 flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="w-10 h-10 text-trust" />
                 </div>
