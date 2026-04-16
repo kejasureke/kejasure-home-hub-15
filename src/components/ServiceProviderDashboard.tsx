@@ -96,7 +96,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                 { name: "7-Day Boost", price: "KES 400", desc: "5x more views + badge" },
                 { name: "30-Day Boost", price: "KES 1,200", desc: "10x views + featured" },
               ].map((b) => (
-                <button key={b.name} onClick={() => { setShowBoost(false); setShowPayment(true); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
+                <button key={b.name} onClick={() => { setShowBoost(false); setBoostProcessing(b.name); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
                   <div>
                     <p className="text-sm font-semibold">{b.name}</p>
                     <p className="text-xs text-muted-foreground">{b.desc}</p>
