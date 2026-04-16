@@ -178,7 +178,24 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               </div>
 
               <button
-                onClick={() => setStep("pending")}
+                onClick={() => {
+                  setStep("pending");
+                  pushGlobalAlert({
+                    type: "booking",
+                    title: "New booking request sent",
+                    body: `Your request to ${provider.name} for ${selectedDate ? format(selectedDate, "MMM d") : ""} at ${selectedTime} has been submitted.`,
+                    action: "open-dashboard",
+                  });
+                  // Simulate provider-side notification after a short delay
+                  setTimeout(() => {
+                    pushGlobalAlert({
+                      type: "booking",
+                      title: `Booking accepted by ${provider.name}`,
+                      body: `${provider.name} accepted your ${provider.category} booking. Contact details unlocked!`,
+                      action: "open-dashboard",
+                    });
+                  }, 3800);
+                }}
                 className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
               >
                 ✓ Send Booking Request
