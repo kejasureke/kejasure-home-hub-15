@@ -55,6 +55,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [showPayment, setShowPayment] = useState(false);
   const [providerType] = useState<ProviderType>("individual");
   const [showCRUD, setShowCRUD] = useState(false);
+  const [showBoost, setShowBoost] = useState(false);
 
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
