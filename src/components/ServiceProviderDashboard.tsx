@@ -514,6 +514,162 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           </div>
         )}
       </div>
+
+      {/* Add Project Modal */}
+      {showAddProject && (
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowAddProject(false)}>
+          <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">📸 Add Project</h3>
+              <button onClick={() => setShowAddProject(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Project Title</label>
+                <input
+                  value={newProjectTitle}
+                  onChange={(e) => setNewProjectTitle(e.target.value)}
+                  placeholder="e.g., Living Room Painting"
+                  className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  maxLength={100}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Category</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {["Plumbing", "Electrical", "Moving", "Cleaning", "Painting", "Carpentry", "Other"].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setNewProjectCategory(cat)}
+                      className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
+                        newProjectCategory === cat ? "gradient-trust text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block">Photos</label>
+                <div className="flex gap-2 flex-wrap">
+                  {newProjectPhotos.map((photo, i) => (
+                    <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden">
+                      <img src={photo} alt="" className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => setNewProjectPhotos((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center"
+                      >
+                        <X className="w-3 h-3 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => {
+                      // Simulate photo upload with random Unsplash images
+                      const mockPhotos = [
+                        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+                        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
+                        "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=400&h=300&fit=crop",
+                        "https://images.unsplash.com/photo-1560185008-b033106af5c8?w=400&h=300&fit=crop",
+                        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop",
+                      ];
+                      const available = mockPhotos.filter((p) => !newProjectPhotos.includes(p));
+                      if (available.length > 0) {
+                        setNewProjectPhotos((prev) => [...prev, available[Math.floor(Math.random() * available.length)]]);
+                        toast.success("Photo added!");
+                      }
+                    }}
+                    className="w-20 h-20 rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform"
+                  >
+                    <Camera className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-[9px] text-muted-foreground">Upload</span>
+                  </button>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">Add up to 5 photos of your work</p>
+              </div>
+              <button
+                onClick={() => {
+                  if (newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0) {
+                    setPortfolioItems((prev) => [
+                      {
+                        id: `p_${Date.now()}`,
+                        title: newProjectTitle.trim(),
+                        category: newProjectCategory,
+                        rating: 0,
+                        reviews: 0,
+                        photos: newProjectPhotos,
+                      },
+                      ...prev,
+                    ]);
+                    setNewProjectTitle("");
+                    setNewProjectCategory("");
+                    setNewProjectPhotos([]);
+                    setShowAddProject(false);
+                    toast.success("Project added!", { description: "Your portfolio has been updated." });
+                  }
+                }}
+                className={`w-full py-4 rounded-xl text-sm font-bold active:scale-[0.98] transition-transform ${
+                  newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0
+                    ? "gradient-trust text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                Add to Portfolio
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightboxPhoto && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90" onClick={() => setLightboxPhoto(null)}>
+          <button onClick={() => setLightboxPhoto(null)} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+            <X className="w-5 h-5 text-white" />
+          </button>
+          {lightboxPhotos.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newIdx = (lightboxIndex - 1 + lightboxPhotos.length) % lightboxPhotos.length;
+                  setLightboxIndex(newIdx);
+                  setLightboxPhoto(lightboxPhotos[newIdx]);
+                }}
+                className="absolute left-3 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+              >
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newIdx = (lightboxIndex + 1) % lightboxPhotos.length;
+                  setLightboxIndex(newIdx);
+                  setLightboxPhoto(lightboxPhotos[newIdx]);
+                }}
+                className="absolute right-3 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+              >
+                <ChevronRight className="w-5 h-5 text-white" />
+              </button>
+            </>
+          )}
+          <img
+            src={lightboxPhoto}
+            alt="Portfolio photo"
+            className="max-w-[90%] max-h-[80vh] object-contain rounded-xl animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="absolute bottom-6 flex items-center gap-1.5">
+            {lightboxPhotos.map((_, i) => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full transition-colors ${i === lightboxIndex ? "bg-white" : "bg-white/30"}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
