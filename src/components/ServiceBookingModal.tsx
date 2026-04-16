@@ -121,14 +121,30 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                   <MapPin className="w-4 h-4 text-primary" />
                   Service Location
                 </h4>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {["Kilimani", "Westlands", "Lavington", "South B", "South C", "Langata", "Karen", "Kileleshwa", "Parklands", "Embakasi", "Ruaka", "Ngong Rd"].map((area) => (
+                    <button
+                      key={area}
+                      type="button"
+                      onClick={() => setLocation(area)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors ${
+                        location === area
+                          ? "gradient-trust text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground"
+                      }`}
+                    >
+                      {area}
+                    </button>
+                  ))}
+                </div>
                 <input
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g., Kilimani, Argwings Kodhek Rd, Apt 4B"
+                  placeholder="Or type a specific address..."
                   className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                   maxLength={200}
                 />
-                <p className="text-[10px] text-muted-foreground mt-1">Where should the provider come?</p>
+                <p className="text-[10px] text-muted-foreground mt-1">Tap an area or type your full address</p>
               </div>
               <div className="flex gap-3">
                 <button
