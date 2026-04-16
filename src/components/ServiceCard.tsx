@@ -1,7 +1,8 @@
-import { Star, Clock, MapPin, MessageCircle, Calendar, ChevronDown, ChevronUp } from "lucide-react";
+import { Star, Clock, MapPin, MessageCircle, Calendar, ChevronDown, ChevronUp, Image } from "lucide-react";
 import { useState } from "react";
 import type { ServiceProvider } from "@/data/mockData";
 import ServiceBookingModal from "./ServiceBookingModal";
+import BeforeAfterSlider from "./BeforeAfterSlider";
 
 interface ServiceCardProps {
   provider: ServiceProvider;
@@ -10,11 +11,14 @@ interface ServiceCardProps {
 const ServiceCard = ({ provider }: ServiceCardProps) => {
   const [showBooking, setShowBooking] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
+  const [showPortfolio, setShowPortfolio] = useState(false);
+  const [activeProject, setActiveProject] = useState(0);
   const tierClass =
     provider.tier === "Premium" ? "tier-badge-premium" :
     provider.tier === "Pro" ? "tier-badge-pro" : "tier-badge-basic";
 
   const hasReviews = provider.recentReviews && provider.recentReviews.length > 0;
+  const hasPortfolio = provider.portfolio && provider.portfolio.length > 0;
 
   return (
     <>
