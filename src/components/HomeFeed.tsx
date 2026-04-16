@@ -270,6 +270,52 @@ const HomeFeed = () => {
         </div>
       </div>
 
+      {/* Business Spaces Category Carousel */}
+      {segment === "Business Spaces" && (
+        <div className="px-4 pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {[
+              { value: "All", icon: "🏢", label: "All" },
+              { value: "shop", icon: "🏪", label: "Shop" },
+              { value: "office", icon: "🏢", label: "Office" },
+              { value: "godown", icon: "🏭", label: "Godown" },
+              { value: "showroom", icon: "🏬", label: "Showroom" },
+              { value: "clinic", icon: "🏥", label: "Clinic" },
+              { value: "hotel", icon: "🏨", label: "Hotel" },
+              { value: "restaurant", icon: "🍽️", label: "Restaurant" },
+              { value: "salon", icon: "💇", label: "Salon" },
+              { value: "pharmacy", icon: "💊", label: "Pharmacy" },
+              { value: "gym", icon: "🏋️", label: "Gym" },
+              { value: "school", icon: "🏫", label: "School" },
+              { value: "church", icon: "⛪", label: "Church" },
+              { value: "petrol_station", icon: "⛽", label: "Petrol" },
+              { value: "bar", icon: "🍺", label: "Bar" },
+              { value: "club", icon: "🎵", label: "Club" },
+              { value: "supermarket", icon: "🛒", label: "Market" },
+              { value: "hardware", icon: "🔧", label: "Hardware" },
+              { value: "garage", icon: "🔩", label: "Garage" },
+              { value: "studio", icon: "🎨", label: "Studio" },
+              { value: "coworking", icon: "💻", label: "Co-Work" },
+            ].map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => setCommCategory(cat.value)}
+                className={`shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-center transition-all duration-200 ${
+                  commCategory === cat.value
+                    ? "bg-primary/15 ring-1 ring-primary/30 scale-105"
+                    : "bg-secondary hover:bg-secondary/80"
+                }`}
+              >
+                <span className="text-lg">{cat.icon}</span>
+                <span className={`text-[10px] font-semibold leading-none ${
+                  commCategory === cat.value ? "text-primary" : "text-muted-foreground"
+                }`}>{cat.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className="px-4">
         {segment === "Services" ? (
