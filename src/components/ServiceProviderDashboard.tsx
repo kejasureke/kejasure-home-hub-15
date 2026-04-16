@@ -252,10 +252,16 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                     <span className="text-xs font-bold text-foreground">{b.amount}</span>
                   </div>
                   <div className="flex gap-2 mt-3">
-                    <button className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold">
+                    <button
+                      onClick={() => window.dispatchEvent(new CustomEvent("open-service-chat", { detail: { name: b.client, avatar: "👤" } }))}
+                      className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold active:scale-[0.98] transition-transform"
+                    >
                       <MessageCircle className="w-3 h-3 inline mr-1" /> Chat
                     </button>
-                    <button className="flex-1 py-2 rounded-lg bg-secondary text-foreground text-xs font-semibold">
+                    <button
+                      onClick={() => setTab("bookings")}
+                      className="flex-1 py-2 rounded-lg bg-secondary text-foreground text-xs font-semibold active:scale-[0.98] transition-transform"
+                    >
                       View Details
                     </button>
                   </div>
