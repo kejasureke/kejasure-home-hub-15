@@ -1,6 +1,6 @@
 import { X, Clock, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon, MapPin, Star, Send } from "lucide-react";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -13,7 +13,7 @@ interface ServiceBookingModalProps {
   onChat: () => void;
 }
 
-type BookingStep = "details" | "confirm" | "pending" | "accepted" | "review" | "reviewed";
+type BookingStep = "details" | "confirm" | "submitting" | "pending" | "accepted" | "review" | "reviewed";
 
 const timeSlots = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 
@@ -26,6 +26,37 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
   const [reviewRating, setReviewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
+  const [submitProgress, setSubmitProgress] = useState(0);
+  const [submitStep, setSubmitStep] = useState(0);
+
+  const submitSteps = ["Validating booking details...", "Finding available slot...", "Sending request to provider..."];
+
+  // Submitting animation
+  useEffect(() => {
+    if (step !== "submitting") return;
+    setSubmitProgress(0);
+    setSubmitStep(0);
+    const progressTimer = setInterval(() => setSubmitProgress((p) => Math.min(p + 5, 100)), 90);
+    const stepTimer = setInterval(() => setSubmitStep((s) => Math.min(s + 1, submitSteps.length - 1)), 700);
+    const completeTimer = setTimeout(() => {
+      setStep("pending");
+      pushGlobalAlert({
+        type: "booking",
+        title: "New booking request sent",
+        body: `Your request to ${provider.name} for ${selectedDate ? format(selectedDate, "MMM d") : ""} at ${selectedTime} has been submitted.`,
+        action: "open-dashboard",
+      });
+      setTimeout(() => {
+        pushGlobalAlert({
+          type: "booking",
+          title: `Booking accepted by ${provider.name}`,
+          body: `${provider.name} accepted your ${provider.category} booking. Contact details unlocked!`,
+          action: "open-dashboard",
+        });
+      }, 3800);
+    }, 2200);
+    return () => { clearInterval(progressTimer); clearInterval(stepTimer); clearTimeout(completeTimer); };
+  }, [step]);
 
   // Simulate provider acceptance
   useEffect(() => {
@@ -218,24 +249,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               </div>
 
               <button
-                onClick={() => {
-                  setStep("pending");
-                  pushGlobalAlert({
-                    type: "booking",
-                    title: "New booking request sent",
-                    body: `Your request to ${provider.name} for ${selectedDate ? format(selectedDate, "MMM d") : ""} at ${selectedTime} has been submitted.`,
-                    action: "open-dashboard",
-                  });
-                  // Simulate provider-side notification after a short delay
-                  setTimeout(() => {
-                    pushGlobalAlert({
-                      type: "booking",
-                      title: `Booking accepted by ${provider.name}`,
-                      body: `${provider.name} accepted your ${provider.category} booking. Contact details unlocked!`,
-                      action: "open-dashboard",
-                    });
-                  }, 3800);
-                }}
+                onClick={() => setStep("submitting")}
                 className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
               >
                 ✓ Send Booking Request
@@ -246,6 +260,66 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               >
                 ← Go Back
               </button>
+            </div>
+          )}
+
+          {step === "submitting" && (
+            <div className="py-8 text-center space-y-5 animate-fade-in">
+              {/* Animated icon */}
+              <div className="relative w-20 h-20 mx-auto">
+                <div className="absolute inset-0 rounded-full border-3 border-primary/20" />
+                <div className="absolute inset-0 rounded-full border-3 border-transparent border-t-trust animate-spin" style={{ animationDuration: "1s" }} />
+                <div className="absolute inset-2 rounded-full bg-trust/10 flex items-center justify-center">
+                  <Send className="w-8 h-8 text-trust animate-pulse" />
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-bold mb-1">Submitting Request</h4>
+                <p className="text-sm text-muted-foreground">Connecting you with {provider.name}…</p>
+              </div>
+
+              {/* Progress bar */}
+              <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className="h-full rounded-full gradient-trust transition-all duration-200 ease-out"
+                  style={{ width: `${submitProgress}%` }}
+                />
+              </div>
+
+              {/* Animated steps */}
+              <div className="space-y-2 text-left px-4">
+                {submitSteps.map((s, i) => (
+                  <div
+                    key={s}
+                    className={`flex items-center gap-2 text-xs transition-all duration-300 ${
+                      i <= submitStep ? "opacity-100" : "opacity-0 translate-y-2"
+                    }`}
+                  >
+                    {i < submitStep ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-trust shrink-0" />
+                    ) : i === submitStep ? (
+                      <div className="w-3.5 h-3.5 rounded-full border-2 border-primary border-t-transparent animate-spin shrink-0" />
+                    ) : (
+                      <div className="w-3.5 h-3.5 shrink-0" />
+                    )}
+                    <span className={i <= submitStep ? "text-foreground font-medium" : "text-muted-foreground"}>
+                      {s}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bouncing dots */}
+              <div className="flex items-center justify-center gap-1.5">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full bg-trust animate-bounce"
+                    style={{ animationDelay: `${i * 0.15}s`, animationDuration: "0.8s" }}
+                  />
+                ))}
+              </div>
             </div>
           )}
 
