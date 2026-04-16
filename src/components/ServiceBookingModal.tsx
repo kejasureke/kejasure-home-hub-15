@@ -1,5 +1,9 @@
-import { X, Calendar, Clock, MapPin, ChevronRight, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck } from "lucide-react";
+import { X, Clock, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon } from "lucide-react";
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import type { ServiceProvider } from "@/data/mockData";
 
 interface ServiceBookingModalProps {
@@ -13,20 +17,10 @@ type BookingStep = "details" | "confirm" | "pending" | "accepted";
 const timeSlots = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 
 const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalProps) => {
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [description, setDescription] = useState("");
   const [step, setStep] = useState<BookingStep>("details");
-
-  const dates = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    return {
-      label: i === 0 ? "Today" : i === 1 ? "Tomorrow" : d.toLocaleDateString("en-KE", { weekday: "short" }),
-      date: d.toLocaleDateString("en-KE", { month: "short", day: "numeric" }),
-      value: d.toISOString().split("T")[0],
-    };
-  });
 
   // Simulate provider acceptance
   useEffect(() => {
@@ -65,22 +59,27 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               {/* Select Date */}
               <div>
                 <h4 className="text-sm font-semibold mb-3">Select Date</h4>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-                  {dates.map((d) => (
-                    <button
-                      key={d.value}
-                      onClick={() => setSelectedDate(d.value)}
-                      className={`shrink-0 w-16 py-3 rounded-xl text-center transition-colors ${
-                        selectedDate === d.value
-                          ? "gradient-trust text-primary-foreground"
-                          : "bg-secondary text-secondary-foreground"
-                      }`}
-                    >
-                      <p className="text-[10px] font-medium">{d.label}</p>
-                      <p className="text-xs font-semibold mt-0.5">{d.date}</p>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className={cn(
+                      "w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm text-left transition-colors",
+                      selectedDate ? "bg-trust/10 text-foreground font-medium" : "bg-secondary text-muted-foreground"
+                    )}>
+                      <CalendarIcon className="w-4 h-4 shrink-0" />
+                      {selectedDate ? format(selectedDate, "EEEE, MMMM d, yyyy") : "Pick a date"}
                     </button>
-                  ))}
-                </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 z-[70]" align="center">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Select Time */}
@@ -152,7 +151,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Date</span>
-                    <span className="font-medium">{dates.find(d => d.value === selectedDate)?.date}</span>
+                    <span className="font-medium">{selectedDate ? format(selectedDate, "MMM d") : ""}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Time</span>
@@ -204,7 +203,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               <div className="p-4 rounded-2xl bg-secondary">
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span className="text-muted-foreground">Date</span>
-                  <span className="font-medium">{dates.find(d => d.value === selectedDate)?.date}</span>
+                  <span className="font-medium">{selectedDate ? format(selectedDate, "MMM d") : ""}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Time</span>
@@ -236,7 +235,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Date</span>
-                    <span className="font-medium">{dates.find(d => d.value === selectedDate)?.date}</span>
+                    <span className="font-medium">{selectedDate ? format(selectedDate, "MMM d") : ""}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Time</span>
