@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight, ChevronLeft,
-  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight
+  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight, Pencil
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
@@ -99,6 +99,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
     beforeAfter?: { before: string; after: string };
   }>>(initialPortfolio);
   const [showAddProject, setShowAddProject] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectCategory, setNewProjectCategory] = useState("");
   const [newProjectPhotos, setNewProjectPhotos] = useState<string[]>([]);
@@ -108,6 +109,45 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
   const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const resetProjectForm = () => {
+    setNewProjectTitle("");
+    setNewProjectCategory("");
+    setNewProjectPhotos([]);
+    setIncludeBeforeAfter(false);
+    setBeforePhoto(null);
+    setAfterPhoto(null);
+    setEditingId(null);
+  };
+
+  const closeProjectModal = () => {
+    setShowAddProject(false);
+    resetProjectForm();
+  };
+
+  const openEditProject = (id: string) => {
+    const project = portfolioItems.find((p) => p.id === id);
+    if (!project) return;
+    setEditingId(id);
+    setNewProjectTitle(project.title);
+    setNewProjectCategory(project.category);
+    setNewProjectPhotos(project.photos);
+    if (project.beforeAfter) {
+      setIncludeBeforeAfter(true);
+      setBeforePhoto(project.beforeAfter.before);
+      setAfterPhoto(project.beforeAfter.after);
+    } else {
+      setIncludeBeforeAfter(false);
+      setBeforePhoto(null);
+      setAfterPhoto(null);
+    }
+    setShowAddProject(true);
+  };
+
+  const openAddProject = () => {
+    resetProjectForm();
+    setShowAddProject(true);
+  };
 
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
@@ -351,7 +391,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           <div className="pb-8">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold">Your Work</h3>
-              <button onClick={() => setShowAddProject(true)} className="text-xs font-semibold text-primary flex items-center gap-1 active:scale-95 transition-transform">
+              <button onClick={openAddProject} className="text-xs font-semibold text-primary flex items-center gap-1 active:scale-95 transition-transform">
                 <Plus className="w-3.5 h-3.5" /> Add Project
               </button>
             </div>
@@ -409,8 +449,19 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                           <span className="text-xs font-semibold">{p.rating}</span>
                         </div>
                         <button
-                          onClick={() => setPortfolioItems((prev) => prev.filter((item) => item.id !== p.id))}
+                          onClick={() => openEditProject(p.id)}
+                          className="p-1 rounded-lg bg-primary/10 active:scale-90 transition-transform"
+                          aria-label="Edit project"
+                        >
+                          <Pencil className="w-3 h-3 text-primary" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setPortfolioItems((prev) => prev.filter((item) => item.id !== p.id));
+                            toast.success("Project deleted");
+                          }}
                           className="p-1 rounded-lg bg-destructive/10 active:scale-90 transition-transform"
+                          aria-label="Delete project"
                         >
                           <Trash2 className="w-3 h-3 text-destructive" />
                         </button>
@@ -552,13 +603,13 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
         )}
       </div>
 
-      {/* Add Project Modal */}
+      {/* Add / Edit Project Modal */}
       {showAddProject && (
-        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowAddProject(false)}>
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={closeProjectModal}>
           <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">📸 Add Project</h3>
-              <button onClick={() => setShowAddProject(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+              <h3 className="text-lg font-bold">{editingId ? "✏️ Edit Project" : "📸 Add Project"}</h3>
+              <button onClick={closeProjectModal}><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
             <div className="space-y-4">
               <div>
@@ -730,11 +781,33 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
 
               <button
                 onClick={() => {
-                  if (newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0) {
-                    if (includeBeforeAfter && (!beforePhoto || !afterPhoto)) {
-                      toast.error("Add both Before and After photos", { description: "Or turn off the comparison toggle." });
-                      return;
-                    }
+                  if (!(newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0)) return;
+                  if (includeBeforeAfter && (!beforePhoto || !afterPhoto)) {
+                    toast.error("Add both Before and After photos", { description: "Or turn off the comparison toggle." });
+                    return;
+                  }
+                  const beforeAfterField = includeBeforeAfter && beforePhoto && afterPhoto
+                    ? { beforeAfter: { before: beforePhoto, after: afterPhoto } }
+                    : {};
+
+                  if (editingId) {
+                    setPortfolioItems((prev) =>
+                      prev.map((item) =>
+                        item.id === editingId
+                          ? {
+                              ...item,
+                              title: newProjectTitle.trim(),
+                              category: newProjectCategory,
+                              photos: newProjectPhotos,
+                              beforeAfter: includeBeforeAfter && beforePhoto && afterPhoto
+                                ? { before: beforePhoto, after: afterPhoto }
+                                : undefined,
+                            }
+                          : item
+                      )
+                    );
+                    toast.success("Project updated!", { description: "Your changes have been saved." });
+                  } else {
                     setPortfolioItems((prev) => [
                       {
                         id: `p_${Date.now()}`,
@@ -743,21 +816,13 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                         rating: 0,
                         reviews: 0,
                         photos: newProjectPhotos,
-                        ...(includeBeforeAfter && beforePhoto && afterPhoto
-                          ? { beforeAfter: { before: beforePhoto, after: afterPhoto } }
-                          : {}),
+                        ...beforeAfterField,
                       },
                       ...prev,
                     ]);
-                    setNewProjectTitle("");
-                    setNewProjectCategory("");
-                    setNewProjectPhotos([]);
-                    setIncludeBeforeAfter(false);
-                    setBeforePhoto(null);
-                    setAfterPhoto(null);
-                    setShowAddProject(false);
                     toast.success("Project added!", { description: "Your portfolio has been updated." });
                   }
+                  closeProjectModal();
                 }}
                 className={`w-full py-4 rounded-xl text-sm font-bold active:scale-[0.98] transition-transform ${
                   newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0
@@ -765,7 +830,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                     : "bg-muted text-muted-foreground"
                 }`}
               >
-                Add to Portfolio
+                {editingId ? "Save Changes" : "Add to Portfolio"}
               </button>
             </div>
           </div>
