@@ -99,6 +99,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
     beforeAfter?: { before: string; after: string };
   }>>(initialPortfolio);
   const [showAddProject, setShowAddProject] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectCategory, setNewProjectCategory] = useState("");
   const [newProjectPhotos, setNewProjectPhotos] = useState<string[]>([]);
