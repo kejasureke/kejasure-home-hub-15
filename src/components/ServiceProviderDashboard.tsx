@@ -449,8 +449,19 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                           <span className="text-xs font-semibold">{p.rating}</span>
                         </div>
                         <button
-                          onClick={() => setPortfolioItems((prev) => prev.filter((item) => item.id !== p.id))}
+                          onClick={() => openEditProject(p.id)}
+                          className="p-1 rounded-lg bg-primary/10 active:scale-90 transition-transform"
+                          aria-label="Edit project"
+                        >
+                          <Pencil className="w-3 h-3 text-primary" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setPortfolioItems((prev) => prev.filter((item) => item.id !== p.id));
+                            toast.success("Project deleted");
+                          }}
                           className="p-1 rounded-lg bg-destructive/10 active:scale-90 transition-transform"
+                          aria-label="Delete project"
                         >
                           <Trash2 className="w-3 h-3 text-destructive" />
                         </button>
