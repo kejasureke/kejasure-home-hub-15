@@ -391,7 +391,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           <div className="pb-8">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold">Your Work</h3>
-              <button onClick={() => setShowAddProject(true)} className="text-xs font-semibold text-primary flex items-center gap-1 active:scale-95 transition-transform">
+              <button onClick={openAddProject} className="text-xs font-semibold text-primary flex items-center gap-1 active:scale-95 transition-transform">
                 <Plus className="w-3.5 h-3.5" /> Add Project
               </button>
             </div>
