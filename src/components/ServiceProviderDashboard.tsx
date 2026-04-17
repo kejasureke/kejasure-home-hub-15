@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight, ChevronLeft,
-  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2
+  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
@@ -692,12 +692,28 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
 
                     {beforePhoto && afterPhoto ? (
                       <div>
-                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Live Preview</p>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Live Preview</p>
+                          <button
+                            onClick={() => {
+                              const prevBefore = beforePhoto;
+                              setBeforePhoto(afterPhoto);
+                              setAfterPhoto(prevBefore);
+                              toast.success("Photos swapped", { description: "Before and After are now reversed." });
+                            }}
+                            className="flex items-center gap-1 px-2 py-1 rounded-full bg-card border border-border active:scale-95 transition-transform"
+                            aria-label="Swap before and after"
+                          >
+                            <ArrowLeftRight className="w-3 h-3 text-primary" />
+                            <span className="text-[10px] font-semibold text-foreground">Swap</span>
+                          </button>
+                        </div>
                         <BeforeAfterSlider
                           beforeImage={beforePhoto}
                           afterImage={afterPhoto}
                           height="h-32"
                         />
+                        <p className="text-[10px] text-muted-foreground mt-1.5 text-center">Tap Swap to reverse Before / After</p>
                       </div>
                     ) : (
                       <p className="text-[10px] text-muted-foreground">Add both photos to enable the comparison slider.</p>
