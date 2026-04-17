@@ -781,11 +781,33 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
 
               <button
                 onClick={() => {
-                  if (newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0) {
-                    if (includeBeforeAfter && (!beforePhoto || !afterPhoto)) {
-                      toast.error("Add both Before and After photos", { description: "Or turn off the comparison toggle." });
-                      return;
-                    }
+                  if (!(newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0)) return;
+                  if (includeBeforeAfter && (!beforePhoto || !afterPhoto)) {
+                    toast.error("Add both Before and After photos", { description: "Or turn off the comparison toggle." });
+                    return;
+                  }
+                  const beforeAfterField = includeBeforeAfter && beforePhoto && afterPhoto
+                    ? { beforeAfter: { before: beforePhoto, after: afterPhoto } }
+                    : {};
+
+                  if (editingId) {
+                    setPortfolioItems((prev) =>
+                      prev.map((item) =>
+                        item.id === editingId
+                          ? {
+                              ...item,
+                              title: newProjectTitle.trim(),
+                              category: newProjectCategory,
+                              photos: newProjectPhotos,
+                              beforeAfter: includeBeforeAfter && beforePhoto && afterPhoto
+                                ? { before: beforePhoto, after: afterPhoto }
+                                : undefined,
+                            }
+                          : item
+                      )
+                    );
+                    toast.success("Project updated!", { description: "Your changes have been saved." });
+                  } else {
                     setPortfolioItems((prev) => [
                       {
                         id: `p_${Date.now()}`,
@@ -794,21 +816,13 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                         rating: 0,
                         reviews: 0,
                         photos: newProjectPhotos,
-                        ...(includeBeforeAfter && beforePhoto && afterPhoto
-                          ? { beforeAfter: { before: beforePhoto, after: afterPhoto } }
-                          : {}),
+                        ...beforeAfterField,
                       },
                       ...prev,
                     ]);
-                    setNewProjectTitle("");
-                    setNewProjectCategory("");
-                    setNewProjectPhotos([]);
-                    setIncludeBeforeAfter(false);
-                    setBeforePhoto(null);
-                    setAfterPhoto(null);
-                    setShowAddProject(false);
                     toast.success("Project added!", { description: "Your portfolio has been updated." });
                   }
+                  closeProjectModal();
                 }}
                 className={`w-full py-4 rounded-xl text-sm font-bold active:scale-[0.98] transition-transform ${
                   newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0
@@ -816,7 +830,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                     : "bg-muted text-muted-foreground"
                 }`}
               >
-                Add to Portfolio
+                {editingId ? "Save Changes" : "Add to Portfolio"}
               </button>
             </div>
           </div>
