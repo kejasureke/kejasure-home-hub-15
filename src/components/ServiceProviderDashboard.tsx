@@ -773,7 +773,14 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
       )}
 
       {/* Lightbox */}
-      {lightboxPhoto && (
+      {lightboxPhoto && (() => {
+        const matchingProject = portfolioItems.find(
+          (p) => p.beforeAfter && (p.beforeAfter.before === lightboxPhoto || p.beforeAfter.after === lightboxPhoto)
+        );
+        const baRole = matchingProject
+          ? matchingProject.beforeAfter!.before === lightboxPhoto ? "Before" : "After"
+          : null;
+        return (
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90" onClick={() => setLightboxPhoto(null)}>
           <button onClick={() => setLightboxPhoto(null)} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
             <X className="w-5 h-5 text-white" />
