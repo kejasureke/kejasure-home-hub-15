@@ -603,13 +603,13 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
         )}
       </div>
 
-      {/* Add Project Modal */}
+      {/* Add / Edit Project Modal */}
       {showAddProject && (
-        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowAddProject(false)}>
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={closeProjectModal}>
           <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">📸 Add Project</h3>
-              <button onClick={() => setShowAddProject(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+              <h3 className="text-lg font-bold">{editingId ? "✏️ Edit Project" : "📸 Add Project"}</h3>
+              <button onClick={closeProjectModal}><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
             <div className="space-y-4">
               <div>
