@@ -1,4 +1,4 @@
-import { Star, Clock, MapPin, MessageCircle, Calendar, ChevronDown, ChevronUp, Image } from "lucide-react";
+import { Star, Clock, MapPin, MessageCircle, Calendar, ChevronDown, ChevronUp, Image, ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
 import type { ServiceProvider } from "@/data/mockData";
 import ServiceBookingModal from "./ServiceBookingModal";
@@ -117,12 +117,13 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
                       <button
                         key={i}
                         onClick={() => setActiveProject(i)}
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium whitespace-nowrap transition-colors ${
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium whitespace-nowrap transition-colors flex items-center gap-1 ${
                           i === activeProject
                             ? "bg-primary text-primary-foreground"
                             : "bg-secondary text-muted-foreground"
                         }`}
                       >
+                        {p.beforeAfter && <ArrowLeftRight className="w-2.5 h-2.5" />}
                         {p.title}
                       </button>
                     ))}
@@ -135,7 +136,15 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
                   return (
                     <div>
                       {provider.portfolio.length <= 1 && (
-                        <p className="text-[10px] font-semibold text-foreground mb-1.5">{project.title}</p>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <p className="text-[10px] font-semibold text-foreground">{project.title}</p>
+                          {project.beforeAfter && (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-bold">
+                              <ArrowLeftRight className="w-2.5 h-2.5" />
+                              Before/After
+                            </span>
+                          )}
+                        </div>
                       )}
                       {project.beforeAfter ? (
                         <BeforeAfterSlider
