@@ -1,4 +1,4 @@
-import { Star, Clock, MapPin, MessageCircle, Calendar, ChevronDown, ChevronUp, Image } from "lucide-react";
+import { Star, Clock, MapPin, MessageCircle, Calendar, ChevronDown, ChevronUp, Image, ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
 import type { ServiceProvider } from "@/data/mockData";
 import ServiceBookingModal from "./ServiceBookingModal";
