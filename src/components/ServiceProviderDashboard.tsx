@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight, ChevronLeft,
-  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2
+  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
