@@ -773,7 +773,14 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
       )}
 
       {/* Lightbox */}
-      {lightboxPhoto && (
+      {lightboxPhoto && (() => {
+        const matchingProject = portfolioItems.find(
+          (p) => p.beforeAfter && (p.beforeAfter.before === lightboxPhoto || p.beforeAfter.after === lightboxPhoto)
+        );
+        const baRole = matchingProject
+          ? matchingProject.beforeAfter!.before === lightboxPhoto ? "Before" : "After"
+          : null;
+        return (
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90" onClick={() => setLightboxPhoto(null)}>
           <button onClick={() => setLightboxPhoto(null)} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
             <X className="w-5 h-5 text-white" />
@@ -810,6 +817,15 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
             className="max-w-[90%] max-h-[80vh] object-contain rounded-xl animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           />
+          {baRole && (
+            <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/90 backdrop-blur-sm shadow-lg animate-fade-in">
+              <ArrowLeftRight className="w-3 h-3 text-primary-foreground" />
+              <span className="text-[11px] font-bold text-primary-foreground">{baRole}</span>
+              {matchingProject && (
+                <span className="text-[10px] font-medium text-primary-foreground/80 ml-1 max-w-[140px] truncate">· {matchingProject.title}</span>
+              )}
+            </div>
+          )}
           <div className="absolute bottom-6 flex items-center gap-1.5">
             {lightboxPhotos.map((_, i) => (
               <div
@@ -819,7 +835,8 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
             ))}
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 };
