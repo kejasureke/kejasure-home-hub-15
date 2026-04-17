@@ -110,6 +110,45 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
+  const resetProjectForm = () => {
+    setNewProjectTitle("");
+    setNewProjectCategory("");
+    setNewProjectPhotos([]);
+    setIncludeBeforeAfter(false);
+    setBeforePhoto(null);
+    setAfterPhoto(null);
+    setEditingId(null);
+  };
+
+  const closeProjectModal = () => {
+    setShowAddProject(false);
+    resetProjectForm();
+  };
+
+  const openEditProject = (id: string) => {
+    const project = portfolioItems.find((p) => p.id === id);
+    if (!project) return;
+    setEditingId(id);
+    setNewProjectTitle(project.title);
+    setNewProjectCategory(project.category);
+    setNewProjectPhotos(project.photos);
+    if (project.beforeAfter) {
+      setIncludeBeforeAfter(true);
+      setBeforePhoto(project.beforeAfter.before);
+      setAfterPhoto(project.beforeAfter.after);
+    } else {
+      setIncludeBeforeAfter(false);
+      setBeforePhoto(null);
+      setAfterPhoto(null);
+    }
+    setShowAddProject(true);
+  };
+
+  const openAddProject = () => {
+    resetProjectForm();
+    setShowAddProject(true);
+  };
+
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
 
