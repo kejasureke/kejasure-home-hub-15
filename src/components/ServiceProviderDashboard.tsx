@@ -611,9 +611,100 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1">Add up to 5 photos of your work</p>
               </div>
+
+              {/* Before / After section */}
+              <div className="rounded-2xl border border-border bg-secondary/40 p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground block">Before / After Comparison</label>
+                    <p className="text-[10px] text-muted-foreground">Show the transformation with a slider</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIncludeBeforeAfter((v) => !v);
+                      if (includeBeforeAfter) {
+                        setBeforePhoto(null);
+                        setAfterPhoto(null);
+                      }
+                    }}
+                    className={`relative w-10 h-6 rounded-full transition-colors ${includeBeforeAfter ? "bg-primary" : "bg-muted"}`}
+                    aria-label="Toggle before/after"
+                  >
+                    <span
+                      className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+                        includeBeforeAfter ? "translate-x-[18px]" : "translate-x-0.5"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {includeBeforeAfter && (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      {([
+                        { label: "Before", photo: beforePhoto, setter: setBeforePhoto, mocks: [
+                          "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop",
+                          "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400&h=300&fit=crop",
+                          "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&h=300&fit=crop",
+                        ] },
+                        { label: "After", photo: afterPhoto, setter: setAfterPhoto, mocks: [
+                          "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop",
+                          "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop",
+                          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop",
+                        ] },
+                      ] as const).map((slot) => (
+                        <div key={slot.label}>
+                          <p className="text-[10px] font-semibold text-muted-foreground mb-1">{slot.label}</p>
+                          {slot.photo ? (
+                            <div className="relative w-full h-24 rounded-xl overflow-hidden">
+                              <img src={slot.photo} alt={slot.label} className="w-full h-full object-cover" />
+                              <button
+                                onClick={() => slot.setter(null)}
+                                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center"
+                              >
+                                <X className="w-3 h-3 text-white" />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                const pick = slot.mocks[Math.floor(Math.random() * slot.mocks.length)];
+                                slot.setter(pick);
+                                toast.success(`${slot.label} photo added!`);
+                              }}
+                              className="w-full h-24 rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-1 active:scale-95 transition-transform"
+                            >
+                              <Camera className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-[9px] text-muted-foreground">Upload {slot.label}</span>
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {beforePhoto && afterPhoto ? (
+                      <div>
+                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Live Preview</p>
+                        <BeforeAfterSlider
+                          beforeImage={beforePhoto}
+                          afterImage={afterPhoto}
+                          height="h-32"
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-[10px] text-muted-foreground">Add both photos to enable the comparison slider.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => {
                   if (newProjectTitle.trim() && newProjectCategory && newProjectPhotos.length > 0) {
+                    if (includeBeforeAfter && (!beforePhoto || !afterPhoto)) {
+                      toast.error("Add both Before and After photos", { description: "Or turn off the comparison toggle." });
+                      return;
+                    }
                     setPortfolioItems((prev) => [
                       {
                         id: `p_${Date.now()}`,
@@ -622,12 +713,18 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                         rating: 0,
                         reviews: 0,
                         photos: newProjectPhotos,
+                        ...(includeBeforeAfter && beforePhoto && afterPhoto
+                          ? { beforeAfter: { before: beforePhoto, after: afterPhoto } }
+                          : {}),
                       },
                       ...prev,
                     ]);
                     setNewProjectTitle("");
                     setNewProjectCategory("");
                     setNewProjectPhotos([]);
+                    setIncludeBeforeAfter(false);
+                    setBeforePhoto(null);
+                    setAfterPhoto(null);
                     setShowAddProject(false);
                     toast.success("Project added!", { description: "Your portfolio has been updated." });
                   }
