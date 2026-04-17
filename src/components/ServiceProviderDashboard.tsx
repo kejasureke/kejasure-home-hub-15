@@ -89,7 +89,15 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [showCRUD, setShowCRUD] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
   const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
-  const [portfolioItems, setPortfolioItems] = useState(initialPortfolio);
+  const [portfolioItems, setPortfolioItems] = useState<Array<{
+    id: string;
+    title: string;
+    category: string;
+    rating: number;
+    reviews: number;
+    photos: string[];
+    beforeAfter?: { before: string; after: string };
+  }>>(initialPortfolio);
   const [showAddProject, setShowAddProject] = useState(false);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectCategory, setNewProjectCategory] = useState("");
