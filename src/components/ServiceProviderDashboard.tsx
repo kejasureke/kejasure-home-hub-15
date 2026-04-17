@@ -94,6 +94,9 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectCategory, setNewProjectCategory] = useState("");
   const [newProjectPhotos, setNewProjectPhotos] = useState<string[]>([]);
+  const [includeBeforeAfter, setIncludeBeforeAfter] = useState(false);
+  const [beforePhoto, setBeforePhoto] = useState<string | null>(null);
+  const [afterPhoto, setAfterPhoto] = useState<string | null>(null);
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
   const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
