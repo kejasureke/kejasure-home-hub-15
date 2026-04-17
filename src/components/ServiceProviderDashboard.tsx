@@ -382,6 +382,12 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                         <Image className="w-3 h-3" /> {p.photos.length}
                       </span>
                     </div>
+                    {p.beforeAfter && (
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-primary/90 backdrop-blur-sm flex items-center gap-1">
+                        <ArrowLeftRight className="w-2.5 h-2.5 text-primary-foreground" />
+                        <span className="text-[10px] font-bold text-primary-foreground">Before/After</span>
+                      </div>
+                    )}
                   </div>
                   {/* Before/After slider */}
                   {p.beforeAfter && (
