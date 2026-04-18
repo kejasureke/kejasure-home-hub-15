@@ -425,8 +425,35 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
 
             {/* Portfolio projects */}
             <div className="space-y-4 mb-6">
-              {portfolioItems.map((p) => (
-                <div key={p.id} className="bg-card rounded-2xl card-shadow overflow-hidden">
+              {portfolioItems.map((p, idx) => (
+                <div
+                  key={p.id}
+                  draggable
+                  onDragStart={(e) => {
+                    setDraggingId(p.id);
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (draggingId && draggingId !== p.id) setDragOverId(p.id);
+                  }}
+                  onDragLeave={() => {
+                    if (dragOverId === p.id) setDragOverId(null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (draggingId) reorderPortfolio(draggingId, p.id);
+                    setDraggingId(null);
+                    setDragOverId(null);
+                  }}
+                  onDragEnd={() => {
+                    setDraggingId(null);
+                    setDragOverId(null);
+                  }}
+                  className={`bg-card rounded-2xl card-shadow overflow-hidden transition-all ${
+                    draggingId === p.id ? "opacity-40 scale-[0.98]" : ""
+                  } ${dragOverId === p.id ? "ring-2 ring-primary" : ""}`}
+                >
                   {/* Photo gallery */}
                   <div className="relative">
                     <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
