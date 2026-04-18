@@ -1,5 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+
+const PORTFOLIO_STORAGE_KEY = "kejasure_provider_portfolio_v1";
+
+type PortfolioItem = {
+  id: string;
+  title: string;
+  category: string;
+  rating: number;
+  reviews: number;
+  photos: string[];
+  beforeAfter?: { before: string; after: string };
+};
+
+const loadPortfolio = (fallback: PortfolioItem[]): PortfolioItem[] => {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = window.localStorage.getItem(PORTFOLIO_STORAGE_KEY);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed as PortfolioItem[];
+    return fallback;
+  } catch {
+    return fallback;
+  }
+};
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight, ChevronLeft,
