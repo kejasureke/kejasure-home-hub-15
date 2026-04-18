@@ -9,6 +9,16 @@ import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
 import BeforeAfterSlider from "./BeforeAfterSlider";
 import ListingCRUD from "./ListingCRUD";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ServiceProviderDashboardProps {
   onBack: () => void;
@@ -98,6 +108,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
     photos: string[];
     beforeAfter?: { before: string; after: string };
   }>>(initialPortfolio);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showAddProject, setShowAddProject] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newProjectTitle, setNewProjectTitle] = useState("");
@@ -456,10 +467,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                           <Pencil className="w-3 h-3 text-primary" />
                         </button>
                         <button
-                          onClick={() => {
-                            setPortfolioItems((prev) => prev.filter((item) => item.id !== p.id));
-                            toast.success("Project deleted");
-                          }}
+                          onClick={() => setDeletingId(p.id)}
                           className="p-1 rounded-lg bg-destructive/10 active:scale-90 transition-transform"
                           aria-label="Delete project"
                         >
@@ -902,6 +910,37 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
         </div>
         );
       })()}
+
+      <AlertDialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+        <AlertDialogContent className="max-w-[90vw] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(() => {
+                const item = portfolioItems.find((p) => p.id === deletingId);
+                return item
+                  ? `"${item.title}" will be permanently removed from your portfolio. This action cannot be undone.`
+                  : "This project will be permanently removed from your portfolio. This action cannot be undone.";
+              })()}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (deletingId) {
+                  setPortfolioItems((prev) => prev.filter((item) => item.id !== deletingId));
+                  toast.success("Project deleted");
+                  setDeletingId(null);
+                }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
