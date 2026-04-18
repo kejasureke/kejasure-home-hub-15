@@ -1,5 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+
+const PORTFOLIO_STORAGE_KEY = "kejasure_provider_portfolio_v1";
+
+type PortfolioItem = {
+  id: string;
+  title: string;
+  category: string;
+  rating: number;
+  reviews: number;
+  photos: string[];
+  beforeAfter?: { before: string; after: string };
+};
+
+const loadPortfolio = (fallback: PortfolioItem[]): PortfolioItem[] => {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = window.localStorage.getItem(PORTFOLIO_STORAGE_KEY);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed as PortfolioItem[];
+    return fallback;
+  } catch {
+    return fallback;
+  }
+};
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight, ChevronLeft,
@@ -99,18 +124,18 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [showCRUD, setShowCRUD] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
   const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
-  const [portfolioItems, setPortfolioItems] = useState<Array<{
-    id: string;
-    title: string;
-    category: string;
-    rating: number;
-    reviews: number;
-    photos: string[];
-    beforeAfter?: { before: string; after: string };
-  }>>(initialPortfolio);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(() => loadPortfolio(initialPortfolio));
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(portfolioItems));
+    } catch {
+      // ignore quota errors
+    }
+  }, [portfolioItems]);
 
   const reorderPortfolio = (fromId: string, toId: string) => {
     if (fromId === toId) return;
