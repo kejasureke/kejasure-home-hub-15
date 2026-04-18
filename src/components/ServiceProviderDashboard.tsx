@@ -474,6 +474,36 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
               </div>
             </div>
 
+            {portfolioItems.length > 0 && (() => {
+              const totalPhotos = portfolioItems.reduce((sum, p) => sum + p.photos.length, 0);
+              const avgRating = portfolioItems.reduce((sum, p) => sum + p.rating, 0) / portfolioItems.length;
+              return (
+                <div className="grid grid-cols-3 gap-2 mb-4 p-3 rounded-2xl bg-card card-shadow">
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-1">
+                      <Camera className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-base font-bold">{portfolioItems.length}</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground mt-0.5">Projects</span>
+                  </div>
+                  <div className="flex flex-col items-center border-x border-border">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 text-accent fill-accent" />
+                      <span className="text-base font-bold">{avgRating.toFixed(1)}</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground mt-0.5">Avg rating</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-1">
+                      <Image className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-base font-bold">{totalPhotos}</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground mt-0.5">Photos</span>
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Portfolio projects */}
             <div className="space-y-4 mb-6">
               {portfolioItems.map((p, idx) => (
