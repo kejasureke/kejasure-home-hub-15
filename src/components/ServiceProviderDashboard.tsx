@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight, ChevronLeft,
-  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight, Pencil
+  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight, Pencil, GripVertical
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
@@ -109,6 +109,22 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
     beforeAfter?: { before: string; after: string };
   }>>(initialPortfolio);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  const reorderPortfolio = (fromId: string, toId: string) => {
+    if (fromId === toId) return;
+    setPortfolioItems((prev) => {
+      const fromIdx = prev.findIndex((i) => i.id === fromId);
+      const toIdx = prev.findIndex((i) => i.id === toId);
+      if (fromIdx === -1 || toIdx === -1) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(fromIdx, 1);
+      next.splice(toIdx, 0, moved);
+      return next;
+    });
+    toast.success("Portfolio reordered");
+  };
   const [showAddProject, setShowAddProject] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newProjectTitle, setNewProjectTitle] = useState("");
