@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight, ChevronLeft,
-  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight, Pencil
+  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight, Pencil, GripVertical
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
@@ -109,6 +109,22 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
     beforeAfter?: { before: string; after: string };
   }>>(initialPortfolio);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  const reorderPortfolio = (fromId: string, toId: string) => {
+    if (fromId === toId) return;
+    setPortfolioItems((prev) => {
+      const fromIdx = prev.findIndex((i) => i.id === fromId);
+      const toIdx = prev.findIndex((i) => i.id === toId);
+      if (fromIdx === -1 || toIdx === -1) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(fromIdx, 1);
+      next.splice(toIdx, 0, moved);
+      return next;
+    });
+    toast.success("Portfolio reordered");
+  };
   const [showAddProject, setShowAddProject] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newProjectTitle, setNewProjectTitle] = useState("");
@@ -409,8 +425,35 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
 
             {/* Portfolio projects */}
             <div className="space-y-4 mb-6">
-              {portfolioItems.map((p) => (
-                <div key={p.id} className="bg-card rounded-2xl card-shadow overflow-hidden">
+              {portfolioItems.map((p, idx) => (
+                <div
+                  key={p.id}
+                  draggable
+                  onDragStart={(e) => {
+                    setDraggingId(p.id);
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (draggingId && draggingId !== p.id) setDragOverId(p.id);
+                  }}
+                  onDragLeave={() => {
+                    if (dragOverId === p.id) setDragOverId(null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (draggingId) reorderPortfolio(draggingId, p.id);
+                    setDraggingId(null);
+                    setDragOverId(null);
+                  }}
+                  onDragEnd={() => {
+                    setDraggingId(null);
+                    setDragOverId(null);
+                  }}
+                  className={`bg-card rounded-2xl card-shadow overflow-hidden transition-all ${
+                    draggingId === p.id ? "opacity-40 scale-[0.98]" : ""
+                  } ${dragOverId === p.id ? "ring-2 ring-primary" : ""}`}
+                >
                   {/* Photo gallery */}
                   <div className="relative">
                     <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
@@ -453,12 +496,37 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                   )}
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-semibold">{p.title}</p>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div
+                          className="p-1 -ml-1 cursor-grab active:cursor-grabbing touch-none text-muted-foreground"
+                          aria-label="Drag to reorder"
+                          title="Drag to reorder"
+                        >
+                          <GripVertical className="w-4 h-4" />
+                        </div>
+                        <p className="text-sm font-semibold truncate">{p.title}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1 mr-1">
                           <Star className="w-3 h-3 text-accent fill-accent" />
                           <span className="text-xs font-semibold">{p.rating}</span>
                         </div>
+                        <button
+                          onClick={() => idx > 0 && reorderPortfolio(p.id, portfolioItems[idx - 1].id)}
+                          disabled={idx === 0}
+                          className="p-1 rounded-lg bg-secondary active:scale-90 transition-transform disabled:opacity-30"
+                          aria-label="Move up"
+                        >
+                          <ChevronLeft className="w-3 h-3 rotate-90" />
+                        </button>
+                        <button
+                          onClick={() => idx < portfolioItems.length - 1 && reorderPortfolio(p.id, portfolioItems[idx + 1].id)}
+                          disabled={idx === portfolioItems.length - 1}
+                          className="p-1 rounded-lg bg-secondary active:scale-90 transition-transform disabled:opacity-30"
+                          aria-label="Move down"
+                        >
+                          <ChevronRight className="w-3 h-3 rotate-90" />
+                        </button>
                         <button
                           onClick={() => openEditProject(p.id)}
                           className="p-1 rounded-lg bg-primary/10 active:scale-90 transition-transform"
