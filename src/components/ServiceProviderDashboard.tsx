@@ -28,7 +28,7 @@ const loadPortfolio = (fallback: PortfolioItem[]): PortfolioItem[] => {
 import {
   ArrowLeft, Eye, Users, MessageCircle, TrendingUp, Zap, Plus, X,
   Calendar, BarChart3, RefreshCw, MapPin, ChevronRight, ChevronLeft,
-  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight, Pencil, GripVertical
+  Star, Clock, CheckCircle2, Wrench, Camera, Shield, Award, User, Building2, Image, Trash2, ArrowLeftRight, Pencil, GripVertical, RotateCcw
 } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
@@ -136,6 +136,21 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
       // ignore quota errors
     }
   }, [portfolioItems]);
+
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const isPortfolioModified = JSON.stringify(portfolioItems) !== JSON.stringify(initialPortfolio);
+
+  const resetPortfolio = () => {
+    setPortfolioItems(initialPortfolio);
+    try {
+      window.localStorage.removeItem(PORTFOLIO_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    setShowResetConfirm(false);
+    toast.success("Portfolio reset", { description: "Restored to default sample projects." });
+  };
 
   const reorderPortfolio = (fromId: string, toId: string) => {
     if (fromId === toId) return;
@@ -443,9 +458,20 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           <div className="pb-8">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold">Your Work</h3>
-              <button onClick={openAddProject} className="text-xs font-semibold text-primary flex items-center gap-1 active:scale-95 transition-transform">
-                <Plus className="w-3.5 h-3.5" /> Add Project
-              </button>
+              <div className="flex items-center gap-3">
+                {isPortfolioModified && (
+                  <button
+                    onClick={() => setShowResetConfirm(true)}
+                    className="text-xs font-semibold text-muted-foreground flex items-center gap-1 active:scale-95 transition-transform"
+                    aria-label="Reset portfolio to defaults"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" /> Reset
+                  </button>
+                )}
+                <button onClick={openAddProject} className="text-xs font-semibold text-primary flex items-center gap-1 active:scale-95 transition-transform">
+                  <Plus className="w-3.5 h-3.5" /> Add Project
+                </button>
+              </div>
             </div>
 
             {/* Portfolio projects */}
@@ -1052,6 +1078,26 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
               }}
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent className="max-w-[90vw] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset portfolio to defaults?</AlertDialogTitle>
+            <AlertDialogDescription>
+              All your saved projects, edits, and the current order will be cleared and replaced with the default sample portfolio. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={resetPortfolio}
+            >
+              Reset
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
