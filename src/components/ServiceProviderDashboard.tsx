@@ -998,9 +998,31 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 if (deletingId) {
+                  const idx = portfolioItems.findIndex((item) => item.id === deletingId);
+                  const removed = portfolioItems[idx];
+                  if (!removed) {
+                    setDeletingId(null);
+                    return;
+                  }
                   setPortfolioItems((prev) => prev.filter((item) => item.id !== deletingId));
-                  toast.success("Project deleted");
                   setDeletingId(null);
+                  toast.success("Project deleted", {
+                    description: `"${removed.title}" was removed from your portfolio.`,
+                    duration: 6000,
+                    action: {
+                      label: "Undo",
+                      onClick: () => {
+                        setPortfolioItems((prev) => {
+                          if (prev.some((item) => item.id === removed.id)) return prev;
+                          const next = [...prev];
+                          const insertAt = Math.min(idx, next.length);
+                          next.splice(insertAt, 0, removed);
+                          return next;
+                        });
+                        toast.success("Project restored");
+                      },
+                    },
+                  });
                 }
               }}
             >
