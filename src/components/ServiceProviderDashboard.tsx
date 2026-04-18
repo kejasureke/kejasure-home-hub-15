@@ -496,12 +496,37 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                   )}
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-semibold">{p.title}</p>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div
+                          className="p-1 -ml-1 cursor-grab active:cursor-grabbing touch-none text-muted-foreground"
+                          aria-label="Drag to reorder"
+                          title="Drag to reorder"
+                        >
+                          <GripVertical className="w-4 h-4" />
+                        </div>
+                        <p className="text-sm font-semibold truncate">{p.title}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1 mr-1">
                           <Star className="w-3 h-3 text-accent fill-accent" />
                           <span className="text-xs font-semibold">{p.rating}</span>
                         </div>
+                        <button
+                          onClick={() => idx > 0 && reorderPortfolio(p.id, portfolioItems[idx - 1].id)}
+                          disabled={idx === 0}
+                          className="p-1 rounded-lg bg-secondary active:scale-90 transition-transform disabled:opacity-30"
+                          aria-label="Move up"
+                        >
+                          <ChevronLeft className="w-3 h-3 rotate-90" />
+                        </button>
+                        <button
+                          onClick={() => idx < portfolioItems.length - 1 && reorderPortfolio(p.id, portfolioItems[idx + 1].id)}
+                          disabled={idx === portfolioItems.length - 1}
+                          className="p-1 rounded-lg bg-secondary active:scale-90 transition-transform disabled:opacity-30"
+                          aria-label="Move down"
+                        >
+                          <ChevronRight className="w-3 h-3 rotate-90" />
+                        </button>
                         <button
                           onClick={() => openEditProject(p.id)}
                           className="p-1 rounded-lg bg-primary/10 active:scale-90 transition-transform"
