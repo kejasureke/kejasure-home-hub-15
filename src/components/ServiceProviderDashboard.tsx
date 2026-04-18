@@ -137,6 +137,21 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
     }
   }, [portfolioItems]);
 
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const isPortfolioModified = JSON.stringify(portfolioItems) !== JSON.stringify(initialPortfolio);
+
+  const resetPortfolio = () => {
+    setPortfolioItems(initialPortfolio);
+    try {
+      window.localStorage.removeItem(PORTFOLIO_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    setShowResetConfirm(false);
+    toast.success("Portfolio reset", { description: "Restored to default sample projects." });
+  };
+
   const reorderPortfolio = (fromId: string, toId: string) => {
     if (fromId === toId) return;
     setPortfolioItems((prev) => {
