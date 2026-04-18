@@ -124,18 +124,18 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const [showCRUD, setShowCRUD] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
   const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
-  const [portfolioItems, setPortfolioItems] = useState<Array<{
-    id: string;
-    title: string;
-    category: string;
-    rating: number;
-    reviews: number;
-    photos: string[];
-    beforeAfter?: { before: string; after: string };
-  }>>(initialPortfolio);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(() => loadPortfolio(initialPortfolio));
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(portfolioItems));
+    } catch {
+      // ignore quota errors
+    }
+  }, [portfolioItems]);
 
   const reorderPortfolio = (fromId: string, toId: string) => {
     if (fromId === toId) return;
