@@ -4,6 +4,7 @@ import { getScamRiskScore } from "@/utils/scamDetection";
 import ScamWarningBadge from "./ScamWarningBadge";
 import PriceDropBadge from "./PriceDropBadge";
 import SmileIDBadge from "./SmileIDBadge";
+import SwipeableImageGallery from "./SwipeableImageGallery";
 interface PropertyCardProps {
   property: Property;
   onPress: (id: string) => void;
