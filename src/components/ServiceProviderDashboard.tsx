@@ -521,9 +521,32 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
               );
             })()}
 
+            {/* Category filter chips */}
+            {portfolioCategories.length > 2 && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4 -mx-1 px-1">
+                {portfolioCategories.map((cat) => {
+                  const count = cat === "All" ? portfolioItems.length : portfolioItems.filter((p) => p.category === cat).length;
+                  const active = categoryFilter === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setCategoryFilter(cat)}
+                      className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+                        active
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-card text-foreground border border-border hover:bg-secondary"
+                      }`}
+                    >
+                      {cat} <span className={active ? "opacity-80" : "text-muted-foreground"}>· {count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             {/* Portfolio projects */}
             <div className="space-y-4 mb-6">
-              {portfolioItems.map((p, idx) => (
+              {filteredPortfolio.map((p, idx) => (
                 <div
                   key={p.id}
                   draggable
