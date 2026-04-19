@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
 const PORTFOLIO_STORAGE_KEY = "kejasure_provider_portfolio_v1";
