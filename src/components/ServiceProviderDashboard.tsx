@@ -633,7 +633,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                           <span className="text-xs font-semibold">{p.rating}</span>
                         </div>
                         <button
-                          onClick={() => idx > 0 && reorderPortfolio(p.id, portfolioItems[idx - 1].id)}
+                          onClick={() => idx > 0 && reorderPortfolio(p.id, filteredPortfolio[idx - 1].id)}
                           disabled={idx === 0}
                           className="p-1 rounded-lg bg-secondary active:scale-90 transition-transform disabled:opacity-30"
                           aria-label="Move up"
@@ -641,8 +641,8 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                           <ChevronLeft className="w-3 h-3 rotate-90" />
                         </button>
                         <button
-                          onClick={() => idx < portfolioItems.length - 1 && reorderPortfolio(p.id, portfolioItems[idx + 1].id)}
-                          disabled={idx === portfolioItems.length - 1}
+                          onClick={() => idx < filteredPortfolio.length - 1 && reorderPortfolio(p.id, filteredPortfolio[idx + 1].id)}
+                          disabled={idx === filteredPortfolio.length - 1}
                           className="p-1 rounded-lg bg-secondary active:scale-90 transition-transform disabled:opacity-30"
                           aria-label="Move down"
                         >
