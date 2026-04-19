@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
 const PORTFOLIO_STORAGE_KEY = "kejasure_provider_portfolio_v1";
@@ -138,6 +138,23 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   }, [portfolioItems]);
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string>("All");
+
+  const portfolioCategories = useMemo(
+    () => ["All", ...Array.from(new Set(portfolioItems.map((p) => p.category)))],
+    [portfolioItems],
+  );
+
+  useEffect(() => {
+    if (categoryFilter !== "All" && !portfolioItems.some((p) => p.category === categoryFilter)) {
+      setCategoryFilter("All");
+    }
+  }, [portfolioItems, categoryFilter]);
+
+  const filteredPortfolio = useMemo(
+    () => (categoryFilter === "All" ? portfolioItems : portfolioItems.filter((p) => p.category === categoryFilter)),
+    [portfolioItems, categoryFilter],
+  );
 
   const isPortfolioModified = JSON.stringify(portfolioItems) !== JSON.stringify(initialPortfolio);
 
@@ -504,9 +521,32 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
               );
             })()}
 
+            {/* Category filter chips */}
+            {portfolioCategories.length > 2 && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4 -mx-1 px-1">
+                {portfolioCategories.map((cat) => {
+                  const count = cat === "All" ? portfolioItems.length : portfolioItems.filter((p) => p.category === cat).length;
+                  const active = categoryFilter === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setCategoryFilter(cat)}
+                      className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${
+                        active
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-card text-foreground border border-border hover:bg-secondary"
+                      }`}
+                    >
+                      {cat} <span className={active ? "opacity-80" : "text-muted-foreground"}>· {count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             {/* Portfolio projects */}
             <div className="space-y-4 mb-6">
-              {portfolioItems.map((p, idx) => (
+              {filteredPortfolio.map((p, idx) => (
                 <div
                   key={p.id}
                   draggable
@@ -593,7 +633,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                           <span className="text-xs font-semibold">{p.rating}</span>
                         </div>
                         <button
-                          onClick={() => idx > 0 && reorderPortfolio(p.id, portfolioItems[idx - 1].id)}
+                          onClick={() => idx > 0 && reorderPortfolio(p.id, filteredPortfolio[idx - 1].id)}
                           disabled={idx === 0}
                           className="p-1 rounded-lg bg-secondary active:scale-90 transition-transform disabled:opacity-30"
                           aria-label="Move up"
@@ -601,8 +641,8 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                           <ChevronLeft className="w-3 h-3 rotate-90" />
                         </button>
                         <button
-                          onClick={() => idx < portfolioItems.length - 1 && reorderPortfolio(p.id, portfolioItems[idx + 1].id)}
-                          disabled={idx === portfolioItems.length - 1}
+                          onClick={() => idx < filteredPortfolio.length - 1 && reorderPortfolio(p.id, filteredPortfolio[idx + 1].id)}
+                          disabled={idx === filteredPortfolio.length - 1}
                           className="p-1 rounded-lg bg-secondary active:scale-90 transition-transform disabled:opacity-30"
                           aria-label="Move down"
                         >
@@ -636,6 +676,18 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                   </div>
                   <p className="text-sm font-medium mb-1">No projects yet</p>
                   <p className="text-xs text-muted-foreground text-center">Add your best work to showcase to potential clients</p>
+                </div>
+              )}
+
+              {portfolioItems.length > 0 && filteredPortfolio.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-10">
+                  <p className="text-sm font-medium mb-1">No projects in {categoryFilter}</p>
+                  <button
+                    onClick={() => setCategoryFilter("All")}
+                    className="text-xs font-semibold text-primary mt-1 active:scale-95 transition-transform"
+                  >
+                    Show all projects
+                  </button>
                 </div>
               )}
             </div>
