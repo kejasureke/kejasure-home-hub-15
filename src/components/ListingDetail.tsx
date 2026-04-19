@@ -12,6 +12,7 @@ import PriceDropBadge from "./PriceDropBadge";
 import MoveInChecklist from "./MoveInChecklist";
 import VideoTourPlayer from "./VideoTourPlayer";
 import SmileIDBadge from "./SmileIDBadge";
+import SwipeableImageGallery from "./SwipeableImageGallery";
 import BookingRequestModal from "./BookingRequestModal";
 import { getScamRiskScore } from "@/utils/scamDetection";
 
@@ -42,10 +43,16 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
     <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       {/* Image Carousel */}
       <div className="relative aspect-[4/3] bg-muted">
-        <img src={property.images[currentImage]} alt={property.title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 via-transparent to-foreground/20" />
+        <SwipeableImageGallery
+          images={property.images}
+          alt={property.title}
+          className="w-full h-full"
+          controlledIndex={currentImage}
+          onIndexChange={setCurrentImage}
+          bottomOffsetClass="bottom-4"
+        />
 
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4">
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-10">
           <button onClick={triggerClose} className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
@@ -59,8 +66,8 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           </div>
         </div>
 
-        <div className="absolute bottom-4 right-4 flex gap-2">
-          {property.videoTour && (
+        {property.videoTour && (
+          <div className="absolute bottom-4 left-4 z-10">
             <button
               onClick={(e) => { e.stopPropagation(); setShowVideoTour(true); }}
               className="px-3 py-1 rounded-full bg-primary/90 text-[10px] font-bold text-primary-foreground flex items-center gap-1"
@@ -68,17 +75,8 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
               <Video className="w-3 h-3" />
               Video Tour
             </button>
-          )}
-          <div className="px-3 py-1 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium">
-            {currentImage + 1}/{property.images.length}
           </div>
-        </div>
-
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-          {property.images.map((_, i) => (
-            <button key={i} onClick={() => setCurrentImage(i)} className={`w-2 h-2 rounded-full transition-all ${i === currentImage ? "bg-card w-5" : "bg-card/50"}`} />
-          ))}
-        </div>
+        )}
       </div>
 
       {/* Content */}
