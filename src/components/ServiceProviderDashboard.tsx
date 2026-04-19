@@ -663,26 +663,15 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                 >
                   {/* Photo gallery */}
                   <div className="relative">
-                    <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
-                      {p.photos.map((photo, i) => (
-                        <img
-                          key={i}
-                          src={photo}
-                          alt={`${p.title} ${i + 1}`}
-                          className="w-full h-40 object-cover shrink-0 snap-center cursor-pointer"
-                          onClick={() => {
-                            setLightboxPhotos(p.photos);
-                            setLightboxIndex(i);
-                            setLightboxPhoto(photo);
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm">
-                      <span className="text-[10px] font-medium text-white flex items-center gap-1">
-                        <Image className="w-3 h-3" /> {p.photos.length}
-                      </span>
-                    </div>
+                    <PortfolioGallery
+                      photos={p.photos}
+                      title={p.title}
+                      onPhotoClick={(photos, i, photo) => {
+                        setLightboxPhotos(photos);
+                        setLightboxIndex(i);
+                        setLightboxPhoto(photo);
+                      }}
+                    />
                     {p.beforeAfter && (
                       <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-primary/90 backdrop-blur-sm flex items-center gap-1">
                         <ArrowLeftRight className="w-2.5 h-2.5 text-primary-foreground" />
