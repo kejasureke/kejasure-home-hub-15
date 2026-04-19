@@ -678,6 +678,18 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                   <p className="text-xs text-muted-foreground text-center">Add your best work to showcase to potential clients</p>
                 </div>
               )}
+
+              {portfolioItems.length > 0 && filteredPortfolio.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-10">
+                  <p className="text-sm font-medium mb-1">No projects in {categoryFilter}</p>
+                  <button
+                    onClick={() => setCategoryFilter("All")}
+                    className="text-xs font-semibold text-primary mt-1 active:scale-95 transition-transform"
+                  >
+                    Show all projects
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Ratings Summary */}
