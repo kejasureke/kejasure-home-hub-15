@@ -138,6 +138,23 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   }, [portfolioItems]);
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string>("All");
+
+  const portfolioCategories = useMemo(
+    () => ["All", ...Array.from(new Set(portfolioItems.map((p) => p.category)))],
+    [portfolioItems],
+  );
+
+  useEffect(() => {
+    if (categoryFilter !== "All" && !portfolioItems.some((p) => p.category === categoryFilter)) {
+      setCategoryFilter("All");
+    }
+  }, [portfolioItems, categoryFilter]);
+
+  const filteredPortfolio = useMemo(
+    () => (categoryFilter === "All" ? portfolioItems : portfolioItems.filter((p) => p.category === categoryFilter)),
+    [portfolioItems, categoryFilter],
+  );
 
   const isPortfolioModified = JSON.stringify(portfolioItems) !== JSON.stringify(initialPortfolio);
 
