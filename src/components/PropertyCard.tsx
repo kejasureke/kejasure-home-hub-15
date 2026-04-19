@@ -32,8 +32,12 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
     >
       {/* Image */}
       <div className="relative aspect-[16/10] overflow-hidden">
-        <img src={property.image} alt={property.title} className="w-full h-full object-cover" loading="lazy" width={800} height={500} />
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-transparent" />
+        <SwipeableImageGallery
+          images={property.images?.length ? property.images : [property.image]}
+          alt={property.title}
+          className="w-full h-full"
+          bottomOffsetClass="bottom-12"
+        />
 
         {/* Ribbons */}
         {property.featured && <div className="premium-ribbon">⭐ Featured</div>}
