@@ -108,10 +108,16 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
           {properties.map((p) => (
             <div key={p.id} className="flex-1 min-w-0 bg-card rounded-2xl card-shadow overflow-hidden">
               <div className="relative aspect-[4/3]">
-                <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                <SwipeableImageGallery
+                  images={p.images?.length ? p.images : [p.image]}
+                  alt={p.title}
+                  className="w-full h-full"
+                  showGradient={false}
+                  bottomOffsetClass="bottom-2"
+                />
                 <button
                   onClick={() => onRemove(p.id)}
-                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-card/80 flex items-center justify-center"
+                  className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-card/80 flex items-center justify-center"
                 >
                   <X className="w-3 h-3 text-foreground" />
                 </button>
