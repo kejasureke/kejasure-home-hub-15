@@ -115,6 +115,92 @@ const countyStats = [
 ];
 
 type Tab = "overview" | "bookings" | "portfolio" | "billing";
+
+interface PortfolioGalleryProps {
+  photos: string[];
+  title: string;
+  onPhotoClick: (photos: string[], index: number, photo: string) => void;
+}
+
+const PortfolioGallery = ({ photos, title, onPhotoClick }: PortfolioGalleryProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const total = photos.length;
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const idx = Math.round(el.scrollLeft / el.clientWidth);
+    if (idx !== activeIndex) setActiveIndex(idx);
+  };
+
+  const scrollToIndex = (idx: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ left: idx * el.clientWidth, behavior: "smooth" });
+  };
+
+  return (
+    <>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+      >
+        {photos.map((photo, i) => (
+          <img
+            key={i}
+            src={photo}
+            alt={`${title} ${i + 1}`}
+            className="w-full h-40 object-cover shrink-0 snap-center cursor-pointer"
+            onClick={() => onPhotoClick(photos, i, photo)}
+          />
+        ))}
+      </div>
+
+      {/* Edge swipe hints when multiple photos */}
+      {total > 1 && (
+        <>
+          {activeIndex > 0 && (
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/30 to-transparent" />
+          )}
+          {activeIndex < total - 1 && (
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black/30 to-transparent" />
+          )}
+        </>
+      )}
+
+      {/* Active index / total counter */}
+      <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm">
+        <span className="text-[10px] font-semibold text-white flex items-center gap-1">
+          <Image className="w-3 h-3" />
+          {total > 1 ? `${activeIndex + 1} / ${total}` : total}
+        </span>
+      </div>
+
+      {/* Dot indicators */}
+      {total > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/40 backdrop-blur-sm">
+          {photos.map((_, i) => (
+            <button
+              key={i}
+              onClick={(e) => {
+                e.stopPropagation();
+                scrollToIndex(i);
+              }}
+              aria-label={`Go to photo ${i + 1}`}
+              className={`rounded-full transition-all ${
+                i === activeIndex ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+};
+
+
 type ProviderType = "individual" | "business";
 
 const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => {
