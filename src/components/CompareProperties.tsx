@@ -1,6 +1,7 @@
 import { X, Bed, Bath, MapPin, ShieldCheck, Star, Trophy } from "lucide-react";
 import { useMemo } from "react";
 import type { Property } from "@/data/mockData";
+import SwipeableImageGallery from "./SwipeableImageGallery";
 
 interface ComparePropertiesProps {
   properties: Property[];
