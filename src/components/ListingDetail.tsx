@@ -12,6 +12,7 @@ import PriceDropBadge from "./PriceDropBadge";
 import MoveInChecklist from "./MoveInChecklist";
 import VideoTourPlayer from "./VideoTourPlayer";
 import SmileIDBadge from "./SmileIDBadge";
+import SwipeableImageGallery from "./SwipeableImageGallery";
 import BookingRequestModal from "./BookingRequestModal";
 import { getScamRiskScore } from "@/utils/scamDetection";
 
