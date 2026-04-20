@@ -51,6 +51,20 @@ export const useMapPan = (
     [minZoom, maxZoom]
   );
 
+  // Limit pan so the map center stays within ~half the viewport in any direction.
+  // This keeps pins reachable while preventing infinite off-screen drag.
+  const clampPan = useCallback(
+    (p: { x: number; y: number }) => {
+      const maxX = mapWidth / 2;
+      const maxY = mapHeight / 2;
+      return {
+        x: Math.min(maxX, Math.max(-maxX, p.x)),
+        y: Math.min(maxY, Math.max(-maxY, p.y)),
+      };
+    },
+    [mapWidth, mapHeight]
+  );
+
   const zoomIn = useCallback(
     () => setZoom((z) => clampZoom(z + zoomStep)),
     [clampZoom, zoomStep]
@@ -90,10 +104,10 @@ export const useMapPan = (
       if (dragging && e.touches.length === 1) {
         const dx = e.touches[0].clientX - dragStart.x;
         const dy = e.touches[0].clientY - dragStart.y;
-        setPan({ x: panStart.x + dx, y: panStart.y + dy });
+        setPan(clampPan({ x: panStart.x + dx, y: panStart.y + dy }));
       }
     },
-    [dragging, dragStart, panStart, clampZoom]
+    [dragging, dragStart, panStart, clampZoom, clampPan]
   );
 
   const onTouchEnd = useCallback((e: React.TouchEvent) => {
