@@ -136,6 +136,35 @@ export const useMapPan = (
     [zoom, pan.x, pan.y, center.lat, center.lng, mapWidth, mapHeight]
   );
 
+  // Smoothly animate pan → {0,0} and zoom → initialZoom over ~350ms.
+  const recenter = useCallback(() => {
+    if (animRef.current !== null) cancelAnimationFrame(animRef.current);
+
+    const startPan = pan;
+    const startZoom = zoom;
+    const targetZoom = initialZoom;
+    const duration = 350;
+    const startTime = performance.now();
+    // ease-out cubic
+    const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      const k = ease(t);
+      setPan({ x: startPan.x * (1 - k), y: startPan.y * (1 - k) });
+      setZoom(startZoom + (targetZoom - startZoom) * k);
+      if (t < 1) {
+        animRef.current = requestAnimationFrame(tick);
+      } else {
+        animRef.current = null;
+      }
+    };
+
+    animRef.current = requestAnimationFrame(tick);
+  }, [pan, zoom, initialZoom]);
+
+  const isCentered = pan.x === 0 && pan.y === 0 && zoom === initialZoom;
+
   return {
     zoom,
     pan,
@@ -143,6 +172,8 @@ export const useMapPan = (
     maxZoom,
     zoomIn,
     zoomOut,
+    recenter,
+    isCentered,
     project,
     touchHandlers: { onTouchStart, onTouchMove, onTouchEnd },
   };
