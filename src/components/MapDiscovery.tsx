@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { ArrowLeft, MapPin, Navigation, Star, Bed, ShieldCheck, Wrench, Home, ChevronRight, Plus, Minus } from "lucide-react";
 import { properties, serviceProviders, type Property, type ServiceProvider } from "@/data/mockData";
+import SwipeableImageGallery from "./SwipeableImageGallery";
 
 interface MapDiscoveryProps {
   onBack: () => void;
@@ -248,37 +249,42 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
       {selected && (
         <div className="px-4 py-3 animate-fade-in">
           {isProperty ? (
-            <button
-              onClick={() => onSelectProperty((selected as Property).id)}
-              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform"
-            >
-              <img
-                src={(selected as Property).image}
-                alt={(selected as Property).title}
-                className="w-16 h-16 rounded-xl object-cover"
-              />
-              <div className="flex-1 text-left min-w-0">
-                <p className="text-sm font-semibold truncate">{(selected as Property).title}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-xs font-bold text-primary">
-                    KES {new Intl.NumberFormat("en-KE").format((selected as Property).price)}
-                    <span className="font-normal text-muted-foreground">{(selected as Property).priceUnit}</span>
-                  </p>
-                  {(selected as Property).verified && <ShieldCheck className="w-3 h-3 text-primary" />}
-                </div>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <Bed className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-[10px] text-muted-foreground">{(selected as Property).bedrooms} BR</span>
-                  {(selected as Property).rating && (
-                    <>
-                      <Star className="w-3 h-3 text-accent fill-accent" />
-                      <span className="text-[10px] text-muted-foreground">{(selected as Property).rating}</span>
-                    </>
-                  )}
-                </div>
+            <div className="rounded-2xl bg-card card-shadow overflow-hidden">
+              <div className="relative">
+                <SwipeableImageGallery
+                  images={(selected as Property).images?.length ? (selected as Property).images : [(selected as Property).image]}
+                  alt={(selected as Property).title}
+                  className="aspect-[16/9]"
+                  bottomOffsetClass="bottom-2"
+                />
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            </button>
+              <button
+                onClick={() => onSelectProperty((selected as Property).id)}
+                className="w-full flex items-center gap-3 p-3 active:scale-[0.98] transition-transform text-left"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate">{(selected as Property).title}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p className="text-xs font-bold text-primary">
+                      KES {new Intl.NumberFormat("en-KE").format((selected as Property).price)}
+                      <span className="font-normal text-muted-foreground">{(selected as Property).priceUnit}</span>
+                    </p>
+                    {(selected as Property).verified && <ShieldCheck className="w-3 h-3 text-primary" />}
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <Bed className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-[10px] text-muted-foreground">{(selected as Property).bedrooms} BR</span>
+                    {(selected as Property).rating && (
+                      <>
+                        <Star className="w-3 h-3 text-accent fill-accent" />
+                        <span className="text-[10px] text-muted-foreground">{(selected as Property).rating}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+              </button>
+            </div>
           ) : (
             <div className="flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow">
               <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-xl">
