@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
-import { ArrowLeft, MapPin, Navigation, Star, Bed, ShieldCheck, Wrench, Home, ChevronRight, Plus, Minus } from "lucide-react";
-import { properties, serviceProviders, type Property, type ServiceProvider } from "@/data/mockData";
-import SwipeableImageGallery from "./SwipeableImageGallery";
+import { ArrowLeft, Navigation } from "lucide-react";
+import { properties, serviceProviders } from "@/data/mockData";
+import MapPins, { type Pin, type PinType } from "./map/MapPins";
+import SelectedCard from "./map/SelectedCard";
+import ZoomControls from "./map/ZoomControls";
 
 interface MapDiscoveryProps {
   onBack: () => void;
@@ -24,19 +26,6 @@ const toPixel = (lat: number, lng: number, zoom: number, panX: number, panY: num
   const y = (CENTER.lat - lat) * scale + MAP_H / 2 + panY;
   return { x, y };
 };
-
-type PinType = "rental" | "shortstay" | "service";
-
-interface Pin {
-  id: string;
-  type: PinType;
-  label: string;
-  x: number;
-  y: number;
-  price?: string;
-  name?: string;
-  avatar?: string;
-}
 
 const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [selectedPin, setSelectedPin] = useState<string | null>(null);
@@ -108,8 +97,6 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
     ? properties.find((p) => p.id === selectedPin) || serviceProviders.find((s) => s.id === selectedPin)
     : null;
 
-  const isProperty = selected && "bedrooms" in selected;
-
   return (
     <div className="fixed inset-0 z-[60] bg-background flex flex-col animate-slide-up pb-20">
       {/* Header */}
@@ -175,42 +162,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
         <span className="absolute text-[9px] font-medium text-muted-foreground/40 uppercase tracking-wider" style={{ top: "10%", right: "15%" }}>Roysambu</span>
 
         {/* Pins */}
-        {allPins.map((pin) => (
-          <button
-            key={pin.id}
-            onClick={() => setSelectedPin(pin.id)}
-            className={`absolute transition-all duration-200 ${selectedPin === pin.id ? "z-20 scale-125" : "z-10"}`}
-            style={{ left: pin.x, top: pin.y, transform: "translate(-50%, -100%)" }}
-          >
-            {pin.type === "service" ? (
-              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm shadow-md ${
-                selectedPin === pin.id ? "bg-accent text-accent-foreground" : "bg-card text-foreground"
-              }`}>
-                {pin.avatar}
-              </div>
-            ) : (
-              <div className={`px-2 py-1 rounded-lg text-[10px] font-bold shadow-md whitespace-nowrap ${
-                selectedPin === pin.id
-                  ? "gradient-trust text-primary-foreground"
-                  : pin.type === "rental"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-accent text-accent-foreground"
-              }`}>
-                {pin.label}
-              </div>
-            )}
-            {/* Pin tail */}
-            <div className={`w-0 h-0 mx-auto border-l-[5px] border-r-[5px] border-t-[6px] border-transparent ${
-              selectedPin === pin.id
-                ? "border-t-primary"
-                : pin.type === "service"
-                ? "border-t-card"
-                : pin.type === "rental"
-                ? "border-t-primary"
-                : "border-t-accent"
-            }`} />
-          </button>
-        ))}
+        <MapPins pins={allPins} selectedPin={selectedPin} onSelect={setSelectedPin} />
 
         {/* User location */}
         <div
@@ -222,85 +174,19 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
         </div>
 
         {/* Zoom controls */}
-        <div className="absolute bottom-3 right-3 z-40 flex flex-col gap-1.5">
-          <button
-            onClick={handleZoomIn}
-            disabled={zoom >= MAX_ZOOM}
-            className="w-9 h-9 rounded-xl bg-card shadow-md flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
-          >
-            <Plus className="w-4 h-4 text-foreground" />
-          </button>
-          <button
-            onClick={handleZoomOut}
-            disabled={zoom <= MIN_ZOOM}
-            className="w-9 h-9 rounded-xl bg-card shadow-md flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
-          >
-            <Minus className="w-4 h-4 text-foreground" />
-          </button>
-        </div>
-
-        {/* Zoom level indicator */}
-        <div className="absolute top-3 right-3 z-40 px-2 py-1 rounded-lg bg-card/80 shadow-sm">
-          <span className="text-[10px] font-medium text-muted-foreground">{zoom.toFixed(1)}x</span>
-        </div>
+        <ZoomControls
+          zoom={zoom}
+          minZoom={MIN_ZOOM}
+          maxZoom={MAX_ZOOM}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+        />
       </div>
 
       {/* Selected card */}
       {selected && (
         <div className="px-4 py-3 animate-fade-in">
-          {isProperty ? (
-            <div className="rounded-2xl bg-card card-shadow overflow-hidden">
-              <div className="relative">
-                <SwipeableImageGallery
-                  images={(selected as Property).images?.length ? (selected as Property).images : [(selected as Property).image]}
-                  alt={(selected as Property).title}
-                  className="aspect-[16/9]"
-                  bottomOffsetClass="bottom-2"
-                />
-              </div>
-              <button
-                onClick={() => onSelectProperty((selected as Property).id)}
-                className="w-full flex items-center gap-3 p-3 active:scale-[0.98] transition-transform text-left"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{(selected as Property).title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <p className="text-xs font-bold text-primary">
-                      KES {new Intl.NumberFormat("en-KE").format((selected as Property).price)}
-                      <span className="font-normal text-muted-foreground">{(selected as Property).priceUnit}</span>
-                    </p>
-                    {(selected as Property).verified && <ShieldCheck className="w-3 h-3 text-primary" />}
-                  </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <Bed className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-[10px] text-muted-foreground">{(selected as Property).bedrooms} BR</span>
-                    {(selected as Property).rating && (
-                      <>
-                        <Star className="w-3 h-3 text-accent fill-accent" />
-                        <span className="text-[10px] text-muted-foreground">{(selected as Property).rating}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow">
-              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-xl">
-                {(selected as ServiceProvider).avatar}
-              </div>
-              <div className="flex-1 text-left">
-                <p className="text-sm font-semibold">{(selected as ServiceProvider).name}</p>
-                <p className="text-xs text-muted-foreground">{(selected as ServiceProvider).category}</p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <Star className="w-3 h-3 text-accent fill-accent" />
-                  <span className="text-[10px] font-medium">{(selected as ServiceProvider).rating}</span>
-                  <span className="text-[10px] text-muted-foreground">({(selected as ServiceProvider).reviews})</span>
-                </div>
-              </div>
-            </div>
-          )}
+          <SelectedCard selected={selected} onSelectProperty={onSelectProperty} />
         </div>
       )}
 
