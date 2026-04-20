@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { ArrowLeft, MapPin, Navigation, Star, Bed, ShieldCheck, Wrench, Home, ChevronRight, Plus, Minus } from "lucide-react";
 import { properties, serviceProviders, type Property, type ServiceProvider } from "@/data/mockData";
+import SwipeableImageGallery from "./SwipeableImageGallery";
 
 interface MapDiscoveryProps {
   onBack: () => void;
