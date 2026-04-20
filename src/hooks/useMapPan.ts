@@ -104,10 +104,10 @@ export const useMapPan = (
       if (dragging && e.touches.length === 1) {
         const dx = e.touches[0].clientX - dragStart.x;
         const dy = e.touches[0].clientY - dragStart.y;
-        setPan({ x: panStart.x + dx, y: panStart.y + dy });
+        setPan(clampPan({ x: panStart.x + dx, y: panStart.y + dy }));
       }
     },
-    [dragging, dragStart, panStart, clampZoom]
+    [dragging, dragStart, panStart, clampZoom, clampPan]
   );
 
   const onTouchEnd = useCallback((e: React.TouchEvent) => {
