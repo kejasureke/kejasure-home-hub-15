@@ -46,6 +46,12 @@ export const useMapPan = (
   // Pinch state lives in a ref so rapid touchmove events don't thrash React.
   const pinchRef = useRef<{ startDist: number; startZoom: number } | null>(null);
 
+  // Animation frame ref so a new recenter call cancels any in-flight animation.
+  const animRef = useRef<number | null>(null);
+  useEffect(() => () => {
+    if (animRef.current !== null) cancelAnimationFrame(animRef.current);
+  }, []);
+
   const clampZoom = useCallback(
     (z: number) => Math.min(maxZoom, Math.max(minZoom, z)),
     [minZoom, maxZoom]
