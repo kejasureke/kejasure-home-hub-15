@@ -20,8 +20,18 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [selectedPin, setSelectedPin] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "rentals" | "shortstays" | "services">("all");
 
-  const { zoom, pan, minZoom, maxZoom, zoomIn, zoomOut, project, touchHandlers } =
-    useMapPan(CENTER, MAP_W, MAP_H);
+  const {
+    zoom,
+    pan,
+    minZoom,
+    maxZoom,
+    zoomIn,
+    zoomOut,
+    recenter,
+    isCentered,
+    project,
+    touchHandlers,
+  } = useMapPan(CENTER, MAP_W, MAP_H);
 
   const propertyPins: Pin[] = properties
     .filter((p) => p.county === "Nairobi")
@@ -144,6 +154,8 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
           maxZoom={maxZoom}
           onZoomIn={zoomIn}
           onZoomOut={zoomOut}
+          onRecenter={recenter}
+          isCentered={isCentered}
         />
       </div>
 

@@ -1,4 +1,4 @@
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Locate } from "lucide-react";
 
 interface ZoomControlsProps {
   zoom: number;
@@ -6,9 +6,19 @@ interface ZoomControlsProps {
   maxZoom: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
+  onRecenter?: () => void;
+  isCentered?: boolean;
 }
 
-const ZoomControls = ({ zoom, minZoom, maxZoom, onZoomIn, onZoomOut }: ZoomControlsProps) => (
+const ZoomControls = ({
+  zoom,
+  minZoom,
+  maxZoom,
+  onZoomIn,
+  onZoomOut,
+  onRecenter,
+  isCentered,
+}: ZoomControlsProps) => (
   <>
     <div className="absolute bottom-3 right-3 z-40 flex flex-col gap-1.5">
       <button
@@ -27,6 +37,16 @@ const ZoomControls = ({ zoom, minZoom, maxZoom, onZoomIn, onZoomOut }: ZoomContr
       >
         <Minus className="w-4 h-4 text-foreground" />
       </button>
+      {onRecenter && (
+        <button
+          onClick={onRecenter}
+          disabled={isCentered}
+          className="w-9 h-9 rounded-xl bg-card shadow-md flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40 animate-fade-in"
+          aria-label="Recenter map"
+        >
+          <Locate className="w-4 h-4 text-primary" />
+        </button>
+      )}
     </div>
 
     <div className="absolute top-3 right-3 z-40 px-2 py-1 rounded-lg bg-card/80 shadow-sm">
