@@ -96,11 +96,18 @@ export const useMapPan = (
 
   const onTouchStart = useCallback(
     (e: React.TouchEvent) => {
+      mapElRef.current = e.currentTarget as HTMLElement;
       if (e.touches.length === 2) {
-        // Begin pinch
+        // Begin pinch — capture midpoint in map-local coords.
+        const rect = mapElRef.current.getBoundingClientRect();
+        const midClientX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const midClientY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
         pinchRef.current = {
           startDist: distance(e.touches[0], e.touches[1]),
           startZoom: zoom,
+          startPan: pan,
+          midX: midClientX - rect.left,
+          midY: midClientY - rect.top,
         };
         setDragging(false);
       } else if (e.touches.length === 1) {
@@ -116,9 +123,24 @@ export const useMapPan = (
   const onTouchMove = useCallback(
     (e: React.TouchEvent) => {
       if (e.touches.length === 2 && pinchRef.current) {
+        const p = pinchRef.current;
         const dist = distance(e.touches[0], e.touches[1]);
-        const ratio = dist / pinchRef.current.startDist;
-        setZoom(clampZoom(pinchRef.current.startZoom * ratio));
+        const ratio = dist / p.startDist;
+        const newZoom = clampZoom(p.startZoom * ratio);
+        // Effective scale ratio after clamping.
+        const k = newZoom / p.startZoom;
+        // Keep the midpoint anchored: the map-local point under the fingers
+        // at gesture start must remain under them as zoom changes.
+        const cx = mapWidth / 2;
+        const cy = mapHeight / 2;
+        const ax = p.midX - cx - p.startPan.x;
+        const ay = p.midY - cy - p.startPan.y;
+        const newPan = clampPan({
+          x: p.midX - cx - ax * k,
+          y: p.midY - cy - ay * k,
+        });
+        setZoom(newZoom);
+        setPan(newPan);
         return;
       }
       if (dragging && e.touches.length === 1) {
@@ -127,7 +149,7 @@ export const useMapPan = (
         setPan(clampPan({ x: panStart.x + dx, y: panStart.y + dy }));
       }
     },
-    [dragging, dragStart, panStart, clampZoom, clampPan]
+    [dragging, dragStart, panStart, clampZoom, clampPan, mapWidth, mapHeight]
   );
 
   const onTouchEnd = useCallback((e: React.TouchEvent) => {
