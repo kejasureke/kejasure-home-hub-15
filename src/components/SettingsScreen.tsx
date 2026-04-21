@@ -69,18 +69,27 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     </div>
   );
 
-  const SettingRow = ({ icon: Icon, label, subtitle, right }: { icon: any; label: string; subtitle?: string; right: React.ReactNode }) => (
-    <div className="flex items-center gap-3 p-4 border-b border-border last:border-b-0">
-      <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-        <Icon className="w-4 h-4 text-primary" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold">{label}</p>
-        {subtitle && <p className="text-[11px] text-muted-foreground">{subtitle}</p>}
-      </div>
-      {right}
-    </div>
-  );
+  const SettingRow = ({ icon: Icon, label, subtitle, right, onClick }: { icon: any; label: string; subtitle?: string; right: React.ReactNode; onClick?: () => void }) => {
+    const content = (
+      <>
+        <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+          <Icon className="w-4 h-4 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <p className="text-sm font-semibold">{label}</p>
+          {subtitle && <p className="text-[11px] text-muted-foreground">{subtitle}</p>}
+        </div>
+        {right}
+      </>
+    );
+    return onClick ? (
+      <button onClick={onClick} className="w-full flex items-center gap-3 p-4 border-b border-border last:border-b-0 active:bg-secondary/40 transition-colors">
+        {content}
+      </button>
+    ) : (
+      <div className="flex items-center gap-3 p-4 border-b border-border last:border-b-0">{content}</div>
+    );
+  };
 
   return (
     <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
