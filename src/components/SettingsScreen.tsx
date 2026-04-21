@@ -174,6 +174,102 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           </div>
         </div>
       )}
+
+      {/* Profile Visibility */}
+      {showVisibility && (
+        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-foreground/40 backdrop-blur-sm" onClick={() => setShowVisibility(false)}>
+          <div className="w-full sm:w-[85%] sm:max-w-sm bg-card rounded-t-3xl sm:rounded-3xl p-6 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-col items-center mb-4">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                <Eye className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-lg font-bold">Profile Visibility</h3>
+              <p className="text-xs text-muted-foreground text-center mt-1">Choose who can see your profile and contact details</p>
+            </div>
+            <div className="space-y-2 mb-4">
+              {([
+                { id: "everyone", label: "Everyone", desc: "All KejaSure users can view your profile" },
+                { id: "verified", label: "Verified users only", desc: "Only KYC-verified users can view" },
+                { id: "private", label: "Private", desc: "Only people you message can view" },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => setVisibility(opt.id)}
+                  className={`w-full p-3 rounded-xl border text-left transition-colors ${
+                    visibility === opt.id ? "border-primary bg-primary/5" : "border-border bg-secondary/30"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">{opt.label}</p>
+                    <div className={`w-4 h-4 rounded-full border-2 ${visibility === opt.id ? "border-primary bg-primary" : "border-muted-foreground"}`} />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{opt.desc}</p>
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setShowVisibility(false)} className="w-full py-3.5 rounded-xl gradient-trust text-primary-foreground text-sm font-bold active:scale-[0.98] transition-transform">
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Change PIN */}
+      {showPinFlow && (
+        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-foreground/40 backdrop-blur-sm" onClick={closePinFlow}>
+          <div className="w-full sm:w-[85%] sm:max-w-sm bg-card rounded-t-3xl sm:rounded-3xl p-6 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            {pinStep === "done" ? (
+              <div className="flex flex-col items-center py-2">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                  <Shield className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="text-lg font-bold">PIN Updated</h3>
+                <p className="text-sm text-muted-foreground text-center mt-1 mb-5">Your 4-digit PIN has been changed successfully.</p>
+                <button onClick={closePinFlow} className="w-full py-3.5 rounded-xl gradient-trust text-primary-foreground text-sm font-bold active:scale-[0.98] transition-transform">
+                  Done
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex flex-col items-center mb-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                    <Shield className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold">
+                    {pinStep === "current" ? "Enter Current PIN" : pinStep === "new" ? "Set New PIN" : "Confirm New PIN"}
+                  </h3>
+                  <p className="text-xs text-muted-foreground text-center mt-1">
+                    {pinStep === "current" ? "Verify it's really you" : pinStep === "new" ? "Choose a new 4-digit PIN" : "Re-enter your new PIN"}
+                  </p>
+                </div>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={4}
+                  autoFocus
+                  value={pinStep === "current" ? currentPin : pinStep === "new" ? newPin : confirmPin}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                    setPinError("");
+                    if (pinStep === "current") setCurrentPin(v);
+                    else if (pinStep === "new") setNewPin(v);
+                    else setConfirmPin(v);
+                  }}
+                  className="w-full text-center text-3xl tracking-[0.6em] font-bold bg-secondary rounded-xl py-4 mb-2 border-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="••••"
+                />
+                {pinError && <p className="text-xs text-destructive text-center mb-2">{pinError}</p>}
+                <button onClick={handlePinSubmit} className="w-full py-3.5 rounded-xl gradient-trust text-primary-foreground text-sm font-bold mt-2 active:scale-[0.98] transition-transform">
+                  {pinStep === "confirm" ? "Update PIN" : "Continue"}
+                </button>
+                <button onClick={closePinFlow} className="w-full py-3 rounded-xl text-sm font-semibold text-muted-foreground">
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
