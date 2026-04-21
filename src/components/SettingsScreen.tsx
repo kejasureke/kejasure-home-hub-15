@@ -17,6 +17,40 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const [biometricEnabled, setBiometricEnabled] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [language, setLanguage] = useState("en");
+  const [showVisibility, setShowVisibility] = useState(false);
+  const [visibility, setVisibility] = useState<"everyone" | "verified" | "private">("everyone");
+  const [showPinFlow, setShowPinFlow] = useState(false);
+  const [pinStep, setPinStep] = useState<"current" | "new" | "confirm" | "done">("current");
+  const [currentPin, setCurrentPin] = useState("");
+  const [newPin, setNewPin] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [pinError, setPinError] = useState("");
+
+  const visibilityLabel = visibility === "everyone" ? "Everyone" : visibility === "verified" ? "Verified users only" : "Private";
+
+  const closePinFlow = () => {
+    setShowPinFlow(false);
+    setPinStep("current");
+    setCurrentPin("");
+    setNewPin("");
+    setConfirmPin("");
+    setPinError("");
+  };
+
+  const handlePinSubmit = () => {
+    setPinError("");
+    if (pinStep === "current") {
+      if (currentPin.length !== 4) return setPinError("Enter your 4-digit PIN");
+      setPinStep("new");
+    } else if (pinStep === "new") {
+      if (newPin.length !== 4) return setPinError("New PIN must be 4 digits");
+      if (newPin === currentPin) return setPinError("New PIN must differ from current");
+      setPinStep("confirm");
+    } else if (pinStep === "confirm") {
+      if (confirmPin !== newPin) return setPinError("PINs do not match");
+      setPinStep("done");
+    }
+  };
 
   const Toggle = ({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) => (
     <button onClick={onToggle} className="shrink-0">
