@@ -56,6 +56,12 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>(initialBookingRequests);
+  const [deletingIdx, setDeletingIdx] = useState<number | null>(null);
+  const [myListings, setMyListings] = useState([
+    { title: "3BR Kilimani", views: 847, leads: 23, status: "active" },
+    { title: "2BR Westlands", views: 612, leads: 18, status: "active" },
+    { title: "Studio Westlands", views: 1203, leads: 45, status: "active" },
+  ]);
   const { isVerified, markVerified } = useKYCStatus("landlord");
 
   useEffect(() => {
