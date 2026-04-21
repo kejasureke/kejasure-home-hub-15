@@ -56,6 +56,12 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>(initialBookingRequests);
+  const [deletingIdx, setDeletingIdx] = useState<number | null>(null);
+  const [myListings, setMyListings] = useState([
+    { title: "3BR Kilimani", views: 847, leads: 23, status: "active" },
+    { title: "2BR Westlands", views: 612, leads: 18, status: "active" },
+    { title: "Studio Westlands", views: 1203, leads: 45, status: "active" },
+  ]);
   const { isVerified, markVerified } = useKYCStatus("landlord");
 
   useEffect(() => {
@@ -65,11 +71,23 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
     }
   }, [autoOpenKYC, isVerified, onKYCOpened]);
 
-  const myListings = [
-    { title: "3BR Kilimani", views: 847, leads: 23, status: "active" },
-    { title: "2BR Westlands", views: 612, leads: 18, status: "active" },
-    { title: "Studio Westlands", views: 1203, leads: 45, status: "active" },
-  ];
+  const handleDeleteConfirm = () => {
+    if (deletingIdx === null) return;
+    const removed = myListings[deletingIdx];
+    setMyListings((prev) => prev.filter((_, i) => i !== deletingIdx));
+    setDeletingIdx(null);
+    toast.success("Listing deleted", {
+      description: `${removed.title} has been removed.`,
+      action: {
+        label: "Undo",
+        onClick: () => setMyListings((prev) => {
+          const next = [...prev];
+          next.splice(deletingIdx, 0, removed);
+          return next;
+        }),
+      },
+    });
+  };
 
   const handleBookingAction = (id: string, action: "accepted" | "declined") => {
     setBookingRequests(prev => prev.map(b => b.id === id ? { ...b, status: action } : b));
@@ -301,7 +319,7 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
                 <button onClick={() => { setEditIdx(i); setShowCRUD(true); }} className="p-1.5 rounded-lg bg-secondary">
                   <Edit3 className="w-3.5 h-3.5 text-primary" />
                 </button>
-                <button className="p-1.5 rounded-lg bg-secondary">
+                <button onClick={() => setDeletingIdx(i)} aria-label="Delete listing" className="p-1.5 rounded-lg bg-secondary active:scale-90 transition-transform">
                   <Trash2 className="w-3.5 h-3.5 text-destructive" />
                 </button>
               </div>
@@ -309,6 +327,32 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
           ))}
         </div>
       </div>
+
+      {/* Delete confirmation */}
+      {deletingIdx !== null && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-foreground/40 backdrop-blur-sm" onClick={() => setDeletingIdx(null)}>
+          <div className="w-[85%] max-w-sm bg-card rounded-3xl p-6 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-col items-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-3">
+                <Trash2 className="w-7 h-7 text-destructive" />
+              </div>
+              <h3 className="text-lg font-bold">Delete listing?</h3>
+              <p className="text-sm text-muted-foreground text-center mt-1">
+                "{myListings[deletingIdx]?.title}" will be removed. Active leads and chats will be archived.
+              </p>
+            </div>
+            <button
+              onClick={handleDeleteConfirm}
+              className="w-full py-3.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-bold mb-2 active:scale-[0.98] transition-transform"
+            >
+              Yes, Delete Listing
+            </button>
+            <button onClick={() => setDeletingIdx(null)} className="w-full py-3 rounded-xl text-sm font-semibold text-muted-foreground">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
