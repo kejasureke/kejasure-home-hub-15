@@ -254,6 +254,49 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   Done
                 </button>
               </div>
+            ) : pinStep === "otp" ? (
+              <>
+                <div className="flex flex-col items-center mb-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                    <Smartphone className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold">Verify it's you</h3>
+                  <p className="text-xs text-muted-foreground text-center mt-1">
+                    Enter the 6-digit code sent to <span className="font-semibold text-foreground">{maskedPhone}</span>
+                  </p>
+                </div>
+                <div className="bg-accent/15 border border-accent/30 rounded-xl px-3 py-2 mb-3 text-center">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Demo code (mock SMS)</p>
+                  <p className="text-lg font-bold tracking-[0.3em] text-foreground">{otpCode}</p>
+                </div>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={6}
+                  autoFocus
+                  value={otpInput}
+                  onChange={(e) => {
+                    setOtpInput(e.target.value.replace(/\D/g, "").slice(0, 6));
+                    setPinError("");
+                  }}
+                  className="w-full text-center text-2xl tracking-[0.4em] font-bold bg-secondary rounded-xl py-4 mb-2 border-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="••••••"
+                />
+                {pinError && <p className="text-xs text-destructive text-center mb-2">{pinError}</p>}
+                <div className="text-center mb-2">
+                  {otpResendIn > 0 ? (
+                    <p className="text-[11px] text-muted-foreground">Resend in <span className="font-semibold text-primary">{otpResendIn}s</span></p>
+                  ) : (
+                    <button onClick={generateOtp} className="text-[11px] font-semibold text-primary">Resend code</button>
+                  )}
+                </div>
+                <button onClick={handlePinSubmit} className="w-full py-3.5 rounded-xl gradient-trust text-primary-foreground text-sm font-bold mt-2 active:scale-[0.98] transition-transform">
+                  Verify & Update PIN
+                </button>
+                <button onClick={closePinFlow} className="w-full py-3 rounded-xl text-sm font-semibold text-muted-foreground">
+                  Cancel
+                </button>
+              </>
             ) : (
               <>
                 <div className="flex flex-col items-center mb-4">
@@ -285,7 +328,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                 />
                 {pinError && <p className="text-xs text-destructive text-center mb-2">{pinError}</p>}
                 <button onClick={handlePinSubmit} className="w-full py-3.5 rounded-xl gradient-trust text-primary-foreground text-sm font-bold mt-2 active:scale-[0.98] transition-transform">
-                  {pinStep === "confirm" ? "Update PIN" : "Continue"}
+                  {pinStep === "confirm" ? "Send SMS Code" : "Continue"}
                 </button>
                 <button onClick={closePinFlow} className="w-full py-3 rounded-xl text-sm font-semibold text-muted-foreground">
                   Cancel
