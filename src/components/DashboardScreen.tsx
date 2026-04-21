@@ -71,11 +71,23 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
     }
   }, [autoOpenKYC, isVerified, onKYCOpened]);
 
-  const myListings = [
-    { title: "3BR Kilimani", views: 847, leads: 23, status: "active" },
-    { title: "2BR Westlands", views: 612, leads: 18, status: "active" },
-    { title: "Studio Westlands", views: 1203, leads: 45, status: "active" },
-  ];
+  const handleDeleteConfirm = () => {
+    if (deletingIdx === null) return;
+    const removed = myListings[deletingIdx];
+    setMyListings((prev) => prev.filter((_, i) => i !== deletingIdx));
+    setDeletingIdx(null);
+    toast.success("Listing deleted", {
+      description: `${removed.title} has been removed.`,
+      action: {
+        label: "Undo",
+        onClick: () => setMyListings((prev) => {
+          const next = [...prev];
+          next.splice(deletingIdx, 0, removed);
+          return next;
+        }),
+      },
+    });
+  };
 
   const handleBookingAction = (id: string, action: "accepted" | "declined") => {
     setBookingRequests(prev => prev.map(b => b.id === id ? { ...b, status: action } : b));
