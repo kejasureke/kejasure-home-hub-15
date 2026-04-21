@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Eye, Shield, ChevronRight, ToggleLeft, ToggleRight, Smartphone, MapPin, Volume2 } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 
