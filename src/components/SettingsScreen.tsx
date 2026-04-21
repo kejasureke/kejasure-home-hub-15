@@ -20,11 +20,28 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const [showVisibility, setShowVisibility] = useState(false);
   const [visibility, setVisibility] = useState<"everyone" | "verified" | "private">("everyone");
   const [showPinFlow, setShowPinFlow] = useState(false);
-  const [pinStep, setPinStep] = useState<"current" | "new" | "confirm" | "done">("current");
+  const [pinStep, setPinStep] = useState<"current" | "new" | "confirm" | "otp" | "done">("current");
   const [currentPin, setCurrentPin] = useState("");
   const [newPin, setNewPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
   const [pinError, setPinError] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpInput, setOtpInput] = useState("");
+  const [otpResendIn, setOtpResendIn] = useState(0);
+  const maskedPhone = "+254 712 ••• 678";
+
+  useEffect(() => {
+    if (otpResendIn <= 0) return;
+    const t = setInterval(() => setOtpResendIn((v) => v - 1), 1000);
+    return () => clearInterval(t);
+  }, [otpResendIn]);
+
+  const generateOtp = () => {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    setOtpCode(code);
+    setOtpInput("");
+    setOtpResendIn(30);
+  };
 
   const visibilityLabel = visibility === "everyone" ? "Everyone" : visibility === "verified" ? "Verified users only" : "Private";
 
@@ -35,6 +52,9 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     setNewPin("");
     setConfirmPin("");
     setPinError("");
+    setOtpCode("");
+    setOtpInput("");
+    setOtpResendIn(0);
   };
 
   const handlePinSubmit = () => {
@@ -48,6 +68,11 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
       setPinStep("confirm");
     } else if (pinStep === "confirm") {
       if (confirmPin !== newPin) return setPinError("PINs do not match");
+      generateOtp();
+      setPinStep("otp");
+    } else if (pinStep === "otp") {
+      if (otpInput.length !== 6) return setPinError("Enter the 6-digit code");
+      if (otpInput !== otpCode) return setPinError("Incorrect code. Try again.");
       setPinStep("done");
     }
   };
