@@ -157,6 +157,12 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
         >
           <div className="w-4 h-4 rounded-full bg-blue-500 border-3 border-card shadow-lg animate-pulse" />
           <div className="absolute -inset-3 rounded-full bg-blue-500/20 animate-ping" />
+          {showHereTooltip && (
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2.5 py-1 rounded-lg bg-foreground text-background text-[10px] font-semibold whitespace-nowrap shadow-lg animate-fade-in pointer-events-none">
+              You are here
+              <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-foreground" />
+            </div>
+          )}
         </div>
 
         {/* Zoom controls */}
@@ -166,7 +172,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
           maxZoom={maxZoom}
           onZoomIn={zoomIn}
           onZoomOut={zoomOut}
-          onRecenter={recenter}
+          onRecenter={handleRecenter}
           isCentered={isCentered}
         />
       </div>
