@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Navigation } from "lucide-react";
 import { properties, serviceProviders } from "@/data/mockData";
 import { useMapPan } from "@/hooks/useMapPan";
@@ -19,6 +19,18 @@ const MAP_H = 420;
 const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [selectedPin, setSelectedPin] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "rentals" | "shortstays" | "services">("all");
+  const [showHereTooltip, setShowHereTooltip] = useState(false);
+
+  useEffect(() => {
+    if (!showHereTooltip) return;
+    const t = setTimeout(() => setShowHereTooltip(false), 1800);
+    return () => clearTimeout(t);
+  }, [showHereTooltip]);
+
+  const handleRecenter = () => {
+    recenter();
+    setShowHereTooltip(true);
+  };
 
   const {
     zoom,
