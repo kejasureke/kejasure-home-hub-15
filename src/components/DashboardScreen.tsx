@@ -319,7 +319,7 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
                 <button onClick={() => { setEditIdx(i); setShowCRUD(true); }} className="p-1.5 rounded-lg bg-secondary">
                   <Edit3 className="w-3.5 h-3.5 text-primary" />
                 </button>
-                <button className="p-1.5 rounded-lg bg-secondary">
+                <button onClick={() => setDeletingIdx(i)} aria-label="Delete listing" className="p-1.5 rounded-lg bg-secondary active:scale-90 transition-transform">
                   <Trash2 className="w-3.5 h-3.5 text-destructive" />
                 </button>
               </div>
@@ -327,6 +327,32 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
           ))}
         </div>
       </div>
+
+      {/* Delete confirmation */}
+      {deletingIdx !== null && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-foreground/40 backdrop-blur-sm" onClick={() => setDeletingIdx(null)}>
+          <div className="w-[85%] max-w-sm bg-card rounded-3xl p-6 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-col items-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-3">
+                <Trash2 className="w-7 h-7 text-destructive" />
+              </div>
+              <h3 className="text-lg font-bold">Delete listing?</h3>
+              <p className="text-sm text-muted-foreground text-center mt-1">
+                "{myListings[deletingIdx]?.title}" will be removed. Active leads and chats will be archived.
+              </p>
+            </div>
+            <button
+              onClick={handleDeleteConfirm}
+              className="w-full py-3.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-bold mb-2 active:scale-[0.98] transition-transform"
+            >
+              Yes, Delete Listing
+            </button>
+            <button onClick={() => setDeletingIdx(null)} className="w-full py-3 rounded-xl text-sm font-semibold text-muted-foreground">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
