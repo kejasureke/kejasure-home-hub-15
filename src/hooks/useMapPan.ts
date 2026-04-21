@@ -44,7 +44,21 @@ export const useMapPan = (
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
 
   // Pinch state lives in a ref so rapid touchmove events don't thrash React.
-  const pinchRef = useRef<{ startDist: number; startZoom: number } | null>(null);
+  // We capture the midpoint (in map-local coords) and the pan/zoom at gesture
+  // start so we can keep that point pinned under the user's fingers.
+  const pinchRef = useRef<
+    | {
+        startDist: number;
+        startZoom: number;
+        startPan: { x: number; y: number };
+        // Midpoint relative to the map element's top-left at gesture start.
+        midX: number;
+        midY: number;
+      }
+    | null
+  >(null);
+  // The map element, captured on touchstart, so we can convert client → local coords.
+  const mapElRef = useRef<HTMLElement | null>(null);
 
   // Animation frame ref so a new recenter call cancels any in-flight animation.
   const animRef = useRef<number | null>(null);
