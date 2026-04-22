@@ -9,7 +9,7 @@ vi.mock("sonner", () => ({
 
 describe("AgencyDashboard – invite cooldown focus & announcement", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     // Force the mocked SMS gateway to ALWAYS fail (Math.random < 0.3 path)
     vi.spyOn(Math, "random").mockReturnValue(0);
   });
@@ -24,10 +24,10 @@ describe("AgencyDashboard – invite cooldown focus & announcement", () => {
 
     // Open invite modal (Quick Action on default Overview tab)
     fireEvent.click(screen.getByText("Add Agent"));
-    expect(await screen.findByText("👤 Invite Agent")).toBeInTheDocument();
+    expect(screen.getByText("👤 Invite Agent")).toBeInTheDocument();
 
     // Submit — triggers the 1.2s mock SMS request that will fail
-    const sendBtn = screen.getByRole("button", { name: /send invitation/i });
+    const sendBtn = screen.getByRole("button", { name: /^send invitation$/i });
     fireEvent.click(sendBtn);
 
     // Advance through the simulated network delay → cooldown begins at 30
