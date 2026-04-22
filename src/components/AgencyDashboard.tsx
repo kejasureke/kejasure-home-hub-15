@@ -62,6 +62,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
   const [showBoost, setShowBoost] = useState(false);
   const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
   const [showAddAgent, setShowAddAgent] = useState(false);
+  const [agentRole, setAgentRole] = useState<string>("Agent");
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("agency");
@@ -145,9 +146,23 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
               <div>
                 <label className="text-xs font-semibold text-muted-foreground mb-1 block">Role</label>
                 <div className="flex gap-2">
-                  {["Agent", "Senior Agent", "Manager"].map((r) => (
-                    <button key={r} className="flex-1 py-2.5 rounded-xl bg-secondary text-xs font-medium text-secondary-foreground active:scale-[0.98]">{r}</button>
-                  ))}
+                  {["Agent", "Senior Agent", "Manager"].map((r) => {
+                    const active = agentRole === r;
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => setAgentRole(r)}
+                        className={`flex-1 py-2.5 rounded-xl text-xs font-medium transition-all active:scale-[0.98] ${
+                          active
+                            ? "bg-primary/10 text-primary border-2 border-primary"
+                            : "bg-secondary text-secondary-foreground border-2 border-transparent"
+                        }`}
+                      >
+                        {r}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               <button onClick={() => { setShowAddAgent(false); toast.success("Invitation sent!", { description: "Your agent will receive an SMS invite shortly." }); }} className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
