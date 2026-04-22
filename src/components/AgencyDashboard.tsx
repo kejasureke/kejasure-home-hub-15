@@ -63,6 +63,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
   const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
   const [showAddAgent, setShowAddAgent] = useState(false);
   const [agentRole, setAgentRole] = useState<string>("Agent");
+  const [invitingAgent, setInvitingAgent] = useState(false);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("agency");
@@ -128,11 +129,11 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
         </div>
       )}
       {showAddAgent && (
-        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowAddAgent(false)}>
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => { if (!invitingAgent) setShowAddAgent(false); }}>
           <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">👤 Invite Agent</h3>
-              <button onClick={() => setShowAddAgent(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+              <button onClick={() => { if (!invitingAgent) setShowAddAgent(false); }} disabled={invitingAgent}><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
             <div className="space-y-4">
               <div>
@@ -165,8 +166,30 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                   })}
                 </div>
               </div>
-              <button onClick={() => { setShowAddAgent(false); toast.success("Invitation sent!", { description: "Your agent will receive an SMS invite shortly." }); }} className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
-                Send Invitation
+              <button
+                onClick={() => {
+                  if (invitingAgent) return;
+                  setInvitingAgent(true);
+                  setTimeout(() => {
+                    setInvitingAgent(false);
+                    setShowAddAgent(false);
+                    toast.success("Invitation sent!", { description: "Your agent will receive an SMS invite shortly." });
+                  }, 1200);
+                }}
+                disabled={invitingAgent}
+                aria-busy={invitingAgent}
+                className={`w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground transition-transform flex items-center justify-center gap-2 ${
+                  invitingAgent ? "opacity-70 cursor-not-allowed" : "active:scale-[0.98]"
+                }`}
+              >
+                {invitingAgent ? (
+                  <>
+                    <span className="w-4 h-4 rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground animate-spin" />
+                    Sending…
+                  </>
+                ) : (
+                  "Send Invitation"
+                )}
               </button>
             </div>
           </div>
