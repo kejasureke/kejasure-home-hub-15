@@ -176,15 +176,16 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
               </div>
               <button
                 onClick={() => {
-                  if (invitingAgent) return;
+                  if (invitingAgent || inviteCooldown > 0) return;
                   setInvitingAgent(true);
                   setTimeout(() => {
                     // Mock SMS gateway: ~30% chance of failure for demo
                     const failed = Math.random() < 0.3;
                     setInvitingAgent(false);
                     if (failed) {
+                      setInviteCooldown(30);
                       toast.error("Failed to send invitation", {
-                        description: "SMS gateway unreachable. Please try again.",
+                        description: "SMS gateway unreachable. You can retry in 30s.",
                       });
                       return;
                     }
@@ -192,10 +193,10 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                     toast.success("Invitation sent!", { description: "Your agent will receive an SMS invite shortly." });
                   }, 1200);
                 }}
-                disabled={invitingAgent}
+                disabled={invitingAgent || inviteCooldown > 0}
                 aria-busy={invitingAgent}
                 className={`w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground transition-transform flex items-center justify-center gap-2 ${
-                  invitingAgent ? "opacity-70 cursor-not-allowed" : "active:scale-[0.98]"
+                  invitingAgent || inviteCooldown > 0 ? "opacity-70 cursor-not-allowed" : "active:scale-[0.98]"
                 }`}
               >
                 {invitingAgent ? (
@@ -203,6 +204,8 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                     <span className="w-4 h-4 rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground animate-spin" />
                     Sending…
                   </>
+                ) : inviteCooldown > 0 ? (
+                  `Retry in ${inviteCooldown}s`
                 ) : (
                   "Send Invitation"
                 )}
