@@ -92,6 +92,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
     prevCooldownRef.current = inviteCooldown;
   }, [inviteCooldown, showAddAgent]);
 
+  const currentPlan = plans.find((p) => p.current)!;
 
   const agencyMpesaPlans = plans.map((p) => ({
     name: p.name,
