@@ -226,14 +226,17 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                   "Send Invitation"
                 )}
               </button>
+              {/* Countdown / sending status announcer */}
               <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
                 {invitingAgent
                   ? "Sending invitation"
-                  : cooldownEndedMsg
-                    ? cooldownEndedMsg
-                    : inviteCooldown > 0 && (inviteCooldown <= 5 || inviteCooldown % 10 === 0)
-                      ? `Retry available in ${inviteCooldown} second${inviteCooldown === 1 ? "" : "s"}.`
-                      : ""}
+                  : inviteCooldown > 0 && (inviteCooldown <= 5 || inviteCooldown % 10 === 0)
+                    ? `Retry available in ${inviteCooldown} second${inviteCooldown === 1 ? "" : "s"}.`
+                    : ""}
+              </div>
+              {/* Dedicated cooldown-ended announcer (assertive so it preempts the countdown region) */}
+              <div role="status" aria-live="assertive" aria-atomic="true" className="sr-only">
+                {cooldownEndedMsg}
               </div>
             </div>
           </div>
