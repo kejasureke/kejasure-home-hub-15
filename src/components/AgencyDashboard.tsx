@@ -171,7 +171,15 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                   if (invitingAgent) return;
                   setInvitingAgent(true);
                   setTimeout(() => {
+                    // Mock SMS gateway: ~30% chance of failure for demo
+                    const failed = Math.random() < 0.3;
                     setInvitingAgent(false);
+                    if (failed) {
+                      toast.error("Failed to send invitation", {
+                        description: "SMS gateway unreachable. Please try again.",
+                      });
+                      return;
+                    }
                     setShowAddAgent(false);
                     toast.success("Invitation sent!", { description: "Your agent will receive an SMS invite shortly." });
                   }, 1200);
