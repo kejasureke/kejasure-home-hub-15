@@ -64,6 +64,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
   const [showAddAgent, setShowAddAgent] = useState(false);
   const [agentRole, setAgentRole] = useState<string>("Agent");
   const [invitingAgent, setInvitingAgent] = useState(false);
+  const [inviteCooldown, setInviteCooldown] = useState(0);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("agency");
