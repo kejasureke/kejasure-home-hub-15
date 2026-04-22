@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import KYCPromptBanner from "./KYCPromptBanner";
 import KYCSnoozeBanner from "./KYCSnoozeBanner";
@@ -65,6 +65,8 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
   const [agentRole, setAgentRole] = useState<string>("Agent");
   const [invitingAgent, setInvitingAgent] = useState(false);
   const [inviteCooldown, setInviteCooldown] = useState(0);
+  const inviteBtnRef = useRef<HTMLButtonElement>(null);
+  const prevCooldownRef = useRef(0);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("agency");
@@ -81,6 +83,14 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
     const id = setInterval(() => setInviteCooldown((s) => (s > 0 ? s - 1 : 0)), 1000);
     return () => clearInterval(id);
   }, [inviteCooldown]);
+
+  useEffect(() => {
+    if (prevCooldownRef.current > 0 && inviteCooldown === 0 && showAddAgent) {
+      // Cooldown just elapsed while modal is open — focus the retry button
+      requestAnimationFrame(() => inviteBtnRef.current?.focus());
+    }
+    prevCooldownRef.current = inviteCooldown;
+  }, [inviteCooldown, showAddAgent]);
 
   const currentPlan = plans.find((p) => p.current)!;
 
@@ -175,6 +185,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                 </div>
               </div>
               <button
+                ref={inviteBtnRef}
                 onClick={() => {
                   if (invitingAgent || inviteCooldown > 0) return;
                   setInvitingAgent(true);
