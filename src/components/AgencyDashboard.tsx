@@ -75,6 +75,13 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
       onKYCOpened?.();
     }
   }, [autoOpenKYC, isVerified, onKYCOpened]);
+
+  useEffect(() => {
+    if (inviteCooldown <= 0) return;
+    const id = setInterval(() => setInviteCooldown((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, [inviteCooldown]);
+
   const currentPlan = plans.find((p) => p.current)!;
 
   const agencyMpesaPlans = plans.map((p) => ({
