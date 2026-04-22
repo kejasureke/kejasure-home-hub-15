@@ -210,6 +210,15 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                   "Send Invitation"
                 )}
               </button>
+              <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+                {invitingAgent
+                  ? "Sending invitation"
+                  : inviteCooldown === 0
+                    ? "You can retry sending the invitation."
+                    : inviteCooldown <= 5 || inviteCooldown % 10 === 0
+                      ? `Retry available in ${inviteCooldown} second${inviteCooldown === 1 ? "" : "s"}.`
+                      : ""}
+              </div>
             </div>
           </div>
         </div>
