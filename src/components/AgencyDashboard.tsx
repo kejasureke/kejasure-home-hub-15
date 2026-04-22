@@ -186,6 +186,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
               </div>
               <button
                 ref={inviteBtnRef}
+                onClick={() => {
                   if (invitingAgent || inviteCooldown > 0) return;
                   setInvitingAgent(true);
                   setTimeout(() => {
