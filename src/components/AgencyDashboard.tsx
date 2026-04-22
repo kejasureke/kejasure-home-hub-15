@@ -65,6 +65,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
   const [agentRole, setAgentRole] = useState<string>("Agent");
   const [invitingAgent, setInvitingAgent] = useState(false);
   const [inviteCooldown, setInviteCooldown] = useState(0);
+  const [cooldownEndedMsg, setCooldownEndedMsg] = useState("");
   const inviteBtnRef = useRef<HTMLButtonElement>(null);
   const prevCooldownRef = useRef(0);
   const [showCRUD, setShowCRUD] = useState(false);
@@ -88,6 +89,10 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
     if (prevCooldownRef.current > 0 && inviteCooldown === 0 && showAddAgent) {
       // Cooldown just elapsed while modal is open — focus the retry button
       requestAnimationFrame(() => inviteBtnRef.current?.focus());
+      setCooldownEndedMsg("Cooldown ended. Send Invitation button is now focused and ready to retry.");
+      const t = setTimeout(() => setCooldownEndedMsg(""), 4000);
+      prevCooldownRef.current = inviteCooldown;
+      return () => clearTimeout(t);
     }
     prevCooldownRef.current = inviteCooldown;
   }, [inviteCooldown, showAddAgent]);
