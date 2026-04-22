@@ -65,6 +65,8 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
   const [agentRole, setAgentRole] = useState<string>("Agent");
   const [invitingAgent, setInvitingAgent] = useState(false);
   const [inviteCooldown, setInviteCooldown] = useState(0);
+  const inviteBtnRef = useRef<HTMLButtonElement>(null);
+  const prevCooldownRef = useRef(0);
   const [showCRUD, setShowCRUD] = useState(false);
   const [showKYCDirect, setShowKYCDirect] = useState(false);
   const { isVerified, markVerified } = useKYCStatus("agency");
@@ -82,7 +84,14 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
     return () => clearInterval(id);
   }, [inviteCooldown]);
 
-  const currentPlan = plans.find((p) => p.current)!;
+  useEffect(() => {
+    if (prevCooldownRef.current > 0 && inviteCooldown === 0 && showAddAgent) {
+      // Cooldown just elapsed while modal is open — focus the retry button
+      requestAnimationFrame(() => inviteBtnRef.current?.focus());
+    }
+    prevCooldownRef.current = inviteCooldown;
+  }, [inviteCooldown, showAddAgent]);
+
 
   const agencyMpesaPlans = plans.map((p) => ({
     name: p.name,
