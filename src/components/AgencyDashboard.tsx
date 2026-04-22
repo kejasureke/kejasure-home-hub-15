@@ -129,11 +129,11 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
         </div>
       )}
       {showAddAgent && (
-        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowAddAgent(false)}>
+        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => { if (!invitingAgent) setShowAddAgent(false); }}>
           <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">👤 Invite Agent</h3>
-              <button onClick={() => setShowAddAgent(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
+              <button onClick={() => { if (!invitingAgent) setShowAddAgent(false); }} disabled={invitingAgent}><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
             <div className="space-y-4">
               <div>
