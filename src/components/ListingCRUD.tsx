@@ -186,9 +186,17 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
       ? `Highlights include ${topAmenities.join(", ")}${form.amenities.length > 5 ? `, and ${form.amenities.length - 5} more` : ""}.`
       : "";
 
-    const photosLine = form.photos.length
-      ? `Browse the ${form.photos.length} photo${form.photos.length === 1 ? "" : "s"} above to see the space for yourself.`
-      : "";
+    const captionList = Object.entries(photoCaptions)
+      .map(([k, v]) => ({ idx: Number(k), text: (v || "").trim() }))
+      .filter((c) => c.text)
+      .sort((a, b) => a.idx - b.idx)
+      .map((c) => c.text.replace(/^Cover photo\s*[—-]\s*/i, ""));
+
+    const photosLine = captionList.length
+      ? `Photo highlights: ${captionList.slice(0, 5).join("; ")}${captionList.length > 5 ? `, and more.` : "."}`
+      : form.photos.length
+        ? `Browse the ${form.photos.length} photo${form.photos.length === 1 ? "" : "s"} above to see the space for yourself.`
+        : "";
 
     const closing = {
       friendly: "Message us today — we'd love to show you around! 💬",
