@@ -766,51 +766,81 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
             {/* Photo Grid */}
             <div className="grid grid-cols-3 gap-2">
-              {form.photos.map((p, i) => (
-                <div key={i} className="space-y-1">
-                  <div className="relative aspect-square rounded-xl bg-card card-shadow flex items-center justify-center border-2 border-transparent">
-                    <span className="text-3xl">{p}</span>
-                    {i === 0 && (
-                      <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[8px] font-bold">
-                        COVER
-                      </div>
-                    )}
-                    {photoCaptions[i] && (
-                      <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-primary/90 text-primary-foreground text-[8px] font-bold flex items-center gap-0.5">
-                        <Sparkles className="w-2 h-2" /> AI
-                      </div>
-                    )}
+              {form.photos.map((p, i) => {
+                const isActive = activeSuggestPhoto === i;
+                const isSaved = savedFlash === i;
+                return (
+                  <div key={i} className="space-y-1">
                     <button
-                      onClick={() => removePhoto(i)}
-                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+                      onClick={() => setActiveSuggestPhoto(isActive ? null : i)}
+                      className={`relative aspect-square w-full rounded-xl bg-card card-shadow flex items-center justify-center border-2 transition-all ${
+                        isActive
+                          ? "border-accent ring-2 ring-accent/30"
+                          : isSaved
+                            ? "border-trust"
+                            : "border-transparent"
+                      }`}
                     >
-                      <X className="w-3 h-3" />
+                      <span className="text-3xl">{p}</span>
+                      {i === 0 && (
+                        <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[8px] font-bold">
+                          COVER
+                        </div>
+                      )}
+                      {photoCaptions[i] && !isSaved && (
+                        <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-primary/90 text-primary-foreground text-[8px] font-bold flex items-center gap-0.5">
+                          <Sparkles className="w-2 h-2" /> AI
+                        </div>
+                      )}
+                      {isSaved && (
+                        <div className="absolute inset-0 rounded-xl bg-trust/15 flex items-center justify-center animate-fade-in">
+                          <div className="w-7 h-7 rounded-full bg-trust text-white flex items-center justify-center">
+                            <Check className="w-4 h-4" />
+                          </div>
+                        </div>
+                      )}
                     </button>
-                  </div>
-                  {photoCaptions[i] !== undefined && (
-                    editingCaption === i ? (
-                      <input
-                        autoFocus
-                        value={photoCaptions[i]}
-                        onChange={(e) => updateCaption(i, e.target.value)}
-                        onBlur={() => setEditingCaption(null)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") setEditingCaption(null);
-                        }}
-                        className="w-full px-1.5 py-1 rounded-md bg-card border border-primary/40 text-[9px] text-foreground outline-none"
-                      />
-                    ) : (
+                    <div className="flex items-center gap-1">
                       <button
-                        onClick={() => setEditingCaption(i)}
-                        className="w-full text-left px-1 text-[9px] text-muted-foreground leading-tight line-clamp-2 hover:text-foreground transition-colors"
-                        title={photoCaptions[i]}
+                        onClick={(e) => { e.stopPropagation(); removePhoto(i); }}
+                        className="w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shrink-0"
+                        aria-label={`Remove photo ${i + 1}`}
                       >
-                        {photoCaptions[i]}
+                        <X className="w-3 h-3" />
                       </button>
-                    )
-                  )}
-                </div>
-              ))}
+                      {photoCaptions[i] !== undefined ? (
+                        editingCaption === i ? (
+                          <input
+                            autoFocus
+                            value={photoCaptions[i]}
+                            onChange={(e) => updateCaption(i, e.target.value)}
+                            onBlur={() => setEditingCaption(null)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") setEditingCaption(null);
+                            }}
+                            className="flex-1 min-w-0 px-1.5 py-1 rounded-md bg-card border border-primary/40 text-[9px] text-foreground outline-none"
+                          />
+                        ) : (
+                          <button
+                            onClick={() => setEditingCaption(i)}
+                            className="flex-1 min-w-0 text-left px-1 text-[9px] text-muted-foreground leading-tight line-clamp-2 hover:text-foreground transition-colors"
+                            title={photoCaptions[i]}
+                          >
+                            {photoCaptions[i]}
+                          </button>
+                        )
+                      ) : (
+                        <button
+                          onClick={() => setActiveSuggestPhoto(i)}
+                          className="flex-1 min-w-0 text-left px-1 text-[9px] text-accent font-semibold leading-tight"
+                        >
+                          + Caption
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
               {form.photos.length < 10 && (
                 <button
                   onClick={addFakePhoto}
@@ -821,6 +851,62 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                 </button>
               )}
             </div>
+
+            {/* Per-photo suggestion picker */}
+            {activeSuggestPhoto !== null && form.photos[activeSuggestPhoto] !== undefined && (
+              <div className="rounded-2xl border-2 border-accent/40 bg-card p-4 space-y-3 animate-fade-in">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-2xl">{form.photos[activeSuggestPhoto]}</span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-foreground">
+                        Photo #{activeSuggestPhoto + 1}
+                        <span className="text-muted-foreground font-normal"> of {form.photos.length}</span>
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">Tap a suggestion to save it.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setActiveSuggestPhoto(null)}
+                    className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0"
+                    aria-label="Close suggestions"
+                  >
+                    <X className="w-3.5 h-3.5 text-muted-foreground" />
+                  </button>
+                </div>
+
+                <div className="space-y-1.5">
+                  {suggestionsFor(activeSuggestPhoto).map((s, si) => (
+                    <button
+                      key={si}
+                      onClick={() => acceptSuggestion(activeSuggestPhoto, s)}
+                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-xl bg-accent/5 hover:bg-accent/10 border border-accent/20 text-left transition-colors active:scale-[0.99]"
+                    >
+                      <span className="flex items-center gap-2 min-w-0">
+                        <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
+                        <span className="text-xs text-foreground leading-snug">{s}</span>
+                      </span>
+                      <span className="text-[10px] font-bold text-accent shrink-0">Use</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 pt-1">
+                  <button
+                    onClick={() => goToNextUncaptioned(activeSuggestPhoto)}
+                    className="flex-1 py-2 rounded-lg bg-card border border-border text-xs font-semibold text-foreground flex items-center justify-center gap-1.5"
+                  >
+                    Skip <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => { setEditingCaption(activeSuggestPhoto); setActiveSuggestPhoto(null); }}
+                    className="flex-1 py-2 rounded-lg bg-card border border-border text-xs font-semibold text-foreground flex items-center justify-center gap-1.5"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" /> Write my own
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Keja AI Photo Captions */}
             {form.photos.length >= 1 && (
