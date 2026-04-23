@@ -940,18 +940,33 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                   </div>
                 )}
 
-                <button
-                  onClick={generateCaptions}
-                  disabled={captionsGenerating}
-                  className="w-full py-2.5 rounded-xl bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
-                >
-                  <Sparkles className={`w-4 h-4 ${captionsGenerating ? "animate-pulse" : ""}`} />
-                  {captionsGenerating
-                    ? `Captioning ${Object.keys(photoCaptions).length}/${form.photos.length}…`
-                    : captionedCount > 0
-                      ? "Regenerate captions"
-                      : "Suggest captions for all photos"}
-                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={generateCaptions}
+                    disabled={captionsGenerating}
+                    className="py-2.5 rounded-xl bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-transform disabled:opacity-60"
+                  >
+                    <Sparkles className={`w-3.5 h-3.5 ${captionsGenerating ? "animate-pulse" : ""}`} />
+                    {captionsGenerating
+                      ? `${Object.keys(photoCaptions).length}/${form.photos.length}…`
+                      : captionedCount > 0
+                        ? "Regenerate all"
+                        : "Auto-caption all"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const firstMissing = form.photos.findIndex((_, i) => !photoCaptions[i] || !photoCaptions[i].trim());
+                      setActiveSuggestPhoto(firstMissing === -1 ? 0 : firstMissing);
+                    }}
+                    disabled={captionsGenerating}
+                    className="py-2.5 rounded-xl bg-card border border-accent/30 text-xs font-bold text-accent flex items-center justify-center gap-1.5 active:scale-95 transition-transform disabled:opacity-60"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" /> One by one
+                  </button>
+                </div>
+                <p className="text-[10px] text-muted-foreground text-center -mt-1">
+                  Tap any photo above to pick a one-tap suggestion.
+                </p>
               </div>
             )}
 
