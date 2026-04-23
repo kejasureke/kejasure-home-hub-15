@@ -925,7 +925,11 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
             {/* Per-photo suggestion picker */}
             {activeSuggestPhoto !== null && form.photos[activeSuggestPhoto] !== undefined && (
-              <div className="rounded-2xl border-2 border-accent/40 bg-card p-4 space-y-3 animate-fade-in">
+              <div
+                role="dialog"
+                aria-label={`Caption suggestions for photo ${activeSuggestPhoto + 1}`}
+                className="rounded-2xl border-2 border-accent/40 bg-card p-4 space-y-3 animate-fade-in"
+              >
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="text-2xl">{form.photos[activeSuggestPhoto]}</span>
@@ -934,47 +938,79 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                         Photo #{activeSuggestPhoto + 1}
                         <span className="text-muted-foreground font-normal"> of {form.photos.length}</span>
                       </p>
-                      <p className="text-[10px] text-muted-foreground">Tap a suggestion to save it.</p>
+                      <p className="text-[10px] text-muted-foreground">Tap, press 1–{suggestionsFor(activeSuggestPhoto).length}, or use arrows + Enter.</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setActiveSuggestPhoto(null)}
                     className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0"
-                    aria-label="Close suggestions"
+                    aria-label="Close suggestions (Esc)"
                   >
                     <X className="w-3.5 h-3.5 text-muted-foreground" />
                   </button>
                 </div>
 
-                <div className="space-y-1.5">
-                  {suggestionsFor(activeSuggestPhoto).map((s, si) => (
-                    <button
-                      key={si}
-                      onClick={() => acceptSuggestion(activeSuggestPhoto, s)}
-                      className="w-full flex items-center justify-between gap-2 p-2.5 rounded-xl bg-accent/5 hover:bg-accent/10 border border-accent/20 text-left transition-colors active:scale-[0.99]"
-                    >
-                      <span className="flex items-center gap-2 min-w-0">
-                        <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
-                        <span className="text-xs text-foreground leading-snug">{s}</span>
-                      </span>
-                      <span className="text-[10px] font-bold text-accent shrink-0">Use</span>
-                    </button>
-                  ))}
+                <div
+                  role="listbox"
+                  aria-label="Caption suggestions"
+                  aria-activedescendant={`caption-chip-${activeSuggestPhoto}-${focusedChip}`}
+                  className="space-y-1.5"
+                >
+                  {suggestionsFor(activeSuggestPhoto).map((s, si) => {
+                    const isFocused = si === focusedChip;
+                    return (
+                      <button
+                        key={si}
+                        id={`caption-chip-${activeSuggestPhoto}-${si}`}
+                        ref={(el) => { chipRefs.current[si] = el; }}
+                        role="option"
+                        aria-selected={isFocused}
+                        tabIndex={isFocused ? 0 : -1}
+                        onFocus={() => setFocusedChip(si)}
+                        onClick={() => acceptSuggestion(activeSuggestPhoto, s)}
+                        className={`w-full flex items-center justify-between gap-2 p-2.5 rounded-xl border text-left transition-colors active:scale-[0.99] outline-none ${
+                          isFocused
+                            ? "bg-accent/15 border-accent ring-2 ring-accent/40"
+                            : "bg-accent/5 border-accent/20 hover:bg-accent/10"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2 min-w-0">
+                          <span className="w-5 h-5 rounded-md bg-accent/20 text-accent text-[10px] font-bold flex items-center justify-center shrink-0">
+                            {si + 1}
+                          </span>
+                          <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
+                          <span className="text-xs text-foreground leading-snug">{s}</span>
+                        </span>
+                        <span className="text-[10px] font-bold text-accent shrink-0">Use</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <div className="flex gap-2 pt-1">
                   <button
                     onClick={() => goToNextUncaptioned(activeSuggestPhoto)}
                     className="flex-1 py-2 rounded-lg bg-card border border-border text-xs font-semibold text-foreground flex items-center justify-center gap-1.5"
+                    aria-label="Skip to next photo (S)"
                   >
                     Skip <ArrowRight className="w-3.5 h-3.5" />
+                    <kbd className="ml-1 px-1 py-0.5 rounded bg-muted text-[9px] text-muted-foreground font-mono">S</kbd>
                   </button>
                   <button
                     onClick={() => { setEditingCaption(activeSuggestPhoto); setActiveSuggestPhoto(null); }}
                     className="flex-1 py-2 rounded-lg bg-card border border-border text-xs font-semibold text-foreground flex items-center justify-center gap-1.5"
+                    aria-label="Write my own caption (E)"
                   >
                     <Edit3 className="w-3.5 h-3.5" /> Write my own
+                    <kbd className="ml-1 px-1 py-0.5 rounded bg-muted text-[9px] text-muted-foreground font-mono">E</kbd>
                   </button>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-1 text-[9px] text-muted-foreground">
+                  <span><kbd className="px-1 py-0.5 rounded bg-muted font-mono">↑↓</kbd> navigate</span>
+                  <span><kbd className="px-1 py-0.5 rounded bg-muted font-mono">Enter</kbd> accept</span>
+                  <span><kbd className="px-1 py-0.5 rounded bg-muted font-mono">1–{suggestionsFor(activeSuggestPhoto).length}</kbd> quick pick</span>
+                  <span><kbd className="px-1 py-0.5 rounded bg-muted font-mono">Esc</kbd> close</span>
                 </div>
               </div>
             )}
