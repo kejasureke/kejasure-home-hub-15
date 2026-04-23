@@ -246,7 +246,78 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   const removePhoto = (i: number) => {
     update({ photos: form.photos.filter((_, idx) => idx !== i) });
+    // Re-key captions so indexes stay aligned with the photo array
+    setPhotoCaptions((prev) => {
+      const next: Record<number, string> = {};
+      Object.entries(prev).forEach(([k, v]) => {
+        const idx = Number(k);
+        if (idx === i) return;
+        next[idx > i ? idx - 1 : idx] = v;
+      });
+      return next;
+    });
+    setEditingCaption(null);
   };
+
+  // Map placeholder emojis to plausible room/scene captions, biased by listing context
+  const captionPoolFor = (emoji: string): string[] => {
+    const isStay = form.type === "shortstay";
+    const isCommercial = form.type === "commercial";
+    switch (emoji) {
+      case "🏠":
+      case "🏡":
+        return isCommercial
+          ? ["Building exterior and street frontage", "Front view of the premises"]
+          : ["Front exterior of the property", "Street-facing view of the home"];
+      case "🏢":
+        return ["Building façade and main entrance", "Exterior view of the block"];
+      case "🏘️":
+        return ["Compound and surrounding units", "View of the wider estate"];
+      case "🛋️":
+        return isStay
+          ? ["Cosy living area with seating", "Lounge styled for guests"]
+          : ["Spacious living room with natural light", "Open lounge area"];
+      case "🛏️":
+        return isStay
+          ? ["Master bedroom with fresh linens", "Comfortable guest bedroom"]
+          : ["Master bedroom with built-in storage", "Bright bedroom with large window"];
+      case "🍳":
+        return ["Modern fitted kitchen", "Kitchen with ample counter space"];
+      case "🚿":
+        return ["Bathroom with hot shower", "Clean, well-finished bathroom"];
+      default:
+        return ["Interior view of the property", "Detail shot from the listing"];
+    }
+  };
+
+  const generateCaptions = () => {
+    if (form.photos.length === 0) return;
+    setCaptionsGenerating(true);
+    setPhotoCaptions({});
+    const total = form.photos.length;
+    let i = 0;
+    const tick = () => {
+      if (i >= total) {
+        setCaptionsGenerating(false);
+        return;
+      }
+      const idx = i;
+      const pool = captionPoolFor(form.photos[idx]);
+      const caption = idx === 0
+        ? `Cover photo — ${pool[0]}`
+        : pool[idx % pool.length];
+      setPhotoCaptions((prev) => ({ ...prev, [idx]: caption }));
+      i += 1;
+      setTimeout(tick, 220);
+    };
+    tick();
+  };
+
+  const updateCaption = (idx: number, value: string) => {
+    setPhotoCaptions((prev) => ({ ...prev, [idx]: value }));
+  };
+
+  const captionedCount = Object.values(photoCaptions).filter((c) => c && c.trim()).length;
 
   const handleSubmit = () => {
     setShowSuccess(true);
