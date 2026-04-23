@@ -130,6 +130,8 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [photoCaptions, setPhotoCaptions] = useState<Record<number, string>>({});
   const [captionsGenerating, setCaptionsGenerating] = useState(false);
   const [editingCaption, setEditingCaption] = useState<number | null>(null);
+  const [activeSuggestPhoto, setActiveSuggestPhoto] = useState<number | null>(null);
+  const [savedFlash, setSavedFlash] = useState<number | null>(null);
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
 
