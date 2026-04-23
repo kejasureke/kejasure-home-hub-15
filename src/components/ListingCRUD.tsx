@@ -1039,7 +1039,12 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                 )}
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Photos</span>
-                  <span className="font-semibold text-foreground">{form.photos.length} photos{form.videoUrl ? " + video" : ""}</span>
+                  <span className="font-semibold text-foreground">
+                    {form.photos.length} photos{form.videoUrl ? " + video" : ""}
+                    {captionedCount > 0 && (
+                      <span className="text-primary"> · {captionedCount} captioned</span>
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Amenities</span>
@@ -1052,6 +1057,31 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                   </div>
                 )}
               </div>
+
+              {/* AI photo captions detail */}
+              {captionedCount > 0 && (
+                <div className="mt-3 bg-card rounded-2xl card-shadow p-4">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Sparkles className="w-3.5 h-3.5 text-accent" />
+                    <h4 className="text-xs font-bold text-foreground">AI Photo Captions</h4>
+                  </div>
+                  <ul className="space-y-1.5">
+                    {form.photos.map((emoji, idx) => {
+                      const caption = photoCaptions[idx];
+                      if (!caption) return null;
+                      return (
+                        <li key={idx} className="flex items-start gap-2 text-[11px]">
+                          <span className="text-base leading-none">{emoji}</span>
+                          <span className="flex-1 text-foreground leading-snug">
+                            <span className="text-muted-foreground font-semibold mr-1">#{idx + 1}</span>
+                            {caption}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         )}
