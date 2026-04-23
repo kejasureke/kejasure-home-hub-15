@@ -132,6 +132,8 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [editingCaption, setEditingCaption] = useState<number | null>(null);
   const [activeSuggestPhoto, setActiveSuggestPhoto] = useState<number | null>(null);
   const [savedFlash, setSavedFlash] = useState<number | null>(null);
+  const [focusedChip, setFocusedChip] = useState(0);
+  const chipRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
 
