@@ -124,8 +124,102 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     ...editData,
   });
   const [showSuccess, setShowSuccess] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiDraft, setAiDraft] = useState("");
+  const [aiTone, setAiTone] = useState<"friendly" | "professional" | "luxury">("friendly");
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
+
+  const generateKejaAIDescription = () => {
+    setAiGenerating(true);
+    setAiDraft("");
+    const beds = form.bedrooms;
+    const baths = form.bathrooms;
+    const loc = [form.estate, form.subcounty, form.county].filter(Boolean).join(", ") || "a prime Kenyan neighborhood";
+    const topAmenities = form.amenities.slice(0, 5);
+    const isStay = form.type === "shortstay";
+    const isCommercial = form.type === "commercial";
+    const isService = type === "service";
+
+    const intros = {
+      friendly: isService
+        ? `Looking for reliable ${form.serviceCategory || "home"} services? You're in the right place! 🛠️`
+        : isStay
+          ? `Welcome to your perfect getaway in ${loc}! ✨`
+          : isCommercial
+            ? `Premium ${form.commercialType || "commercial"} space available in ${loc}. 🏢`
+            : `Welcome home! This lovely ${beds}-bedroom unit in ${loc} is ready for you. 🏡`,
+      professional: isService
+        ? `Professional ${form.serviceCategory || ""} services delivered with care, precision, and accountability.`
+        : isStay
+          ? `Thoughtfully appointed short-stay accommodation situated in ${loc}, ideal for business and leisure travelers.`
+          : isCommercial
+            ? `Strategically located ${form.commercialType || "commercial"} premises in ${loc}, suited for established and growing businesses.`
+            : `A well-maintained ${beds}-bedroom, ${baths}-bathroom property situated in ${loc}, offered by a verified provider.`,
+      luxury: isService
+        ? `Experience white-glove ${form.serviceCategory || "home"} service tailored to discerning clients.`
+        : isStay
+          ? `Indulge in an elevated stay at this signature residence in ${loc} — where every detail is considered.`
+          : isCommercial
+            ? `An exceptional ${form.commercialType || "commercial"} address in ${loc}, designed for prestige and performance.`
+            : `Discover refined ${beds}-bedroom living in ${loc} — a sanctuary of comfort, light, and timeless design.`,
+    };
+
+    const features: string[] = [];
+    if (!isService && !isCommercial) {
+      features.push(`${beds} spacious bedroom${beds === 1 ? "" : "s"}`);
+      features.push(`${baths} modern bathroom${baths === 1 ? "" : "s"}`);
+      if (form.size) features.push(`approximately ${form.size} sqm of living space`);
+      if (form.floor) features.push(`located on the ${form.floor} floor`);
+      if (form.furnished) features.push("fully furnished and move-in ready");
+      if (form.petFriendly) features.push("pet-friendly environment");
+    }
+    if (isCommercial) {
+      if (form.sizeSqft) features.push(`${form.sizeSqft} sqft of usable space`);
+      if (form.floor) features.push(`positioned on the ${form.floor} floor`);
+    }
+
+    const amenitiesText = topAmenities.length
+      ? `Highlights include ${topAmenities.join(", ")}${form.amenities.length > 5 ? `, and ${form.amenities.length - 5} more` : ""}.`
+      : "";
+
+    const photosLine = form.photos.length
+      ? `Browse the ${form.photos.length} photo${form.photos.length === 1 ? "" : "s"} above to see the space for yourself.`
+      : "";
+
+    const closing = {
+      friendly: "Message us today — we'd love to show you around! 💬",
+      professional: "Schedule a viewing at your convenience. Verified provider on Keja.",
+      luxury: "Private viewings available by appointment.",
+    }[aiTone];
+
+    const parts = [
+      intros[aiTone],
+      features.length ? `It offers ${features.join(", ")}.` : "",
+      amenitiesText,
+      photosLine,
+      closing,
+    ].filter(Boolean);
+
+    const fullText = parts.join(" ");
+
+    // Stream the text in chunks for a polished AI feel
+    let i = 0;
+    const stepSize = 3;
+    const interval = setInterval(() => {
+      i += stepSize;
+      setAiDraft(fullText.slice(0, i));
+      if (i >= fullText.length) {
+        clearInterval(interval);
+        setAiGenerating(false);
+      }
+    }, 20);
+  };
+
+  const applyAIDraft = () => {
+    update({ description: aiDraft });
+    setAiDraft("");
+  };
 
   const selectedCounty = kenyaCounties.find((c) => c.name === form.county);
   const amenitiesList = form.type === "commercial" ? commercialAmenities : form.type === "shortstay" ? stayAmenities : rentalAmenities;
@@ -598,6 +692,90 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                 </span>
               </button>
             </div>
+
+            {/* Keja AI Description Helper */}
+            {form.photos.length >= 1 && (
+              <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-accent/5 to-background p-4 space-y-3">
+                <div className="flex items-start gap-2">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                      Keja AI
+                      <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[9px] font-semibold uppercase tracking-wide">Beta</span>
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+                      Let AI write a polished description from your photos and details — edit anything before publishing.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tone selector */}
+                <div className="flex gap-1.5">
+                  {(["friendly", "professional", "luxury"] as const).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setAiTone(t)}
+                      disabled={aiGenerating}
+                      className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold capitalize transition-all ${
+                        aiTone === t
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card text-foreground border border-border"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Draft preview */}
+                {(aiDraft || aiGenerating) && (
+                  <div className="rounded-xl bg-card border border-border p-3 space-y-2">
+                    <div className="flex items-center gap-1.5 text-[10px] font-semibold text-primary uppercase tracking-wide">
+                      <Sparkles className="w-3 h-3" />
+                      {aiGenerating ? "Generating..." : "AI Draft"}
+                    </div>
+                    <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap min-h-[60px]">
+                      {aiDraft}
+                      {aiGenerating && <span className="inline-block w-1.5 h-3 bg-primary animate-pulse ml-0.5 align-middle" />}
+                    </p>
+                    {!aiGenerating && aiDraft && (
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={applyAIDraft}
+                          className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                        >
+                          <Check className="w-3.5 h-3.5" /> Use this description
+                        </button>
+                        <button
+                          onClick={generateKejaAIDescription}
+                          className="px-3 py-2 rounded-lg bg-card border border-border text-xs font-semibold text-foreground"
+                        >
+                          Regenerate
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!aiDraft && !aiGenerating && (
+                  <button
+                    onClick={generateKejaAIDescription}
+                    className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    {form.description ? "Rewrite description with Keja AI" : "Write description with Keja AI"}
+                  </button>
+                )}
+
+                {form.description && !aiDraft && (
+                  <p className="text-[10px] text-muted-foreground text-center">
+                    Current description will be replaced when you apply the AI draft.
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* AI Photo Verification */}
             {form.photos.length >= 1 && (
