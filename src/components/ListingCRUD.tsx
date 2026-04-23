@@ -127,6 +127,9 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiDraft, setAiDraft] = useState("");
   const [aiTone, setAiTone] = useState<"friendly" | "professional" | "luxury">("friendly");
+  const [photoCaptions, setPhotoCaptions] = useState<Record<number, string>>({});
+  const [captionsGenerating, setCaptionsGenerating] = useState(false);
+  const [editingCaption, setEditingCaption] = useState<number | null>(null);
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
 
