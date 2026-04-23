@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ArrowLeft, ArrowRight, Camera, Video, X, Check, Zap, MapPin,
   Home, Bed, Bath, DollarSign, FileText, Star, Sparkles, Trash2, Edit3, Image
