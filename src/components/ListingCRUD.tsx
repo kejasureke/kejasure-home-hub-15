@@ -124,8 +124,102 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     ...editData,
   });
   const [showSuccess, setShowSuccess] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiDraft, setAiDraft] = useState("");
+  const [aiTone, setAiTone] = useState<"friendly" | "professional" | "luxury">("friendly");
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
+
+  const generateKejaAIDescription = () => {
+    setAiGenerating(true);
+    setAiDraft("");
+    const beds = form.bedrooms;
+    const baths = form.bathrooms;
+    const loc = [form.estate, form.subcounty, form.county].filter(Boolean).join(", ") || "a prime Kenyan neighborhood";
+    const topAmenities = form.amenities.slice(0, 5);
+    const isStay = form.type === "shortstay";
+    const isCommercial = form.type === "commercial";
+    const isService = type === "service";
+
+    const intros = {
+      friendly: isService
+        ? `Looking for reliable ${form.serviceCategory || "home"} services? You're in the right place! 🛠️`
+        : isStay
+          ? `Welcome to your perfect getaway in ${loc}! ✨`
+          : isCommercial
+            ? `Premium ${form.commercialType || "commercial"} space available in ${loc}. 🏢`
+            : `Welcome home! This lovely ${beds}-bedroom unit in ${loc} is ready for you. 🏡`,
+      professional: isService
+        ? `Professional ${form.serviceCategory || ""} services delivered with care, precision, and accountability.`
+        : isStay
+          ? `Thoughtfully appointed short-stay accommodation situated in ${loc}, ideal for business and leisure travelers.`
+          : isCommercial
+            ? `Strategically located ${form.commercialType || "commercial"} premises in ${loc}, suited for established and growing businesses.`
+            : `A well-maintained ${beds}-bedroom, ${baths}-bathroom property situated in ${loc}, offered by a verified provider.`,
+      luxury: isService
+        ? `Experience white-glove ${form.serviceCategory || "home"} service tailored to discerning clients.`
+        : isStay
+          ? `Indulge in an elevated stay at this signature residence in ${loc} — where every detail is considered.`
+          : isCommercial
+            ? `An exceptional ${form.commercialType || "commercial"} address in ${loc}, designed for prestige and performance.`
+            : `Discover refined ${beds}-bedroom living in ${loc} — a sanctuary of comfort, light, and timeless design.`,
+    };
+
+    const features: string[] = [];
+    if (!isService && !isCommercial) {
+      features.push(`${beds} spacious bedroom${beds === 1 ? "" : "s"}`);
+      features.push(`${baths} modern bathroom${baths === 1 ? "" : "s"}`);
+      if (form.size) features.push(`approximately ${form.size} sqm of living space`);
+      if (form.floor) features.push(`located on the ${form.floor} floor`);
+      if (form.furnished) features.push("fully furnished and move-in ready");
+      if (form.petFriendly) features.push("pet-friendly environment");
+    }
+    if (isCommercial) {
+      if (form.sizeSqft) features.push(`${form.sizeSqft} sqft of usable space`);
+      if (form.floor) features.push(`positioned on the ${form.floor} floor`);
+    }
+
+    const amenitiesText = topAmenities.length
+      ? `Highlights include ${topAmenities.join(", ")}${form.amenities.length > 5 ? `, and ${form.amenities.length - 5} more` : ""}.`
+      : "";
+
+    const photosLine = form.photos.length
+      ? `Browse the ${form.photos.length} photo${form.photos.length === 1 ? "" : "s"} above to see the space for yourself.`
+      : "";
+
+    const closing = {
+      friendly: "Message us today — we'd love to show you around! 💬",
+      professional: "Schedule a viewing at your convenience. Verified provider on Keja.",
+      luxury: "Private viewings available by appointment.",
+    }[aiTone];
+
+    const parts = [
+      intros[aiTone],
+      features.length ? `It offers ${features.join(", ")}.` : "",
+      amenitiesText,
+      photosLine,
+      closing,
+    ].filter(Boolean);
+
+    const fullText = parts.join(" ");
+
+    // Stream the text in chunks for a polished AI feel
+    let i = 0;
+    const stepSize = 3;
+    const interval = setInterval(() => {
+      i += stepSize;
+      setAiDraft(fullText.slice(0, i));
+      if (i >= fullText.length) {
+        clearInterval(interval);
+        setAiGenerating(false);
+      }
+    }, 20);
+  };
+
+  const applyAIDraft = () => {
+    update({ description: aiDraft });
+    setAiDraft("");
+  };
 
   const selectedCounty = kenyaCounties.find((c) => c.name === form.county);
   const amenitiesList = form.type === "commercial" ? commercialAmenities : form.type === "shortstay" ? stayAmenities : rentalAmenities;
