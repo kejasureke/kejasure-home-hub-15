@@ -327,6 +327,40 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     setPhotoCaptions((prev) => ({ ...prev, [idx]: value }));
   };
 
+  const suggestionsFor = (idx: number): string[] => {
+    if (!form.photos[idx]) return [];
+    const pool = captionPoolFor(form.photos[idx]);
+    const extras = ["Newly renovated and freshly cleaned", "Bright space with great natural light"];
+    const base = idx === 0 ? [`Cover photo — ${pool[0]}`, ...pool.slice(1)] : pool;
+    // De-duplicate while preserving order
+    return Array.from(new Set([...base, ...extras])).slice(0, 4);
+  };
+
+  const goToNextUncaptioned = (fromIdx: number) => {
+    for (let j = fromIdx + 1; j < form.photos.length; j += 1) {
+      if (!photoCaptions[j] || !photoCaptions[j].trim()) {
+        setActiveSuggestPhoto(j);
+        return;
+      }
+    }
+    // Wrap to earlier photos still missing a caption
+    for (let j = 0; j < fromIdx; j += 1) {
+      if (!photoCaptions[j] || !photoCaptions[j].trim()) {
+        setActiveSuggestPhoto(j);
+        return;
+      }
+    }
+    setActiveSuggestPhoto(null);
+  };
+
+  const acceptSuggestion = (idx: number, text: string) => {
+    setPhotoCaptions((prev) => ({ ...prev, [idx]: text }));
+    setEditingCaption(null);
+    setSavedFlash(idx);
+    setTimeout(() => setSavedFlash((s) => (s === idx ? null : s)), 900);
+    goToNextUncaptioned(idx);
+  };
+
   const captionedCount = Object.values(photoCaptions).filter((c) => c && c.trim()).length;
 
   const handleSubmit = () => {
