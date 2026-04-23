@@ -365,6 +365,75 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   const captionedCount = Object.values(photoCaptions).filter((c) => c && c.trim()).length;
 
+  // Reset focused chip whenever the active photo changes, then focus first chip
+  useEffect(() => {
+    if (activeSuggestPhoto === null) return;
+    setFocusedChip(0);
+    requestAnimationFrame(() => chipRefs.current[0]?.focus());
+  }, [activeSuggestPhoto]);
+
+  // Keep DOM focus in sync with focusedChip
+  useEffect(() => {
+    if (activeSuggestPhoto === null) return;
+    chipRefs.current[focusedChip]?.focus();
+  }, [focusedChip, activeSuggestPhoto]);
+
+  // Global keyboard shortcuts while the suggestion picker is open
+  useEffect(() => {
+    if (activeSuggestPhoto === null) return;
+    const handler = (e: KeyboardEvent) => {
+      // Don't hijack typing in inputs/textareas
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const isTyping = tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable;
+      const suggestions = suggestionsFor(activeSuggestPhoto);
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setActiveSuggestPhoto(null);
+        return;
+      }
+      if (isTyping) return;
+
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+        e.preventDefault();
+        setFocusedChip((f) => (suggestions.length ? (f + 1) % suggestions.length : 0));
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        setFocusedChip((f) => (suggestions.length ? (f - 1 + suggestions.length) % suggestions.length : 0));
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        setFocusedChip(0);
+      } else if (e.key === "End") {
+        e.preventDefault();
+        setFocusedChip(Math.max(0, suggestions.length - 1));
+      } else if (e.key === "Enter" || e.key === " ") {
+        // Let native button activation handle the focused chip; only intercept if focus isn't on a chip
+        if (!chipRefs.current.includes(document.activeElement as HTMLButtonElement)) {
+          e.preventDefault();
+          const text = suggestions[focusedChip];
+          if (text) acceptSuggestion(activeSuggestPhoto, text);
+        }
+      } else if (e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        goToNextUncaptioned(activeSuggestPhoto);
+      } else if (e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        setEditingCaption(activeSuggestPhoto);
+        setActiveSuggestPhoto(null);
+      } else if (/^[1-9]$/.test(e.key)) {
+        const n = Number(e.key) - 1;
+        if (n < suggestions.length) {
+          e.preventDefault();
+          acceptSuggestion(activeSuggestPhoto, suggestions[n]);
+        }
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSuggestPhoto, focusedChip, photoCaptions, form.photos]);
+
   const handleSubmit = () => {
     setShowSuccess(true);
     setTimeout(() => {
