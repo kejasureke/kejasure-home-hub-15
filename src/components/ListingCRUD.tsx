@@ -723,19 +723,48 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
             {/* Photo Grid */}
             <div className="grid grid-cols-3 gap-2">
               {form.photos.map((p, i) => (
-                <div key={i} className="relative aspect-square rounded-xl bg-card card-shadow flex items-center justify-center border-2 border-transparent">
-                  <span className="text-3xl">{p}</span>
-                  {i === 0 && (
-                    <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[8px] font-bold">
-                      COVER
-                    </div>
+                <div key={i} className="space-y-1">
+                  <div className="relative aspect-square rounded-xl bg-card card-shadow flex items-center justify-center border-2 border-transparent">
+                    <span className="text-3xl">{p}</span>
+                    {i === 0 && (
+                      <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[8px] font-bold">
+                        COVER
+                      </div>
+                    )}
+                    {photoCaptions[i] && (
+                      <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-primary/90 text-primary-foreground text-[8px] font-bold flex items-center gap-0.5">
+                        <Sparkles className="w-2 h-2" /> AI
+                      </div>
+                    )}
+                    <button
+                      onClick={() => removePhoto(i)}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                  {photoCaptions[i] !== undefined && (
+                    editingCaption === i ? (
+                      <input
+                        autoFocus
+                        value={photoCaptions[i]}
+                        onChange={(e) => updateCaption(i, e.target.value)}
+                        onBlur={() => setEditingCaption(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") setEditingCaption(null);
+                        }}
+                        className="w-full px-1.5 py-1 rounded-md bg-card border border-primary/40 text-[9px] text-foreground outline-none"
+                      />
+                    ) : (
+                      <button
+                        onClick={() => setEditingCaption(i)}
+                        className="w-full text-left px-1 text-[9px] text-muted-foreground leading-tight line-clamp-2 hover:text-foreground transition-colors"
+                        title={photoCaptions[i]}
+                      >
+                        {photoCaptions[i]}
+                      </button>
+                    )
                   )}
-                  <button
-                    onClick={() => removePhoto(i)}
-                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
                 </div>
               ))}
               {form.photos.length < 10 && (
@@ -748,6 +777,53 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                 </button>
               )}
             </div>
+
+            {/* Keja AI Photo Captions */}
+            {form.photos.length >= 1 && (
+              <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-accent/5 via-primary/5 to-background p-4 space-y-3">
+                <div className="flex items-start gap-2">
+                  <div className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+                    <Image className="w-5 h-5 text-accent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                      AI Photo Captions
+                      <span className="px-1.5 py-0.5 rounded-md bg-accent/10 text-accent text-[9px] font-semibold uppercase tracking-wide">Beta</span>
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+                      Suggests what each photo shows so tenants can scan your listing faster. Tap any caption to edit.
+                    </p>
+                  </div>
+                </div>
+
+                {captionedCount > 0 && !captionsGenerating && (
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-muted-foreground">
+                      {captionedCount} of {form.photos.length} photos captioned
+                    </span>
+                    <button
+                      onClick={() => { setPhotoCaptions({}); setEditingCaption(null); }}
+                      className="text-destructive font-semibold"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  onClick={generateCaptions}
+                  disabled={captionsGenerating}
+                  className="w-full py-2.5 rounded-xl bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
+                >
+                  <Sparkles className={`w-4 h-4 ${captionsGenerating ? "animate-pulse" : ""}`} />
+                  {captionsGenerating
+                    ? `Captioning ${Object.keys(photoCaptions).length}/${form.photos.length}…`
+                    : captionedCount > 0
+                      ? "Regenerate captions"
+                      : "Suggest captions for all photos"}
+                </button>
+              </div>
+            )}
 
             {/* Video */}
             <div>
