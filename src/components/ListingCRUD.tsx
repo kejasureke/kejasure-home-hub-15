@@ -259,16 +259,18 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   const removePhoto = (i: number) => {
     update({ photos: form.photos.filter((_, idx) => idx !== i) });
-    // Re-key captions so indexes stay aligned with the photo array
-    setPhotoCaptions((prev) => {
-      const next: Record<number, string> = {};
+    // Re-key captions and errors so indexes stay aligned with the photo array
+    const rekey = <T,>(prev: Record<number, T>): Record<number, T> => {
+      const next: Record<number, T> = {};
       Object.entries(prev).forEach(([k, v]) => {
         const idx = Number(k);
         if (idx === i) return;
         next[idx > i ? idx - 1 : idx] = v;
       });
       return next;
-    });
+    };
+    setPhotoCaptions(rekey);
+    setCaptionErrors(rekey);
     setEditingCaption(null);
   };
 
@@ -931,23 +933,39 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                       </button>
                       {photoCaptions[i] !== undefined ? (
                         editingCaption === i ? (
-                          <input
-                            autoFocus
-                            value={photoCaptions[i]}
-                            onChange={(e) => updateCaption(i, e.target.value)}
-                            onBlur={() => setEditingCaption(null)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") setEditingCaption(null);
-                            }}
-                            className="flex-1 min-w-0 px-1.5 py-1 rounded-md bg-card border border-primary/40 text-[9px] text-foreground outline-none"
-                          />
+                          <div className="flex-1 min-w-0">
+                            <input
+                              autoFocus
+                              value={photoCaptions[i]}
+                              onChange={(e) => updateCaption(i, e.target.value)}
+                              onBlur={() => tryCommitEdit(i)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  tryCommitEdit(i);
+                                }
+                              }}
+                              aria-invalid={!!captionErrors[i]}
+                              aria-describedby={captionErrors[i] ? `caption-err-${i}` : undefined}
+                              className={`w-full min-w-0 px-1.5 py-1 rounded-md bg-card border text-[9px] text-foreground outline-none ${
+                                captionErrors[i] ? "border-destructive" : "border-primary/40"
+                              }`}
+                            />
+                            {captionErrors[i] && (
+                              <p id={`caption-err-${i}`} role="alert" className="text-[8px] text-destructive leading-tight mt-0.5">
+                                {captionErrors[i]}
+                              </p>
+                            )}
+                          </div>
                         ) : (
                           <button
                             onClick={() => setEditingCaption(i)}
-                            className="flex-1 min-w-0 text-left px-1 text-[9px] text-muted-foreground leading-tight line-clamp-2 hover:text-foreground transition-colors"
-                            title={photoCaptions[i]}
+                            className={`flex-1 min-w-0 text-left px-1 text-[9px] leading-tight line-clamp-2 transition-colors ${
+                              captionErrors[i] ? "text-destructive font-semibold" : "text-muted-foreground hover:text-foreground"
+                            }`}
+                            title={captionErrors[i] || photoCaptions[i]}
                           >
-                            {photoCaptions[i]}
+                            {captionErrors[i] ? `⚠ ${captionErrors[i]}` : photoCaptions[i]}
                           </button>
                         )
                       ) : (
