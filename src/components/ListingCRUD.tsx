@@ -356,8 +356,8 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     const check = validateCaption(value);
     setCaptionErrors((prev) => {
       const next = { ...prev };
-      if (check.ok) delete next[idx];
-      else next[idx] = check.reason;
+      if (!check.ok) next[idx] = check.reason;
+      else delete next[idx];
       return next;
     });
   };
