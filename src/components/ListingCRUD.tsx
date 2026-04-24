@@ -354,9 +354,10 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const updateCaption = (idx: number, value: string) => {
     setPhotoCaptions((prev) => ({ ...prev, [idx]: value }));
     const check = validateCaption(value);
+    const reason = check.ok ? null : check.reason;
     setCaptionErrors((prev) => {
       const next = { ...prev };
-      if (!check.ok) next[idx] = check.reason;
+      if (reason) next[idx] = reason;
       else delete next[idx];
       return next;
     });
@@ -365,7 +366,8 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const tryCommitEdit = (idx: number) => {
     const check = validateCaption(photoCaptions[idx] || "");
     if (!check.ok) {
-      setCaptionErrors((prev) => ({ ...prev, [idx]: check.reason }));
+      const reason = check.reason;
+      setCaptionErrors((prev) => ({ ...prev, [idx]: reason }));
       return false;
     }
     setCaptionErrors((prev) => {
