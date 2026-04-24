@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   ArrowLeft, ArrowRight, Camera, Video, X, Check, Zap, MapPin,
-  Home, Bed, Bath, DollarSign, FileText, Star, Sparkles, Trash2, Edit3, Image
+  Home, Bed, Bath, DollarSign, FileText, Star, Sparkles, Trash2, Edit3, Image, Wand2
 } from "lucide-react";
 import AIPhotoVerification from "./AIPhotoVerification";
 import { kenyaCounties } from "@/data/kenyaCounties";
@@ -132,6 +132,8 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [editingCaption, setEditingCaption] = useState<number | null>(null);
   const [activeSuggestPhoto, setActiveSuggestPhoto] = useState<number | null>(null);
   const [savedFlash, setSavedFlash] = useState<number | null>(null);
+  const [polishEnabled, setPolishEnabled] = useState(true);
+  const [polishCandidate, setPolishCandidate] = useState<{ idx: number; original: string; polished: string } | null>(null);
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
 
