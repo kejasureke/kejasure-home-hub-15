@@ -443,13 +443,29 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     return t;
   };
 
-  const commitCaption = (idx: number, text: string) => {
+  const commitCaption = (idx: number, text: string): boolean => {
+    const reason = validateCaption(text);
+    if (reason) {
+      setCaptionErrors((prev) => ({ ...prev, [idx]: reason }));
+      // Surface the offending text in the inline editor so the user can fix it
+      setPhotoCaptions((prev) => ({ ...prev, [idx]: text }));
+      setPolishCandidate(null);
+      setActiveSuggestPhoto(null);
+      setEditingCaption(idx);
+      return false;
+    }
+    setCaptionErrors((prev) => {
+      const next = { ...prev };
+      delete next[idx];
+      return next;
+    });
     setPhotoCaptions((prev) => ({ ...prev, [idx]: text }));
     setEditingCaption(null);
     setPolishCandidate(null);
     setSavedFlash(idx);
     setTimeout(() => setSavedFlash((s) => (s === idx ? null : s)), 900);
     goToNextUncaptioned(idx);
+    return true;
   };
 
   const acceptSuggestion = (idx: number, text: string) => {
