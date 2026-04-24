@@ -134,6 +134,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [savedFlash, setSavedFlash] = useState<number | null>(null);
   const [polishEnabled, setPolishEnabled] = useState(true);
   const [polishCandidate, setPolishCandidate] = useState<{ idx: number; original: string; polished: string } | null>(null);
+  const [captionErrors, setCaptionErrors] = useState<Record<number, string>>({});
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
 
@@ -325,8 +326,55 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     tick();
   };
 
+  // Centralised safety check for any caption write path.
+  // Blocks phone numbers, emails, and pricing — even when the user types it themselves
+  // or chooses an unpolished suggestion.
+  const validateCaption = (text: string): { ok: true } | { ok: false; reason: string } => {
+    const t = (text || "").trim();
+    if (!t) return { ok: true };
+    if (t.length > 120) return { ok: false, reason: "Keep captions under 120 characters." };
+    // Phone numbers: Kenyan formats and generic 7+ digit runs
+    if (/\b(?:\+?254|0)[17]\d{8}\b/.test(t) || /(?:\d[\s-]?){7,}/.test(t)) {
+      return { ok: false, reason: "Remove phone numbers — keep contact in chat." };
+    }
+    // Emails
+    if (/[\w.+-]+@[\w-]+\.[\w.-]+/.test(t)) {
+      return { ok: false, reason: "Remove email addresses — keep contact in chat." };
+    }
+    // Pricing: KES/Ksh/Sh + amount, currency symbols, or per-month/per-night phrasing
+    if (/\b(?:KES|Ksh|KSh|Sh|USD|EUR|GBP)\.?\s?\d/i.test(t) || /[$€£]\s?\d/.test(t)) {
+      return { ok: false, reason: "Remove pricing — it belongs in the price field." };
+    }
+    if (/\b\d[\d,]{2,}\s*(?:\/-|bob|shillings?|per\s?(?:month|night|day|week))\b/i.test(t)) {
+      return { ok: false, reason: "Remove pricing — it belongs in the price field." };
+    }
+    return { ok: true };
+  };
+
   const updateCaption = (idx: number, value: string) => {
     setPhotoCaptions((prev) => ({ ...prev, [idx]: value }));
+    const check = validateCaption(value);
+    setCaptionErrors((prev) => {
+      const next = { ...prev };
+      if (check.ok) delete next[idx];
+      else next[idx] = check.reason;
+      return next;
+    });
+  };
+
+  const tryCommitEdit = (idx: number) => {
+    const check = validateCaption(photoCaptions[idx] || "");
+    if (!check.ok) {
+      setCaptionErrors((prev) => ({ ...prev, [idx]: check.reason }));
+      return false;
+    }
+    setCaptionErrors((prev) => {
+      const next = { ...prev };
+      delete next[idx];
+      return next;
+    });
+    setEditingCaption(null);
+    return true;
   };
 
   const suggestionsFor = (idx: number): string[] => {
