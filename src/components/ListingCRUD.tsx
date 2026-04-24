@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   ArrowLeft, ArrowRight, Camera, Video, X, Check, Zap, MapPin,
-  Home, Bed, Bath, DollarSign, FileText, Star, Sparkles, Trash2, Edit3, Image
+  Home, Bed, Bath, DollarSign, FileText, Star, Sparkles, Trash2, Edit3, Image, Wand2
 } from "lucide-react";
 import AIPhotoVerification from "./AIPhotoVerification";
 import { kenyaCounties } from "@/data/kenyaCounties";
@@ -132,6 +132,8 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [editingCaption, setEditingCaption] = useState<number | null>(null);
   const [activeSuggestPhoto, setActiveSuggestPhoto] = useState<number | null>(null);
   const [savedFlash, setSavedFlash] = useState<number | null>(null);
+  const [polishEnabled, setPolishEnabled] = useState(true);
+  const [polishCandidate, setPolishCandidate] = useState<{ idx: number; original: string; polished: string } | null>(null);
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
 
@@ -353,12 +355,70 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     setActiveSuggestPhoto(null);
   };
 
-  const acceptSuggestion = (idx: number, text: string) => {
+  // Build a safer, more engaging variant of a caption.
+  // - Strips contact info / prices (safety)
+  // - Adds a sensory or trust adjective when missing
+  // - Caps at ~80 chars and trims trailing punctuation
+  const polishCaption = (idx: number, text: string): string => {
+    let t = text.trim();
+    // Safety: remove phone numbers, emails, and explicit KES amounts
+    t = t.replace(/\b(?:\+?254|0)[17]\d{8}\b/g, "");
+    t = t.replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, "");
+    t = t.replace(/\b(?:KES|Ksh|KSh|Sh)\.?\s?\d[\d,]*\b/gi, "");
+    t = t.replace(/\s{2,}/g, " ").trim();
+
+    const emoji = form.photos[idx];
+    const isCover = idx === 0;
+    const lower = t.toLowerCase();
+    const hasFlavor = /(bright|cosy|cozy|spacious|modern|fresh|airy|natural light|well-?lit|inviting|stylish|generous)/i.test(lower);
+
+    const flavorByEmoji: Record<string, string> = {
+      "🛋️": "bright and inviting",
+      "🛏️": "restful and freshly made",
+      "🍳": "modern and well-equipped",
+      "🚿": "clean and well-finished",
+      "🏠": "welcoming",
+      "🏢": "well-kept",
+      "🏘️": "calm and well-maintained",
+    };
+    const flavor = flavorByEmoji[emoji] || "well-presented";
+
+    if (!hasFlavor) {
+      // Insert flavor naturally after the first noun phrase if possible
+      t = t.replace(/^(\w+(?:\s\w+){0,2})/, (m) => `${m} — ${flavor}`);
+    }
+
+    if (isCover && !/^cover/i.test(t)) {
+      t = `Cover · ${t}`;
+    }
+
+    // Trim trailing punctuation and cap length
+    t = t.replace(/[.,;:!\-–—\s]+$/g, "");
+    if (t.length > 80) t = `${t.slice(0, 77).trimEnd()}…`;
+    return t;
+  };
+
+  const commitCaption = (idx: number, text: string) => {
     setPhotoCaptions((prev) => ({ ...prev, [idx]: text }));
     setEditingCaption(null);
+    setPolishCandidate(null);
     setSavedFlash(idx);
     setTimeout(() => setSavedFlash((s) => (s === idx ? null : s)), 900);
     goToNextUncaptioned(idx);
+  };
+
+  const acceptSuggestion = (idx: number, text: string) => {
+    if (!polishEnabled) {
+      commitCaption(idx, text);
+      return;
+    }
+    const polished = polishCaption(idx, text);
+    // If polish didn't meaningfully change the text, save directly
+    if (polished.trim().toLowerCase() === text.trim().toLowerCase()) {
+      commitCaption(idx, text);
+      return;
+    }
+    setPolishCandidate({ idx, original: text, polished });
   };
 
   const captionedCount = Object.values(photoCaptions).filter((c) => c && c.trim()).length;
@@ -867,11 +927,15 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                         Photo #{activeSuggestPhoto + 1}
                         <span className="text-muted-foreground font-normal"> of {form.photos.length}</span>
                       </p>
-                      <p className="text-[10px] text-muted-foreground">Tap a suggestion to use it.</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {polishCandidate && polishCandidate.idx === activeSuggestPhoto
+                          ? "Pick the version you want to save."
+                          : "Tap a suggestion to use it."}
+                      </p>
                     </div>
                   </div>
                   <button
-                    onClick={() => setActiveSuggestPhoto(null)}
+                    onClick={() => { setActiveSuggestPhoto(null); setPolishCandidate(null); }}
                     className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0"
                     aria-label="Close suggestions"
                   >
@@ -879,45 +943,104 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                   </button>
                 </div>
 
-                <ul
-                  role="list"
-                  aria-label="Caption suggestions"
-                  className="space-y-1.5"
-                >
-                  {suggestionsFor(activeSuggestPhoto).map((s, si) => (
-                    <li key={si}>
-                      <button
-                        type="button"
-                        onClick={() => acceptSuggestion(activeSuggestPhoto, s)}
-                        aria-label={`Use caption: ${s}`}
-                        className="w-full flex items-center justify-between gap-2 p-2.5 rounded-xl border bg-accent/5 border-accent/20 text-left active:scale-[0.99] active:bg-accent/15 transition-transform"
-                      >
-                        <span className="flex items-center gap-2 min-w-0">
-                          <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
-                          <span className="text-xs text-foreground leading-snug">{s}</span>
-                        </span>
-                        <span className="text-[10px] font-bold text-accent shrink-0">Use</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                {/* Polish toggle — optional safer/more engaging step */}
+                <label className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-muted/40 border border-border">
+                  <span className="flex items-center gap-1.5 text-[11px] text-foreground">
+                    <Wand2 className="w-3 h-3 text-accent" />
+                    Polish before saving
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={polishEnabled}
+                    onClick={() => setPolishEnabled((v) => !v)}
+                    className={`relative w-8 h-4 rounded-full transition-colors ${polishEnabled ? "bg-accent" : "bg-muted-foreground/30"}`}
+                  >
+                    <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-card shadow transition-transform ${polishEnabled ? "translate-x-4" : "translate-x-0.5"}`} />
+                  </button>
+                </label>
 
-                <div className="flex gap-2 pt-1">
-                  <button
-                    onClick={() => goToNextUncaptioned(activeSuggestPhoto)}
-                    className="flex-1 py-2 rounded-lg bg-card border border-border text-xs font-semibold text-foreground flex items-center justify-center gap-1.5"
-                    aria-label="Skip to next photo"
-                  >
-                    Skip <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => { setEditingCaption(activeSuggestPhoto); setActiveSuggestPhoto(null); }}
-                    className="flex-1 py-2 rounded-lg bg-card border border-border text-xs font-semibold text-foreground flex items-center justify-center gap-1.5"
-                    aria-label="Write my own caption"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" /> Write my own
-                  </button>
-                </div>
+                {polishCandidate && polishCandidate.idx === activeSuggestPhoto ? (
+                  <div className="space-y-2 animate-fade-in" role="group" aria-label="Polish caption preview">
+                    <button
+                      type="button"
+                      onClick={() => commitCaption(activeSuggestPhoto, polishCandidate.original)}
+                      className="w-full text-left p-2.5 rounded-xl border bg-card border-border active:scale-[0.99] transition-transform"
+                      aria-label={`Use original caption: ${polishCandidate.original}`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">Original</span>
+                        <span className="text-[10px] font-bold text-foreground">Use</span>
+                      </div>
+                      <p className="text-xs text-foreground leading-snug">{polishCandidate.original}</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => commitCaption(activeSuggestPhoto, polishCandidate.polished)}
+                      className="w-full text-left p-2.5 rounded-xl border-2 bg-accent/10 border-accent active:scale-[0.99] transition-transform"
+                      aria-label={`Use polished caption: ${polishCandidate.polished}`}
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-accent">
+                          <Wand2 className="w-2.5 h-2.5" /> Polished · safer & catchier
+                        </span>
+                        <span className="text-[10px] font-bold text-accent">Use</span>
+                      </div>
+                      <p className="text-xs text-foreground leading-snug">{polishCandidate.polished}</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPolishCandidate(null)}
+                      className="w-full py-1.5 text-[11px] font-semibold text-muted-foreground"
+                    >
+                      ← Back to suggestions
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <ul
+                      role="list"
+                      aria-label="Caption suggestions"
+                      className="space-y-1.5"
+                    >
+                      {suggestionsFor(activeSuggestPhoto).map((s, si) => (
+                        <li key={si}>
+                          <button
+                            type="button"
+                            onClick={() => acceptSuggestion(activeSuggestPhoto, s)}
+                            aria-label={`Use caption: ${s}`}
+                            className="w-full flex items-center justify-between gap-2 p-2.5 rounded-xl border bg-accent/5 border-accent/20 text-left active:scale-[0.99] active:bg-accent/15 transition-transform"
+                          >
+                            <span className="flex items-center gap-2 min-w-0">
+                              <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
+                              <span className="text-xs text-foreground leading-snug">{s}</span>
+                            </span>
+                            <span className="text-[10px] font-bold text-accent shrink-0">
+                              {polishEnabled ? "Polish" : "Use"}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={() => goToNextUncaptioned(activeSuggestPhoto)}
+                        className="flex-1 py-2 rounded-lg bg-card border border-border text-xs font-semibold text-foreground flex items-center justify-center gap-1.5"
+                        aria-label="Skip to next photo"
+                      >
+                        Skip <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => { setEditingCaption(activeSuggestPhoto); setActiveSuggestPhoto(null); }}
+                        className="flex-1 py-2 rounded-lg bg-card border border-border text-xs font-semibold text-foreground flex items-center justify-center gap-1.5"
+                        aria-label="Write my own caption"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" /> Write my own
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
