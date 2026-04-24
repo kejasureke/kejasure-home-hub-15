@@ -355,12 +355,70 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     setActiveSuggestPhoto(null);
   };
 
-  const acceptSuggestion = (idx: number, text: string) => {
+  // Build a safer, more engaging variant of a caption.
+  // - Strips contact info / prices (safety)
+  // - Adds a sensory or trust adjective when missing
+  // - Caps at ~80 chars and trims trailing punctuation
+  const polishCaption = (idx: number, text: string): string => {
+    let t = text.trim();
+    // Safety: remove phone numbers, emails, and explicit KES amounts
+    t = t.replace(/\b(?:\+?254|0)[17]\d{8}\b/g, "");
+    t = t.replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, "");
+    t = t.replace(/\b(?:KES|Ksh|KSh|Sh)\.?\s?\d[\d,]*\b/gi, "");
+    t = t.replace(/\s{2,}/g, " ").trim();
+
+    const emoji = form.photos[idx];
+    const isCover = idx === 0;
+    const lower = t.toLowerCase();
+    const hasFlavor = /(bright|cosy|cozy|spacious|modern|fresh|airy|natural light|well-?lit|inviting|stylish|generous)/i.test(lower);
+
+    const flavorByEmoji: Record<string, string> = {
+      "🛋️": "bright and inviting",
+      "🛏️": "restful and freshly made",
+      "🍳": "modern and well-equipped",
+      "🚿": "clean and well-finished",
+      "🏠": "welcoming",
+      "🏢": "well-kept",
+      "🏘️": "calm and well-maintained",
+    };
+    const flavor = flavorByEmoji[emoji] || "well-presented";
+
+    if (!hasFlavor) {
+      // Insert flavor naturally after the first noun phrase if possible
+      t = t.replace(/^(\w+(?:\s\w+){0,2})/, (m) => `${m} — ${flavor}`);
+    }
+
+    if (isCover && !/^cover/i.test(t)) {
+      t = `Cover · ${t}`;
+    }
+
+    // Trim trailing punctuation and cap length
+    t = t.replace(/[.,;:!\-–—\s]+$/g, "");
+    if (t.length > 80) t = `${t.slice(0, 77).trimEnd()}…`;
+    return t;
+  };
+
+  const commitCaption = (idx: number, text: string) => {
     setPhotoCaptions((prev) => ({ ...prev, [idx]: text }));
     setEditingCaption(null);
+    setPolishCandidate(null);
     setSavedFlash(idx);
     setTimeout(() => setSavedFlash((s) => (s === idx ? null : s)), 900);
     goToNextUncaptioned(idx);
+  };
+
+  const acceptSuggestion = (idx: number, text: string) => {
+    if (!polishEnabled) {
+      commitCaption(idx, text);
+      return;
+    }
+    const polished = polishCaption(idx, text);
+    // If polish didn't meaningfully change the text, save directly
+    if (polished.trim().toLowerCase() === text.trim().toLowerCase()) {
+      commitCaption(idx, text);
+      return;
+    }
+    setPolishCandidate({ idx, original: text, polished });
   };
 
   const captionedCount = Object.values(photoCaptions).filter((c) => c && c.trim()).length;
