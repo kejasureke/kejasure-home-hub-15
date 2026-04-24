@@ -354,7 +354,8 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const updateCaption = (idx: number, value: string) => {
     setPhotoCaptions((prev) => ({ ...prev, [idx]: value }));
     const check = validateCaption(value);
-    const reason = check.ok ? null : check.reason;
+    let reason: string | null = null;
+    if (!check.ok) reason = check.reason;
     setCaptionErrors((prev) => {
       const next = { ...prev };
       if (reason) next[idx] = reason;
