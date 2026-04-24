@@ -329,33 +329,28 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   // Centralised safety check for any caption write path.
   // Blocks phone numbers, emails, and pricing — even when the user types it themselves
   // or chooses an unpolished suggestion.
-  const validateCaption = (text: string): { ok: true } | { ok: false; reason: string } => {
+  const validateCaption = (text: string): string | null => {
     const t = (text || "").trim();
-    if (!t) return { ok: true };
-    if (t.length > 120) return { ok: false, reason: "Keep captions under 120 characters." };
-    // Phone numbers: Kenyan formats and generic 7+ digit runs
+    if (!t) return null;
+    if (t.length > 120) return "Keep captions under 120 characters.";
     if (/\b(?:\+?254|0)[17]\d{8}\b/.test(t) || /(?:\d[\s-]?){7,}/.test(t)) {
-      return { ok: false, reason: "Remove phone numbers — keep contact in chat." };
+      return "Remove phone numbers — keep contact in chat.";
     }
-    // Emails
     if (/[\w.+-]+@[\w-]+\.[\w.-]+/.test(t)) {
-      return { ok: false, reason: "Remove email addresses — keep contact in chat." };
+      return "Remove email addresses — keep contact in chat.";
     }
-    // Pricing: KES/Ksh/Sh + amount, currency symbols, or per-month/per-night phrasing
     if (/\b(?:KES|Ksh|KSh|Sh|USD|EUR|GBP)\.?\s?\d/i.test(t) || /[$€£]\s?\d/.test(t)) {
-      return { ok: false, reason: "Remove pricing — it belongs in the price field." };
+      return "Remove pricing — it belongs in the price field.";
     }
     if (/\b\d[\d,]{2,}\s*(?:\/-|bob|shillings?|per\s?(?:month|night|day|week))\b/i.test(t)) {
-      return { ok: false, reason: "Remove pricing — it belongs in the price field." };
+      return "Remove pricing — it belongs in the price field.";
     }
-    return { ok: true };
+    return null;
   };
 
   const updateCaption = (idx: number, value: string) => {
     setPhotoCaptions((prev) => ({ ...prev, [idx]: value }));
-    const check = validateCaption(value);
-    let reason: string | null = null;
-    if (!check.ok) reason = check.reason;
+    const reason = validateCaption(value);
     setCaptionErrors((prev) => {
       const next = { ...prev };
       if (reason) next[idx] = reason;
@@ -365,9 +360,8 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   };
 
   const tryCommitEdit = (idx: number) => {
-    const check = validateCaption(photoCaptions[idx] || "");
-    if (!check.ok) {
-      const reason = check.reason;
+    const reason = validateCaption(photoCaptions[idx] || "");
+    if (reason) {
       setCaptionErrors((prev) => ({ ...prev, [idx]: reason }));
       return false;
     }
