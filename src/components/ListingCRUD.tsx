@@ -309,6 +309,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     if (form.photos.length === 0) return;
     setCaptionsGenerating(true);
     setPhotoCaptions({});
+    setCaptionErrors({});
     const total = form.photos.length;
     let i = 0;
     const tick = () => {
@@ -1147,7 +1148,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                       {captionedCount} of {form.photos.length} photos captioned
                     </span>
                     <button
-                      onClick={() => { setPhotoCaptions({}); setEditingCaption(null); }}
+                      onClick={() => { setPhotoCaptions({}); setCaptionErrors({}); setEditingCaption(null); }}
                       className="text-destructive font-semibold"
                     >
                       Clear all
