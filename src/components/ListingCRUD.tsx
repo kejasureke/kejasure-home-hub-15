@@ -134,6 +134,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [savedFlash, setSavedFlash] = useState<number | null>(null);
   const [polishEnabled, setPolishEnabled] = useState(true);
   const [polishCandidate, setPolishCandidate] = useState<{ idx: number; original: string; polished: string } | null>(null);
+  const [captionErrors, setCaptionErrors] = useState<Record<number, string>>({});
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
 
@@ -258,16 +259,18 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   const removePhoto = (i: number) => {
     update({ photos: form.photos.filter((_, idx) => idx !== i) });
-    // Re-key captions so indexes stay aligned with the photo array
-    setPhotoCaptions((prev) => {
-      const next: Record<number, string> = {};
+    // Re-key captions and errors so indexes stay aligned with the photo array
+    const rekey = <T,>(prev: Record<number, T>): Record<number, T> => {
+      const next: Record<number, T> = {};
       Object.entries(prev).forEach(([k, v]) => {
         const idx = Number(k);
         if (idx === i) return;
         next[idx > i ? idx - 1 : idx] = v;
       });
       return next;
-    });
+    };
+    setPhotoCaptions(rekey);
+    setCaptionErrors(rekey);
     setEditingCaption(null);
   };
 
@@ -306,6 +309,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     if (form.photos.length === 0) return;
     setCaptionsGenerating(true);
     setPhotoCaptions({});
+    setCaptionErrors({});
     const total = form.photos.length;
     let i = 0;
     const tick = () => {
@@ -325,8 +329,52 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     tick();
   };
 
+  // Centralised safety check for any caption write path.
+  // Blocks phone numbers, emails, and pricing — even when the user types it themselves
+  // or chooses an unpolished suggestion.
+  const validateCaption = (text: string): string | null => {
+    const t = (text || "").trim();
+    if (!t) return null;
+    if (t.length > 120) return "Keep captions under 120 characters.";
+    if (/\b(?:\+?254|0)[17]\d{8}\b/.test(t) || /(?:\d[\s-]?){7,}/.test(t)) {
+      return "Remove phone numbers — keep contact in chat.";
+    }
+    if (/[\w.+-]+@[\w-]+\.[\w.-]+/.test(t)) {
+      return "Remove email addresses — keep contact in chat.";
+    }
+    if (/\b(?:KES|Ksh|KSh|Sh|USD|EUR|GBP)\.?\s?\d/i.test(t) || /[$€£]\s?\d/.test(t)) {
+      return "Remove pricing — it belongs in the price field.";
+    }
+    if (/\b\d[\d,]{2,}\s*(?:\/-|bob|shillings?|per\s?(?:month|night|day|week))\b/i.test(t)) {
+      return "Remove pricing — it belongs in the price field.";
+    }
+    return null;
+  };
+
   const updateCaption = (idx: number, value: string) => {
     setPhotoCaptions((prev) => ({ ...prev, [idx]: value }));
+    const reason = validateCaption(value);
+    setCaptionErrors((prev) => {
+      const next = { ...prev };
+      if (reason) next[idx] = reason;
+      else delete next[idx];
+      return next;
+    });
+  };
+
+  const tryCommitEdit = (idx: number) => {
+    const reason = validateCaption(photoCaptions[idx] || "");
+    if (reason) {
+      setCaptionErrors((prev) => ({ ...prev, [idx]: reason }));
+      return false;
+    }
+    setCaptionErrors((prev) => {
+      const next = { ...prev };
+      delete next[idx];
+      return next;
+    });
+    setEditingCaption(null);
+    return true;
   };
 
   const suggestionsFor = (idx: number): string[] => {
@@ -398,13 +446,29 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     return t;
   };
 
-  const commitCaption = (idx: number, text: string) => {
+  const commitCaption = (idx: number, text: string): boolean => {
+    const reason = validateCaption(text);
+    if (reason) {
+      setCaptionErrors((prev) => ({ ...prev, [idx]: reason }));
+      // Surface the offending text in the inline editor so the user can fix it
+      setPhotoCaptions((prev) => ({ ...prev, [idx]: text }));
+      setPolishCandidate(null);
+      setActiveSuggestPhoto(null);
+      setEditingCaption(idx);
+      return false;
+    }
+    setCaptionErrors((prev) => {
+      const next = { ...prev };
+      delete next[idx];
+      return next;
+    });
     setPhotoCaptions((prev) => ({ ...prev, [idx]: text }));
     setEditingCaption(null);
     setPolishCandidate(null);
     setSavedFlash(idx);
     setTimeout(() => setSavedFlash((s) => (s === idx ? null : s)), 900);
     goToNextUncaptioned(idx);
+    return true;
   };
 
   const acceptSuggestion = (idx: number, text: string) => {
@@ -870,23 +934,39 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                       </button>
                       {photoCaptions[i] !== undefined ? (
                         editingCaption === i ? (
-                          <input
-                            autoFocus
-                            value={photoCaptions[i]}
-                            onChange={(e) => updateCaption(i, e.target.value)}
-                            onBlur={() => setEditingCaption(null)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") setEditingCaption(null);
-                            }}
-                            className="flex-1 min-w-0 px-1.5 py-1 rounded-md bg-card border border-primary/40 text-[9px] text-foreground outline-none"
-                          />
+                          <div className="flex-1 min-w-0">
+                            <input
+                              autoFocus
+                              value={photoCaptions[i]}
+                              onChange={(e) => updateCaption(i, e.target.value)}
+                              onBlur={() => tryCommitEdit(i)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  tryCommitEdit(i);
+                                }
+                              }}
+                              aria-invalid={!!captionErrors[i]}
+                              aria-describedby={captionErrors[i] ? `caption-err-${i}` : undefined}
+                              className={`w-full min-w-0 px-1.5 py-1 rounded-md bg-card border text-[9px] text-foreground outline-none ${
+                                captionErrors[i] ? "border-destructive" : "border-primary/40"
+                              }`}
+                            />
+                            {captionErrors[i] && (
+                              <p id={`caption-err-${i}`} role="alert" className="text-[8px] text-destructive leading-tight mt-0.5">
+                                {captionErrors[i]}
+                              </p>
+                            )}
+                          </div>
                         ) : (
                           <button
                             onClick={() => setEditingCaption(i)}
-                            className="flex-1 min-w-0 text-left px-1 text-[9px] text-muted-foreground leading-tight line-clamp-2 hover:text-foreground transition-colors"
-                            title={photoCaptions[i]}
+                            className={`flex-1 min-w-0 text-left px-1 text-[9px] leading-tight line-clamp-2 transition-colors ${
+                              captionErrors[i] ? "text-destructive font-semibold" : "text-muted-foreground hover:text-foreground"
+                            }`}
+                            title={captionErrors[i] || photoCaptions[i]}
                           >
-                            {photoCaptions[i]}
+                            {captionErrors[i] ? `⚠ ${captionErrors[i]}` : photoCaptions[i]}
                           </button>
                         )
                       ) : (
@@ -1068,7 +1148,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                       {captionedCount} of {form.photos.length} photos captioned
                     </span>
                     <button
-                      onClick={() => { setPhotoCaptions({}); setEditingCaption(null); }}
+                      onClick={() => { setPhotoCaptions({}); setCaptionErrors({}); setEditingCaption(null); }}
                       className="text-destructive font-semibold"
                     >
                       Clear all
