@@ -357,7 +357,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
       }
     }
     // Explicit price context with digits — e.g. "10,000/-", "5000 bob", "20000 per month"
-    if (/\b\d[\d,]{2,}\s*(?:\/-|bob|shillings?|per\s?(?:month|night|day|week))\b/i.test(t)) {
+    if (/\b\d[\d,]{2,}\s*(?:\/-|\/=|bob|shillings?|per\s?(?:month|night|day|week))/i.test(t)) {
       return "Remove pricing — it belongs in the price field.";
     }
     return null;
