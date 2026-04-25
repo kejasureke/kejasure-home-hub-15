@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Unit tests
+    name: Unit tests + coverage gate
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -29,5 +29,15 @@ jobs:
       - name: Caption safety unit tests
         run: bunx vitest run src/utils/captionSafety.test.ts --reporter=verbose
 
-      - name: Full test suite
-        run: bun run test
+      # Full suite + coverage thresholds (gated on src/utils/captionSafety.ts).
+      # Any uncovered line/branch/function in the validator fails the build.
+      - name: Full test suite with coverage gate
+        run: bun run test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
