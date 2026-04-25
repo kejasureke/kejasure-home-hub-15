@@ -342,9 +342,21 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     if (/[\w.+-]+@[\w-]+\.[\w.-]+/.test(t)) {
       return "Remove email addresses — keep contact in chat.";
     }
-    if (/\b(?:KES|Ksh|KSh|Sh|USD|EUR|GBP)\.?\s?\d/i.test(t) || /[$€£]\s?\d/.test(t)) {
+    // Currency code or symbol followed by a number — e.g. "Ksh 5M", "KES 10,000", "$50"
+    if (/\b(?:KES|Ksh|KSh|Sh|USD|EUR|GBP)\.?\s?\d[\d,.]*\s?[kKmM]?\b/i.test(t) || /[$€£]\s?\d/.test(t)) {
       return "Remove pricing — it belongs in the price field.";
     }
+    // Kenyan shorthand: "10k", "12k/month", "1.5m", "5M per night" — require 1-3 digits + k/m,
+    // optionally followed by a price-context word or slash. Skips bare numbers like "2 people".
+    if (/\b\d{1,3}(?:[.,]\d{1,3})?\s?[kKmM]\b(?:\s?(?:\/|per\b|p\/?[mn]\b|month|night|day|week|mo\b|pm\b|pn\b))?/i.test(t)) {
+      // Only flag if it's clearly price-coded: has k/M AND (currency vibe OR price-context word OR slash)
+      if (/\b\d{1,3}(?:[.,]\d{1,3})?\s?[kKmM]\s?(?:\/|per\b|p\/?[mn]\b|month|night|day|week|mo\b|pm\b|pn\b|bob|shillings?)/i.test(t)
+          || /(?:^|\s)(?:ksh|kes|sh|@)\s?\d{1,3}(?:[.,]\d{1,3})?\s?[kKmM]\b/i.test(t)
+          || /\b\d{1,3}(?:[.,]\d{1,3})?\s?[kKmM]\b\s*(?:only|net|nego|negotiable)/i.test(t)) {
+        return "Remove pricing — it belongs in the price field.";
+      }
+    }
+    // Explicit price context with digits — e.g. "10,000/-", "5000 bob", "20000 per month"
     if (/\b\d[\d,]{2,}\s*(?:\/-|bob|shillings?|per\s?(?:month|night|day|week))\b/i.test(t)) {
       return "Remove pricing — it belongs in the price field.";
     }
