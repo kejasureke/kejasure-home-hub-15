@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Caption safety regex regressions must fail the build.
+      # Run this suite first so failures surface immediately in the CI log.
+      - name: Caption safety unit tests
+        run: bunx vitest run src/utils/captionSafety.test.ts --reporter=verbose
+
+      - name: Full test suite
+        run: bun run test
