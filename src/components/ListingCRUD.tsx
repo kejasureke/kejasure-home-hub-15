@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import AIPhotoVerification from "./AIPhotoVerification";
 import { kenyaCounties } from "@/data/kenyaCounties";
+import { validateCaption } from "@/utils/captionSafety";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial";
 
