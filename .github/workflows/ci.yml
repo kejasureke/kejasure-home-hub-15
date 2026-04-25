@@ -34,10 +34,35 @@ jobs:
       - name: Full test suite with coverage gate
         run: bun run test:coverage
 
-      - name: Upload coverage report
+      # Always upload coverage so failed threshold runs are inspectable.
+      # `if: always()` ensures the artifacts upload even when test:coverage exits
+      # non-zero (e.g. a captionSafety branch dropped below the threshold).
+
+      - name: Upload coverage HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-html
           path: coverage/
+          if-no-files-found: warn
           retention-days: 14
+
+      - name: Upload coverage JSON summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-json-summary
+          path: coverage/coverage-summary.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Print coverage summary to job log
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "::group::captionSafety.ts coverage"
+            node -e "const s=require('./coverage/coverage-summary.json');const k=Object.keys(s).find(x=>x.endsWith('captionSafety.ts'));console.log(k?JSON.stringify(s[k],null,2):'captionSafety.ts not found in summary');"
+            echo "::endgroup::"
+          else
+            echo "No coverage summary produced (tests may have failed before coverage)."
+          fi
