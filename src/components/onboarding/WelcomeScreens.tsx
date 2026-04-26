@@ -77,7 +77,7 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
     touchStartY.current = null;
   };
 
-  const showHint = !interacted && !isLast;
+  const showHint = !swiped && !hintTimedOut && !isLast;
 
   return (
     <div
