@@ -85,6 +85,22 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     setStep("biometric");
   };
 
+  // Auto-advance: PIN entered → confirm
+  useEffect(() => {
+    if (step === "pin" && isPinFilled) {
+      const t = setTimeout(() => handlePinSubmit(), 180);
+      return () => clearTimeout(t);
+    }
+  }, [step, isPinFilled]);
+
+  // Auto-advance: confirm PIN entered → validate & continue
+  useEffect(() => {
+    if (step === "confirm-pin" && isConfirmFilled) {
+      const t = setTimeout(() => handleConfirmPinSubmit(), 180);
+      return () => clearTimeout(t);
+    }
+  }, [step, isConfirmFilled]);
+
   const stepIndex = ["phone", "otp", "pin", "confirm-pin", "biometric"].indexOf(step);
   const progress = ((stepIndex + 1) / 5) * 100;
 
