@@ -15,6 +15,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const [pin, setPin] = useState(["", "", "", ""]);
   const [confirmPin, setConfirmPin] = useState(["", "", "", ""]);
   const [pinError, setPinError] = useState("");
+  const [shakeError, setShakeError] = useState(false);
   const [otpTimer, setOtpTimer] = useState(60);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const pinRefs = useRef<(HTMLInputElement | null)[]>([]);
