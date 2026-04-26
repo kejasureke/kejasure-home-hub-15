@@ -18,6 +18,11 @@ const slides = [
     accent: "Simple, direct connections.",
   },
   {
+    title: "Corporate Stays &\nBusiness Spaces",
+    description: "Furnished homes for NGOs, consultants and expats. Plus shops, offices, godowns and showrooms for your business.",
+    accent: "Live and work, sorted.",
+  },
+  {
     title: "Find Your Next\nKeja Anywhere",
     description: "From Nairobi to Mombasa, Kisumu to Nakuru. Discover rentals, short stays, and home services nationwide.",
     accent: "47 counties. One app.",
