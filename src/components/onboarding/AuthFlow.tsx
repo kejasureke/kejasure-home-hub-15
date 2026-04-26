@@ -100,10 +100,11 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     }
   }, [step, isPinFilled]);
 
-  // Auto-advance: confirm PIN entered → validate & continue
+  // Auto-advance: confirm PIN entered → validate immediately
   useEffect(() => {
     if (step === "confirm-pin" && isConfirmFilled) {
-      const t = setTimeout(() => handleConfirmPinSubmit(), 180);
+      // Run on next tick so the last digit paints before any error shake
+      const t = setTimeout(() => handleConfirmPinSubmit(), 60);
       return () => clearTimeout(t);
     }
   }, [step, isConfirmFilled]);
