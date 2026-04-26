@@ -8,11 +8,11 @@ interface RoleSelectionProps {
 }
 
 const roles: { id: UserRole; icon: any; title: string; subtitle: string }[] = [
-  { id: "tenant", icon: Home, title: "Tenant", subtitle: "Rentals, short stays & business spaces" },
-  { id: "landlord", icon: Building2, title: "Landlord", subtitle: "List homes, corporate stays & commercial units" },
-  { id: "agency", icon: Briefcase, title: "Agency", subtitle: "Manage residential & commercial portfolios" },
-  { id: "stayhost", icon: Palmtree, title: "Stay Host", subtitle: "Host short stays & corporate guests" },
-  { id: "serviceprovider", icon: Wrench, title: "Service Provider", subtitle: "Offer move-in & business-space services" },
+  { id: "tenant", icon: Home, title: "Tenant", subtitle: "Find rentals & short stays" },
+  { id: "landlord", icon: Building2, title: "Landlord", subtitle: "List & manage properties" },
+  { id: "agency", icon: Briefcase, title: "Agency", subtitle: "Manage multiple listings" },
+  { id: "stayhost", icon: Palmtree, title: "Stay Host", subtitle: "Host short-term guests" },
+  { id: "serviceprovider", icon: Wrench, title: "Service Provider", subtitle: "Offer move-in services" },
 ];
 
 const RoleSelection = ({ onSelect }: RoleSelectionProps) => {
