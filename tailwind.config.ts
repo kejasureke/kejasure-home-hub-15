@@ -134,6 +134,11 @@ export default {
           "0%, 100%": { transform: "translateX(0)", opacity: "0.55" },
           "50%": { transform: "translateX(-10px)", opacity: "1" },
         },
+        "shake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "20%, 60%": { transform: "translateX(-8px)" },
+          "40%, 80%": { transform: "translateX(8px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -146,6 +151,7 @@ export default {
         "pulse-soft": "pulse-soft 2s ease-in-out infinite",
         "confetti-fall": "confetti-fall 2s ease-out forwards",
         "swipe-hint": "swipe-hint 1.8s ease-in-out infinite",
+        "shake": "shake 0.4s ease-in-out",
       },
     },
   },

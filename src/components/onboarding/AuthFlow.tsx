@@ -15,6 +15,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const [pin, setPin] = useState(["", "", "", ""]);
   const [confirmPin, setConfirmPin] = useState(["", "", "", ""]);
   const [pinError, setPinError] = useState("");
+  const [shakeError, setShakeError] = useState(false);
   const [otpTimer, setOtpTimer] = useState(60);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const pinRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -77,8 +78,14 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const handleConfirmPinSubmit = () => {
     if (pin.join("") !== confirmPin.join("")) {
       setPinError("PINs don't match. Try again.");
+      setShakeError(true);
       setConfirmPin(["", "", "", ""]);
       confirmPinRefs.current[0]?.focus();
+      // Haptic-style vibration on supported devices
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        navigator.vibrate?.(120);
+      }
+      setTimeout(() => setShakeError(false), 450);
       return;
     }
     setPinError("");
@@ -93,10 +100,11 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     }
   }, [step, isPinFilled]);
 
-  // Auto-advance: confirm PIN entered → validate & continue
+  // Auto-advance: confirm PIN entered → validate immediately
   useEffect(() => {
     if (step === "confirm-pin" && isConfirmFilled) {
-      const t = setTimeout(() => handleConfirmPinSubmit(), 180);
+      // Run on next tick so the last digit paints before any error shake
+      const t = setTimeout(() => handleConfirmPinSubmit(), 60);
       return () => clearTimeout(t);
     }
   }, [step, isConfirmFilled]);
@@ -261,7 +269,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
             <h1 className="text-2xl font-extrabold text-foreground mb-2">Confirm your PIN</h1>
             <p className="text-sm text-muted-foreground mb-8">Re-enter your 4-digit PIN to confirm</p>
 
-            <div className="flex gap-4 justify-center mb-4">
+            <div className={`flex gap-4 justify-center mb-4 ${shakeError ? "animate-shake" : ""}`}>
               {confirmPin.map((digit, i) => (
                 <input
                   key={i}
@@ -270,23 +278,32 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
                   inputMode="numeric"
                   maxLength={1}
                   value={digit}
-                  onChange={(e) => handleCodeInput(e.target.value, i, confirmPin, setConfirmPin, confirmPinRefs, 4)}
+                  onChange={(e) => {
+                    if (pinError) setPinError("");
+                    handleCodeInput(e.target.value, i, confirmPin, setConfirmPin, confirmPinRefs, 4);
+                  }}
                   onKeyDown={(e) => handleKeyDown(e, i, confirmPin, setConfirmPin, confirmPinRefs)}
-                  className={`w-14 h-16 rounded-xl text-center text-2xl font-bold border-2 transition-colors bg-card outline-none ${
-                    digit ? "border-primary" : pinError ? "border-destructive" : "border-border"
+                  className={`w-14 h-16 rounded-xl text-center text-2xl font-bold border-2 transition-colors outline-none ${
+                    pinError
+                      ? "border-destructive bg-destructive/5 text-destructive"
+                      : digit
+                      ? "border-primary bg-card"
+                      : "border-border bg-card"
                   }`}
                   autoFocus={i === 0}
                 />
               ))}
             </div>
 
-            {pinError && (
-              <p className="text-xs text-destructive text-center font-medium mb-4">{pinError}</p>
+            {pinError ? (
+              <p className="text-xs text-destructive text-center font-semibold mb-4 animate-fade-in">
+                {pinError}
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground text-center mt-auto pb-10">
+                We'll confirm automatically once both PINs match
+              </p>
             )}
-
-            <p className="text-xs text-muted-foreground text-center mt-auto pb-10">
-              We'll confirm automatically once both PINs match
-            </p>
           </div>
         )}
 
