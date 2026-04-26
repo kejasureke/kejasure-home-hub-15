@@ -28,7 +28,8 @@ const SWIPE_THRESHOLD = 50; // px
 
 const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
   const [current, setCurrent] = useState(0);
-  const [interacted, setInteracted] = useState(false);
+  const [swiped, setSwiped] = useState(false);
+  const [hintTimedOut, setHintTimedOut] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const swipeHandled = useRef(false);
@@ -36,22 +37,20 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
   const isLast = current === slides.length - 1;
   const slide = slides[current];
 
-  // Auto-hide hint after a few seconds even if user doesn't interact
+  // Auto-hide hint after a few seconds even if user doesn't swipe
   useEffect(() => {
-    const t = setTimeout(() => setInteracted(true), 6000);
+    const t = setTimeout(() => setHintTimedOut(true), 6000);
     return () => clearTimeout(t);
   }, []);
 
-  const markInteracted = () => {
-    if (!interacted) setInteracted(true);
+  const markSwiped = () => {
+    if (!swiped) setSwiped(true);
   };
 
   const goNext = () => {
-    markInteracted();
     setCurrent((c) => Math.min(c + 1, slides.length - 1));
   };
   const goPrev = () => {
-    markInteracted();
     setCurrent((c) => Math.max(c - 1, 0));
   };
 
@@ -68,6 +67,7 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
     if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
       if (dx < 0) goNext();
       else goPrev();
+      markSwiped();
       swipeHandled.current = true;
     }
   };
@@ -77,7 +77,7 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
     touchStartY.current = null;
   };
 
-  const showHint = !interacted && !isLast;
+  const showHint = !swiped && !hintTimedOut && !isLast;
 
   return (
     <div
@@ -159,7 +159,6 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
               key={i}
               aria-label={`Go to slide ${i + 1}`}
               onClick={() => {
-                markInteracted();
                 setCurrent(i);
               }}
               className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -172,7 +171,6 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
         {/* CTA Button */}
         <button
           onClick={() => {
-            markInteracted();
             isLast ? onComplete() : setCurrent(current + 1);
           }}
           className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
