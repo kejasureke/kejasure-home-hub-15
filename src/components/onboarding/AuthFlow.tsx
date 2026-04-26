@@ -78,8 +78,14 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const handleConfirmPinSubmit = () => {
     if (pin.join("") !== confirmPin.join("")) {
       setPinError("PINs don't match. Try again.");
+      setShakeError(true);
       setConfirmPin(["", "", "", ""]);
       confirmPinRefs.current[0]?.focus();
+      // Haptic-style vibration on supported devices
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        navigator.vibrate?.(120);
+      }
+      setTimeout(() => setShakeError(false), 450);
       return;
     }
     setPinError("");
