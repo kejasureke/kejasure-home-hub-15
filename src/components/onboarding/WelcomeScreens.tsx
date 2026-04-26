@@ -159,7 +159,6 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
               key={i}
               aria-label={`Go to slide ${i + 1}`}
               onClick={() => {
-                markInteracted();
                 setCurrent(i);
               }}
               className={`h-1.5 rounded-full transition-all duration-300 ${
