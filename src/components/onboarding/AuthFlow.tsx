@@ -246,18 +246,9 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
               ))}
             </div>
 
-            <div className="mt-auto pb-10">
-              <button
-                onClick={handlePinSubmit}
-                disabled={!isPinFilled}
-                className={`w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
-                  isPinFilled ? "gradient-trust text-primary-foreground active:scale-[0.98]" : "bg-muted text-muted-foreground"
-                }`}
-              >
-                Continue
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
+            <p className="text-xs text-muted-foreground text-center mt-auto pb-10">
+              We'll move on as soon as your PIN is entered
+            </p>
           </div>
         )}
 
