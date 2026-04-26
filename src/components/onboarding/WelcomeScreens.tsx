@@ -171,7 +171,6 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
         {/* CTA Button */}
         <button
           onClick={() => {
-            markInteracted();
             isLast ? onComplete() : setCurrent(current + 1);
           }}
           className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
