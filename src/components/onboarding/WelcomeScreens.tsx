@@ -28,7 +28,8 @@ const SWIPE_THRESHOLD = 50; // px
 
 const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
   const [current, setCurrent] = useState(0);
-  const [interacted, setInteracted] = useState(false);
+  const [swiped, setSwiped] = useState(false);
+  const [hintTimedOut, setHintTimedOut] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const swipeHandled = useRef(false);
@@ -36,22 +37,20 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
   const isLast = current === slides.length - 1;
   const slide = slides[current];
 
-  // Auto-hide hint after a few seconds even if user doesn't interact
+  // Auto-hide hint after a few seconds even if user doesn't swipe
   useEffect(() => {
-    const t = setTimeout(() => setInteracted(true), 6000);
+    const t = setTimeout(() => setHintTimedOut(true), 6000);
     return () => clearTimeout(t);
   }, []);
 
-  const markInteracted = () => {
-    if (!interacted) setInteracted(true);
+  const markSwiped = () => {
+    if (!swiped) setSwiped(true);
   };
 
   const goNext = () => {
-    markInteracted();
     setCurrent((c) => Math.min(c + 1, slides.length - 1));
   };
   const goPrev = () => {
-    markInteracted();
     setCurrent((c) => Math.max(c - 1, 0));
   };
 
