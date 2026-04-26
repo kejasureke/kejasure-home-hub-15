@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { ChevronRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ChevronRight, ShieldCheck, ChevronLeft } from "lucide-react";
 import logoIcon from "@/assets/logo-icon-green.png";
 
 interface WelcomeScreensProps {
@@ -28,6 +28,7 @@ const SWIPE_THRESHOLD = 50; // px
 
 const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
   const [current, setCurrent] = useState(0);
+  const [interacted, setInteracted] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const swipeHandled = useRef(false);
@@ -35,8 +36,24 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
   const isLast = current === slides.length - 1;
   const slide = slides[current];
 
-  const goNext = () => setCurrent((c) => Math.min(c + 1, slides.length - 1));
-  const goPrev = () => setCurrent((c) => Math.max(c - 1, 0));
+  // Auto-hide hint after a few seconds even if user doesn't interact
+  useEffect(() => {
+    const t = setTimeout(() => setInteracted(true), 6000);
+    return () => clearTimeout(t);
+  }, []);
+
+  const markInteracted = () => {
+    if (!interacted) setInteracted(true);
+  };
+
+  const goNext = () => {
+    markInteracted();
+    setCurrent((c) => Math.min(c + 1, slides.length - 1));
+  };
+  const goPrev = () => {
+    markInteracted();
+    setCurrent((c) => Math.max(c - 1, 0));
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -48,7 +65,6 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
     if (touchStartX.current === null || touchStartY.current === null || swipeHandled.current) return;
     const dx = e.touches[0].clientX - touchStartX.current;
     const dy = e.touches[0].clientY - touchStartY.current;
-    // Only treat as horizontal swipe if dx dominates dy
     if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
       if (dx < 0) goNext();
       else goPrev();
@@ -61,6 +77,8 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
     touchStartY.current = null;
   };
 
+  const showHint = !interacted && !isLast;
+
   return (
     <div
       className="fixed inset-0 z-[90] bg-background flex flex-col"
@@ -68,8 +86,14 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Skip button */}
-      <div className="flex justify-end px-5 pt-5">
+      {/* Top bar: trust micro-badge + skip */}
+      <div className="flex items-center justify-between px-5 pt-5">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/15">
+          <ShieldCheck className="w-3 h-3 text-primary" />
+          <span className="text-[10px] font-semibold text-primary tracking-wide">
+            Safe & Verified
+          </span>
+        </div>
         <button
           onClick={onComplete}
           className="text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-full bg-secondary"
@@ -111,13 +135,33 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
 
       {/* Bottom section */}
       <div className="px-6 pb-10">
+        {/* Swipe hint */}
+        <div
+          aria-hidden="true"
+          className={`flex items-center justify-center gap-1.5 mb-3 h-4 transition-opacity duration-500 ${
+            showHint ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <ChevronLeft className="w-3.5 h-3.5 text-muted-foreground/60" />
+          <span
+            className="text-[11px] font-medium text-muted-foreground animate-swipe-hint"
+            style={{ willChange: "transform, opacity" }}
+          >
+            Swipe to see how we keep you safe
+          </span>
+          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
+        </div>
+
         {/* Dots */}
         <div className="flex justify-center gap-2 mb-6">
           {slides.map((_, i) => (
             <button
               key={i}
               aria-label={`Go to slide ${i + 1}`}
-              onClick={() => setCurrent(i)}
+              onClick={() => {
+                markInteracted();
+                setCurrent(i);
+              }}
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === current ? "w-8 bg-primary" : "w-1.5 bg-muted"
               }`}
@@ -127,7 +171,10 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
 
         {/* CTA Button */}
         <button
-          onClick={() => (isLast ? onComplete() : setCurrent(current + 1))}
+          onClick={() => {
+            markInteracted();
+            isLast ? onComplete() : setCurrent(current + 1);
+          }}
           className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
         >
           {isLast ? "Find Your Next Keja" : "Continue"}
