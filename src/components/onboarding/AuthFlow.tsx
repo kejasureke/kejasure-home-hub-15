@@ -284,18 +284,9 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
               <p className="text-xs text-destructive text-center font-medium mb-4">{pinError}</p>
             )}
 
-            <div className="mt-auto pb-10">
-              <button
-                onClick={handleConfirmPinSubmit}
-                disabled={!isConfirmFilled}
-                className={`w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
-                  isConfirmFilled ? "gradient-trust text-primary-foreground active:scale-[0.98]" : "bg-muted text-muted-foreground"
-                }`}
-              >
-                Confirm
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
+            <p className="text-xs text-muted-foreground text-center mt-auto pb-10">
+              We'll confirm automatically once both PINs match
+            </p>
           </div>
         )}
 
