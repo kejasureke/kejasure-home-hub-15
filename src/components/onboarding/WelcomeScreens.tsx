@@ -67,6 +67,7 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
     if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
       if (dx < 0) goNext();
       else goPrev();
+      markSwiped();
       swipeHandled.current = true;
     }
   };
