@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronRight } from "lucide-react";
 import logoIcon from "@/assets/logo-icon-green.png";
 
@@ -24,14 +24,50 @@ const slides = [
   },
 ];
 
+const SWIPE_THRESHOLD = 50; // px
+
 const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
   const [current, setCurrent] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const swipeHandled = useRef(false);
 
   const isLast = current === slides.length - 1;
   const slide = slides[current];
 
+  const goNext = () => setCurrent((c) => Math.min(c + 1, slides.length - 1));
+  const goPrev = () => setCurrent((c) => Math.max(c - 1, 0));
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    swipeHandled.current = false;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null || swipeHandled.current) return;
+    const dx = e.touches[0].clientX - touchStartX.current;
+    const dy = e.touches[0].clientY - touchStartY.current;
+    // Only treat as horizontal swipe if dx dominates dy
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) goNext();
+      else goPrev();
+      swipeHandled.current = true;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   return (
-    <div className="fixed inset-0 z-[90] bg-background flex flex-col">
+    <div
+      className="fixed inset-0 z-[90] bg-background flex flex-col"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Skip button */}
       <div className="flex justify-end px-5 pt-5">
         <button
@@ -43,13 +79,17 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
+      <div
+        key={current}
+        className="flex-1 flex flex-col items-center justify-center px-8 text-center select-none"
+      >
         {/* Logo icon */}
         <div className="w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center mb-8 animate-fade-in">
           <img
             src={logoIcon}
             alt="KejaSure"
             className="w-16 h-16 object-contain"
+            draggable={false}
           />
         </div>
 
@@ -74,8 +114,10 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
         {/* Dots */}
         <div className="flex justify-center gap-2 mb-6">
           {slides.map((_, i) => (
-            <div
+            <button
               key={i}
+              aria-label={`Go to slide ${i + 1}`}
+              onClick={() => setCurrent(i)}
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === current ? "w-8 bg-primary" : "w-1.5 bg-muted"
               }`}
