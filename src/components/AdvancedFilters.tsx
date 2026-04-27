@@ -28,7 +28,17 @@ interface AdvancedFiltersProps {
   estate: string;
   onLocationChange: (county: string, subcounty: string, ward: string, estate: string) => void;
   segment?: string;
+  onSegmentChange?: (segment: string) => void;
 }
+
+const categoryOptions = [
+  { value: "All", label: "All", icon: "✨" },
+  { value: "Rentals", label: "Rentals", icon: "🏠" },
+  { value: "Short Stays", label: "Short Stays", icon: "🛎️" },
+  { value: "Business Spaces", label: "Business Spaces", icon: "🏢" },
+  { value: "Corporate Stay", label: "Corporate Stay", icon: "💼" },
+  { value: "Services", label: "Services", icon: "🔧" },
+];
 
 const bedroomOptions = [1, 2, 3, 4, 5];
 
