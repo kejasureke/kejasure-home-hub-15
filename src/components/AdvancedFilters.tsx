@@ -1,5 +1,5 @@
-import { X, SlidersHorizontal, Building2, Ruler } from "lucide-react";
-import { useState } from "react";
+import { X, SlidersHorizontal, Building2, Ruler, Layers } from "lucide-react";
+import { useState, useEffect } from "react";
 import LocationSelector from "./LocationSelector";
 
 interface Filters {
@@ -28,7 +28,17 @@ interface AdvancedFiltersProps {
   estate: string;
   onLocationChange: (county: string, subcounty: string, ward: string, estate: string) => void;
   segment?: string;
+  onSegmentChange?: (segment: string) => void;
 }
+
+const categoryOptions = [
+  { value: "All", label: "All", icon: "✨" },
+  { value: "Rentals", label: "Rentals", icon: "🏠" },
+  { value: "Short Stays", label: "Short Stays", icon: "🛎️" },
+  { value: "Business Spaces", label: "Business Spaces", icon: "🏢" },
+  { value: "Corporate Stay", label: "Corporate Stay", icon: "💼" },
+  { value: "Services", label: "Services", icon: "🔧" },
+];
 
 const bedroomOptions = [1, 2, 3, 4, 5];
 
@@ -81,9 +91,17 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange, segment }: AdvancedFiltersProps) => {
+const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange, segment, onSegmentChange }: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>({ ...filters });
-  const isCommercial = segment === "Business Spaces";
+  const [localSegment, setLocalSegment] = useState<string>(segment || "All");
+  const isCommercial = localSegment === "Business Spaces";
+  const isServices = localSegment === "Services";
+  const isShortStay = localSegment === "Short Stays";
+
+  // Re-sync segment when sheet (re)opens or parent segment changes
+  useEffect(() => {
+    if (isOpen) setLocalSegment(segment || "All");
+  }, [isOpen, segment]);
 
   if (!isOpen) return null;
 
@@ -132,7 +150,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
         </button>
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4" />
-          {isCommercial ? "Business Space Filters" : "Filters"}
+          {localSegment === "All" ? "Filters" : `${localSegment} Filters`}
           {activeCount > 0 && (
             <span className="w-5 h-5 rounded-full gradient-trust text-[10px] font-bold text-primary-foreground flex items-center justify-center">
               {activeCount}
@@ -160,6 +178,33 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
             selectedEstate={estate}
             onSelect={(c, sc, w, e) => onLocationChange(c, sc, w, e)}
           />
+        </div>
+
+        {/* Category — drives which filters show below */}
+        <div>
+          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-primary" />
+            Category
+          </h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Pick what you're looking for — filters below adapt automatically
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {categoryOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setLocalSegment(opt.value)}
+                className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl text-xs font-semibold transition-all ${
+                  localSegment === opt.value
+                    ? "gradient-trust text-primary-foreground ring-2 ring-primary/30 shadow-sm"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                <span className="text-lg leading-none">{opt.icon}</span>
+                <span className="leading-tight text-center">{opt.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Commercial Type filter */}
@@ -269,8 +314,8 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           </div>
         </div>
 
-        {/* Bedrooms (hide for commercial) */}
-        {!isCommercial && (
+        {/* Bedrooms (hide for commercial & services) */}
+        {!isCommercial && !isServices && (
           <div>
             <h3 className="text-sm font-semibold mb-3">Bedrooms</h3>
             <div className="flex gap-2">
@@ -298,8 +343,8 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
             {[
               { key: "verified" as const, label: "Verified Only", icon: "✓", show: true },
               { key: "smileIdVerified" as const, label: "Verified by Smile ID", icon: "😊", show: true },
-              { key: "furnished" as const, label: "Furnished", icon: "🏠", show: !isCommercial },
-              { key: "petFriendly" as const, label: "Pet Friendly", icon: "🐾", show: !isCommercial },
+              { key: "furnished" as const, label: "Furnished", icon: "🏠", show: !isCommercial && !isServices },
+              { key: "petFriendly" as const, label: "Pet Friendly", icon: "🐾", show: !isCommercial && !isServices },
             ].filter(t => t.show).map((toggle) => (
               <button
                 key={toggle.key}
@@ -326,34 +371,42 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           </div>
         </div>
 
-        {/* Amenities */}
-        <div>
-          <h3 className="text-sm font-semibold mb-3">{isCommercial ? "Space Features" : "Amenities"}</h3>
-          <div className="flex flex-wrap gap-2">
-            {amenityList.map((a) => (
-              <button
-                key={a}
-                onClick={() => toggleAmenity(a)}
-                className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
-                  local.amenities.includes(a)
-                    ? "gradient-trust text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {a}
-              </button>
-            ))}
+        {/* Amenities (hide for services) */}
+        {!isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3">{isCommercial ? "Space Features" : "Amenities"}</h3>
+            <div className="flex flex-wrap gap-2">
+              {amenityList.map((a) => (
+                <button
+                  key={a}
+                  onClick={() => toggleAmenity(a)}
+                  className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                    local.amenities.includes(a)
+                      ? "gradient-trust text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Apply button */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
         <button
-          onClick={() => { onApply(local); onClose(); }}
+          onClick={() => {
+            if (onSegmentChange && localSegment !== "All" && localSegment !== segment) {
+              onSegmentChange(localSegment);
+            }
+            onApply(local);
+            onClose();
+          }}
           className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
         >
-          Apply Filters
+          {localSegment === "All" ? "Apply Filters" : `Show ${localSegment}`}
         </button>
       </div>
     </div>
