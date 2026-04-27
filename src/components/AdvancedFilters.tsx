@@ -1,4 +1,4 @@
-import { X, SlidersHorizontal, Building2, Ruler, Layers } from "lucide-react";
+import { X, SlidersHorizontal, Building2, Ruler, Layers, Wrench } from "lucide-react";
 import { useState, useEffect } from "react";
 import LocationSelector from "./LocationSelector";
 
@@ -29,6 +29,10 @@ interface AdvancedFiltersProps {
   onLocationChange: (county: string, subcounty: string, ward: string, estate: string) => void;
   segment?: string;
   onSegmentChange?: (segment: string) => void;
+  serviceCategory?: string;
+  onServiceCategoryChange?: (cat: string) => void;
+  serviceSort?: string;
+  onServiceSortChange?: (sort: "featured" | "rating" | "reviews") => void;
 }
 
 const categoryOptions = [
@@ -39,6 +43,30 @@ const categoryOptions = [
   { value: "Corporate Stay", label: "Corporate Stay", icon: "💼" },
   { value: "Services", label: "Services", icon: "🔧" },
 ];
+
+const serviceCategoryOptions = [
+  { value: "All", label: "All Services", icon: "✨" },
+  { value: "Movers", label: "Movers", icon: "🚛" },
+  { value: "Cleaners", label: "Cleaners", icon: "🧹" },
+  { value: "Electricians", label: "Electricians", icon: "⚡" },
+  { value: "Plumbers", label: "Plumbers", icon: "🔧" },
+  { value: "Internet Installers", label: "Internet", icon: "📡" },
+  { value: "Security", label: "Security", icon: "🛡️" },
+  { value: "Painters", label: "Painters", icon: "🎨" },
+  { value: "Fumigators", label: "Fumigators", icon: "🪲" },
+  { value: "Carpenters", label: "Carpenters", icon: "🪚" },
+  { value: "Gardeners", label: "Gardeners", icon: "🌿" },
+  { value: "AC Repair", label: "AC Repair", icon: "❄️" },
+  { value: "Locksmiths", label: "Locksmiths", icon: "🔑" },
+  { value: "Welders", label: "Welders", icon: "🔥" },
+  { value: "Masons", label: "Masons", icon: "🧱" },
+];
+
+const serviceSortOptions = [
+  { value: "featured", label: "Featured" },
+  { value: "rating", label: "Top Rated" },
+  { value: "reviews", label: "Most Reviews" },
+] as const;
 
 const bedroomOptions = [1, 2, 3, 4, 5];
 
@@ -91,17 +119,28 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange, segment, onSegmentChange }: AdvancedFiltersProps) => {
+const AdvancedFilters = ({
+  isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange,
+  segment, onSegmentChange,
+  serviceCategory, onServiceCategoryChange,
+  serviceSort, onServiceSortChange,
+}: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>({ ...filters });
   const [localSegment, setLocalSegment] = useState<string>(segment || "All");
+  const [localServiceCategory, setLocalServiceCategory] = useState<string>(serviceCategory || "All");
+  const [localServiceSort, setLocalServiceSort] = useState<string>(serviceSort || "featured");
   const isCommercial = localSegment === "Business Spaces";
   const isServices = localSegment === "Services";
   const isShortStay = localSegment === "Short Stays";
 
-  // Re-sync segment when sheet (re)opens or parent segment changes
+  // Re-sync segment & service fields when sheet (re)opens or parent values change
   useEffect(() => {
-    if (isOpen) setLocalSegment(segment || "All");
-  }, [isOpen, segment]);
+    if (isOpen) {
+      setLocalSegment(segment || "All");
+      setLocalServiceCategory(serviceCategory || "All");
+      setLocalServiceSort(serviceSort || "featured");
+    }
+  }, [isOpen, segment, serviceCategory, serviceSort]);
 
   if (!isOpen) return null;
 
@@ -207,6 +246,54 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           </div>
         </div>
 
+        {/* Service Type filter — shown when Services is selected */}
+        {isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+              <Wrench className="w-4 h-4 text-primary" />
+              Service Type
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              {serviceCategoryOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setLocalServiceCategory(opt.value)}
+                  className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl text-xs font-semibold transition-all ${
+                    localServiceCategory === opt.value
+                      ? "gradient-trust text-primary-foreground ring-2 ring-primary/30 shadow-sm"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  <span className="text-lg leading-none">{opt.icon}</span>
+                  <span className="leading-tight text-center">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Service Sort — shown when Services is selected */}
+        {isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Sort Services By</h3>
+            <div className="flex flex-wrap gap-2">
+              {serviceSortOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setLocalServiceSort(opt.value)}
+                  className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                    localServiceSort === opt.value
+                      ? "gradient-trust text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Commercial Type filter */}
         {isCommercial && (
           <div>
@@ -266,53 +353,57 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           </div>
         )}
 
-        {/* Sort */}
-        <div>
-          <h3 className="text-sm font-semibold mb-3">Sort By</h3>
-          <div className="flex flex-wrap gap-2">
-            {sortOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setLocal((f) => ({ ...f, sortBy: opt.value }))}
-                className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
-                  local.sortBy === opt.value
-                    ? "gradient-trust text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
+        {/* Sort (property listings) — hide for services */}
+        {!isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Sort By</h3>
+            <div className="flex flex-wrap gap-2">
+              {sortOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setLocal((f) => ({ ...f, sortBy: opt.value }))}
+                  className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                    local.sortBy === opt.value
+                      ? "gradient-trust text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Price Range */}
-        <div>
-          <h3 className="text-sm font-semibold mb-3">Price Range (KES)</h3>
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="text-xs text-muted-foreground mb-1 block">Min</label>
-              <input
-                type="number"
-                value={local.minPrice || ""}
-                onChange={(e) => setLocal((f) => ({ ...f, minPrice: Number(e.target.value) || 0 }))}
-                placeholder="0"
-                className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
-            </div>
-            <div className="flex items-end pb-2.5 text-muted-foreground">–</div>
-            <div className="flex-1">
-              <label className="text-xs text-muted-foreground mb-1 block">Max</label>
-              <input
-                type="number"
-                value={local.maxPrice >= 500000 ? "" : local.maxPrice}
-                onChange={(e) => setLocal((f) => ({ ...f, maxPrice: Number(e.target.value) || 500000 }))}
-                placeholder="No limit"
-                className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
+        {/* Price Range — hide for services (per-job pricing varies) */}
+        {!isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Price Range (KES)</h3>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="text-xs text-muted-foreground mb-1 block">Min</label>
+                <input
+                  type="number"
+                  value={local.minPrice || ""}
+                  onChange={(e) => setLocal((f) => ({ ...f, minPrice: Number(e.target.value) || 0 }))}
+                  placeholder="0"
+                  className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+              <div className="flex items-end pb-2.5 text-muted-foreground">–</div>
+              <div className="flex-1">
+                <label className="text-xs text-muted-foreground mb-1 block">Max</label>
+                <input
+                  type="number"
+                  value={local.maxPrice >= 500000 ? "" : local.maxPrice}
+                  onChange={(e) => setLocal((f) => ({ ...f, maxPrice: Number(e.target.value) || 500000 }))}
+                  placeholder="No limit"
+                  className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Bedrooms (hide for commercial & services) */}
         {!isCommercial && !isServices && (
@@ -338,7 +429,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
 
         {/* Quick toggles */}
         <div>
-          <h3 className="text-sm font-semibold mb-3">Property Features</h3>
+          <h3 className="text-sm font-semibold mb-3">{isServices ? "Trust & Verification" : "Property Features"}</h3>
           <div className="space-y-3">
             {[
               { key: "verified" as const, label: "Verified Only", icon: "✓", show: true },
@@ -401,12 +492,18 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
             if (onSegmentChange && localSegment !== "All" && localSegment !== segment) {
               onSegmentChange(localSegment);
             }
+            if (isServices) {
+              onServiceCategoryChange?.(localServiceCategory);
+              onServiceSortChange?.(localServiceSort as "featured" | "rating" | "reviews");
+            }
             onApply(local);
             onClose();
           }}
           className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
         >
-          {localSegment === "All" ? "Apply Filters" : `Show ${localSegment}`}
+          {isServices
+            ? (localServiceCategory === "All" ? "Show All Services" : `Show ${localServiceCategory}`)
+            : (localSegment === "All" ? "Apply Filters" : `Show ${localSegment}`)}
         </button>
       </div>
     </div>
