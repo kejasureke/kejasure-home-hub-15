@@ -128,7 +128,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         <Section title="Notifications">
           <SettingRow icon={Bell} label="Push Notifications" subtitle="Listing alerts & messages" right={<Toggle enabled={pushEnabled} onToggle={() => setPushEnabled(!pushEnabled)} />} />
           <SettingRow icon={Smartphone} label="SMS Alerts" subtitle="Important updates via SMS" right={<Toggle enabled={smsEnabled} onToggle={() => setSmsEnabled(!smsEnabled)} />} />
-          <SettingRow icon={Bell} label="Email Notifications" subtitle="Weekly digest & promotions" right={<Toggle enabled={emailEnabled} onToggle={() => setEmailEnabled(!emailEnabled)} />} />
+          <SettingRow icon={Bell} label="Price Drop Alerts" subtitle="Get notified on price changes" right={<Toggle enabled={priceAlerts} onToggle={() => setPriceAlerts(!priceAlerts)} />} />
           <SettingRow icon={Bell} label="Price Drop Alerts" subtitle="Get notified on price changes" right={<Toggle enabled={priceAlerts} onToggle={() => setPriceAlerts(!priceAlerts)} />} />
           <SettingRow icon={Volume2} label="Notification Sound" subtitle="Play sound for alerts" right={<Toggle enabled={soundEnabled} onToggle={() => setSoundEnabled(!soundEnabled)} />} />
         </Section>
