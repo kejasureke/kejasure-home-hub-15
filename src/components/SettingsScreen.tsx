@@ -9,7 +9,7 @@ interface SettingsScreenProps {
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const { closing, triggerClose } = useOverlayClose(onBack);
   const [pushEnabled, setPushEnabled] = useState(true);
-  const [emailEnabled, setEmailEnabled] = useState(false);
+  const [smsEnabled, setSmsEnabled] = useState(true);
   const [smsEnabled, setSmsEnabled] = useState(true);
   const [priceAlerts, setPriceAlerts] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
