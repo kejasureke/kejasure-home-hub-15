@@ -150,7 +150,7 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
         </button>
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4" />
-          {isCommercial ? "Business Space Filters" : "Filters"}
+          {localSegment === "All" ? "Filters" : `${localSegment} Filters`}
           {activeCount > 0 && (
             <span className="w-5 h-5 rounded-full gradient-trust text-[10px] font-bold text-primary-foreground flex items-center justify-center">
               {activeCount}
