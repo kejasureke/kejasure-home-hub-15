@@ -398,7 +398,9 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
         <button
           onClick={() => {
-            if (onSegmentChange && localSegment !== segment) onSegmentChange(localSegment);
+            if (onSegmentChange && localSegment !== "All" && localSegment !== segment) {
+              onSegmentChange(localSegment);
+            }
             onApply(local);
             onClose();
           }}
