@@ -314,8 +314,8 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           </div>
         </div>
 
-        {/* Bedrooms (hide for commercial) */}
-        {!isCommercial && (
+        {/* Bedrooms (hide for commercial & services) */}
+        {!isCommercial && !isServices && (
           <div>
             <h3 className="text-sm font-semibold mb-3">Bedrooms</h3>
             <div className="flex gap-2">
