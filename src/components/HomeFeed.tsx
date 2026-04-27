@@ -700,6 +700,11 @@ const HomeFeed = () => {
         estate={estate}
         onLocationChange={(c, sc, w, e) => { setCounty(c); setSubcounty(sc); setWard(w); setEstate(e); }}
         segment={segment}
+        onSegmentChange={(s) => {
+          if ((segments as readonly string[]).includes(s)) {
+            setSegment(s as (typeof segments)[number]);
+          }
+        }}
       />
     </div>
   );
