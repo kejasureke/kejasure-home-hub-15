@@ -1,5 +1,5 @@
-import { X, SlidersHorizontal, Building2, Ruler } from "lucide-react";
-import { useState } from "react";
+import { X, SlidersHorizontal, Building2, Ruler, Layers } from "lucide-react";
+import { useState, useEffect } from "react";
 import LocationSelector from "./LocationSelector";
 
 interface Filters {
