@@ -10,7 +10,6 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const { closing, triggerClose } = useOverlayClose(onBack);
   const [pushEnabled, setPushEnabled] = useState(true);
   const [smsEnabled, setSmsEnabled] = useState(true);
-  const [smsEnabled, setSmsEnabled] = useState(true);
   const [priceAlerts, setPriceAlerts] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [locationEnabled, setLocationEnabled] = useState(true);
