@@ -91,9 +91,17 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange, segment }: AdvancedFiltersProps) => {
+const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange, segment, onSegmentChange }: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>({ ...filters });
-  const isCommercial = segment === "Business Spaces";
+  const [localSegment, setLocalSegment] = useState<string>(segment || "All");
+  const isCommercial = localSegment === "Business Spaces";
+  const isServices = localSegment === "Services";
+  const isShortStay = localSegment === "Short Stays";
+
+  // Re-sync segment when sheet (re)opens or parent segment changes
+  useEffect(() => {
+    if (isOpen) setLocalSegment(segment || "All");
+  }, [isOpen, segment]);
 
   if (!isOpen) return null;
 
