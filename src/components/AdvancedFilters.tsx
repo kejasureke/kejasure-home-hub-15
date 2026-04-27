@@ -371,25 +371,27 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           </div>
         </div>
 
-        {/* Amenities */}
-        <div>
-          <h3 className="text-sm font-semibold mb-3">{isCommercial ? "Space Features" : "Amenities"}</h3>
-          <div className="flex flex-wrap gap-2">
-            {amenityList.map((a) => (
-              <button
-                key={a}
-                onClick={() => toggleAmenity(a)}
-                className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
-                  local.amenities.includes(a)
-                    ? "gradient-trust text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {a}
-              </button>
-            ))}
+        {/* Amenities (hide for services) */}
+        {!isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3">{isCommercial ? "Space Features" : "Amenities"}</h3>
+            <div className="flex flex-wrap gap-2">
+              {amenityList.map((a) => (
+                <button
+                  key={a}
+                  onClick={() => toggleAmenity(a)}
+                  className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                    local.amenities.includes(a)
+                      ? "gradient-trust text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Apply button */}
