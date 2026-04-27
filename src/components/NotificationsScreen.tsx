@@ -364,7 +364,7 @@ const NotificationsScreen = ({
 
           <div className="px-4 pt-6 pb-4 text-center">
             <Bell className="w-5 h-5 text-muted-foreground/30 mx-auto mb-1" />
-            <p className="text-[10px] text-muted-foreground/40">Swipe left to dismiss</p>
+            <p className="text-[10px] text-muted-foreground/40">Tap to open • Swipe left to delete</p>
           </div>
         </>
       )}
