@@ -492,12 +492,18 @@ const AdvancedFilters = ({
             if (onSegmentChange && localSegment !== "All" && localSegment !== segment) {
               onSegmentChange(localSegment);
             }
+            if (isServices) {
+              onServiceCategoryChange?.(localServiceCategory);
+              onServiceSortChange?.(localServiceSort as "featured" | "rating" | "reviews");
+            }
             onApply(local);
             onClose();
           }}
           className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
         >
-          {localSegment === "All" ? "Apply Filters" : `Show ${localSegment}`}
+          {isServices
+            ? (localServiceCategory === "All" ? "Show All Services" : `Show ${localServiceCategory}`)
+            : (localSegment === "All" ? "Apply Filters" : `Show ${localSegment}`)}
         </button>
       </div>
     </div>
