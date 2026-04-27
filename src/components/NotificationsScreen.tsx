@@ -393,6 +393,70 @@ const NotificationsScreen = ({
           </div>
         </div>
       )}
+
+      {/* Detail sheet */}
+      {detailItem && (() => {
+        const Icon = alertIconMap[detailItem.type] || Bell;
+        const colorClass = alertColorMap[detailItem.type] || alertColorMap.system;
+        return (
+          <div className="fixed inset-0 z-[60] flex items-end justify-center">
+            {/* Backdrop */}
+            <div
+              className={`absolute inset-0 bg-foreground/40 backdrop-blur-[2px] transition-opacity duration-200 ${detailClosing ? "opacity-0" : "opacity-100"}`}
+              onClick={closeDetail}
+            />
+            {/* Sheet */}
+            <div
+              className={`relative w-full max-w-lg bg-card rounded-t-3xl shadow-2xl ${detailClosing ? "animate-slide-down" : "animate-slide-up"}`}
+            >
+              {/* Grabber */}
+              <div className="flex justify-center pt-2.5 pb-1">
+                <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+              </div>
+
+              <div className="px-5 pt-3 pb-6">
+                <div className="flex items-start gap-3">
+                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${colorClass}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {alertTypeLabel[detailItem.type] || detailItem.type}
+                    </p>
+                    <h3 className="text-base font-bold text-foreground mt-0.5 leading-snug">
+                      {detailItem.title}
+                    </h3>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Clock className="w-3 h-3 text-muted-foreground/60" />
+                      <span className="text-[11px] text-muted-foreground">{detailItem.timeLabel}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-sm text-foreground/80 leading-relaxed mt-4">
+                  {detailItem.description}
+                </p>
+
+                <div className="flex gap-2 mt-6">
+                  <button
+                    onClick={closeDetail}
+                    className="flex-1 py-3 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm active:scale-[0.98] transition-transform"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={closeDetail}
+                    className="flex-[1.4] py-3 rounded-xl gradient-trust text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
+                  >
+                    {detailActionLabel(detailItem.type)}
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
