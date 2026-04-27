@@ -348,7 +348,7 @@ const NotificationsScreen = ({
             <div className="px-4 pt-4">
               <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Today</h2>
               {todayNotifs.map((n) => (
-                <SwipeableNotification key={n.id} notification={n} onDismiss={dismiss} onTap={markRead} />
+                <SwipeableNotification key={n.id} notification={n} onDismiss={dismiss} onTap={openStoredDetail} />
               ))}
             </div>
           )}
