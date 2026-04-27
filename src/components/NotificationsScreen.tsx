@@ -357,7 +357,7 @@ const NotificationsScreen = ({
             <div className="px-4 pt-5">
               <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Earlier</h2>
               {earlierNotifs.map((n) => (
-                <SwipeableNotification key={n.id} notification={n} onDismiss={dismiss} onTap={markRead} />
+                <SwipeableNotification key={n.id} notification={n} onDismiss={dismiss} onTap={openStoredDetail} />
               ))}
             </div>
           )}
