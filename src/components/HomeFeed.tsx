@@ -705,6 +705,10 @@ const HomeFeed = () => {
             setSegment(s as (typeof segments)[number]);
           }
         }}
+        serviceCategory={serviceCategory}
+        onServiceCategoryChange={setServiceCategory}
+        serviceSort={serviceSort}
+        onServiceSortChange={setServiceSort}
       />
     </div>
   );
