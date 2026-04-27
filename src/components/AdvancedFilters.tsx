@@ -29,6 +29,10 @@ interface AdvancedFiltersProps {
   onLocationChange: (county: string, subcounty: string, ward: string, estate: string) => void;
   segment?: string;
   onSegmentChange?: (segment: string) => void;
+  serviceCategory?: string;
+  onServiceCategoryChange?: (cat: string) => void;
+  serviceSort?: string;
+  onServiceSortChange?: (sort: "featured" | "rating" | "reviews") => void;
 }
 
 const categoryOptions = [
@@ -39,6 +43,30 @@ const categoryOptions = [
   { value: "Corporate Stay", label: "Corporate Stay", icon: "💼" },
   { value: "Services", label: "Services", icon: "🔧" },
 ];
+
+const serviceCategoryOptions = [
+  { value: "All", label: "All Services", icon: "✨" },
+  { value: "Movers", label: "Movers", icon: "🚛" },
+  { value: "Cleaners", label: "Cleaners", icon: "🧹" },
+  { value: "Electricians", label: "Electricians", icon: "⚡" },
+  { value: "Plumbers", label: "Plumbers", icon: "🔧" },
+  { value: "Internet Installers", label: "Internet", icon: "📡" },
+  { value: "Security", label: "Security", icon: "🛡️" },
+  { value: "Painters", label: "Painters", icon: "🎨" },
+  { value: "Fumigators", label: "Fumigators", icon: "🪲" },
+  { value: "Carpenters", label: "Carpenters", icon: "🪚" },
+  { value: "Gardeners", label: "Gardeners", icon: "🌿" },
+  { value: "AC Repair", label: "AC Repair", icon: "❄️" },
+  { value: "Locksmiths", label: "Locksmiths", icon: "🔑" },
+  { value: "Welders", label: "Welders", icon: "🔥" },
+  { value: "Masons", label: "Masons", icon: "🧱" },
+];
+
+const serviceSortOptions = [
+  { value: "featured", label: "Featured" },
+  { value: "rating", label: "Top Rated" },
+  { value: "reviews", label: "Most Reviews" },
+] as const;
 
 const bedroomOptions = [1, 2, 3, 4, 5];
 
