@@ -397,10 +397,14 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
       {/* Apply button */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
         <button
-          onClick={() => { onApply(local); onClose(); }}
+          onClick={() => {
+            if (onSegmentChange && localSegment !== segment) onSegmentChange(localSegment);
+            onApply(local);
+            onClose();
+          }}
           className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
         >
-          Apply Filters
+          {localSegment === "All" ? "Apply Filters" : `Show ${localSegment}`}
         </button>
       </div>
     </div>
