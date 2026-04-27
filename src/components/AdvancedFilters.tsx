@@ -180,6 +180,33 @@ const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty,
           />
         </div>
 
+        {/* Category — drives which filters show below */}
+        <div>
+          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-primary" />
+            Category
+          </h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            Pick what you're looking for — filters below adapt automatically
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {categoryOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setLocalSegment(opt.value)}
+                className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl text-xs font-semibold transition-all ${
+                  localSegment === opt.value
+                    ? "gradient-trust text-primary-foreground ring-2 ring-primary/30 shadow-sm"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                <span className="text-lg leading-none">{opt.icon}</span>
+                <span className="leading-tight text-center">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Commercial Type filter */}
         {isCommercial && (
           <div>
