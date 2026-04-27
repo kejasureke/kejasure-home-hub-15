@@ -332,7 +332,7 @@ const NotificationsScreen = ({
                       <SwipeableAlertItem
                         key={alert.id}
                         alert={alert}
-                        onTap={(id) => onMarkAlertRead?.(id)}
+                        onTap={openLiveDetail}
                         onDismiss={handleDismissAlert}
                         indented
                       />
