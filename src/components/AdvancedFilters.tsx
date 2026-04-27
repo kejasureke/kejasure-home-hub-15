@@ -353,53 +353,57 @@ const AdvancedFilters = ({
           </div>
         )}
 
-        {/* Sort */}
-        <div>
-          <h3 className="text-sm font-semibold mb-3">Sort By</h3>
-          <div className="flex flex-wrap gap-2">
-            {sortOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setLocal((f) => ({ ...f, sortBy: opt.value }))}
-                className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
-                  local.sortBy === opt.value
-                    ? "gradient-trust text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
+        {/* Sort (property listings) — hide for services */}
+        {!isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Sort By</h3>
+            <div className="flex flex-wrap gap-2">
+              {sortOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setLocal((f) => ({ ...f, sortBy: opt.value }))}
+                  className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                    local.sortBy === opt.value
+                      ? "gradient-trust text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Price Range */}
-        <div>
-          <h3 className="text-sm font-semibold mb-3">Price Range (KES)</h3>
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="text-xs text-muted-foreground mb-1 block">Min</label>
-              <input
-                type="number"
-                value={local.minPrice || ""}
-                onChange={(e) => setLocal((f) => ({ ...f, minPrice: Number(e.target.value) || 0 }))}
-                placeholder="0"
-                className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
-            </div>
-            <div className="flex items-end pb-2.5 text-muted-foreground">–</div>
-            <div className="flex-1">
-              <label className="text-xs text-muted-foreground mb-1 block">Max</label>
-              <input
-                type="number"
-                value={local.maxPrice >= 500000 ? "" : local.maxPrice}
-                onChange={(e) => setLocal((f) => ({ ...f, maxPrice: Number(e.target.value) || 500000 }))}
-                placeholder="No limit"
-                className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
+        {/* Price Range — hide for services (per-job pricing varies) */}
+        {!isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Price Range (KES)</h3>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="text-xs text-muted-foreground mb-1 block">Min</label>
+                <input
+                  type="number"
+                  value={local.minPrice || ""}
+                  onChange={(e) => setLocal((f) => ({ ...f, minPrice: Number(e.target.value) || 0 }))}
+                  placeholder="0"
+                  className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+              <div className="flex items-end pb-2.5 text-muted-foreground">–</div>
+              <div className="flex-1">
+                <label className="text-xs text-muted-foreground mb-1 block">Max</label>
+                <input
+                  type="number"
+                  value={local.maxPrice >= 500000 ? "" : local.maxPrice}
+                  onChange={(e) => setLocal((f) => ({ ...f, maxPrice: Number(e.target.value) || 500000 }))}
+                  placeholder="No limit"
+                  className="w-full px-3 py-2.5 rounded-xl bg-secondary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Bedrooms (hide for commercial & services) */}
         {!isCommercial && !isServices && (
