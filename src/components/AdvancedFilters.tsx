@@ -246,6 +246,54 @@ const AdvancedFilters = ({
           </div>
         </div>
 
+        {/* Service Type filter — shown when Services is selected */}
+        {isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+              <Wrench className="w-4 h-4 text-primary" />
+              Service Type
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              {serviceCategoryOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setLocalServiceCategory(opt.value)}
+                  className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl text-xs font-semibold transition-all ${
+                    localServiceCategory === opt.value
+                      ? "gradient-trust text-primary-foreground ring-2 ring-primary/30 shadow-sm"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  <span className="text-lg leading-none">{opt.icon}</span>
+                  <span className="leading-tight text-center">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Service Sort — shown when Services is selected */}
+        {isServices && (
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Sort Services By</h3>
+            <div className="flex flex-wrap gap-2">
+              {serviceSortOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setLocalServiceSort(opt.value)}
+                  className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                    localServiceSort === opt.value
+                      ? "gradient-trust text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Commercial Type filter */}
         {isCommercial && (
           <div>
