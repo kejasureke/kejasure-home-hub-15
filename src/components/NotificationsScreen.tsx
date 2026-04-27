@@ -73,6 +73,51 @@ const NotificationsScreen = ({
   const undoStartRef = useRef<number>(0);
   const UNDO_DURATION = 5000;
 
+  // Detail sheet for tapped notifications
+  type DetailItem = {
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    timeLabel: string;
+    source: "stored" | "live";
+  };
+  const [detailItem, setDetailItem] = useState<DetailItem | null>(null);
+  const [detailClosing, setDetailClosing] = useState(false);
+
+  const closeDetail = useCallback(() => {
+    setDetailClosing(true);
+    setTimeout(() => {
+      setDetailItem(null);
+      setDetailClosing(false);
+    }, 200);
+  }, []);
+
+  const openStoredDetail = useCallback((id: string) => {
+    const n = notifications.find((x) => x.id === id);
+    if (!n) return;
+    markRead(id);
+    setDetailItem({ id: n.id, type: n.type, title: n.title, description: n.description, timeLabel: n.time, source: "stored" });
+  }, [notifications, markRead]);
+
+  const openLiveDetail = useCallback((id: string) => {
+    const a = liveAlerts.find((x) => x.id === id);
+    if (!a) return;
+    onMarkAlertRead?.(id);
+    setDetailItem({ id: a.id, type: a.type, title: a.title, description: a.body, timeLabel: timeAgo(a.timestamp), source: "live" });
+  }, [liveAlerts, onMarkAlertRead]);
+
+  const detailActionLabel = (type: string) => {
+    switch (type) {
+      case "listing": return "View Listing";
+      case "booking": return "View Booking";
+      case "price": return "View Property";
+      case "verified": return "View Profile";
+      case "message": return "Open Chat";
+      default: return "View Details";
+    }
+  };
+
   const stopUndoAnim = useCallback(() => {
     if (undoAnimRef.current) cancelAnimationFrame(undoAnimRef.current);
   }, []);
