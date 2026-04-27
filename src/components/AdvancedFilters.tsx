@@ -429,7 +429,7 @@ const AdvancedFilters = ({
 
         {/* Quick toggles */}
         <div>
-          <h3 className="text-sm font-semibold mb-3">Property Features</h3>
+          <h3 className="text-sm font-semibold mb-3">{isServices ? "Trust & Verification" : "Property Features"}</h3>
           <div className="space-y-3">
             {[
               { key: "verified" as const, label: "Verified Only", icon: "✓", show: true },
