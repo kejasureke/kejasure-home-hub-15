@@ -73,6 +73,51 @@ const NotificationsScreen = ({
   const undoStartRef = useRef<number>(0);
   const UNDO_DURATION = 5000;
 
+  // Detail sheet for tapped notifications
+  type DetailItem = {
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    timeLabel: string;
+    source: "stored" | "live";
+  };
+  const [detailItem, setDetailItem] = useState<DetailItem | null>(null);
+  const [detailClosing, setDetailClosing] = useState(false);
+
+  const closeDetail = useCallback(() => {
+    setDetailClosing(true);
+    setTimeout(() => {
+      setDetailItem(null);
+      setDetailClosing(false);
+    }, 200);
+  }, []);
+
+  const openStoredDetail = useCallback((id: string) => {
+    const n = notifications.find((x) => x.id === id);
+    if (!n) return;
+    markRead(id);
+    setDetailItem({ id: n.id, type: n.type, title: n.title, description: n.description, timeLabel: n.time, source: "stored" });
+  }, [notifications, markRead]);
+
+  const openLiveDetail = useCallback((id: string) => {
+    const a = liveAlerts.find((x) => x.id === id);
+    if (!a) return;
+    onMarkAlertRead?.(id);
+    setDetailItem({ id: a.id, type: a.type, title: a.title, description: a.body, timeLabel: timeAgo(a.timestamp), source: "live" });
+  }, [liveAlerts, onMarkAlertRead]);
+
+  const detailActionLabel = (type: string) => {
+    switch (type) {
+      case "listing": return "View Listing";
+      case "booking": return "View Booking";
+      case "price": return "View Property";
+      case "verified": return "View Profile";
+      case "message": return "Open Chat";
+      default: return "View Details";
+    }
+  };
+
   const stopUndoAnim = useCallback(() => {
     if (undoAnimRef.current) cancelAnimationFrame(undoAnimRef.current);
   }, []);
@@ -287,7 +332,7 @@ const NotificationsScreen = ({
                       <SwipeableAlertItem
                         key={alert.id}
                         alert={alert}
-                        onTap={(id) => onMarkAlertRead?.(id)}
+                        onTap={openLiveDetail}
                         onDismiss={handleDismissAlert}
                         indented
                       />
@@ -303,7 +348,7 @@ const NotificationsScreen = ({
             <div className="px-4 pt-4">
               <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Today</h2>
               {todayNotifs.map((n) => (
-                <SwipeableNotification key={n.id} notification={n} onDismiss={dismiss} onTap={markRead} />
+                <SwipeableNotification key={n.id} notification={n} onDismiss={dismiss} onTap={openStoredDetail} />
               ))}
             </div>
           )}
@@ -312,14 +357,14 @@ const NotificationsScreen = ({
             <div className="px-4 pt-5">
               <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Earlier</h2>
               {earlierNotifs.map((n) => (
-                <SwipeableNotification key={n.id} notification={n} onDismiss={dismiss} onTap={markRead} />
+                <SwipeableNotification key={n.id} notification={n} onDismiss={dismiss} onTap={openStoredDetail} />
               ))}
             </div>
           )}
 
           <div className="px-4 pt-6 pb-4 text-center">
             <Bell className="w-5 h-5 text-muted-foreground/30 mx-auto mb-1" />
-            <p className="text-[10px] text-muted-foreground/40">Swipe left to dismiss</p>
+            <p className="text-[10px] text-muted-foreground/40">Tap to open • Swipe left to delete</p>
           </div>
         </>
       )}
@@ -348,6 +393,70 @@ const NotificationsScreen = ({
           </div>
         </div>
       )}
+
+      {/* Detail sheet */}
+      {detailItem && (() => {
+        const Icon = alertIconMap[detailItem.type] || Bell;
+        const colorClass = alertColorMap[detailItem.type] || alertColorMap.system;
+        return (
+          <div className="fixed inset-0 z-[60] flex items-end justify-center">
+            {/* Backdrop */}
+            <div
+              className={`absolute inset-0 bg-foreground/40 backdrop-blur-[2px] transition-opacity duration-200 ${detailClosing ? "opacity-0" : "opacity-100"}`}
+              onClick={closeDetail}
+            />
+            {/* Sheet */}
+            <div
+              className={`relative w-full max-w-lg bg-card rounded-t-3xl shadow-2xl ${detailClosing ? "animate-slide-down" : "animate-slide-up"}`}
+            >
+              {/* Grabber */}
+              <div className="flex justify-center pt-2.5 pb-1">
+                <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+              </div>
+
+              <div className="px-5 pt-3 pb-6">
+                <div className="flex items-start gap-3">
+                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${colorClass}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {alertTypeLabel[detailItem.type] || detailItem.type}
+                    </p>
+                    <h3 className="text-base font-bold text-foreground mt-0.5 leading-snug">
+                      {detailItem.title}
+                    </h3>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Clock className="w-3 h-3 text-muted-foreground/60" />
+                      <span className="text-[11px] text-muted-foreground">{detailItem.timeLabel}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-sm text-foreground/80 leading-relaxed mt-4">
+                  {detailItem.description}
+                </p>
+
+                <div className="flex gap-2 mt-6">
+                  <button
+                    onClick={closeDetail}
+                    className="flex-1 py-3 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm active:scale-[0.98] transition-transform"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={closeDetail}
+                    className="flex-[1.4] py-3 rounded-xl gradient-trust text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
+                  >
+                    {detailActionLabel(detailItem.type)}
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
