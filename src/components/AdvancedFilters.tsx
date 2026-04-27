@@ -119,17 +119,28 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const AdvancedFilters = ({ isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange, segment, onSegmentChange }: AdvancedFiltersProps) => {
+const AdvancedFilters = ({
+  isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange,
+  segment, onSegmentChange,
+  serviceCategory, onServiceCategoryChange,
+  serviceSort, onServiceSortChange,
+}: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>({ ...filters });
   const [localSegment, setLocalSegment] = useState<string>(segment || "All");
+  const [localServiceCategory, setLocalServiceCategory] = useState<string>(serviceCategory || "All");
+  const [localServiceSort, setLocalServiceSort] = useState<string>(serviceSort || "featured");
   const isCommercial = localSegment === "Business Spaces";
   const isServices = localSegment === "Services";
   const isShortStay = localSegment === "Short Stays";
 
-  // Re-sync segment when sheet (re)opens or parent segment changes
+  // Re-sync segment & service fields when sheet (re)opens or parent values change
   useEffect(() => {
-    if (isOpen) setLocalSegment(segment || "All");
-  }, [isOpen, segment]);
+    if (isOpen) {
+      setLocalSegment(segment || "All");
+      setLocalServiceCategory(serviceCategory || "All");
+      setLocalServiceSort(serviceSort || "featured");
+    }
+  }, [isOpen, segment, serviceCategory, serviceSort]);
 
   if (!isOpen) return null;
 
