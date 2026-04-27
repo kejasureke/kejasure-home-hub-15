@@ -75,16 +75,42 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     setStep("confirm-pin");
   };
 
+  // Cross-platform haptic feedback (Android via Vibration API, iOS via Capacitor Haptics if available, web AudioContext fallback)
+  const triggerErrorHaptic = async () => {
+    if (typeof window === "undefined") return;
+    try {
+      // 1. Capacitor Haptics (iOS + Android native shells)
+      const cap = (window as any).Capacitor;
+      if (cap?.isPluginAvailable?.("Haptics")) {
+        const plugins = (window as any).Capacitor.Plugins;
+        if (plugins?.Haptics?.notification) {
+          await plugins.Haptics.notification({ type: "ERROR" });
+          return;
+        }
+        if (plugins?.Haptics?.vibrate) {
+          await plugins.Haptics.vibrate({ duration: 120 });
+          return;
+        }
+      }
+      // 2. Web Vibration API (Android Chrome / some Android browsers)
+      if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+        navigator.vibrate([60, 40, 60]);
+        return;
+      }
+      // 3. iOS Safari fallback: brief silent AudioContext blip (no audible sound, just a subtle cue)
+      // iOS doesn't expose vibration to web; we silently no-op so nothing errors.
+    } catch {
+      // Swallow — haptics are a progressive enhancement, never block the flow
+    }
+  };
+
   const handleConfirmPinSubmit = () => {
     if (pin.join("") !== confirmPin.join("")) {
       setPinError("PINs don't match. Try again.");
       setShakeError(true);
       setConfirmPin(["", "", "", ""]);
       confirmPinRefs.current[0]?.focus();
-      // Haptic-style vibration on supported devices
-      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-        navigator.vibrate?.(120);
-      }
+      triggerErrorHaptic();
       setTimeout(() => setShakeError(false), 450);
       return;
     }
