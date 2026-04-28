@@ -1,4 +1,4 @@
-import { X, SlidersHorizontal, Building2, Ruler, Layers, Wrench } from "lucide-react";
+import { X, SlidersHorizontal, Building2, Ruler, Layers, Wrench, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import LocationSelector from "./LocationSelector";
 
