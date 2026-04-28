@@ -182,7 +182,7 @@ const AdvancedFilters = ({
   const amenityList = isCommercial ? commercialAmenities : residentialAmenities;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background animate-slide-up overflow-y-auto">
+    <div className="fixed inset-0 z-[70] bg-background animate-slide-up overflow-y-auto">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 bg-background z-10">
         <button onClick={onClose}>
           <X className="w-5 h-5 text-muted-foreground" />
@@ -486,7 +486,7 @@ const AdvancedFilters = ({
       </div>
 
       {/* Apply button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
+      <div className="fixed bottom-0 left-0 right-0 z-[71] p-4 glass-surface border-t border-border safe-bottom">
         <button
           onClick={() => {
             if (onSegmentChange && localSegment !== "All" && localSegment !== segment) {
