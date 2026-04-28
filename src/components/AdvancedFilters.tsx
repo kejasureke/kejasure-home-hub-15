@@ -1,4 +1,4 @@
-import { X, SlidersHorizontal, Building2, Ruler, Layers, Wrench } from "lucide-react";
+import { X, SlidersHorizontal, Building2, Ruler, Layers, Wrench, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import LocationSelector from "./LocationSelector";
 
@@ -499,11 +499,12 @@ const AdvancedFilters = ({
             onApply(local);
             onClose();
           }}
-          className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
+          className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2 shadow-lg"
         >
+          <Search className="w-4 h-4" />
           {isServices
-            ? (localServiceCategory === "All" ? "Show All Services" : `Show ${localServiceCategory}`)
-            : (localSegment === "All" ? "Apply Filters" : `Show ${localSegment}`)}
+            ? (localServiceCategory === "All" ? "Search All Services" : `Search ${localServiceCategory}`)
+            : (localSegment === "All" ? "Search Properties" : `Search ${localSegment}`)}
         </button>
       </div>
     </div>
