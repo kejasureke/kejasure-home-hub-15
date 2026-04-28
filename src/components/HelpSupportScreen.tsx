@@ -9,14 +9,39 @@ interface HelpSupportScreenProps {
 type Tab = "faq" | "contact" | "feedback";
 
 const faqs = [
-  { q: "How do I get a landlord's contact?", a: "Subscribe to a plan, then book a viewing on the listing you're interested in. Once the landlord accepts your booking, their contact details (phone & chat) are revealed to you automatically." },
-  { q: "Is KejaSure free to use?", a: "Browsing listings is completely free. You need a subscription to book viewings, and landlord contacts are shared once your booking is accepted." },
-  { q: "How does identity verification work?", a: "Go to your Profile → Verification, upload your National ID or passport, take a selfie, and our Smile ID system will verify your identity within seconds." },
-  { q: "Can I list my property on KejaSure?", a: "Yes! Select the 'Landlord' role during signup, verify your identity, and start adding your properties with photos, pricing, and amenities." },
-  { q: "How do I report a fake listing?", a: "Tap the flag icon on any listing detail page and select the reason for reporting. Our team reviews all reports within 24 hours." },
-  { q: "What happens if I'm scammed?", a: "Go to Profile → Disputes & Safety to file a dispute. Provide evidence and our team will investigate. We also work with authorities on fraud cases." },
-  { q: "How do M-Pesa payments work?", a: "We send an STK push to your phone. Enter your M-Pesa PIN to confirm. Payments are processed instantly and you receive a digital receipt." },
-  { q: "Can I get a refund?", a: "Refunds are processed for verified scam cases. File a dispute through the app and our team will review within 48 hours." },
+  // Categories
+  { q: "What categories can I browse on KejaSure?", a: "KejaSure covers six segments: Rentals (long-term homes), Short Stays (nightly Airbnb-style bookings), Corporate Stays (furnished homes for expats, NGOs and professionals), Business Spaces (shops, offices, godowns and showrooms), and Services (movers, cleaners, electricians, plumbers and other home pros). Use the filter button to switch between them." },
+  { q: "What's the difference between Short Stays and Corporate Stays?", a: "Short Stays are nightly bookings (1+ nights) ideal for tourists and weekend getaways. Corporate Stays are premium furnished rentals for monthly/extended stays, tailored for expats, NGO staff and corporate professionals — usually with workspace, fast Wi-Fi and concierge support." },
+  { q: "How do Business Spaces work?", a: "Business Spaces (Commercial) covers shops, offices, godowns and showrooms. You can filter by square footage, loading bay access, parking and zoning. Booking and contact-unlock works the same as residential rentals." },
+  { q: "How do I book a service provider?", a: "Open the Services category, pick a service type (e.g. Movers, Cleaners, Plumbers), choose a verified provider, and tap Book. You'll select a date/time and the provider will confirm — contact details unlock once they accept." },
+
+  // Account & contact
+  { q: "How do I get a landlord's or host's contact?", a: "Subscribe to a plan, then send a booking request on the listing. Once the landlord, host or service provider accepts, their phone and chat are unlocked automatically inside the app." },
+  { q: "Is KejaSure free to use?", a: "Browsing all listings is completely free. A subscription is required to send booking requests. Landlord and provider contacts only unlock after your booking is accepted." },
+  { q: "What subscription plans are available?", a: "Tenants can choose KES 50 (24 hours), KES 100 (3 days) or KES 250 (7 days). Landlords, agencies, stay hosts and service providers have their own monthly plans with listing limits and boost credits." },
+
+  // Verification & trust
+  { q: "How does identity verification (KYC) work?", a: "Go to Profile → Verification. Tier 1 is phone (OTP), Tier 2 is National ID + selfie via Smile ID, and Tier 3 is Business verification (KRA PIN + business permit) for agencies and providers. Most checks complete in under a minute." },
+  { q: "What do the verification badges mean?", a: "Blue = Phone Verified (Tenant), Green = ID Verified (Individual landlord/host), and Gold = Business Verified (Agency or registered service provider). Always look for at least a green badge before booking." },
+  { q: "How do I spot a scam listing?", a: "Each listing shows a Scam Risk score based on verification, pricing and host activity. Avoid listings with 'Unverified' badges, prices far below market, or hosts pushing you to pay outside the app. Never send rent or deposit via M-Pesa to an individual." },
+
+  // Listings & hosts
+  { q: "Can I list my property on KejaSure?", a: "Yes. Choose the Landlord, Agency or Stay Host role at signup, complete verification, then use the 5-step listing wizard (Details → Location → Amenities → Media → Review) to publish." },
+  { q: "How do I boost my listing for more views?", a: "From your dashboard, open any active listing and tap Boost. Pick a duration, pay via M-Pesa, and your listing gets a premium ribbon plus priority placement in the feed and map." },
+  { q: "Can I edit or pause a listing?", a: "Yes — open your dashboard, tap the listing, then choose Edit, Pause or Delete. Paused listings stop receiving booking requests but stay saved for later." },
+
+  // Payments & safety
+  { q: "How do M-Pesa payments work?", a: "We send an STK push to your phone. Enter your M-Pesa PIN to confirm — payments process instantly and you get a digital receipt in the app. KejaSure only handles platform fees, subscriptions and service bookings." },
+  { q: "Can I pay rent or deposit through KejaSure?", a: "No. To protect both sides, KejaSure does not handle rent or deposit transfers between tenants and landlords. Always pay these directly to the landlord after viewing and signing the lease." },
+  { q: "How do I report a fake listing or bad host?", a: "Tap the flag icon on any listing or chat. Pick a reason, add details and submit — our trust team reviews all reports within 24 hours and may suspend the account." },
+  { q: "What happens if I'm scammed?", a: "Open Profile → Disputes & Safety, file a dispute and upload evidence (screenshots, receipts). Our team investigates within 48 hours and works with authorities for confirmed fraud cases." },
+  { q: "Can I get a refund?", a: "Subscription and platform fees are refundable for verified scam or service-failure cases. File a dispute through the app and the team will review within 48 hours." },
+
+  // App features
+  { q: "How do price drop alerts work?", a: "Save any listing as a favourite or tap the bell icon to track its price. You'll get an in-app notification (and SMS) the moment the host lowers the rent or nightly rate." },
+  { q: "How do I compare two properties?", a: "Open any listing, tap Compare, then pick a second property. You'll see a side-by-side breakdown of price, size, amenities and a colour-coded winner." },
+  { q: "Can I switch roles (e.g. tenant to landlord)?", a: "Yes. Open Profile and tap the Role Switcher to move between Tenant, Landlord, Agency, Stay Host and Service Provider modes. Each role has its own dashboard and tools." },
+  { q: "How do notifications work?", a: "KejaSure sends in-app and SMS notifications for new messages, booking updates, price drops and verification status. Manage them under Settings → Notifications." },
 ];
 
 const HelpSupportScreen = ({ onBack }: HelpSupportScreenProps) => {
