@@ -221,7 +221,7 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
               {properties.map((p, idx) => {
                 const other = properties[idx === 0 ? 1 : 0];
                 return (
-                  <div key={p.id} className="flex-1 min-w-0">
+                  <div key={p.id} className="flex-1 min-w-0 basis-0">
                     <div className="flex flex-wrap gap-1">
                       {p.amenities.map((a) => {
                         const unique = other && !other.amenities.includes(a);
