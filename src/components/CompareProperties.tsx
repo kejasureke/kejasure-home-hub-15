@@ -104,9 +104,9 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
       </div>
 
       <div className="p-4">
-        <div className="flex gap-3" style={{ minWidth: `${properties.length * 170}px` }}>
+        <div className="flex gap-3">
           {properties.map((p) => (
-            <div key={p.id} className="flex-1 min-w-0 bg-card rounded-2xl card-shadow overflow-hidden">
+            <div key={p.id} className="flex-1 min-w-0 basis-0 bg-card rounded-2xl card-shadow overflow-hidden">
               <div className="relative aspect-[4/3]">
                 <SwipeableImageGallery
                   images={p.images?.length ? p.images : [p.image]}
