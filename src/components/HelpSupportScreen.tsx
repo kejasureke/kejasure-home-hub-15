@@ -117,11 +117,17 @@ const HelpSupportScreen = ({ onBack }: HelpSupportScreenProps) => {
             <p className="text-sm text-muted-foreground mb-4">Reach our support team through any of these channels:</p>
 
             {[
-              { icon: MessageCircle, label: "Live Chat", desc: "Chat with our support team", detail: "Available 8AM - 10PM EAT", color: "text-primary" },
-              { icon: Phone, label: "Call Us", desc: "+254 700 KEJASURE", detail: "Mon-Sat, 8AM - 6PM EAT", color: "text-primary" },
-              { icon: Mail, label: "Email Support", desc: "support@kejasure.co.ke", detail: "Response within 24 hours", color: "text-primary" },
+              { icon: MessageCircle, label: "Live Chat (WhatsApp)", desc: "Chat with us on WhatsApp", detail: "Available 8AM - 10PM EAT", color: "text-primary", href: "https://wa.me/254700535287?text=Hi%20KejaSure%20support%2C%20I%20need%20help%20with..." },
+              { icon: Phone, label: "Call Us", desc: "+254 700 KEJASURE", detail: "Mon-Sat, 8AM - 6PM EAT", color: "text-primary", href: "tel:+254700535287" },
+              { icon: Mail, label: "Email Support", desc: "support@kejasure.co.ke", detail: "Response within 24 hours", color: "text-primary", href: "mailto:support@kejasure.co.ke" },
             ].map((ch) => (
-              <button key={ch.label} className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform">
+              <a
+                key={ch.label}
+                href={ch.href}
+                target={ch.href.startsWith("http") ? "_blank" : undefined}
+                rel={ch.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="w-full flex items-center gap-3 p-4 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform"
+              >
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                   <ch.icon className={`w-5 h-5 ${ch.color}`} />
                 </div>
@@ -131,7 +137,7 @@ const HelpSupportScreen = ({ onBack }: HelpSupportScreenProps) => {
                   <p className="text-[10px] text-muted-foreground">{ch.detail}</p>
                 </div>
                 <ExternalLink className="w-4 h-4 text-muted-foreground" />
-              </button>
+              </a>
             ))}
 
             <div className="p-3 rounded-xl bg-primary/5 border border-primary/15 mt-4">
