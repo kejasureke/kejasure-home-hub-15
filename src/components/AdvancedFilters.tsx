@@ -486,7 +486,7 @@ const AdvancedFilters = ({
       </div>
 
       {/* Apply button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
+      <div className="fixed bottom-0 left-0 right-0 z-[71] p-4 glass-surface border-t border-border safe-bottom">
         <button
           onClick={() => {
             if (onSegmentChange && localSegment !== "All" && localSegment !== segment) {
