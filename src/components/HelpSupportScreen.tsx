@@ -139,6 +139,39 @@ const HelpSupportScreen = ({ onBack }: HelpSupportScreenProps) => {
               </a>
             ))}
 
+            {/* Social Media handles */}
+            <div className="mt-4 p-4 rounded-2xl bg-card card-shadow">
+              <p className="text-xs font-semibold text-muted-foreground mb-3">Reach us on social</p>
+              <div className="flex items-center justify-center gap-4">
+                {[
+                  { label: "TikTok", href: "https://tiktok.com/@kejasure", icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z"/></svg>
+                  )},
+                  { label: "Instagram", href: "https://instagram.com/kejasure", icon: (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                  )},
+                  { label: "Facebook", href: "https://facebook.com/kejasure", icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                  )},
+                  { label: "X", href: "https://x.com/kejasure", icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  )},
+                ].map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                    aria-label={social.label}
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground text-center mt-3">DM us @kejasure on any platform</p>
+            </div>
+
             <div className="p-3 rounded-xl bg-primary/5 border border-primary/15 mt-4">
               <p className="text-[11px] text-muted-foreground">
                 🚨 For <span className="font-semibold text-primary">urgent safety concerns</span>, use the Disputes & Safety feature in your Profile for faster resolution.
