@@ -104,9 +104,9 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
       </div>
 
       <div className="p-4">
-        <div className="flex gap-3" style={{ minWidth: `${properties.length * 170}px` }}>
+        <div className="flex gap-3">
           {properties.map((p) => (
-            <div key={p.id} className="flex-1 min-w-0 bg-card rounded-2xl card-shadow overflow-hidden">
+            <div key={p.id} className="flex-1 min-w-0 basis-0 bg-card rounded-2xl card-shadow overflow-hidden">
               <div className="relative aspect-[4/3]">
                 <SwipeableImageGallery
                   images={p.images?.length ? p.images : [p.image]}
@@ -123,8 +123,8 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
                 </button>
               </div>
               <div className="p-3 space-y-2">
-                <h3 className="text-xs font-semibold line-clamp-2">{p.title}</h3>
-                <p className="text-sm font-bold text-primary">KES {formatPrice(p.price)}<span className="text-xs font-normal text-muted-foreground">{p.priceUnit}</span></p>
+                <h3 className="text-xs font-semibold line-clamp-2 break-words">{p.title}</h3>
+                <p className="text-sm font-bold text-primary break-words leading-tight">KES {formatPrice(p.price)}<span className="text-[10px] font-normal text-muted-foreground">{p.priceUnit}</span></p>
               </div>
             </div>
           ))}
@@ -204,7 +204,7 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
                   return (
                     <div
                       key={p.id}
-                      className={`flex-1 min-w-0 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${highlightClass(result)}`}
+                      className={`flex-1 min-w-0 basis-0 px-2.5 py-2 rounded-xl text-[11px] font-medium leading-snug break-words transition-colors ${highlightClass(result)}`}
                     >
                       {row.render(p)}
                     </div>
@@ -221,7 +221,7 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
               {properties.map((p, idx) => {
                 const other = properties[idx === 0 ? 1 : 0];
                 return (
-                  <div key={p.id} className="flex-1 min-w-0">
+                  <div key={p.id} className="flex-1 min-w-0 basis-0">
                     <div className="flex flex-wrap gap-1">
                       {p.amenities.map((a) => {
                         const unique = other && !other.amenities.includes(a);
