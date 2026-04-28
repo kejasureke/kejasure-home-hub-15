@@ -123,8 +123,8 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
                 </button>
               </div>
               <div className="p-3 space-y-2">
-                <h3 className="text-xs font-semibold line-clamp-2">{p.title}</h3>
-                <p className="text-sm font-bold text-primary">KES {formatPrice(p.price)}<span className="text-xs font-normal text-muted-foreground">{p.priceUnit}</span></p>
+                <h3 className="text-xs font-semibold line-clamp-2 break-words">{p.title}</h3>
+                <p className="text-sm font-bold text-primary break-words leading-tight">KES {formatPrice(p.price)}<span className="text-[10px] font-normal text-muted-foreground">{p.priceUnit}</span></p>
               </div>
             </div>
           ))}
