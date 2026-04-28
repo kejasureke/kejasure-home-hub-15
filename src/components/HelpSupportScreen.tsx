@@ -118,7 +118,6 @@ const HelpSupportScreen = ({ onBack }: HelpSupportScreenProps) => {
 
             {[
               { icon: MessageCircle, label: "Live Chat (WhatsApp)", desc: "Chat with us on WhatsApp", detail: "Available 8AM - 10PM EAT", color: "text-primary", href: "https://wa.me/254700535287?text=Hi%20KejaSure%20support%2C%20I%20need%20help%20with..." },
-              { icon: Phone, label: "Call Us", desc: "+254 700 KEJASURE", detail: "Mon-Sat, 8AM - 6PM EAT", color: "text-primary", href: "tel:+254700535287" },
               { icon: Mail, label: "Email Support", desc: "support@kejasure.co.ke", detail: "Response within 24 hours", color: "text-primary", href: "mailto:support@kejasure.co.ke" },
             ].map((ch) => (
               <a
