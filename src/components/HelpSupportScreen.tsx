@@ -169,7 +169,7 @@ const HelpSupportScreen = ({ onBack }: HelpSupportScreenProps) => {
                   </a>
                 ))}
               </div>
-              <p className="text-[10px] text-muted-foreground text-center mt-3">DM us @kejasure on any platform</p>
+              
             </div>
 
             <div className="p-3 rounded-xl bg-primary/5 border border-primary/15 mt-4">
