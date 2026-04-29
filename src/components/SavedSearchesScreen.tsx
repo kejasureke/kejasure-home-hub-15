@@ -149,6 +149,7 @@ const SavedSearchesScreen = ({ onBack, onRunSearch }: SavedSearchesScreenProps) 
   const [newLabel, setNewLabel] = useState("");
   const [newCounty, setNewCounty] = useState("");
   const [newSegment, setNewSegment] = useState("rental");
+  const [dismissedDemos, setDismissedDemos] = useState<string[]>([]);
 
   const toggleAlert = (id: string) => {
     setAlertsEnabled((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -168,11 +169,29 @@ const SavedSearchesScreen = ({ onBack, onRunSearch }: SavedSearchesScreenProps) 
   };
 
   // Demo data if no saved searches
-  const demoSearches: SavedSearch[] = searches.length > 0 ? searches : [
+  const baseDemo: SavedSearch[] = [
     { id: "demo1", label: "2BR in Kilimani", county: "Nairobi", subcounty: "Dagoretti North", estate: "Kilimani", segment: "rental", createdAt: Date.now() - 86400000 * 3 },
     { id: "demo2", label: "Studio in Westlands", county: "Nairobi", subcounty: "Westlands", estate: "Westlands", segment: "rental", createdAt: Date.now() - 86400000 },
     { id: "demo3", label: "Airbnb in Diani", county: "Kwale", subcounty: "Msambweni", estate: "Diani Beach", segment: "shortstay", createdAt: Date.now() - 86400000 * 7 },
   ];
+  const demoSearches: SavedSearch[] = searches.length > 0
+    ? searches
+    : baseDemo.filter((d) => !dismissedDemos.includes(d.id));
+
+  const handleDelete = (id: string) => {
+    if (id.startsWith("demo")) {
+      setDismissedDemos((prev) => [...prev, id]);
+    } else {
+      removeSearch(id);
+    }
+  };
+
+  const handleEdit = (s: SavedSearch) => {
+    setNewLabel(s.label);
+    setNewCounty(s.county);
+    setNewSegment(s.segment);
+    setShowAdd(true);
+  };
 
   return (
     <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
