@@ -18,9 +18,19 @@ const slides = [
     accent: "Simple, direct connections.",
   },
   {
+    title: "Short Stays\nMade Easy",
+    description: "Book nightly stays in Diani, Naivasha, Nanyuki and beyond. Perfect for weekends, holidays and work trips.",
+    accent: "Your home away from home.",
+  },
+  {
     title: "Corporate Stays &\nBusiness Spaces",
     description: "Furnished homes for NGOs, consultants and expats. Plus shops, offices, godowns and showrooms for your business.",
     accent: "Live and work, sorted.",
+  },
+  {
+    title: "Home Services\nAt Your Fingertips",
+    description: "Book trusted movers, cleaners, plumbers, electricians and more. Rated professionals near you.",
+    accent: "One app for everything home.",
   },
   {
     title: "Find Your Next\nKeja Anywhere",
@@ -91,20 +101,14 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Top bar: trust micro-badge + skip */}
-      <div className="flex items-center justify-between px-5 pt-5">
+      {/* Top bar: trust micro-badge */}
+      <div className="flex items-center justify-center px-5 pt-5">
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/15">
           <ShieldCheck className="w-3 h-3 text-primary" />
           <span className="text-[10px] font-semibold text-primary tracking-wide">
             Safe & Verified
           </span>
         </div>
-        <button
-          onClick={onComplete}
-          className="text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-full bg-secondary"
-        >
-          Skip
-        </button>
       </div>
 
       {/* Content */}
