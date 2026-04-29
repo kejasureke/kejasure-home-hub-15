@@ -197,10 +197,15 @@ const AdvancedFilters = ({
           )}
         </h2>
         <button
+          type="button"
           onClick={() => {
             setLocal({ minPrice: 0, maxPrice: 500000, bedrooms: [], amenities: [], verified: false, smileIdVerified: false, furnished: false, petFriendly: false, sortBy: "featured", commercialTypes: [], minSqft: 0, maxSqft: 0 });
+            setLocalSegment("All");
+            setLocalServiceCategory("All");
+            setLocalServiceSort("featured");
+            onLocationChange("", "", "", "");
           }}
-          className="text-xs font-medium text-primary"
+          className="text-xs font-semibold text-primary px-3 py-2 -mr-2 rounded-lg active:bg-primary/10 transition-colors"
         >
           Reset
         </button>
