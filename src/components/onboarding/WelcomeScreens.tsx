@@ -177,16 +177,18 @@ const WelcomeScreens = ({ onComplete }: WelcomeScreensProps) => {
           ))}
         </div>
 
-        {/* CTA Button */}
-        <button
-          onClick={() => {
-            isLast ? onComplete() : setCurrent(current + 1);
-          }}
-          className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-        >
-          {isLast ? "Find Your Next Keja" : "Continue"}
-          <ChevronRight className="w-5 h-5" />
-        </button>
+        {/* CTA only on the last slide — earlier slides advance via swipe */}
+        {isLast ? (
+          <button
+            onClick={onComplete}
+            className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform animate-fade-in"
+          >
+            Find Your Next Keja
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        ) : (
+          <div className="h-[56px]" aria-hidden="true" />
+        )}
       </div>
     </div>
   );
