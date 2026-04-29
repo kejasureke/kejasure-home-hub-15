@@ -18,9 +18,19 @@ const slides = [
     accent: "Simple, direct connections.",
   },
   {
+    title: "Short Stays\nMade Easy",
+    description: "Book nightly stays in Diani, Naivasha, Nanyuki and beyond. Perfect for weekends, holidays and work trips.",
+    accent: "Your home away from home.",
+  },
+  {
     title: "Corporate Stays &\nBusiness Spaces",
     description: "Furnished homes for NGOs, consultants and expats. Plus shops, offices, godowns and showrooms for your business.",
     accent: "Live and work, sorted.",
+  },
+  {
+    title: "Home Services\nAt Your Fingertips",
+    description: "Book trusted movers, cleaners, plumbers, electricians and more. Rated professionals near you.",
+    accent: "One app for everything home.",
   },
   {
     title: "Find Your Next\nKeja Anywhere",
