@@ -1,7 +1,139 @@
 import { ArrowLeft, Search, Bell, BellOff, Trash2, MapPin, Clock, Plus, Filter } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useSavedSearches, type SavedSearch } from "@/hooks/useSavedSearches";
+
+interface SwipeRowProps {
+  search: SavedSearch;
+  alertOn: boolean;
+  onToggleAlert: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onRun: () => void;
+  formatDate: (ts: number) => string;
+}
+
+const SWIPE_THRESHOLD = -80;
+
+const SavedSearchRow = ({ search: s, alertOn, onToggleAlert, onEdit, onDelete, onRun, formatDate }: SwipeRowProps) => {
+  const [offsetX, setOffsetX] = useState(0);
+  const [removing, setRemoving] = useState(false);
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const swiping = useRef(false);
+  const locked = useRef<"h" | "v" | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX;
+    startY.current = e.touches[0].clientY;
+    swiping.current = false;
+    locked.current = null;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const dx = e.touches[0].clientX - startX.current;
+    const dy = e.touches[0].clientY - startY.current;
+    if (!locked.current) {
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+        locked.current = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+      }
+    }
+    if (locked.current === "h") {
+      if (dx < -10) swiping.current = true;
+      setOffsetX(Math.max(Math.min(dx, 0), -120));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (offsetX < SWIPE_THRESHOLD) {
+      if (navigator.vibrate) navigator.vibrate(30);
+      setRemoving(true);
+      setTimeout(() => onDelete(), 240);
+    } else {
+      setOffsetX(0);
+    }
+  };
+
+  const handleCardClick = () => {
+    if (!swiping.current) onRun();
+  };
+
+  return (
+    <div
+      className={`relative overflow-hidden rounded-2xl transition-all duration-250 ${
+        removing ? "max-h-0 opacity-0 mb-0" : "max-h-[280px] opacity-100"
+      }`}
+    >
+      {/* Delete background */}
+      <div className="absolute inset-0 bg-destructive flex items-center justify-end pr-6 rounded-2xl">
+        <Trash2 className="w-5 h-5 text-destructive-foreground" />
+      </div>
+
+      <div
+        className={`relative bg-card rounded-2xl card-shadow p-4 ${offsetX === 0 && !removing ? "transition-transform duration-200" : ""}`}
+        style={{ transform: `translateX(${offsetX}px)` }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div
+          className="flex items-start gap-3 cursor-pointer active:opacity-80"
+          onClick={handleCardClick}
+        >
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+            <Search className="w-5 h-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-bold truncate">{s.label}</h3>
+            <div className="flex items-center gap-1.5 mt-1">
+              <MapPin className="w-3 h-3 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">{s.estate ? `${s.estate}, ` : ""}{s.county}</span>
+            </div>
+            <div className="flex items-center gap-3 mt-1.5">
+              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                s.segment === "shortstay" ? "bg-accent/15 text-accent-foreground" : "bg-primary/10 text-primary"
+              }`}>
+                {s.segment === "shortstay" ? "Short Stay" : s.segment === "service" ? "Service" : "Rental"}
+              </span>
+              <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <Clock className="w-3 h-3" />
+                {formatDate(s.createdAt)}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onToggleAlert(); }}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-colors active:scale-[0.97] ${
+              alertOn ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
+            }`}
+          >
+            {alertOn ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+            {alertOn ? "Alerts On" : "Alerts Off"}
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-secondary text-xs font-semibold text-muted-foreground active:scale-[0.97] transition-transform"
+          >
+            <Filter className="w-3.5 h-3.5" />
+            Edit Filters
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            aria-label="Delete saved search"
+            className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center active:scale-[0.95] transition-transform"
+          >
+            <Trash2 className="w-4 h-4 text-destructive" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface SavedSearchesScreenProps {
   onBack: () => void;
