@@ -143,6 +143,33 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
 
         <Section title="Preferences">
           <SettingRow
+            icon={theme === "dark" ? Moon : Sun}
+            label="Appearance"
+            subtitle={theme === "dark" ? "Dark mode" : "Light mode"}
+            right={
+              <div className="p-1 rounded-lg bg-secondary flex gap-1">
+                <button
+                  onClick={() => setTheme("light")}
+                  className={`flex items-center justify-center w-8 h-7 rounded-md transition-all ${
+                    theme === "light" ? "bg-card card-shadow text-foreground" : "text-muted-foreground"
+                  }`}
+                  aria-label="Light mode"
+                >
+                  <Sun className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setTheme("dark")}
+                  className={`flex items-center justify-center w-8 h-7 rounded-md transition-all ${
+                    theme === "dark" ? "bg-card card-shadow text-foreground" : "text-muted-foreground"
+                  }`}
+                  aria-label="Dark mode"
+                >
+                  <Moon className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            }
+          />
+          <SettingRow
             icon={Globe}
             label="Language"
             subtitle={language === "en" ? "English" : "Kiswahili"}
