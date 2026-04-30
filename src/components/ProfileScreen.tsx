@@ -47,7 +47,6 @@ const ProfileScreen = () => {
   const [showSubscription, setShowSubscription] = useState(false);
   const [showNeighborhood, setShowNeighborhood] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
-  const { theme, setTheme } = useTheme();
   const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound, dismissAlert, restoreAlert } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();
