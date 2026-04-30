@@ -26,55 +26,40 @@ interface Category {
   color: string;
 }
 
-const categories: Category[] = [
-  {
-    label: "Bedsitters",
-    icon: DoorOpen,
-    filter: (p) => p.bedrooms === 0 || p.title.toLowerCase().includes("bedsit"),
-    color: "bg-primary/10 text-primary",
-  },
-  {
-    label: "1 Bedroom",
-    icon: Bed,
-    filter: (p) => p.bedrooms === 1,
-    color: "bg-trust/10 text-trust",
-  },
-  {
-    label: "2 Bedroom",
-    icon: Home,
-    filter: (p) => p.bedrooms === 2,
-    color: "bg-accent/10 text-accent",
-  },
-  {
-    label: "3+ Bedroom",
-    icon: Castle,
-    filter: (p) => p.bedrooms >= 3,
-    color: "bg-primary/10 text-primary",
-  },
-  {
-    label: "Studio",
-    icon: Building2,
-    filter: (p) => p.title.toLowerCase().includes("studio"),
-    color: "bg-trust/10 text-trust",
-  },
-  {
-    label: "Furnished",
-    icon: Sofa,
-    filter: (p) => p.furnished === true,
-    color: "bg-accent/10 text-accent",
-  },
-  {
-    label: "Pet Friendly",
-    icon: PawPrint,
-    filter: (p) => p.petFriendly === true,
-    color: "bg-primary/10 text-primary",
-  },
-  {
-    label: "With Parking",
-    icon: Car,
-    filter: (p) => p.amenities.some((a) => a.toLowerCase().includes("parking")),
-    color: "bg-trust/10 text-trust",
-  },
+const rentalCategories: Category[] = [
+  { label: "Bedsitters", icon: DoorOpen, filter: (p) => p.bedrooms === 0 || p.title.toLowerCase().includes("bedsit"), color: "bg-primary/10 text-primary" },
+  { label: "1 Bedroom", icon: Bed, filter: (p) => p.bedrooms === 1, color: "bg-trust/10 text-trust" },
+  { label: "2 Bedroom", icon: Home, filter: (p) => p.bedrooms === 2, color: "bg-accent/10 text-accent" },
+  { label: "3+ Bedroom", icon: Castle, filter: (p) => p.bedrooms >= 3, color: "bg-primary/10 text-primary" },
+  { label: "Studio", icon: Building2, filter: (p) => p.title.toLowerCase().includes("studio"), color: "bg-trust/10 text-trust" },
+  { label: "Furnished", icon: Sofa, filter: (p) => p.furnished === true, color: "bg-accent/10 text-accent" },
+  { label: "Pet Friendly", icon: PawPrint, filter: (p) => p.petFriendly === true, color: "bg-primary/10 text-primary" },
+  { label: "With Parking", icon: Car, filter: (p) => p.amenities.some((a) => a.toLowerCase().includes("parking")), color: "bg-trust/10 text-trust" },
+];
+
+const shortStayCategories: Category[] = [
+  { label: "Studio Stays", icon: Building2, filter: (p) => p.title.toLowerCase().includes("studio"), color: "bg-primary/10 text-primary" },
+  { label: "1BR Apartments", icon: Bed, filter: (p) => p.bedrooms === 1, color: "bg-trust/10 text-trust" },
+  { label: "2BR+ Family", icon: Home, filter: (p) => p.bedrooms >= 2, color: "bg-accent/10 text-accent" },
+  { label: "Beachfront", icon: Palmtree, filter: (p) => /beach|diani|mombasa|coast/i.test(p.estate + p.title), color: "bg-primary/10 text-primary" },
+  { label: "City Center", icon: Building2, filter: (p) => /cbd|westlands|kilimani|upper hill/i.test(p.estate), color: "bg-trust/10 text-trust" },
+  { label: "Near Airport", icon: Plane, filter: (p) => /embakasi|syokimau|jkia|airport/i.test(p.estate + p.nearbyLandmarks.join(" ")), color: "bg-accent/10 text-accent" },
+];
+
+const commercialCategories: Category[] = [
+  { label: "Shops & Retail", icon: Store, filter: (p) => p.commercialType === "shop" || p.commercialType === "supermarket" || p.commercialType === "showroom", color: "bg-primary/10 text-primary" },
+  { label: "Offices", icon: Briefcase, filter: (p) => p.commercialType === "office" || p.commercialType === "coworking", color: "bg-trust/10 text-trust" },
+  { label: "Godowns & Warehouses", icon: Warehouse, filter: (p) => p.commercialType === "godown" || p.commercialType === "warehouse", color: "bg-accent/10 text-accent" },
+  { label: "Hospitality", icon: Hotel, filter: (p) => p.commercialType === "hotel" || p.commercialType === "restaurant" || p.commercialType === "bar" || p.commercialType === "club", color: "bg-primary/10 text-primary" },
+  { label: "Health & Wellness", icon: Cross, filter: (p) => p.commercialType === "clinic" || p.commercialType === "pharmacy" || p.commercialType === "gym" || p.commercialType === "salon", color: "bg-trust/10 text-trust" },
+  { label: "Industrial & Auto", icon: Wrench, filter: (p) => p.commercialType === "hardware" || p.commercialType === "garage" || p.commercialType === "petrol_station", color: "bg-accent/10 text-accent" },
+];
+
+const corporateCategories: Category[] = [
+  { label: "Diplomatic Zones", icon: Shield, filter: (p) => /gigiri|runda|muthaiga/i.test(p.estate), color: "bg-primary/10 text-primary" },
+  { label: "Serviced Apartments", icon: Sparkles, filter: (p) => p.furnished === true, color: "bg-trust/10 text-trust" },
+  { label: "Executive Villas", icon: Castle, filter: (p) => p.bedrooms >= 3, color: "bg-accent/10 text-accent" },
+  { label: "City Premium", icon: Building2, filter: (p) => /westlands|kilimani|lavington|kileleshwa/i.test(p.estate), color: "bg-primary/10 text-primary" },
 ];
 
 const priceRanges = [
@@ -82,6 +67,36 @@ const priceRanges = [
   { label: "20K – 40K", min: 20000, max: 40000 },
   { label: "40K – 70K", min: 40000, max: 70000 },
   { label: "70K+", min: 70000, max: Infinity },
+];
+
+const shortStayPriceRanges = [
+  { label: "Under 3K/night", min: 0, max: 3000 },
+  { label: "3K – 6K/night", min: 3000, max: 6000 },
+  { label: "6K – 12K/night", min: 6000, max: 12000 },
+  { label: "12K+/night", min: 12000, max: Infinity },
+];
+
+const commercialPriceRanges = [
+  { label: "Under 50K", min: 0, max: 50000 },
+  { label: "50K – 150K", min: 50000, max: 150000 },
+  { label: "150K – 400K", min: 150000, max: 400000 },
+  { label: "400K+", min: 400000, max: Infinity },
+];
+
+const corporatePriceRanges = [
+  { label: "Under 100K", min: 0, max: 100000 },
+  { label: "100K – 250K", min: 100000, max: 250000 },
+  { label: "250K – 500K", min: 250000, max: 500000 },
+  { label: "500K+", min: 500000, max: Infinity },
+];
+
+const serviceCategories = [
+  { label: "Movers", icon: Truck, color: "bg-primary/10 text-primary" },
+  { label: "Plumbers", icon: Wrench, color: "bg-trust/10 text-trust" },
+  { label: "Cleaners", icon: Sparkles, color: "bg-accent/10 text-accent" },
+  { label: "Electricians", icon: Zap, color: "bg-primary/10 text-primary" },
+  { label: "Security", icon: Shield, color: "bg-trust/10 text-trust" },
+  { label: "Painters", icon: Palmtree, color: "bg-accent/10 text-accent" },
 ];
 
 interface ExploreScreenProps {
