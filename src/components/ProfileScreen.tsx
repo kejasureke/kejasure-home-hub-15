@@ -1,4 +1,4 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw } from "lucide-react";
 import VerificationBadge from "./VerificationBadge";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
 import { useState } from "react";
