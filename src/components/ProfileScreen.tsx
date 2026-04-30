@@ -119,10 +119,6 @@ const ProfileScreen = () => {
     { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact", action: () => setShowHelp(true) },
   ];
 
-  const themeOptions = [
-    { value: "light" as const, icon: Sun, label: "Light" },
-    { value: "dark" as const, icon: Moon, label: "Dark" },
-  ];
 
   return (
     <div className="pb-32 px-4 pt-5">
