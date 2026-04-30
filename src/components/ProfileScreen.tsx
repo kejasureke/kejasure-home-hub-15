@@ -1,4 +1,4 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Sun, Moon, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw } from "lucide-react";
 import VerificationBadge from "./VerificationBadge";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
 import { useState } from "react";
@@ -17,7 +17,7 @@ import ReviewRatingFlow from "./ReviewRatingFlow";
 import SubscriptionPlans from "./SubscriptionPlans";
 import NeighborhoodSafety from "./NeighborhoodSafety";
 import BoostListingFlow from "./BoostListingFlow";
-import { useTheme } from "@/hooks/useTheme";
+
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -47,7 +47,6 @@ const ProfileScreen = () => {
   const [showSubscription, setShowSubscription] = useState(false);
   const [showNeighborhood, setShowNeighborhood] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
-  const { theme, setTheme } = useTheme();
   const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound, dismissAlert, restoreAlert } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();
@@ -120,10 +119,6 @@ const ProfileScreen = () => {
     { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact", action: () => setShowHelp(true) },
   ];
 
-  const themeOptions = [
-    { value: "light" as const, icon: Sun, label: "Light" },
-    { value: "dark" as const, icon: Moon, label: "Dark" },
-  ];
 
   return (
     <div className="pb-32 px-4 pt-5">
@@ -158,23 +153,7 @@ const ProfileScreen = () => {
         </button>
       </div>
 
-      {/* Theme toggle */}
-      <div className="mb-3 p-1 rounded-xl bg-secondary flex gap-1">
-        {themeOptions.map((opt) => (
-          <button
-            key={opt.value}
-            onClick={() => setTheme(opt.value)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-              theme === opt.value
-                ? "bg-card card-shadow text-foreground"
-                : "text-muted-foreground"
-            }`}
-          >
-            <opt.icon className="w-3.5 h-3.5" />
-            {opt.label}
-          </button>
-        ))}
-      </div>
+
 
       {/* Role Mode Switcher */}
       <div className="mb-4 p-4 rounded-2xl bg-card card-shadow">

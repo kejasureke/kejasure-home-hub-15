@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Eye, Shield, ChevronRight, ToggleLeft, ToggleRight, Smartphone, MapPin, Volume2 } from "lucide-react";
+import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Sun, Eye, Shield, ChevronRight, ToggleLeft, ToggleRight, Smartphone, MapPin, Volume2 } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
+import { useTheme } from "@/hooks/useTheme";
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -8,6 +9,7 @@ interface SettingsScreenProps {
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const { closing, triggerClose } = useOverlayClose(onBack);
+  const { theme, setTheme } = useTheme();
   const [pushEnabled, setPushEnabled] = useState(true);
   const [smsEnabled, setSmsEnabled] = useState(true);
   const [priceAlerts, setPriceAlerts] = useState(true);
@@ -140,6 +142,33 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         </Section>
 
         <Section title="Preferences">
+          <SettingRow
+            icon={theme === "dark" ? Moon : Sun}
+            label="Appearance"
+            subtitle={theme === "dark" ? "Dark mode" : "Light mode"}
+            right={
+              <div className="p-1 rounded-lg bg-secondary flex gap-1">
+                <button
+                  onClick={() => setTheme("light")}
+                  className={`flex items-center justify-center w-8 h-7 rounded-md transition-all ${
+                    theme === "light" ? "bg-card card-shadow text-foreground" : "text-muted-foreground"
+                  }`}
+                  aria-label="Light mode"
+                >
+                  <Sun className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setTheme("dark")}
+                  className={`flex items-center justify-center w-8 h-7 rounded-md transition-all ${
+                    theme === "dark" ? "bg-card card-shadow text-foreground" : "text-muted-foreground"
+                  }`}
+                  aria-label="Dark mode"
+                >
+                  <Moon className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            }
+          />
           <SettingRow
             icon={Globe}
             label="Language"
