@@ -157,23 +157,7 @@ const ProfileScreen = () => {
         </button>
       </div>
 
-      {/* Theme toggle */}
-      <div className="mb-3 p-1 rounded-xl bg-secondary flex gap-1">
-        {themeOptions.map((opt) => (
-          <button
-            key={opt.value}
-            onClick={() => setTheme(opt.value)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-              theme === opt.value
-                ? "bg-card card-shadow text-foreground"
-                : "text-muted-foreground"
-            }`}
-          >
-            <opt.icon className="w-3.5 h-3.5" />
-            {opt.label}
-          </button>
-        ))}
-      </div>
+
 
       {/* Role Mode Switcher */}
       <div className="mb-4 p-4 rounded-2xl bg-card card-shadow">
