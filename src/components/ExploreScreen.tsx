@@ -1,12 +1,23 @@
-import { useState, useMemo } from "react";
-import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints, Volume2, Bus, GraduationCap, Cross, ShoppingBag, TreePine, Wifi, ChevronDown, ChevronUp } from "lucide-react";
-import { properties } from "@/data/mockData";
+import { useState, useMemo, useEffect } from "react";
+import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints, Volume2, Bus, GraduationCap, Cross, ShoppingBag, TreePine, Wifi, ChevronDown, ChevronUp, Briefcase, Store, Warehouse, Hotel, Wrench, Truck, Sparkles, Star, Palmtree, Plane } from "lucide-react";
+import { properties, serviceProviders } from "@/data/mockData";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
 import PropertyCard from "./PropertyCard";
 import ListingDetail from "./ListingDetail";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+
+type Segment = "Rentals" | "Short Stays" | "Business Spaces" | "Corporate Stay" | "Services";
+const segments: Segment[] = ["Rentals", "Short Stays", "Business Spaces", "Corporate Stay", "Services"];
+
+const segmentMatchers: Record<Segment, (p: Property) => boolean> = {
+  "Rentals": (p) => p.type === "rental" && !p.corporate,
+  "Short Stays": (p) => p.type === "shortstay" && !p.corporate,
+  "Business Spaces": (p) => p.type === "commercial",
+  "Corporate Stay": (p) => !!p.corporate,
+  "Services": () => false,
+};
 
 interface Category {
   label: string;
