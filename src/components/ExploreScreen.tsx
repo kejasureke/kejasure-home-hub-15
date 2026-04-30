@@ -104,8 +104,10 @@ interface ExploreScreenProps {
 }
 
 const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
+  const [segment, setSegment] = useState<Segment>("Rentals");
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [activePriceRange, setActivePriceRange] = useState<typeof priceRanges[number] | null>(null);
+  const [activeServiceCategory, setActiveServiceCategory] = useState<string | null>(null);
   const [activeArea, setActiveArea] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [insightsCollapsed, setInsightsCollapsed] = useState(false);
@@ -113,8 +115,34 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { addRecent } = useRecentlyViewed();
 
+  // Reset filters when segment changes
+  useEffect(() => {
+    setActiveCategory(null);
+    setActivePriceRange(null);
+    setActiveServiceCategory(null);
+    setActiveArea(null);
+  }, [segment]);
+
+  const activeCategories: Category[] =
+    segment === "Rentals" ? rentalCategories :
+    segment === "Short Stays" ? shortStayCategories :
+    segment === "Business Spaces" ? commercialCategories :
+    segment === "Corporate Stay" ? corporateCategories :
+    [];
+
+  const activePriceRanges =
+    segment === "Short Stays" ? shortStayPriceRanges :
+    segment === "Business Spaces" ? commercialPriceRanges :
+    segment === "Corporate Stay" ? corporatePriceRanges :
+    priceRanges;
+
+  const segmentProperties = useMemo(
+    () => properties.filter(segmentMatchers[segment]),
+    [segment]
+  );
+
   const filteredProperties = useMemo(() => {
-    let results = properties;
+    let results = segmentProperties;
 
     if (activeCategory) {
       results = results.filter(activeCategory.filter);
@@ -139,10 +167,28 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
     }
 
     return results;
-  }, [activeCategory, activePriceRange, activeArea, searchQuery]);
+  }, [segmentProperties, activeCategory, activePriceRange, activeArea, searchQuery]);
 
-  const activeLabel = activeCategory?.label || activePriceRange?.label || activeArea || "Search Results";
-  const showingResults = activeCategory || activePriceRange || activeArea || searchQuery;
+  const filteredServices = useMemo(() => {
+    let results = serviceProviders;
+    if (activeServiceCategory) {
+      results = results.filter((s) => s.category === activeServiceCategory);
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      results = results.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.category.toLowerCase().includes(q) ||
+          s.areaServed.toLowerCase().includes(q)
+      );
+    }
+    return results;
+  }, [activeServiceCategory, searchQuery]);
+
+  const activeLabel = activeCategory?.label || activePriceRange?.label || activeArea || activeServiceCategory || "Search Results";
+  const showingResults = activeCategory || activePriceRange || activeArea || activeServiceCategory || searchQuery;
+  const isServices = segment === "Services";
 
   if (selectedProperty) {
     return (
