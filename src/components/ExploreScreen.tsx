@@ -506,7 +506,40 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
               </div>
             );
           })()}
-          {filteredProperties.length > 0 ? (
+          {isServices ? (
+            filteredServices.length > 0 ? (
+              <div className="space-y-3">
+                {filteredServices.map((sp) => (
+                  <div key={sp.id} className="w-full p-4 rounded-2xl bg-card card-shadow flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl shrink-0">
+                      {sp.avatar}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-foreground truncate">{sp.name}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{sp.category} · {sp.areaServed}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-accent fill-accent" />
+                          <span className="text-[11px] font-medium text-foreground">{sp.rating}</span>
+                          <span className="text-[10px] text-muted-foreground">({sp.reviews})</span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground">· {sp.price}</span>
+                      </div>
+                    </div>
+                    {sp.tier === "Premium" && (
+                      <span className="px-2 py-1 rounded-lg bg-accent/10 text-accent text-[10px] font-semibold">Premium</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20">
+                <Search className="w-10 h-10 text-muted-foreground/20 mb-3" />
+                <p className="text-sm font-medium text-foreground">No providers found</p>
+                <p className="text-xs text-muted-foreground mt-1">Try a different category or search term</p>
+              </div>
+            )
+          ) : filteredProperties.length > 0 ? (
             <div className="space-y-4">
               {filteredProperties.map((p) => (
                 <PropertyCard
