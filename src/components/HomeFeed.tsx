@@ -739,9 +739,38 @@ const HomeFeed = () => {
             </div>
 
             {filteredProperties.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-sm text-muted-foreground">Keja Safi, Keja Sure.</p>
-                <p className="text-xs text-muted-foreground mt-1">No properties found in this area</p>
+              <div className="text-center py-12 px-4">
+                <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-secondary flex items-center justify-center">
+                  <SearchX className="w-7 h-7 text-muted-foreground" />
+                </div>
+                <p className="text-sm font-semibold text-foreground">No matches found</p>
+                <p className="text-xs text-muted-foreground mt-1 mb-4">Try broadening your search or clearing filters</p>
+                <div className="flex flex-col gap-2 max-w-[240px] mx-auto">
+                  <button
+                    onClick={() => {
+                      setCounty(""); setSubcounty(""); setWard(""); setEstate("");
+                      setSearchQuery("");
+                      setFilters({
+                        minPrice: 0, maxPrice: 500000, bedrooms: [], amenities: [],
+                        verified: false, smileIdVerified: false, furnished: false, petFriendly: false,
+                        sortBy: "featured", commercialTypes: [], minSqft: 0, maxSqft: 100000,
+                      });
+                      setCommCategory("All");
+                    }}
+                    className="w-full py-2.5 rounded-xl gradient-trust text-xs font-semibold text-primary-foreground"
+                  >
+                    Clear all filters
+                  </button>
+                  {(county || estate || searchQuery) && (
+                    <button
+                      onClick={handleSaveSearch}
+                      className="w-full py-2.5 rounded-xl bg-secondary text-xs font-semibold text-secondary-foreground flex items-center justify-center gap-1.5"
+                    >
+                      <BookmarkPlus className="w-3.5 h-3.5" />
+                      Notify me when available
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
