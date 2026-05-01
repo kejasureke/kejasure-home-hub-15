@@ -1,4 +1,4 @@
-import { X, SlidersHorizontal, Building2, Ruler, Layers, Wrench, Search } from "lucide-react";
+import { X, SlidersHorizontal, Building2, Ruler, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import LocationSelector from "./LocationSelector";
 
@@ -27,46 +27,9 @@ interface AdvancedFiltersProps {
   ward: string;
   estate: string;
   onLocationChange: (county: string, subcounty: string, ward: string, estate: string) => void;
+  /** Read-only: tells the filter sheet which fields are relevant. Pick category on Home tabs / Explore. */
   segment?: string;
-  onSegmentChange?: (segment: string) => void;
-  serviceCategory?: string;
-  onServiceCategoryChange?: (cat: string) => void;
-  serviceSort?: string;
-  onServiceSortChange?: (sort: "featured" | "rating" | "reviews") => void;
 }
-
-const categoryOptions = [
-  { value: "All", label: "All", icon: "✨" },
-  { value: "Rentals", label: "Rentals", icon: "🏠" },
-  { value: "Short Stays", label: "Short Stays", icon: "🛎️" },
-  { value: "Business Spaces", label: "Business Spaces", icon: "🏢" },
-  { value: "Corporate Stay", label: "Corporate Stay", icon: "💼" },
-  { value: "Services", label: "Services", icon: "🔧" },
-];
-
-const serviceCategoryOptions = [
-  { value: "All", label: "All Services", icon: "✨" },
-  { value: "Movers", label: "Movers", icon: "🚛" },
-  { value: "Cleaners", label: "Cleaners", icon: "🧹" },
-  { value: "Electricians", label: "Electricians", icon: "⚡" },
-  { value: "Plumbers", label: "Plumbers", icon: "🔧" },
-  { value: "Internet Installers", label: "Internet", icon: "📡" },
-  { value: "Security", label: "Security", icon: "🛡️" },
-  { value: "Painters", label: "Painters", icon: "🎨" },
-  { value: "Fumigators", label: "Fumigators", icon: "🪲" },
-  { value: "Carpenters", label: "Carpenters", icon: "🪚" },
-  { value: "Gardeners", label: "Gardeners", icon: "🌿" },
-  { value: "AC Repair", label: "AC Repair", icon: "❄️" },
-  { value: "Locksmiths", label: "Locksmiths", icon: "🔑" },
-  { value: "Welders", label: "Welders", icon: "🔥" },
-  { value: "Masons", label: "Masons", icon: "🧱" },
-];
-
-const serviceSortOptions = [
-  { value: "featured", label: "Featured" },
-  { value: "rating", label: "Top Rated" },
-  { value: "reviews", label: "Most Reviews" },
-] as const;
 
 const bedroomOptions = [1, 2, 3, 4, 5];
 
@@ -121,26 +84,16 @@ const sortOptions = [
 
 const AdvancedFilters = ({
   isOpen, onClose, filters, onApply, county, subcounty, ward, estate, onLocationChange,
-  segment, onSegmentChange,
-  serviceCategory, onServiceCategoryChange,
-  serviceSort, onServiceSortChange,
+  segment,
 }: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>({ ...filters });
-  const [localSegment, setLocalSegment] = useState<string>(segment || "All");
-  const [localServiceCategory, setLocalServiceCategory] = useState<string>(serviceCategory || "All");
-  const [localServiceSort, setLocalServiceSort] = useState<string>(serviceSort || "featured");
-  const isCommercial = localSegment === "Business Spaces";
-  const isServices = localSegment === "Services";
-  const isShortStay = localSegment === "Short Stays";
 
-  // Re-sync segment & service fields when sheet (re)opens or parent values change
+  const isCommercial = segment === "Business Spaces";
+  const isServices = segment === "Services";
+
   useEffect(() => {
-    if (isOpen) {
-      setLocalSegment(segment || "All");
-      setLocalServiceCategory(serviceCategory || "All");
-      setLocalServiceSort(serviceSort || "featured");
-    }
-  }, [isOpen, segment, serviceCategory, serviceSort]);
+    if (isOpen) setLocal({ ...filters });
+  }, [isOpen, filters]);
 
   if (!isOpen) return null;
 
@@ -189,7 +142,7 @@ const AdvancedFilters = ({
         </button>
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4" />
-          {localSegment === "All" ? "Filters" : `${localSegment} Filters`}
+          Refine {segment || "Results"}
           {activeCount > 0 && (
             <span className="w-5 h-5 rounded-full gradient-trust text-[10px] font-bold text-primary-foreground flex items-center justify-center">
               {activeCount}
@@ -200,9 +153,6 @@ const AdvancedFilters = ({
           type="button"
           onClick={() => {
             setLocal({ minPrice: 0, maxPrice: 500000, bedrooms: [], amenities: [], verified: false, smileIdVerified: false, furnished: false, petFriendly: false, sortBy: "featured", commercialTypes: [], minSqft: 0, maxSqft: 0 });
-            setLocalSegment("All");
-            setLocalServiceCategory("All");
-            setLocalServiceSort("featured");
             onLocationChange("", "", "", "");
           }}
           className="text-xs font-semibold text-primary px-3 py-2 -mr-2 rounded-lg active:bg-primary/10 transition-colors"
@@ -212,6 +162,11 @@ const AdvancedFilters = ({
       </div>
 
       <div className="px-4 py-5 space-y-6 pb-32">
+        {/* Helper hint */}
+        <p className="text-xs text-muted-foreground -mb-2">
+          Refining <span className="font-semibold text-foreground">{segment || "current results"}</span>. Switch category from the tabs above or in Explore.
+        </p>
+
         {/* Location */}
         <div>
           <h3 className="text-sm font-semibold mb-3">Location</h3>
@@ -223,81 +178,6 @@ const AdvancedFilters = ({
             onSelect={(c, sc, w, e) => onLocationChange(c, sc, w, e)}
           />
         </div>
-
-        {/* Category — drives which filters show below */}
-        <div>
-          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-primary" />
-            Category
-          </h3>
-          <p className="text-xs text-muted-foreground mb-3">
-            Pick what you're looking for — filters below adapt automatically
-          </p>
-          <div className="grid grid-cols-3 gap-2">
-            {categoryOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setLocalSegment(opt.value)}
-                className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl text-xs font-semibold transition-all ${
-                  localSegment === opt.value
-                    ? "gradient-trust text-primary-foreground ring-2 ring-primary/30 shadow-sm"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                <span className="text-lg leading-none">{opt.icon}</span>
-                <span className="leading-tight text-center">{opt.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Service Type filter — shown when Services is selected */}
-        {isServices && (
-          <div>
-            <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <Wrench className="w-4 h-4 text-primary" />
-              Service Type
-            </h3>
-            <div className="grid grid-cols-3 gap-2">
-              {serviceCategoryOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => setLocalServiceCategory(opt.value)}
-                  className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl text-xs font-semibold transition-all ${
-                    localServiceCategory === opt.value
-                      ? "gradient-trust text-primary-foreground ring-2 ring-primary/30 shadow-sm"
-                      : "bg-secondary text-secondary-foreground"
-                  }`}
-                >
-                  <span className="text-lg leading-none">{opt.icon}</span>
-                  <span className="leading-tight text-center">{opt.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Service Sort — shown when Services is selected */}
-        {isServices && (
-          <div>
-            <h3 className="text-sm font-semibold mb-3">Sort Services By</h3>
-            <div className="flex flex-wrap gap-2">
-              {serviceSortOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => setLocalServiceSort(opt.value)}
-                  className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
-                    localServiceSort === opt.value
-                      ? "gradient-trust text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Commercial Type filter */}
         {isCommercial && (
@@ -380,7 +260,7 @@ const AdvancedFilters = ({
           </div>
         )}
 
-        {/* Price Range — hide for services (per-job pricing varies) */}
+        {/* Price Range — hide for services */}
         {!isServices && (
           <div>
             <h3 className="text-sm font-semibold mb-3">Price Range (KES)</h3>
@@ -494,22 +374,13 @@ const AdvancedFilters = ({
       <div className="fixed bottom-0 left-0 right-0 z-[71] p-4 glass-surface border-t border-border safe-bottom">
         <button
           onClick={() => {
-            if (onSegmentChange && localSegment !== "All" && localSegment !== segment) {
-              onSegmentChange(localSegment);
-            }
-            if (isServices) {
-              onServiceCategoryChange?.(localServiceCategory);
-              onServiceSortChange?.(localServiceSort as "featured" | "rating" | "reviews");
-            }
             onApply(local);
             onClose();
           }}
           className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2 shadow-lg"
         >
           <Search className="w-4 h-4" />
-          {isServices
-            ? (localServiceCategory === "All" ? "Search All Services" : `Search ${localServiceCategory}`)
-            : (localSegment === "All" ? "Search Properties" : `Search ${localSegment}`)}
+          Apply Filters
         </button>
       </div>
     </div>
