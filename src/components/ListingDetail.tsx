@@ -1,7 +1,10 @@
 import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2, Lock, GitCompare } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import type { Property } from "@/data/mockData";
+import HostCard from "./listing/HostCard";
+import SimilarListingsRail from "./listing/SimilarListingsRail";
+import FullscreenImageViewer from "./listing/FullscreenImageViewer";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
 import ShareListingSheet from "./ShareListingSheet";
 import ReportListingModal from "./ReportListingModal";
@@ -22,9 +25,10 @@ interface ListingDetailProps {
   liked?: boolean;
   onToggleLike?: () => void;
   onCompareWith?: (property: Property) => void;
+  onSelectProperty?: (property: Property) => void;
 }
 
-const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith }: ListingDetailProps) => {
+const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith, onSelectProperty }: ListingDetailProps) => {
   const { closing, triggerClose } = useOverlayClose(onBack);
   const [currentImage, setCurrentImage] = useState(0);
   const [showBooking, setShowBooking] = useState(false);
@@ -33,6 +37,17 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
   const [showReviews, setShowReviews] = useState(false);
   const [showMoveIn, setShowMoveIn] = useState(false);
   const [showVideoTour, setShowVideoTour] = useState(false);
+  const [showFullscreen, setShowFullscreen] = useState(false);
+  const [stickyHeader, setStickyHeader] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => setStickyHeader(el.scrollTop > 240);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
 
   const formatPrice = (price: number) => new Intl.NumberFormat("en-KE").format(price);
   const scamRisk = getScamRiskScore(property);
@@ -40,7 +55,32 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
 
   return (
-    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
+    <div ref={scrollRef} className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
+      {/* Sticky compact header (appears after gallery) */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-20 max-w-lg mx-auto glass-surface border-b border-border transition-all duration-200 ${
+          stickyHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="flex items-center gap-3 px-4 py-3">
+          <button onClick={triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
+            <ArrowLeft className="w-4 h-4 text-foreground" />
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold truncate">{property.title}</p>
+            <p className="text-[11px] text-muted-foreground truncate">
+              KES {new Intl.NumberFormat("en-KE").format(property.price)} {property.priceUnit}
+            </p>
+          </div>
+          <button onClick={onToggleLike} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
+            <Heart className={`w-4 h-4 ${liked ? "fill-destructive text-destructive" : "text-foreground"}`} />
+          </button>
+          <button onClick={() => setShowShare(true)} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
+            <Share2 className="w-4 h-4 text-foreground" />
+          </button>
+        </div>
+      </div>
+
       {/* Image Carousel */}
       <div className="relative aspect-[4/3] bg-muted">
         <SwipeableImageGallery
@@ -49,6 +89,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           className="w-full h-full"
           controlledIndex={currentImage}
           onIndexChange={setCurrentImage}
+          onImageClick={() => setShowFullscreen(true)}
           bottomOffsetClass="bottom-4"
         />
 
@@ -293,6 +334,9 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           </div>
         </div>
 
+        {/* Host / Landlord Card */}
+        <HostCard property={property} />
+
         {/* Smile ID Verified Badge */}
         {property.verified && (
           <div className="mb-4">
@@ -373,6 +417,11 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           </button>
         )}
 
+        {/* Similar Listings */}
+        {onSelectProperty && (
+          <SimilarListingsRail current={property} onSelect={onSelectProperty} />
+        )}
+
         {/* Report */}
         <button
           onClick={() => setShowReport(true)}
@@ -430,6 +479,14 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           title={property.title}
           onBack={() => setShowVideoTour(false)}
           rooms={property.videoTourRooms}
+        />
+      )}
+      {showFullscreen && (
+        <FullscreenImageViewer
+          images={property.images}
+          alt={property.title}
+          initialIndex={currentImage}
+          onClose={() => setShowFullscreen(false)}
         />
       )}
     </div>

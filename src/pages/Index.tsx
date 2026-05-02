@@ -89,6 +89,7 @@ const Index = () => {
         onBack={() => setSelectedProperty(null)}
         liked={isFavorite(selectedProperty.id)}
         onToggleLike={() => toggleFavorite(selectedProperty.id)}
+        onSelectProperty={(p) => setSelectedProperty(p)}
       />
     );
   }
