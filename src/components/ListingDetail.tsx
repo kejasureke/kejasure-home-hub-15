@@ -36,6 +36,17 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
   const [showReviews, setShowReviews] = useState(false);
   const [showMoveIn, setShowMoveIn] = useState(false);
   const [showVideoTour, setShowVideoTour] = useState(false);
+  const [showFullscreen, setShowFullscreen] = useState(false);
+  const [stickyHeader, setStickyHeader] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => setStickyHeader(el.scrollTop > 240);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
 
   const formatPrice = (price: number) => new Intl.NumberFormat("en-KE").format(price);
   const scamRisk = getScamRiskScore(property);
