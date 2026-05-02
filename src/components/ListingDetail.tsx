@@ -29,8 +29,6 @@ interface ListingDetailProps {
 }
 
 const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith, onSelectProperty }: ListingDetailProps) => {
-
-const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith }: ListingDetailProps) => {
   const { closing, triggerClose } = useOverlayClose(onBack);
   const [currentImage, setCurrentImage] = useState(0);
   const [showBooking, setShowBooking] = useState(false);
