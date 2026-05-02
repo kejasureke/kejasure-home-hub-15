@@ -417,6 +417,11 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           </button>
         )}
 
+        {/* Similar Listings */}
+        {onSelectProperty && (
+          <SimilarListingsRail current={property} onSelect={onSelectProperty} />
+        )}
+
         {/* Report */}
         <button
           onClick={() => setShowReport(true)}
