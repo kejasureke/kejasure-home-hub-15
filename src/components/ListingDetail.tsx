@@ -25,7 +25,10 @@ interface ListingDetailProps {
   liked?: boolean;
   onToggleLike?: () => void;
   onCompareWith?: (property: Property) => void;
+  onSelectProperty?: (property: Property) => void;
 }
+
+const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith, onSelectProperty }: ListingDetailProps) => {
 
 const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith }: ListingDetailProps) => {
   const { closing, triggerClose } = useOverlayClose(onBack);
