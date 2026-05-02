@@ -481,6 +481,14 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           rooms={property.videoTourRooms}
         />
       )}
+      {showFullscreen && (
+        <FullscreenImageViewer
+          images={property.images}
+          alt={property.title}
+          initialIndex={currentImage}
+          onClose={() => setShowFullscreen(false)}
+        />
+      )}
     </div>
   );
 };
