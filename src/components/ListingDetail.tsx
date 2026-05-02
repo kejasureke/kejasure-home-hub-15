@@ -333,6 +333,9 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           </div>
         </div>
 
+        {/* Host / Landlord Card */}
+        <HostCard property={property} />
+
         {/* Smile ID Verified Badge */}
         {property.verified && (
           <div className="mb-4">
