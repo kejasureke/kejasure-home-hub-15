@@ -54,7 +54,32 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
 
   return (
-    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
+    <div ref={scrollRef} className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
+      {/* Sticky compact header (appears after gallery) */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-20 max-w-lg mx-auto glass-surface border-b border-border transition-all duration-200 ${
+          stickyHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="flex items-center gap-3 px-4 py-3">
+          <button onClick={triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
+            <ArrowLeft className="w-4 h-4 text-foreground" />
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold truncate">{property.title}</p>
+            <p className="text-[11px] text-muted-foreground truncate">
+              KES {new Intl.NumberFormat("en-KE").format(property.price)} {property.priceUnit}
+            </p>
+          </div>
+          <button onClick={onToggleLike} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
+            <Heart className={`w-4 h-4 ${liked ? "fill-destructive text-destructive" : "text-foreground"}`} />
+          </button>
+          <button onClick={() => setShowShare(true)} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
+            <Share2 className="w-4 h-4 text-foreground" />
+          </button>
+        </div>
+      </div>
+
       {/* Image Carousel */}
       <div className="relative aspect-[4/3] bg-muted">
         <SwipeableImageGallery
@@ -63,6 +88,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           className="w-full h-full"
           controlledIndex={currentImage}
           onIndexChange={setCurrentImage}
+          onImageClick={() => setShowFullscreen(true)}
           bottomOffsetClass="bottom-4"
         />
 
