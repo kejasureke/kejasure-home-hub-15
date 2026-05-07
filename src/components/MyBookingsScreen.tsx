@@ -220,22 +220,6 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
         </div>
       )}
 
-      {/* M-Pesa deposit */}
-      {payFor && (
-        <MpesaPaymentFlow
-          category="Booking Deposit"
-          plans={[{
-            name: `${payFor.propertyTitle.slice(0, 24)} — ${payFor.nights}n`,
-            price: payFor.totalPrice || 0,
-            duration: `${formatDate(payFor.date)} → ${formatDate(payFor.checkOut || "")}`,
-          }]}
-          onClose={() => setPayFor(null)}
-          onSuccess={(_, txId) => {
-            updateBooking(payFor.id, { paid: true, paidAmount: payFor.totalPrice, paidAt: Date.now() });
-            setPayFor(null);
-          }}
-        />
-      )}
     </div>
   );
 };
