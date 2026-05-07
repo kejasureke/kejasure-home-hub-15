@@ -4,6 +4,7 @@ import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartph
 type AuthStep = "phone" | "otp" | "pin" | "confirm-pin" | "biometric";
 
 const AUTH_STATE_KEY = "kejasure_auth_progress";
+const OTP_DURATION = 60; // seconds
 
 interface PersistedAuth {
   step: AuthStep;
@@ -11,9 +12,13 @@ interface PersistedAuth {
   otp: string[];
   pin: string[];
   confirmPin: string[];
-  otpTimer: number;
-  savedAt: number;
+  otpExpiresAt: number | null; // epoch ms, null = no active cooldown
 }
+
+const computeRemaining = (expiresAt: number | null): number => {
+  if (!expiresAt) return 0;
+  return Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
+};
 
 const loadAuthState = (): Partial<PersistedAuth> => {
   try {
@@ -22,10 +27,7 @@ const loadAuthState = (): Partial<PersistedAuth> => {
     const p = JSON.parse(raw) as PersistedAuth;
     const valid: AuthStep[] = ["phone", "otp", "pin", "confirm-pin", "biometric"];
     if (!valid.includes(p.step)) return {};
-    // Decay OTP timer based on elapsed time
-    const elapsed = Math.floor((Date.now() - (p.savedAt || Date.now())) / 1000);
-    const decayedTimer = Math.max(0, (p.otpTimer ?? 0) - elapsed);
-    return { ...p, otpTimer: decayedTimer };
+    return p;
   } catch {
     return {};
   }
@@ -45,27 +47,44 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const [confirmPin, setConfirmPin] = useState<string[]>(initial.confirmPin ?? ["", "", "", ""]);
   const [pinError, setPinError] = useState("");
   const [shakeError, setShakeError] = useState(false);
-  const [otpTimer, setOtpTimer] = useState(initial.otpTimer ?? 60);
+  const [otpExpiresAt, setOtpExpiresAt] = useState<number | null>(initial.otpExpiresAt ?? null);
+  const [otpTimer, setOtpTimer] = useState<number>(computeRemaining(initial.otpExpiresAt ?? null));
 
   // Persist on every relevant change
   useEffect(() => {
     try {
-      const payload: PersistedAuth = {
-        step, phone, otp, pin, confirmPin, otpTimer, savedAt: Date.now(),
-      };
+      const payload: PersistedAuth = { step, phone, otp, pin, confirmPin, otpExpiresAt };
       localStorage.setItem(AUTH_STATE_KEY, JSON.stringify(payload));
     } catch {}
-  }, [step, phone, otp, pin, confirmPin, otpTimer]);
+  }, [step, phone, otp, pin, confirmPin, otpExpiresAt]);
+
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const pinRefs = useRef<(HTMLInputElement | null)[]>([]);
   const confirmPinRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // OTP timer
+  // OTP timer — derived from absolute expiry, ticks each second; recovers correctly after refresh
   useEffect(() => {
-    if (step !== "otp" || otpTimer <= 0) return;
-    const t = setInterval(() => setOtpTimer((v) => v - 1), 1000);
+    if (step !== "otp" || !otpExpiresAt) return;
+    setOtpTimer(computeRemaining(otpExpiresAt));
+    const t = setInterval(() => {
+      const remaining = computeRemaining(otpExpiresAt);
+      setOtpTimer(remaining);
+      if (remaining <= 0) clearInterval(t);
+    }, 1000);
     return () => clearInterval(t);
-  }, [step, otpTimer]);
+  }, [step, otpExpiresAt]);
+
+  // Re-sync timer when tab/app becomes visible again
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        setOtpTimer(computeRemaining(otpExpiresAt));
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [otpExpiresAt]);
+
 
   const handleCodeInput = (
     value: string,
@@ -103,7 +122,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const isConfirmFilled = confirmPin.every((d) => d !== "");
 
   const handlePhoneSubmit = () => {
-    setOtpTimer(60);
+    setOtpExpiresAt(Date.now() + OTP_DURATION * 1000);
     setStep("otp");
   };
 
@@ -250,7 +269,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
               onClick={() => {
                 // Safe edit: keep PIN, clear OTP + reset timer, return to phone step
                 setOtp(["", "", "", "", "", ""]);
-                setOtpTimer(0);
+                setOtpExpiresAt(null);
                 setStep("phone");
               }}
               className="self-start mb-6 text-xs font-semibold text-primary active:opacity-70 underline-offset-2 underline"
@@ -281,7 +300,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
               {otpTimer > 0 ? (
                 <p className="text-xs text-muted-foreground">Resend code in <span className="font-semibold text-primary">{otpTimer}s</span></p>
               ) : (
-                <button onClick={() => setOtpTimer(60)} className="text-xs font-semibold text-primary">
+                <button onClick={() => setOtpExpiresAt(Date.now() + OTP_DURATION * 1000)} className="text-xs font-semibold text-primary">
                   Resend Code
                 </button>
               )}
