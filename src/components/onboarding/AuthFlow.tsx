@@ -123,12 +123,88 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const isPinFilled = pin.every((d) => d !== "");
   const isConfirmFilled = confirmPin.every((d) => d !== "");
 
-  const handlePhoneSubmit = () => {
-    setOtpExpiresAt(Date.now() + OTP_DURATION * 1000);
-    setStep("otp");
+  const [sending, setSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+
+  // Normalize Kenyan phone to E.164 (+254XXXXXXXXX)
+  const toE164 = (raw: string) => {
+    const digits = raw.replace(/\D/g, "");
+    const trimmed = digits.startsWith("0") ? digits.slice(1) : digits;
+    return `+254${trimmed}`;
   };
 
-  const handleOtpSubmit = () => setStep("pin");
+  // Parse server-provided cooldown from rate-limit errors (e.g. "after 47 seconds")
+  const parseRetryAfter = (msg?: string): number | null => {
+    if (!msg) return null;
+    const m = msg.match(/(\d+)\s*second/i);
+    return m ? parseInt(m[1], 10) : null;
+  };
+
+  const sendOtp = async (isResend = false) => {
+    if (sending) return;
+    setSending(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: toE164(phone),
+        options: { channel: "sms" },
+      });
+      if (error) {
+        const retry = parseRetryAfter(error.message);
+        if (retry) {
+          // Server says we must wait — reflect that exact cooldown
+          setOtpExpiresAt(Date.now() + retry * 1000);
+          if (!isResend) setStep("otp");
+          toast({
+            title: "Please wait",
+            description: `You can request a new code in ${retry}s.`,
+          });
+        } else {
+          toast({
+            title: "Couldn't send code",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+      setOtpExpiresAt(Date.now() + OTP_DURATION * 1000);
+      if (!isResend) setStep("otp");
+      if (isResend) toast({ title: "New code sent" });
+    } catch (e: any) {
+      toast({
+        title: "Network error",
+        description: e?.message ?? "Try again",
+        variant: "destructive",
+      });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handlePhoneSubmit = () => sendOtp(false);
+
+  const handleOtpSubmit = async () => {
+    if (verifying) return;
+    setVerifying(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        phone: toE164(phone),
+        token: otp.join(""),
+        type: "sms",
+      });
+      if (error) {
+        toast({
+          title: "Invalid code",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+      setStep("pin");
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   const handlePinSubmit = () => {
     setPinError("");
