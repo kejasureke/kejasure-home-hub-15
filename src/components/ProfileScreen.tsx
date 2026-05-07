@@ -263,7 +263,18 @@ const ProfileScreen = () => {
         </div>
       </div>
 
-      <button className="w-full flex items-center gap-3 p-4 rounded-2xl mt-4 active:scale-[0.98] transition-transform text-destructive">
+      <button
+        onClick={() => {
+          if (window.confirm("Sign out of KejaSure? You'll need to log in again to access your account.")) {
+            try {
+              localStorage.removeItem("kejasure_onboarded");
+              localStorage.removeItem("kejasure_onboarding_progress");
+            } catch {}
+            window.location.reload();
+          }
+        }}
+        className="w-full flex items-center gap-3 p-4 rounded-2xl mt-4 active:scale-[0.98] transition-transform text-destructive hover:bg-destructive/5"
+      >
         <LogOut className="w-5 h-5" />
         <span className="text-sm font-semibold">Sign Out</span>
       </button>
