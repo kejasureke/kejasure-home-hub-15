@@ -98,7 +98,7 @@ const NotificationToast = ({ alert, onDismiss, onTap }: Props) => {
     : Math.max(0.3, 1 - Math.max(Math.abs(offsetX) / 200, Math.abs(offsetY) / 150));
 
   return (
-    <div className="fixed top-4 left-3 right-3 z-[100] animate-in slide-in-from-top-4 fade-in duration-300 max-w-lg mx-auto">
+    <div className="fixed top-4 left-3 right-3 z-[55] animate-in slide-in-from-top-4 fade-in duration-300 max-w-lg mx-auto">
       <div
         onClick={handleClick}
         onTouchStart={handleTouchStart}
