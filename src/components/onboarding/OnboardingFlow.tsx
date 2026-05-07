@@ -30,7 +30,7 @@ const loadProgress = (): Progress => {
     const raw = localStorage.getItem(PROGRESS_KEY);
     if (raw) {
       const p = JSON.parse(raw) as Partial<Progress>;
-      const validSteps: OnboardingStep[] = ["welcome", "role", "auth", "profile"];
+      const validSteps: OnboardingStep[] = ["welcome", "role", "auth", "profile", "tour"];
       if (p.step && validSteps.includes(p.step)) {
         return {
           step: p.step,
