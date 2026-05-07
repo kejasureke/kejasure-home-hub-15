@@ -390,14 +390,14 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
 
             <div className="w-full space-y-3 mt-auto pb-10">
               <button
-                onClick={onComplete}
+                onClick={() => { try { localStorage.removeItem(AUTH_STATE_KEY); } catch {} onComplete(); }}
                 className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
               >
                 Enable Biometrics
                 <Fingerprint className="w-5 h-5" />
               </button>
               <button
-                onClick={onComplete}
+                onClick={() => { try { localStorage.removeItem(AUTH_STATE_KEY); } catch {} onComplete(); }}
                 className="w-full py-3 rounded-2xl text-sm font-medium text-muted-foreground"
               >
                 Maybe Later
