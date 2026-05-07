@@ -56,9 +56,8 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
     const ms = new Date(checkOut).getTime() - new Date(selectedDate).getTime();
     return Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
   }, [isShortStay, selectedDate, checkOut]);
-  const cleaningFee = isShortStay ? 1500 : 0;
   const subtotal = isShortStay ? property.price * nights : 0;
-  const total = subtotal + cleaningFee;
+  const total = subtotal;
 
   const canProceed = isShortStay
     ? !!selectedDate && !!checkOut && nights > 0 && guests > 0
@@ -94,7 +93,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
       nights: isShortStay ? nights : undefined,
       guests: isShortStay ? guests : undefined,
       nightlyPrice: isShortStay ? property.price : undefined,
-      cleaningFee: isShortStay ? cleaningFee : undefined,
+      cleaningFee: undefined,
       totalPrice: isShortStay ? total : undefined,
       note: note || undefined,
       landlordName: host.name,
@@ -231,14 +230,13 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
                         <span className="text-muted-foreground">{fmtKES(property.price)} × {nights} night{nights !== 1 ? "s" : ""}</span>
                         <span className="font-medium">{fmtKES(subtotal)}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Cleaning fee</span>
-                        <span className="font-medium">{fmtKES(cleaningFee)}</span>
-                      </div>
                       <div className="flex justify-between pt-2 border-t border-primary/20">
-                        <span className="font-bold">Total</span>
+                        <span className="font-bold">Estimated cost</span>
                         <span className="font-bold text-primary">{fmtKES(total)}</span>
                       </div>
+                      <p className="text-[10px] text-muted-foreground pt-1 leading-relaxed">
+                        Final price agreed directly with the host. KejaSure does not collect rent or deposits.
+                      </p>
                     </div>
                   )}
                 </>
@@ -320,7 +318,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
                         <span className="font-medium">{guests}</span>
                       </div>
                       <div className="flex justify-between pt-2 border-t border-trust/10">
-                        <span className="font-semibold">Total</span>
+                        <span className="font-semibold">Estimated cost</span>
                         <span className="font-bold text-primary">{fmtKES(total)}</span>
                       </div>
                     </>
@@ -347,7 +345,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
 
               <div className="p-3 rounded-xl bg-accent/5 border border-accent/20">
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  <span className="font-semibold text-accent-foreground">How it works:</span> Your request will be sent to the landlord. Once they accept, their contact details (phone & chat) will be shared with you{isShortStay ? " and you can pay the deposit via M-Pesa" : ""}.
+                  <span className="font-semibold text-accent-foreground">How it works:</span> Your request is sent to the landlord. Once they accept, their contact details (phone & chat) are shared so you can arrange viewing or check-in directly. KejaSure does not handle rent or deposits — never pay before viewing.
                 </p>
               </div>
 
@@ -380,7 +378,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
                 {isShortStay ? (
                   <>
                     <div className="flex justify-between"><span className="text-muted-foreground">Stay</span><span className="font-medium">{nights} night{nights !== 1 ? "s" : ""}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Total</span><span className="font-bold text-primary">{fmtKES(total)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Est. cost</span><span className="font-bold text-primary">{fmtKES(total)}</span></div>
                   </>
                 ) : (
                   <>
@@ -444,7 +442,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
                 onClick={onClose}
                 className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
               >
-                {isShortStay ? "Done — pay deposit from My Bookings" : "Done"}
+                Done
               </button>
             </div>
           )}

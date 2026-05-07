@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
-import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, CreditCard, X, Calendar, MoreVertical } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, ShieldAlert, Calendar, MoreVertical } from "lucide-react";
 import { useBookings, type BookingStatus, type Booking } from "@/hooks/useBookings";
-import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface MyBookingsScreenProps {
   onBack: () => void;
@@ -36,7 +35,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
   const { bookings, counts, cancelBooking, updateBooking } = useBookings();
   const [tab, setTab] = useState<BookingStatus | "all">("pending");
   const [actionFor, setActionFor] = useState<Booking | null>(null);
-  const [payFor, setPayFor] = useState<Booking | null>(null);
+  
 
   const filtered = useMemo(() => {
     if (tab === "all") return bookings;
@@ -166,19 +165,16 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                       >
                         <MessageCircle className="w-3.5 h-3.5" /> Chat
                       </button>
-                      {isStay && !b.paid && (
-                        <button
-                          onClick={() => setPayFor(b)}
-                          className="flex-1 py-2.5 rounded-xl gradient-trust text-xs font-semibold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
-                        >
-                          <CreditCard className="w-3.5 h-3.5" /> Pay
-                        </button>
-                      )}
-                      {isStay && b.paid && (
-                        <div className="flex-1 py-2.5 rounded-xl bg-trust/10 text-xs font-semibold text-trust flex items-center justify-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Paid
-                        </div>
-                      )}
+                    </div>
+                  )}
+
+                  {/* Safety reminder for accepted stays */}
+                  {b.status === "accepted" && isStay && (
+                    <div className="mx-3 mb-3 flex items-start gap-2 p-2.5 rounded-xl bg-accent/5 border border-accent/20">
+                      <ShieldAlert className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">
+                        <span className="font-semibold text-accent-foreground">Safety:</span> Arrange payment directly with the host on arrival. KejaSure does not handle rent or deposits — never send money before viewing.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -224,22 +220,6 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
         </div>
       )}
 
-      {/* M-Pesa deposit */}
-      {payFor && (
-        <MpesaPaymentFlow
-          category="Booking Deposit"
-          plans={[{
-            name: `${payFor.propertyTitle.slice(0, 24)} — ${payFor.nights}n`,
-            price: payFor.totalPrice || 0,
-            duration: `${formatDate(payFor.date)} → ${formatDate(payFor.checkOut || "")}`,
-          }]}
-          onClose={() => setPayFor(null)}
-          onSuccess={(_, txId) => {
-            updateBooking(payFor.id, { paid: true, paidAmount: payFor.totalPrice, paidAt: Date.now() });
-            setPayFor(null);
-          }}
-        />
-      )}
     </div>
   );
 };
