@@ -300,7 +300,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
               {otpTimer > 0 ? (
                 <p className="text-xs text-muted-foreground">Resend code in <span className="font-semibold text-primary">{otpTimer}s</span></p>
               ) : (
-                <button onClick={() => setOtpTimer(60)} className="text-xs font-semibold text-primary">
+                <button onClick={() => setOtpExpiresAt(Date.now() + OTP_DURATION * 1000)} className="text-xs font-semibold text-primary">
                   Resend Code
                 </button>
               )}
