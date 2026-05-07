@@ -243,9 +243,20 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
               <ShieldCheck className="w-8 h-8 text-primary" />
             </div>
             <h1 className="text-2xl font-extrabold text-foreground mb-2">Verify your number</h1>
-            <p className="text-sm text-muted-foreground mb-8">
+            <p className="text-sm text-muted-foreground mb-2">
               Enter the 6-digit code sent to <span className="font-semibold text-foreground">+254 {phone}</span>
             </p>
+            <button
+              onClick={() => {
+                // Safe edit: keep PIN, clear OTP + reset timer, return to phone step
+                setOtp(["", "", "", "", "", ""]);
+                setOtpTimer(0);
+                setStep("phone");
+              }}
+              className="self-start mb-6 text-xs font-semibold text-primary active:opacity-70 underline-offset-2 underline"
+            >
+              Wrong number? Edit
+            </button>
 
             <div className="flex gap-2.5 justify-center mb-6">
               {otp.map((digit, i) => (
