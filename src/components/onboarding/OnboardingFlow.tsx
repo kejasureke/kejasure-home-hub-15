@@ -101,8 +101,10 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
       );
     case "profile":
       return role ? (
-        <ProfileSetup role={role} onComplete={finish} onBack={() => setStep("auth")} />
+        <ProfileSetup role={role} onComplete={() => setStep("tour")} onBack={() => setStep("auth")} />
       ) : null;
+    case "tour":
+      return <AppTour onFinish={finish} />;
     default:
       return null;
   }
