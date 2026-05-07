@@ -165,19 +165,16 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                       >
                         <MessageCircle className="w-3.5 h-3.5" /> Chat
                       </button>
-                      {isStay && !b.paid && (
-                        <button
-                          onClick={() => setPayFor(b)}
-                          className="flex-1 py-2.5 rounded-xl gradient-trust text-xs font-semibold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
-                        >
-                          <CreditCard className="w-3.5 h-3.5" /> Pay
-                        </button>
-                      )}
-                      {isStay && b.paid && (
-                        <div className="flex-1 py-2.5 rounded-xl bg-trust/10 text-xs font-semibold text-trust flex items-center justify-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Paid
-                        </div>
-                      )}
+                    </div>
+                  )}
+
+                  {/* Safety reminder for accepted stays */}
+                  {b.status === "accepted" && isStay && (
+                    <div className="mx-3 mb-3 flex items-start gap-2 p-2.5 rounded-xl bg-accent/5 border border-accent/20">
+                      <ShieldAlert className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">
+                        <span className="font-semibold text-accent-foreground">Safety:</span> Arrange payment directly with the host on arrival. KejaSure does not handle rent or deposits — never send money before viewing.
+                      </p>
                     </div>
                   )}
                 </div>
