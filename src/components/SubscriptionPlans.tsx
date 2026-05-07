@@ -58,7 +58,7 @@ const landlordPlans = [
   },
   {
     name: "Premium",
-    price: 3500,
+    price: 2500,
     duration: "/month",
     badge: "Individual",
     features: ["15 active listings", "Residential + ✨ Commercial premises", "✨ Corporate stays (NGO/expat)", "Full owner analytics", "2 monthly boosts", "Verified owner badge"],
