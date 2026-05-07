@@ -93,7 +93,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
       nights: isShortStay ? nights : undefined,
       guests: isShortStay ? guests : undefined,
       nightlyPrice: isShortStay ? property.price : undefined,
-      cleaningFee: isShortStay ? cleaningFee : undefined,
+      cleaningFee: undefined,
       totalPrice: isShortStay ? total : undefined,
       note: note || undefined,
       landlordName: host.name,
