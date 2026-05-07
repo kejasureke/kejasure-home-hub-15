@@ -111,7 +111,16 @@ const ProfileScreen = () => {
   const dashboardItem = getDashboardItem();
   const showBoostOption = !isTenant;
 
+  const bookingsActiveCount = bookingCounts.pending + bookingCounts.accepted;
   const menuItems = [
+    {
+      icon: Calendar,
+      label: "My Bookings",
+      subtitle: bookingsActiveCount > 0
+        ? `${bookingCounts.pending} pending · ${bookingCounts.accepted} accepted`
+        : "Track viewings and stays",
+      action: () => setShowMyBookings(true),
+    },
     ...(!isTenant ? [{ icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action }] : []),
     { icon: Crown, label: "Subscription Plans", subtitle: "Manage your plan", action: () => setShowSubscription(true) },
     ...(!isTenant ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
