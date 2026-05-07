@@ -51,6 +51,8 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const [shakeError, setShakeError] = useState(false);
   const [otpExpiresAt, setOtpExpiresAt] = useState<number | null>(initial.otpExpiresAt ?? null);
   const [otpTimer, setOtpTimer] = useState<number>(computeRemaining(initial.otpExpiresAt ?? null));
+  const [lockoutExpiresAt, setLockoutExpiresAt] = useState<number | null>(null);
+  const [lockoutTimer, setLockoutTimer] = useState<number>(0);
 
   // Persist on every relevant change
   useEffect(() => {
