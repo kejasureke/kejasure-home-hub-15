@@ -269,7 +269,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
               onClick={() => {
                 // Safe edit: keep PIN, clear OTP + reset timer, return to phone step
                 setOtp(["", "", "", "", "", ""]);
-                setOtpTimer(0);
+                setOtpExpiresAt(null);
                 setStep("phone");
               }}
               className="self-start mb-6 text-xs font-semibold text-primary active:opacity-70 underline-offset-2 underline"
