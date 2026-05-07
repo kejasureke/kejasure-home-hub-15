@@ -51,6 +51,8 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const [shakeError, setShakeError] = useState(false);
   const [otpExpiresAt, setOtpExpiresAt] = useState<number | null>(initial.otpExpiresAt ?? null);
   const [otpTimer, setOtpTimer] = useState<number>(computeRemaining(initial.otpExpiresAt ?? null));
+  const [lockoutExpiresAt, setLockoutExpiresAt] = useState<number | null>(null);
+  const [lockoutTimer, setLockoutTimer] = useState<number>(0);
 
   // Persist on every relevant change
   useEffect(() => {
@@ -86,6 +88,24 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [otpExpiresAt]);
+
+  // Lockout countdown — ticks down a fixed expiry from server retryAfter
+  useEffect(() => {
+    if (!lockoutExpiresAt) {
+      setLockoutTimer(0);
+      return;
+    }
+    setLockoutTimer(computeRemaining(lockoutExpiresAt));
+    const t = setInterval(() => {
+      const remaining = computeRemaining(lockoutExpiresAt);
+      setLockoutTimer(remaining);
+      if (remaining <= 0) {
+        clearInterval(t);
+        setLockoutExpiresAt(null);
+      }
+    }, 1000);
+    return () => clearInterval(t);
+  }, [lockoutExpiresAt]);
 
 
   const handleCodeInput = (
@@ -205,8 +225,9 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
         const retry = payload?.retryAfter;
         const remaining = payload?.remainingAttempts;
         if (retry) {
+          setLockoutExpiresAt(Date.now() + retry * 1000);
           toast({
-            title: "Locked out",
+            title: "Too many attempts",
             description: payload?.error ?? `Try again in ${retry}s.`,
             variant: "destructive",
           });
@@ -415,16 +436,34 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
               )}
             </div>
 
+            {lockoutTimer > 0 && (
+              <div
+                role="alert"
+                aria-live="polite"
+                className="mb-4 px-4 py-3 rounded-xl bg-destructive/10 border border-destructive/30 flex items-center justify-between gap-3 animate-fade-in"
+              >
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-destructive">Too many attempts</span>
+                  <span className="text-[11px] text-muted-foreground">Verification temporarily locked</span>
+                </div>
+                <span className="font-mono text-base font-bold text-destructive tabular-nums">
+                  {Math.floor(lockoutTimer / 60).toString().padStart(2, "0")}:{(lockoutTimer % 60).toString().padStart(2, "0")}
+                </span>
+              </div>
+            )}
+
             <div className="mt-auto pb-10">
               <button
                 onClick={handleOtpSubmit}
-                disabled={!isOtpFilled}
+                disabled={!isOtpFilled || verifying || lockoutTimer > 0}
                 className={`w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
-                  isOtpFilled ? "gradient-trust text-primary-foreground active:scale-[0.98]" : "bg-muted text-muted-foreground"
+                  isOtpFilled && lockoutTimer === 0 && !verifying
+                    ? "gradient-trust text-primary-foreground active:scale-[0.98]"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
-                Verify
-                <ChevronRight className="w-5 h-5" />
+                {lockoutTimer > 0 ? `Locked (${lockoutTimer}s)` : verifying ? "Verifying…" : "Verify"}
+                {lockoutTimer === 0 && !verifying && <ChevronRight className="w-5 h-5" />}
               </button>
             </div>
           </div>
