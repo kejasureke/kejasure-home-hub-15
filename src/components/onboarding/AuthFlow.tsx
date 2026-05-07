@@ -3,20 +3,59 @@ import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartph
 
 type AuthStep = "phone" | "otp" | "pin" | "confirm-pin" | "biometric";
 
+const AUTH_STATE_KEY = "kejasure_auth_progress";
+
+interface PersistedAuth {
+  step: AuthStep;
+  phone: string;
+  otp: string[];
+  pin: string[];
+  confirmPin: string[];
+  otpTimer: number;
+  savedAt: number;
+}
+
+const loadAuthState = (): Partial<PersistedAuth> => {
+  try {
+    const raw = localStorage.getItem(AUTH_STATE_KEY);
+    if (!raw) return {};
+    const p = JSON.parse(raw) as PersistedAuth;
+    const valid: AuthStep[] = ["phone", "otp", "pin", "confirm-pin", "biometric"];
+    if (!valid.includes(p.step)) return {};
+    // Decay OTP timer based on elapsed time
+    const elapsed = Math.floor((Date.now() - (p.savedAt || Date.now())) / 1000);
+    const decayedTimer = Math.max(0, (p.otpTimer ?? 0) - elapsed);
+    return { ...p, otpTimer: decayedTimer };
+  } catch {
+    return {};
+  }
+};
+
 interface AuthFlowProps {
   onComplete: () => void;
   onBack: () => void;
 }
 
 const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
-  const [step, setStep] = useState<AuthStep>("phone");
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [pin, setPin] = useState(["", "", "", ""]);
-  const [confirmPin, setConfirmPin] = useState(["", "", "", ""]);
+  const initial = loadAuthState();
+  const [step, setStep] = useState<AuthStep>(initial.step ?? "phone");
+  const [phone, setPhone] = useState(initial.phone ?? "");
+  const [otp, setOtp] = useState<string[]>(initial.otp ?? ["", "", "", "", "", ""]);
+  const [pin, setPin] = useState<string[]>(initial.pin ?? ["", "", "", ""]);
+  const [confirmPin, setConfirmPin] = useState<string[]>(initial.confirmPin ?? ["", "", "", ""]);
   const [pinError, setPinError] = useState("");
   const [shakeError, setShakeError] = useState(false);
-  const [otpTimer, setOtpTimer] = useState(60);
+  const [otpTimer, setOtpTimer] = useState(initial.otpTimer ?? 60);
+
+  // Persist on every relevant change
+  useEffect(() => {
+    try {
+      const payload: PersistedAuth = {
+        step, phone, otp, pin, confirmPin, otpTimer, savedAt: Date.now(),
+      };
+      localStorage.setItem(AUTH_STATE_KEY, JSON.stringify(payload));
+    } catch {}
+  }, [step, phone, otp, pin, confirmPin, otpTimer]);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const pinRefs = useRef<(HTMLInputElement | null)[]>([]);
   const confirmPinRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -351,14 +390,14 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
 
             <div className="w-full space-y-3 mt-auto pb-10">
               <button
-                onClick={onComplete}
+                onClick={() => { try { localStorage.removeItem(AUTH_STATE_KEY); } catch {} onComplete(); }}
                 className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
               >
                 Enable Biometrics
                 <Fingerprint className="w-5 h-5" />
               </button>
               <button
-                onClick={onComplete}
+                onClick={() => { try { localStorage.removeItem(AUTH_STATE_KEY); } catch {} onComplete(); }}
                 className="w-full py-3 rounded-2xl text-sm font-medium text-muted-foreground"
               >
                 Maybe Later
