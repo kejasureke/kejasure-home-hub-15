@@ -230,14 +230,13 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
                         <span className="text-muted-foreground">{fmtKES(property.price)} × {nights} night{nights !== 1 ? "s" : ""}</span>
                         <span className="font-medium">{fmtKES(subtotal)}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Cleaning fee</span>
-                        <span className="font-medium">{fmtKES(cleaningFee)}</span>
-                      </div>
                       <div className="flex justify-between pt-2 border-t border-primary/20">
-                        <span className="font-bold">Total</span>
+                        <span className="font-bold">Estimated cost</span>
                         <span className="font-bold text-primary">{fmtKES(total)}</span>
                       </div>
+                      <p className="text-[10px] text-muted-foreground pt-1 leading-relaxed">
+                        Final price agreed directly with the host. KejaSure does not collect rent or deposits.
+                      </p>
                     </div>
                   )}
                 </>
