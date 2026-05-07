@@ -122,7 +122,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   const isConfirmFilled = confirmPin.every((d) => d !== "");
 
   const handlePhoneSubmit = () => {
-    setOtpTimer(60);
+    setOtpExpiresAt(Date.now() + OTP_DURATION * 1000);
     setStep("otp");
   };
 
