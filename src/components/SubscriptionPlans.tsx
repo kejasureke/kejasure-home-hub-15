@@ -62,7 +62,7 @@ const landlordPlans = [
     duration: "/month",
     badge: "Individual",
     features: ["15 active listings", "Residential + ✨ Commercial premises", "✨ Corporate stays (NGO/expat)", "Full owner analytics", "2 monthly boosts", "Verified owner badge"],
-    notIncluded: ["Multi-agent team", "Full agency CRM", "API access", "White label"],
+    notIncluded: ["Multi-agent team", "Full agency CRM", "White label"],
     current: false,
   },
 ];
