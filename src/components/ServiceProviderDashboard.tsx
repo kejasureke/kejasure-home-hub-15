@@ -1260,6 +1260,61 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {selectedBooking && (
+        <div className="fixed inset-0 z-[70] bg-black/60 flex items-end animate-fade-in" onClick={() => setSelectedBooking(null)}>
+          <div className="w-full bg-card rounded-t-3xl p-5 animate-slide-up max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-1 bg-muted rounded-full mx-auto mb-4" />
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">Booking Details</h3>
+              <button onClick={() => setSelectedBooking(null)} className="p-1.5 rounded-full bg-secondary">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-lg">👤</div>
+                <div>
+                  <p className="text-sm font-bold">{selectedBooking.client}</p>
+                  <p className="text-xs text-muted-foreground">{selectedBooking.service}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-3 rounded-xl bg-secondary/50">
+                  <p className="text-[10px] text-muted-foreground uppercase mb-1">Date</p>
+                  <p className="text-xs font-semibold">{selectedBooking.date}</p>
+                </div>
+                <div className="p-3 rounded-xl bg-secondary/50">
+                  <p className="text-[10px] text-muted-foreground uppercase mb-1">Amount</p>
+                  <p className="text-xs font-bold text-primary">{selectedBooking.amount}</p>
+                </div>
+                <div className="p-3 rounded-xl bg-secondary/50 col-span-2">
+                  <p className="text-[10px] text-muted-foreground uppercase mb-1">Status</p>
+                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                    selectedBooking.status === "confirmed" ? "bg-trust/10 text-trust" : "bg-accent/10 text-accent-foreground"
+                  }`}>{selectedBooking.status}</span>
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-accent/5 border border-accent/20">
+                <p className="text-[11px] text-muted-foreground">
+                  <span className="font-semibold text-foreground">Reminder:</span> Confirm scope and arrange payment directly with the client. KejaSure does not handle service payments.
+                </p>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent("open-service-chat", { detail: { name: selectedBooking.client, avatar: "👤" } }));
+                    setSelectedBooking(null);
+                  }}
+                  className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold active:scale-[0.98]"
+                >
+                  <MessageCircle className="w-4 h-4 inline mr-1.5" /> Chat Client
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
