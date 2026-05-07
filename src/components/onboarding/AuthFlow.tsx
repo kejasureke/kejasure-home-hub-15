@@ -144,30 +144,37 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     if (sending) return;
     setSending(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: toE164(phone),
-        options: { channel: "sms" },
+      const { data, error } = await supabase.functions.invoke("otp-send", {
+        body: { phone: toE164(phone) },
       });
+
+      // FunctionsHttpError exposes the response so we can read structured 429 payloads
       if (error) {
-        const retry = parseRetryAfter(error.message);
+        let payload: any = null;
+        try {
+          // @ts-expect-error - context.response exists on FunctionsHttpError
+          payload = await error.context?.response?.json?.();
+        } catch {}
+        const retry = payload?.retryAfter ?? parseRetryAfter(payload?.error ?? error.message);
         if (retry) {
-          // Server says we must wait — reflect that exact cooldown
           setOtpExpiresAt(Date.now() + retry * 1000);
           if (!isResend) setStep("otp");
           toast({
             title: "Please wait",
-            description: `You can request a new code in ${retry}s.`,
+            description: payload?.error ?? `You can request a new code in ${retry}s.`,
           });
         } else {
           toast({
             title: "Couldn't send code",
-            description: error.message,
+            description: payload?.error ?? error.message,
             variant: "destructive",
           });
         }
         return;
       }
-      setOtpExpiresAt(Date.now() + OTP_DURATION * 1000);
+
+      const cooldown = (data as any)?.cooldownSeconds ?? OTP_DURATION;
+      setOtpExpiresAt(Date.now() + cooldown * 1000);
       if (!isResend) setStep("otp");
       if (isResend) toast({ title: "New code sent" });
     } catch (e: any) {
