@@ -378,7 +378,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
                 {isShortStay ? (
                   <>
                     <div className="flex justify-between"><span className="text-muted-foreground">Stay</span><span className="font-medium">{nights} night{nights !== 1 ? "s" : ""}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Total</span><span className="font-bold text-primary">{fmtKES(total)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Est. cost</span><span className="font-bold text-primary">{fmtKES(total)}</span></div>
                   </>
                 ) : (
                   <>
