@@ -152,8 +152,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
       if (error) {
         let payload: any = null;
         try {
-          // @ts-expect-error - context.response exists on FunctionsHttpError
-          payload = await error.context?.response?.json?.();
+          payload = await (error as any).context?.response?.json?.();
         } catch {}
         const retry = payload?.retryAfter ?? parseRetryAfter(payload?.error ?? error.message);
         if (retry) {
