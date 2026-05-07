@@ -7,7 +7,7 @@ import AIPhotoVerification from "./AIPhotoVerification";
 import { kenyaCounties } from "@/data/kenyaCounties";
 import { validateCaption } from "@/utils/captionSafety";
 
-type ListingType = "rental" | "shortstay" | "service" | "commercial";
+type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
 
 interface ListingCRUDProps {
   type: ListingType;
@@ -18,8 +18,11 @@ interface ListingCRUDProps {
 interface ListingFormData {
   title: string;
   description: string;
-  type: "rental" | "shortstay" | "commercial" | "service";
+  type: "rental" | "shortstay" | "commercial" | "service" | "corporate";
   commercialType: string;
+  rentalType: string;
+  stayType: string;
+  corporateType: string;
   price: string;
   priceUnit: string;
   bedrooms: number;
@@ -49,10 +52,63 @@ const commercialTypes = [
   { value: "office", label: "🏢 Office", desc: "Office suite, co-working" },
   { value: "godown", label: "🏭 Godown/Warehouse", desc: "Storage, distribution" },
   { value: "showroom", label: "🏬 Showroom", desc: "Display, gallery space" },
+  { value: "clinic", label: "🏥 Clinic/Medical", desc: "Health & medical use" },
+  { value: "hotel", label: "🏨 Hotel/Lodge", desc: "Hospitality premises" },
+  { value: "restaurant", label: "🍽️ Restaurant", desc: "Eatery, café, kitchen" },
+  { value: "salon", label: "💇 Salon/Barber", desc: "Beauty & grooming" },
+  { value: "pharmacy", label: "💊 Pharmacy", desc: "Chemist, drug store" },
+  { value: "gym", label: "🏋️ Gym/Fitness", desc: "Fitness centre, studio" },
+  { value: "school", label: "🏫 School/Academy", desc: "Education, training" },
+  { value: "church", label: "⛪ Church/Worship", desc: "Place of worship" },
+  { value: "petrol_station", label: "⛽ Petrol Station", desc: "Fuel & service station" },
+  { value: "bar", label: "🍺 Bar/Pub", desc: "Licensed premises" },
+  { value: "club", label: "🎵 Club/Lounge", desc: "Entertainment venue" },
+  { value: "supermarket", label: "🛒 Supermarket", desc: "Mini-mart, grocery" },
+  { value: "hardware", label: "🔧 Hardware Store", desc: "Building & tools" },
+  { value: "garage", label: "🔩 Garage/Workshop", desc: "Mechanic, body shop" },
+  { value: "studio", label: "🎨 Studio Space", desc: "Creative, photo, art" },
+  { value: "coworking", label: "💻 Co-Working", desc: "Shared workspace" },
+];
+
+const rentalTypes = [
+  { value: "bedsitter", label: "🛏️ Bedsitter", desc: "Single-room with kitchenette" },
+  { value: "studio", label: "🏙️ Studio", desc: "Open-plan unit" },
+  { value: "1br", label: "🛋️ 1 Bedroom", desc: "Compact apartment" },
+  { value: "2br", label: "🛏️ 2 Bedroom", desc: "Family-sized apartment" },
+  { value: "3br", label: "🏡 3 Bedroom", desc: "Spacious apartment" },
+  { value: "4br+", label: "🏘️ 4+ Bedroom", desc: "Large apartment / penthouse" },
+  { value: "maisonette", label: "🏠 Maisonette", desc: "Two-storey home" },
+  { value: "bungalow", label: "🏚️ Bungalow", desc: "Single-storey home" },
+  { value: "townhouse", label: "🏘️ Townhouse", desc: "Row house in estate" },
+  { value: "villa", label: "🏛️ Villa", desc: "Luxury standalone home" },
+  { value: "penthouse", label: "🌆 Penthouse", desc: "Top-floor luxury unit" },
+  { value: "servant_quarter", label: "🚪 DSQ", desc: "Detached servant quarter" },
+  { value: "shared_room", label: "👥 Shared Room", desc: "Roommate / hostel" },
+];
+
+const stayTypes = [
+  { value: "entire_apt", label: "🏢 Entire Apartment", desc: "Whole unit, private" },
+  { value: "entire_house", label: "🏡 Entire House", desc: "Whole home, private" },
+  { value: "private_room", label: "🚪 Private Room", desc: "Room in shared home" },
+  { value: "shared_room", label: "👥 Shared Room", desc: "Hostel-style" },
+  { value: "villa", label: "🏛️ Villa", desc: "Luxury vacation villa" },
+  { value: "cottage", label: "🛖 Cottage", desc: "Cosy getaway home" },
+  { value: "beach_house", label: "🏖️ Beach House", desc: "Coastal stay" },
+  { value: "safari_lodge", label: "🦁 Safari Lodge", desc: "Wildlife / tented camp" },
+  { value: "studio_stay", label: "🌙 Studio Stay", desc: "Compact short-term unit" },
+  { value: "guesthouse", label: "🏨 Guesthouse", desc: "B&B style" },
+];
+
+const corporateTypes = [
+  { value: "serviced_apt", label: "🏢 Serviced Apartment", desc: "Housekeeping included" },
+  { value: "executive_villa", label: "🏛️ Executive Villa", desc: "Diplomat / C-suite" },
+  { value: "expat_townhouse", label: "🏘️ Expat Townhouse", desc: "Gated community" },
+  { value: "ngo_housing", label: "🌍 NGO/Diplomat Housing", desc: "Long-stay missions" },
+  { value: "relocation", label: "✈️ Relocation Package", desc: "Furnished + utilities" },
 ];
 
 const defaultForm: ListingFormData = {
-  title: "", description: "", type: "rental", commercialType: "", price: "", priceUnit: "/mo",
+  title: "", description: "", type: "rental", commercialType: "", rentalType: "", stayType: "", corporateType: "", price: "", priceUnit: "/mo",
   bedrooms: 1, bathrooms: 1, county: "", subcounty: "", estate: "",
   amenities: [], photos: [], videoUrl: "", furnished: false, petFriendly: false,
   deposit: "", moveInDate: "", size: "", sizeSqft: "", floor: "", featured: false, boostDays: 0,
