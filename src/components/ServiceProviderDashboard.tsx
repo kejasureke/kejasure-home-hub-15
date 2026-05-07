@@ -528,7 +528,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                       <MessageCircle className="w-3 h-3 inline mr-1" /> Chat
                     </button>
                     <button
-                      onClick={() => setTab("bookings")}
+                      onClick={() => setSelectedBooking(b)}
                       className="flex-1 py-2 rounded-lg bg-secondary text-foreground text-xs font-semibold active:scale-[0.98] transition-transform"
                     >
                       View Details
