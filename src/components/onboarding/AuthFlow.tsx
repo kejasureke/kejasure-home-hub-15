@@ -225,8 +225,9 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
         const retry = payload?.retryAfter;
         const remaining = payload?.remainingAttempts;
         if (retry) {
+          setLockoutExpiresAt(Date.now() + retry * 1000);
           toast({
-            title: "Locked out",
+            title: "Too many attempts",
             description: payload?.error ?? `Try again in ${retry}s.`,
             variant: "destructive",
           });
