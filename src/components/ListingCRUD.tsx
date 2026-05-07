@@ -608,45 +608,69 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
             {type !== "service" && (
               <div>
                 <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Listing Type</label>
-                <div className="flex gap-2">
-                  {(["rental", "shortstay", "commercial"] as const).map((t) => (
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { v: "rental", label: "🏠 Long-term Rental" },
+                    { v: "shortstay", label: "🌙 Short Stay" },
+                    { v: "commercial", label: "🏢 Commercial / Business" },
+                    { v: "corporate", label: "💼 Corporate / Expat" },
+                  ] as const).map((t) => (
                     <button
-                      key={t}
-                      onClick={() => update({ type: t, priceUnit: t === "shortstay" ? "/night" : "/mo", amenities: [] })}
-                      className={`flex-1 py-3 rounded-xl text-xs font-semibold transition-all ${
-                        form.type === t
+                      key={t.v}
+                      onClick={() => update({
+                        type: t.v as ListingFormData["type"],
+                        priceUnit: t.v === "shortstay" ? "/night" : "/mo",
+                        amenities: [],
+                        commercialType: "", rentalType: "", stayType: "", corporateType: "",
+                      })}
+                      className={`py-3 px-3 rounded-xl text-xs font-semibold transition-all text-left ${
+                        form.type === t.v
                           ? "bg-primary text-primary-foreground"
                           : "bg-card card-shadow text-foreground"
                       }`}
                     >
-                      {t === "rental" ? "🏠 Rental" : t === "shortstay" ? "🌙 Short Stay" : "🏢 Commercial"}
+                      {t.label}
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
-            {form.type === "commercial" && (
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Commercial Type</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {commercialTypes.map((ct) => (
-                    <button
-                      key={ct.value}
-                      onClick={() => update({ commercialType: ct.value })}
-                      className={`py-3 px-3 rounded-xl text-left transition-all ${
-                        form.commercialType === ct.value
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-card card-shadow text-foreground"
-                      }`}
-                    >
-                      <p className="text-sm font-semibold">{ct.label}</p>
-                      <p className={`text-[10px] mt-0.5 ${form.commercialType === ct.value ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{ct.desc}</p>
-                    </button>
-                  ))}
+            {/* Subcategory pickers per listing type */}
+            {(() => {
+              const cfg =
+                form.type === "commercial"
+                  ? { label: "Commercial Type", list: commercialTypes, key: "commercialType" as const, value: form.commercialType }
+                  : form.type === "rental"
+                  ? { label: "Rental Type", list: rentalTypes, key: "rentalType" as const, value: form.rentalType }
+                  : form.type === "shortstay"
+                  ? { label: "Stay Type", list: stayTypes, key: "stayType" as const, value: form.stayType }
+                  : form.type === "corporate"
+                  ? { label: "Corporate Type", list: corporateTypes, key: "corporateType" as const, value: form.corporateType }
+                  : null;
+              if (!cfg || type === "service") return null;
+              return (
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">{cfg.label}</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {cfg.list.map((ct) => (
+                      <button
+                        key={ct.value}
+                        onClick={() => update({ [cfg.key]: ct.value } as Partial<ListingFormData>)}
+                        className={`py-3 px-3 rounded-xl text-left transition-all ${
+                          cfg.value === ct.value
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-card card-shadow text-foreground"
+                        }`}
+                      >
+                        <p className="text-sm font-semibold">{ct.label}</p>
+                        <p className={`text-[10px] mt-0.5 ${cfg.value === ct.value ? "text-primary-foreground/70" : "text-muted-foreground"}`}>{ct.desc}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             <div>
               <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Title</label>
