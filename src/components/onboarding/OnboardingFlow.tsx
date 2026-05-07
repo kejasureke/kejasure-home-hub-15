@@ -3,8 +3,9 @@ import WelcomeScreens from "./WelcomeScreens";
 import RoleSelection, { type UserRole } from "./RoleSelection";
 import AuthFlow from "./AuthFlow";
 import ProfileSetup from "./ProfileSetup";
+import AppTour from "./AppTour";
 
-type OnboardingStep = "welcome" | "role" | "auth" | "profile";
+type OnboardingStep = "welcome" | "role" | "auth" | "profile" | "tour";
 
 const ONBOARDING_KEY = "kejasure_onboarded";
 const PROGRESS_KEY = "kejasure_onboarding_progress";
@@ -29,7 +30,7 @@ const loadProgress = (): Progress => {
     const raw = localStorage.getItem(PROGRESS_KEY);
     if (raw) {
       const p = JSON.parse(raw) as Partial<Progress>;
-      const validSteps: OnboardingStep[] = ["welcome", "role", "auth", "profile"];
+      const validSteps: OnboardingStep[] = ["welcome", "role", "auth", "profile", "tour"];
       if (p.step && validSteps.includes(p.step)) {
         return {
           step: p.step,
@@ -100,8 +101,10 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
       );
     case "profile":
       return role ? (
-        <ProfileSetup role={role} onComplete={finish} onBack={() => setStep("auth")} />
+        <ProfileSetup role={role} onComplete={() => setStep("tour")} onBack={() => setStep("auth")} />
       ) : null;
+    case "tour":
+      return <AppTour onFinish={finish} />;
     default:
       return null;
   }
