@@ -14,13 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      otp_attempts: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string
+          phone: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip: string
+          phone: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string
+          phone?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      purge_old_otp_attempts: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
