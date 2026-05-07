@@ -56,9 +56,8 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
     const ms = new Date(checkOut).getTime() - new Date(selectedDate).getTime();
     return Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
   }, [isShortStay, selectedDate, checkOut]);
-  const cleaningFee = isShortStay ? 1500 : 0;
   const subtotal = isShortStay ? property.price * nights : 0;
-  const total = subtotal + cleaningFee;
+  const total = subtotal;
 
   const canProceed = isShortStay
     ? !!selectedDate && !!checkOut && nights > 0 && guests > 0
