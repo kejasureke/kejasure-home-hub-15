@@ -193,19 +193,44 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     if (verifying) return;
     setVerifying(true);
     try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: toE164(phone),
-        token: otp.join(""),
-        type: "sms",
+      const { data, error } = await supabase.functions.invoke("otp-verify", {
+        body: { phone: toE164(phone), token: otp.join("") },
       });
+
       if (error) {
-        toast({
-          title: "Invalid code",
-          description: error.message,
-          variant: "destructive",
-        });
+        let payload: any = null;
+        try {
+          payload = await (error as any).context?.response?.json?.();
+        } catch {}
+        const retry = payload?.retryAfter;
+        const remaining = payload?.remainingAttempts;
+        if (retry) {
+          toast({
+            title: "Locked out",
+            description: payload?.error ?? `Try again in ${retry}s.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Invalid code",
+            description:
+              (payload?.error ?? error.message) +
+              (typeof remaining === "number" ? ` (${remaining} attempts left)` : ""),
+            variant: "destructive",
+          });
+        }
         return;
       }
+
+      // Establish the auth session locally
+      const session = (data as any)?.session;
+      if (session?.access_token && session?.refresh_token) {
+        await supabase.auth.setSession({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        });
+      }
+
       setStep("pin");
     } finally {
       setVerifying(false);

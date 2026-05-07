@@ -35,12 +35,37 @@ export type Database = {
         }
         Relationships: []
       }
+      otp_verify_attempts: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string
+          phone: string
+          success: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip: string
+          phone: string
+          success?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string
+          phone?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       purge_old_otp_attempts: { Args: never; Returns: undefined }
+      purge_old_otp_verify_attempts: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
