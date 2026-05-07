@@ -160,7 +160,7 @@ const serviceProviderPlans = [
     price: 5000,
     duration: "/month",
     badge: "Business",
-    features: ["Unlimited listings", "Unlimited team", "Full CRM", "County analytics", "Featured profile", "Priority support", "API access"],
+    features: ["Unlimited listings", "Unlimited team", "Full CRM", "County analytics", "Featured profile", "Priority support"],
     notIncluded: [],
     current: false,
   },
