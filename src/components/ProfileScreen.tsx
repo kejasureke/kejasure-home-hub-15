@@ -1,4 +1,6 @@
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw, Calendar } from "lucide-react";
+import MyBookingsScreen from "./MyBookingsScreen";
+import { useBookings } from "@/hooks/useBookings";
 import VerificationBadge from "./VerificationBadge";
 import { useKYCStatus } from "@/hooks/useKYCStatus";
 import { useState } from "react";
@@ -47,11 +49,15 @@ const ProfileScreen = () => {
   const [showSubscription, setShowSubscription] = useState(false);
   const [showNeighborhood, setShowNeighborhood] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
+  const [showMyBookings, setShowMyBookings] = useState(false);
   const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound, dismissAlert, restoreAlert } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();
+  const { counts: bookingCounts } = useBookings();
 
   const { isVerified } = useKYCStatus(role);
+
+  if (showMyBookings) return <MyBookingsScreen onBack={() => setShowMyBookings(false)} />;
 
   if (showDashboard) return <DashboardScreen onBack={() => setShowDashboard(false)} />;
   if (showAgency) return <AgencyDashboard onBack={() => setShowAgency(false)} />;
@@ -105,7 +111,16 @@ const ProfileScreen = () => {
   const dashboardItem = getDashboardItem();
   const showBoostOption = !isTenant;
 
+  const bookingsActiveCount = bookingCounts.pending + bookingCounts.accepted;
   const menuItems = [
+    {
+      icon: Calendar,
+      label: "My Bookings",
+      subtitle: bookingsActiveCount > 0
+        ? `${bookingCounts.pending} pending · ${bookingCounts.accepted} accepted`
+        : "Track viewings and stays",
+      action: () => setShowMyBookings(true),
+    },
     ...(!isTenant ? [{ icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action }] : []),
     { icon: Crown, label: "Subscription Plans", subtitle: "Manage your plan", action: () => setShowSubscription(true) },
     ...(!isTenant ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
