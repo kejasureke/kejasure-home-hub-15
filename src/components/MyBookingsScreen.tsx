@@ -35,7 +35,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
   const { bookings, counts, cancelBooking, updateBooking } = useBookings();
   const [tab, setTab] = useState<BookingStatus | "all">("pending");
   const [actionFor, setActionFor] = useState<Booking | null>(null);
-  const [payFor, setPayFor] = useState<Booking | null>(null);
+  
 
   const filtered = useMemo(() => {
     if (tab === "all") return bookings;
