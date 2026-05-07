@@ -224,6 +224,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   }, [portfolioItems]);
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<typeof bookings[number] | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
 
   const portfolioCategories = useMemo(
