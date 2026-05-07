@@ -444,7 +444,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
                 onClick={onClose}
                 className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
               >
-                {isShortStay ? "Done — pay deposit from My Bookings" : "Done"}
+                Done
               </button>
             </div>
           )}
