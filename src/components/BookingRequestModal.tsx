@@ -347,7 +347,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
 
               <div className="p-3 rounded-xl bg-accent/5 border border-accent/20">
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  <span className="font-semibold text-accent-foreground">How it works:</span> Your request will be sent to the landlord. Once they accept, their contact details (phone & chat) will be shared with you{isShortStay ? " and you can pay the deposit via M-Pesa" : ""}.
+                  <span className="font-semibold text-accent-foreground">How it works:</span> Your request is sent to the landlord. Once they accept, their contact details (phone & chat) are shared so you can arrange viewing or check-in directly. KejaSure does not handle rent or deposits — never pay before viewing.
                 </p>
               </div>
 
