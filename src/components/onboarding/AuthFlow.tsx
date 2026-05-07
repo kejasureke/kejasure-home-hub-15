@@ -89,6 +89,24 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [otpExpiresAt]);
 
+  // Lockout countdown — ticks down a fixed expiry from server retryAfter
+  useEffect(() => {
+    if (!lockoutExpiresAt) {
+      setLockoutTimer(0);
+      return;
+    }
+    setLockoutTimer(computeRemaining(lockoutExpiresAt));
+    const t = setInterval(() => {
+      const remaining = computeRemaining(lockoutExpiresAt);
+      setLockoutTimer(remaining);
+      if (remaining <= 0) {
+        clearInterval(t);
+        setLockoutExpiresAt(null);
+      }
+    }, 1000);
+    return () => clearInterval(t);
+  }, [lockoutExpiresAt]);
+
 
   const handleCodeInput = (
     value: string,
