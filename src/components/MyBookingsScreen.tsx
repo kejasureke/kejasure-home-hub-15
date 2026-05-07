@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
-import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, CreditCard, X, Calendar, MoreVertical } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, ShieldAlert, Calendar, MoreVertical } from "lucide-react";
 import { useBookings, type BookingStatus, type Booking } from "@/hooks/useBookings";
-import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface MyBookingsScreenProps {
   onBack: () => void;
