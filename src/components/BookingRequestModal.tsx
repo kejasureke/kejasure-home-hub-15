@@ -318,7 +318,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
                         <span className="font-medium">{guests}</span>
                       </div>
                       <div className="flex justify-between pt-2 border-t border-trust/10">
-                        <span className="font-semibold">Total</span>
+                        <span className="font-semibold">Estimated cost</span>
                         <span className="font-bold text-primary">{fmtKES(total)}</span>
                       </div>
                     </>
