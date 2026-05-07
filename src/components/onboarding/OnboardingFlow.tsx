@@ -3,8 +3,9 @@ import WelcomeScreens from "./WelcomeScreens";
 import RoleSelection, { type UserRole } from "./RoleSelection";
 import AuthFlow from "./AuthFlow";
 import ProfileSetup from "./ProfileSetup";
+import AppTour from "./AppTour";
 
-type OnboardingStep = "welcome" | "role" | "auth" | "profile";
+type OnboardingStep = "welcome" | "role" | "auth" | "profile" | "tour";
 
 const ONBOARDING_KEY = "kejasure_onboarded";
 const PROGRESS_KEY = "kejasure_onboarding_progress";
