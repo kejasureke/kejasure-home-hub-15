@@ -56,64 +56,8 @@ Deno.serve(async (req) => {
     auth: { persistSession: false },
   });
 
-  const now = Date.now();
-  const oneHourAgo = new Date(now - 3600_000).toISOString();
-  const cooldownAgo = new Date(now - PHONE_COOLDOWN_SECONDS * 1000).toISOString();
-
-  // 1) Per-phone cooldown (most recent attempt < cooldown window)
-  const { data: lastForPhone, error: lastErr } = await supabase
-    .from("otp_attempts")
-    .select("created_at")
-    .eq("phone", phone)
-    .gte("created_at", cooldownAgo)
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  if (lastErr) {
-    console.error("phone cooldown query failed", lastErr);
-    return json({ error: "Server error" }, 500);
-  }
-  if (lastForPhone && lastForPhone.length > 0) {
-    const last = new Date(lastForPhone[0].created_at).getTime();
-    const retryAfter = Math.max(1, Math.ceil((last + PHONE_COOLDOWN_SECONDS * 1000 - now) / 1000));
-    return json({ error: "Cooldown active", retryAfter }, 429);
-  }
-
-  // 2) Per-phone hourly cap
-  const { count: phoneCount, error: phoneCountErr } = await supabase
-    .from("otp_attempts")
-    .select("id", { count: "exact", head: true })
-    .eq("phone", phone)
-    .gte("created_at", oneHourAgo);
-
-  if (phoneCountErr) {
-    console.error("phone hourly count failed", phoneCountErr);
-    return json({ error: "Server error" }, 500);
-  }
-  if ((phoneCount ?? 0) >= PHONE_HOURLY_LIMIT) {
-    return json(
-      { error: "Hourly limit reached for this number. Try again later.", retryAfter: 3600 },
-      429,
-    );
-  }
-
-  // 3) Per-IP hourly cap (cross-phone abuse)
-  const { count: ipCount, error: ipCountErr } = await supabase
-    .from("otp_attempts")
-    .select("id", { count: "exact", head: true })
-    .eq("ip", ip)
-    .gte("created_at", oneHourAgo);
-
-  if (ipCountErr) {
-    console.error("ip hourly count failed", ipCountErr);
-    return json({ error: "Server error" }, 500);
-  }
-  if ((ipCount ?? 0) >= IP_HOURLY_LIMIT) {
-    return json(
-      { error: "Too many requests from your network. Try again later.", retryAfter: 3600 },
-      429,
-    );
-  }
+  // DEMO MODE — rate limits disabled while phone provider isn't configured.
+  // (Original per-phone cooldown / hourly caps removed for UI/UX testing.)
 
   // 4) DEMO MODE — phone provider not configured. Simulate a successful send.
   // The mock OTP code is always "123456" (verified server-side in otp-verify).
