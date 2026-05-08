@@ -80,6 +80,6 @@ Deno.serve(async (req) => {
   return json({
     ok: true,
     cooldownSeconds: PHONE_COOLDOWN_SECONDS,
-    phoneRemainingThisHour: Math.max(0, PHONE_HOURLY_LIMIT - ((phoneCount ?? 0) + 1)),
+    demo: true,
   });
 });
