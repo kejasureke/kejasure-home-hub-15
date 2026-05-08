@@ -115,23 +115,9 @@ Deno.serve(async (req) => {
     );
   }
 
-  // 4) Trigger the actual SMS via Supabase Auth's Phone OTP
-  const { error: sendErr } = await supabase.auth.signInWithOtp({
-    phone,
-    options: { channel: "sms" },
-  });
-
-  if (sendErr) {
-    // Surface common provider errors plainly; do NOT log this attempt as a successful send
-    console.error("signInWithOtp failed", sendErr);
-    // If the provider itself rate-limited us, propagate as 429
-    const msg = sendErr.message ?? "Failed to send code";
-    const retryMatch = msg.match(/(\d+)\s*second/i);
-    if (retryMatch) {
-      return json({ error: msg, retryAfter: parseInt(retryMatch[1], 10) }, 429);
-    }
-    return json({ error: msg }, 502);
-  }
+  // 4) DEMO MODE — phone provider not configured. Simulate a successful send.
+  // The mock OTP code is always "123456" (verified server-side in otp-verify).
+  console.log(`[demo] Mock OTP send to ${phone} (code: 123456)`);
 
   // 5) Record the successful attempt
   const { error: insertErr } = await supabase
