@@ -123,14 +123,9 @@ Deno.serve(async (req) => {
     );
   }
 
-  // 4) Verify the code via Supabase Auth
-  const { data: verified, error: verifyErr } = await supabase.auth.verifyOtp({
-    phone,
-    token,
-    type: "sms",
-  });
-
-  const success = !verifyErr && !!verified?.session;
+  // 4) DEMO MODE — accept the mock code "123456" without a real auth session.
+  // Phone provider isn't configured; this lets the UX/UI flow proceed.
+  const success = token === "123456";
 
   // Record the attempt (best-effort)
   const { error: insertErr } = await supabase
@@ -147,17 +142,13 @@ Deno.serve(async (req) => {
     const remaining = Math.max(0, PHONE_FAIL_LIMIT - ((recentFails?.length ?? 0) + 1));
     return json(
       {
-        error: verifyErr?.message ?? "Invalid or expired code.",
+        error: "Invalid or expired code.",
         remainingAttempts: remaining,
       },
       400,
     );
   }
 
-  // Return the session so the client can call setSession()
-  return json({
-    ok: true,
-    session: verified!.session,
-    user: { id: verified!.user?.id, phone: verified!.user?.phone },
-  });
+  // No real session in demo mode — client proceeds to PIN step regardless.
+  return json({ ok: true, demo: true });
 });
