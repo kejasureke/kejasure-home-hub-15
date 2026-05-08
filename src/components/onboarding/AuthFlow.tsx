@@ -402,10 +402,15 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
                 setOtpExpiresAt(null);
                 setStep("phone");
               }}
-              className="self-start mb-6 text-xs font-semibold text-primary active:opacity-70 underline-offset-2 underline"
+              className="self-start mb-3 text-xs font-semibold text-primary active:opacity-70 underline-offset-2 underline"
             >
               Wrong number? Edit
             </button>
+            <div className="mb-6 px-3 py-2 rounded-lg bg-accent/10 border border-accent/30">
+              <p className="text-[11px] text-muted-foreground">
+                <span className="font-bold text-accent-foreground">Demo mode:</span> use code <span className="font-mono font-bold text-foreground">123456</span>
+              </p>
+            </div>
 
             <div className="flex gap-2.5 justify-center mb-6">
               {otp.map((digit, i) => (
