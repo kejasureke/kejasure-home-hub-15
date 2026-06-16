@@ -337,7 +337,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
         {/* Host / Landlord Card */}
         <HostCard property={property} />
 
-        {/* Smile ID Verified Badge */}
+        {/* smile.id Verified Badge */}
         {property.verified && (
           <div className="mb-4">
             <SmileIDBadge propertyId={property.id} imageCount={property.images?.length || 4} />
@@ -351,7 +351,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             <h3 className="text-sm font-semibold text-trust">Trust & Safety</h3>
           </div>
           <ul className="space-y-1.5 text-xs text-muted-foreground">
-            <li>✓ Landlord identity verified via Smile ID</li>
+            <li>✓ Landlord identity verified via smile.id</li>
             <li>✓ Property photos verified</li>
             <li>✓ Last active: {property.lastActive}</li>
             <li>✓ Response time: {property.landlordResponseTime}</li>

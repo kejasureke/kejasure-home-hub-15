@@ -113,7 +113,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </button>
           <div className="flex-1">
             <h1 className="text-base font-bold">Identity Verification</h1>
-            <p className="text-[10px] text-muted-foreground">Powered by Smile ID</p>
+            <p className="text-[10px] text-muted-foreground">Powered by smile.id</p>
           </div>
           <ShieldCheck className="w-5 h-5 text-primary" />
         </div>
@@ -157,7 +157,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="space-y-1.5 ml-15">
-                {["Phone number verified via OTP", "Name match to phone data", "Smile ID phone verification"].map((f) => (
+                {["Phone number verified via OTP", "Name match to phone data", "smile.id phone verification"].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <CheckCircle2 className="w-3 h-3 text-blue-600 shrink-0" />
                     <span>{f}</span>
@@ -244,8 +244,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold mb-1">Your Details</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              We'll verify your name matches the phone number registered with your mobile provider via Smile ID.
-            </p>
+              We'll verify your name matches the phone number registered with your mobile provider via smile.id.
 
             <div className="space-y-3">
               <div>
@@ -287,7 +286,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               <div className="flex items-start gap-2">
                 <Smartphone className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                 <p className="text-[11px] text-muted-foreground">
-                  Smile ID will verify that the name you provide matches the registered owner of this phone number.
+                  smile.id will verify that the name you provide matches the registered owner of this phone number.
                 </p>
               </div>
             </div>
@@ -622,7 +621,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             </div>
             <div className="mt-8 space-y-2 w-full max-w-xs">
               {(verificationCategory === "tenant"
-                ? ["Phone number verification", "Name match check", "Smile ID validation"]
+                ? ["Phone number verification", "Name match check", "smile.id validation"]
                 : ["Document quality check", "Face matching", "Database verification"]
               ).map((s, i) => (
                 <div key={s} className="flex items-center gap-2 text-xs text-muted-foreground animate-fade-in" style={{ animationDelay: `${i * 1.2}s` }}>

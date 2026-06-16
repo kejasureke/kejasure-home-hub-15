@@ -13,6 +13,9 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const AT_USERNAME = Deno.env.get("AFRICASTALKING_USERNAME") ?? Deno.env.get("AT_USERNAME");
+const AT_API_KEY = Deno.env.get("AFRICASTALKING_API_KEY") ?? Deno.env.get("AT_API_KEY");
+const OTP_EXPIRY_SECONDS = 5 * 60;
 
 // Limits (tweak here)
 const PHONE_COOLDOWN_SECONDS = 60;
@@ -35,6 +38,41 @@ const json = (body: unknown, status = 200) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+const sendSmsViaAfricastalking = async (phone: string, message: string) => {
+  if (!AT_USERNAME || !AT_API_KEY) {
+    return { ok: false, error: "Africa's Talking credentials are not configured." };
+  }
+
+  const params = new URLSearchParams({
+    username: AT_USERNAME,
+    to: phone,
+    message,
+  });
+
+  const response = await fetch("https://api.africastalking.com/version1/messaging", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      apiKey: AT_API_KEY,
+    },
+    body: params.toString(),
+  });
+
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) {
+    return { ok: false, error: payload?.errorMessage || "Africa's Talking sms request failed." };
+  }
+
+  const recipients = payload?.SMSMessageData?.Recipients;
+  if (!Array.isArray(recipients) || recipients.some((r: any) => r.status !== "Success")) {
+    return { ok: false, error: "SMS delivery failed." };
+  }
+
+  return { ok: true, payload };
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -56,30 +94,43 @@ Deno.serve(async (req) => {
     auth: { persistSession: false },
   });
 
-  // DEMO MODE — rate limits disabled while phone provider isn't configured.
-  // (Original per-phone cooldown / hourly caps removed for UI/UX testing.)
+  const code = AT_USERNAME && AT_API_KEY ? generateOtp() : "123456";
+  const expiresAt = new Date(Date.now() + OTP_EXPIRY_SECONDS * 1000).toISOString();
+  const { error: codeInsertErr } = await supabase
+    .from("otp_codes")
+    .insert({ phone, code, expires_at: expiresAt });
+  if (codeInsertErr) {
+    console.error("failed to record otp code", codeInsertErr);
+  }
 
-  // 4) DEMO MODE — phone provider not configured. Simulate a successful send.
-  // The mock OTP code is always "123456" (verified server-side in otp-verify).
-  console.log(`[demo] Mock OTP send to ${phone} (code: 123456)`);
+  let smsSent = false;
+  let smsError: string | null = null;
 
-  // 5) Record the successful attempt
+  if (AT_USERNAME && AT_API_KEY) {
+    const sendResult = await sendSmsViaAfricastalking(phone, `Your KejaSure verification code is ${code}.`);
+    smsSent = sendResult.ok;
+    smsError = sendResult.ok ? null : sendResult.error;
+  }
+
   const { error: insertErr } = await supabase
     .from("otp_attempts")
     .insert({ phone, ip });
   if (insertErr) {
-    // Logged but not fatal — code already sent
     console.error("failed to record attempt", insertErr);
   }
 
-  // Best-effort housekeeping (fire and forget)
   supabase.rpc("purge_old_otp_attempts").then(({ error }) => {
     if (error) console.error("purge failed", error);
   });
 
+  if (AT_USERNAME && AT_API_KEY && !smsSent) {
+    console.error("Africa's Talking SMS failed", smsError);
+    return json({ error: "Failed to send SMS. Please try again later." }, 500);
+  }
+
   return json({
     ok: true,
     cooldownSeconds: PHONE_COOLDOWN_SECONDS,
-    demo: true,
+    demo: !smsSent,
   });
 });

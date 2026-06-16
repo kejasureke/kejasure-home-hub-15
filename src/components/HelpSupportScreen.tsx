@@ -21,7 +21,7 @@ const faqs = [
   { q: "What subscription plans are available?", a: "Tenants can choose KES 50 (24 hours), KES 100 (3 days) or KES 250 (7 days). Landlords, agencies, stay hosts and service providers have their own monthly plans with listing limits and boost credits." },
 
   // Verification & trust
-  { q: "How does identity verification (KYC) work?", a: "Go to Profile → Verification. Tier 1 is phone (OTP), Tier 2 is National ID + selfie via Smile ID, and Tier 3 is Business verification (KRA PIN + business permit) for agencies and providers. Most checks complete in under a minute." },
+  { q: "How does identity verification (KYC) work?", a: "Go to Profile → Verification. Tier 1 is phone (OTP), Tier 2 is National ID + selfie via smile.id, and Tier 3 is Business verification (KRA PIN + business permit) for agencies and providers. Most checks complete in under a minute." },
   { q: "What do the verification badges mean?", a: "Blue = Phone Verified (Tenant), Green = ID Verified (Individual landlord/host), and Gold = Business Verified (Agency or registered service provider). Always look for at least a green badge before booking." },
   { q: "How do I spot a scam listing?", a: "Each listing shows a Scam Risk score based on verification, pricing and host activity. Avoid listings with 'Unverified' badges, prices far below market, or hosts pushing you to pay outside the app. Never send rent or deposit via M-Pesa to an individual." },
 

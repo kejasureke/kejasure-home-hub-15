@@ -38,7 +38,7 @@ const SmileIDBadge = ({ compact = false, propertyId, imageCount = 4 }: { compact
           className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/8 border border-primary/15 active:scale-95 transition-transform"
         >
           <SmileIDLogo className="w-3 h-3 text-primary" />
-          <span className="text-[9px] font-semibold text-primary">Photos Verified by Smile ID</span>
+          <span className="text-[9px] font-semibold text-primary">Photos Verified by smile.id</span>
         </button>
       ) : (
         <button
@@ -50,7 +50,7 @@ const SmileIDBadge = ({ compact = false, propertyId, imageCount = 4 }: { compact
               <SmileIDLogo className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="text-xs font-bold text-primary">Photos Verified by Smile ID</p>
+              <p className="text-xs font-bold text-primary">Photos Verified by smile.id</p>
               <p className="text-[10px] text-muted-foreground">Tap to view verification details</p>
             </div>
             <ChevronRight className="w-4 h-4 text-primary shrink-0" />
@@ -69,7 +69,7 @@ const SmileIDBadge = ({ compact = false, propertyId, imageCount = 4 }: { compact
                 <SmileIDLogo className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <h3 className="text-base font-bold">Smile ID Verification</h3>
+                <h3 className="text-base font-bold">smile.id Verification</h3>
                 <p className="text-[10px] text-muted-foreground">Photo & identity verification report</p>
               </div>
             </div>
@@ -114,13 +114,13 @@ const SmileIDBadge = ({ compact = false, propertyId, imageCount = 4 }: { compact
                 </div>
                 <div>
                   <p className="text-muted-foreground">Provider</p>
-                  <p className="font-semibold">Smile Identity</p>
+                  <p className="font-semibold">smile.id</p>
                 </div>
               </div>
             </div>
 
             <p className="text-[9px] text-center text-muted-foreground">
-              Powered by Smile ID · Africa's leading identity verification
+              Powered by smile.id · Africa's leading identity verification
             </p>
 
             <button

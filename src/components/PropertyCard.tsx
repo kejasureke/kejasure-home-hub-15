@@ -193,7 +193,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
           )}
         </div>
 
-        {/* Smile ID badge */}
+        {/* smile.id badge */}
         {property.verified && (
           <SmileIDBadge compact propertyId={property.id} imageCount={property.images?.length || 4} />
         )}

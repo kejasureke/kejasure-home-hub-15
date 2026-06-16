@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, Crown, Check, ShieldCheck, Zap, Star, MapPin, Phone, MessageCircle, BarChart3, Bell, Heart, SlidersHorizontal, TrendingUp, Sparkles, Receipt, Clock } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
+import { toast } from "@/hooks/use-toast";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface SubscriptionPlansProps {
@@ -183,6 +184,39 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
   const [selectedPlan, setSelectedPlan] = useState(() => plans.findIndex(p => p.popular) ?? 1);
   const [showPayment, setShowPayment] = useState(false);
 
+  const handleSubscriptionSuccess = async (plan: { name: string; price: number; duration: string }, transactionId: string) => {
+    try {
+      await import("@/integrations/supabase/actions").then(async ({ createSubscription, recordPayment }) => {
+        await createSubscription({
+          plan_id: null,
+          plan_name: plan.name,
+          role: role as any,
+          price: plan.price,
+          duration: plan.duration || "",
+          auto_renew: false,
+          currency: "KES",
+          metadata: { transaction_id: transactionId, category: `${label} Subscription` },
+        });
+        await recordPayment({
+          subscription_id: null,
+          amount: plan.price,
+          currency: "KES",
+          method: "M-Pesa",
+          status: "completed",
+          transaction_id: transactionId,
+          metadata: { plan: plan.name, category: `${label} Subscription` },
+        });
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Subscription saved locally",
+        description: "Payment succeeded, but saving the subscription to the server failed.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const mpesaPlans = plans.filter(p => p.price > 0).map(p => ({
     name: p.name,
     price: p.price,
@@ -198,6 +232,7 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
         selectedPlanIndex={Math.max(0, selectedPlan - (plans[0].price === 0 ? 1 : 0))}
         category={`${label} Subscription`}
         onClose={() => setShowPayment(false)}
+        onSuccess={handleSubscriptionSuccess}
       />
     );
   }

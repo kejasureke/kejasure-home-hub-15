@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ArrowLeft, MapPin, Wallet, Bed, ChevronRight, Home, Sparkles, User, FileText, AlertCircle } from "lucide-react";
 import type { UserRole } from "./RoleSelection";
+import { toast } from "@/hooks/use-toast";
+import { upsertProfile } from "@/integrations/supabase/actions";
 
 interface ProfileSetupProps {
   role: UserRole;
@@ -26,7 +28,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
     {
       icon: User,
       title: "What's your name?",
-      subtitle: "Used for phone verification via Smile ID",
+      subtitle: "Used for phone verification via smile.id",
       content: (
         <div className="space-y-3">
           <div>
@@ -51,7 +53,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
             <p className="text-[11px] text-muted-foreground">
-              📱 Your name will be matched against your phone number's registered owner via Smile ID verification.
+              📱 Your name will be matched against your phone number's registered owner via smile.id verification.
             </p>
           </div>
         </div>
@@ -139,7 +141,30 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
     },
   ];
 
-  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={onComplete} onBack={onBack} />;
+  const handleComplete = async () => {
+    try {
+      await upsertProfile({
+        role: "tenant",
+        first_name: firstName || null,
+        last_name: lastName || null,
+        display_name: `${firstName} ${lastName}`.trim() || null,
+        preferred_counties: counties.length ? counties : null,
+        budget_range: budget || null,
+        property_count: bedrooms || null,
+        stay_type: preference || null,
+      });
+      onComplete();
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Unable to save your profile",
+        description: "Please try again or check your network.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={handleComplete} onBack={onBack} />;
 };
 
 // ─── Landlord Setup ───
@@ -153,7 +178,7 @@ const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
     {
       icon: User,
       title: "What's your name?",
-      subtitle: "Used for phone verification via Smile ID",
+      subtitle: "Used for phone verification via smile.id",
       content: (
         <div className="space-y-3">
           <div>
@@ -167,7 +192,7 @@ const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via Smile ID verification.</p>
+            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via smile.id verification.</p>
           </div>
         </div>
       ),
@@ -192,7 +217,27 @@ const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
     },
   ];
 
-  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={onComplete} onBack={onBack} />;
+  const handleComplete = async () => {
+    try {
+      await upsertProfile({
+        role: "landlord",
+        first_name: firstName || null,
+        last_name: lastName || null,
+        display_name: `${firstName} ${lastName}`.trim() || null,
+        property_count: propertyCount || null,
+      });
+      onComplete();
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Unable to save your profile",
+        description: "Please try again or check your network.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={handleComplete} onBack={onBack} />;
 };
 
 // ─── Agency Setup ───
@@ -206,7 +251,7 @@ const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
     {
       icon: User,
       title: "What's your name?",
-      subtitle: "Used for phone verification via Smile ID",
+      subtitle: "Used for phone verification via smile.id",
       content: (
         <div className="space-y-3">
           <div>
@@ -220,7 +265,7 @@ const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via Smile ID verification.</p>
+            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via smile.id verification.</p>
           </div>
         </div>
       ),
@@ -240,7 +285,27 @@ const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
     },
   ];
 
-  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={onComplete} onBack={onBack} />;
+  const handleComplete = async () => {
+    try {
+      await upsertProfile({
+        role: "agency",
+        first_name: firstName || null,
+        last_name: lastName || null,
+        display_name: `${firstName} ${lastName}`.trim() || null,
+        agency_name: agencyName || null,
+      });
+      onComplete();
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Unable to save your profile",
+        description: "Please try again or check your network.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={handleComplete} onBack={onBack} />;
 };
 
 // ─── Stay Host Setup ───
@@ -254,7 +319,7 @@ const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
     {
       icon: User,
       title: "What's your name?",
-      subtitle: "Used for phone verification via Smile ID",
+      subtitle: "Used for phone verification via smile.id",
       content: (
         <div className="space-y-3">
           <div>
@@ -268,7 +333,7 @@ const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via Smile ID verification.</p>
+            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via smile.id verification.</p>
           </div>
         </div>
       ),
@@ -293,7 +358,27 @@ const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
     },
   ];
 
-  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={onComplete} onBack={onBack} />;
+  const handleComplete = async () => {
+    try {
+      await upsertProfile({
+        role: "stayhost",
+        first_name: firstName || null,
+        last_name: lastName || null,
+        display_name: `${firstName} ${lastName}`.trim() || null,
+        stay_type: propertyType || null,
+      });
+      onComplete();
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Unable to save your profile",
+        description: "Please try again or check your network.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={handleComplete} onBack={onBack} />;
 };
 
 // ─── Service Provider Setup ───
@@ -455,7 +540,30 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
     ? [...baseSteps, kraStep, ...remainingSteps]
     : [...baseSteps, ...remainingSteps];
 
-  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={onComplete} onBack={onBack} />;
+  const handleComplete = async () => {
+    try {
+      await upsertProfile({
+        role: "serviceprovider",
+        first_name: firstName || null,
+        last_name: lastName || null,
+        display_name: `${firstName} ${lastName}`.trim() || null,
+        service_category: type || null,
+        agency_name: category || null,
+        preferred_counties: serviceCounties.length ? serviceCounties : null,
+        plan_name: plan || null,
+      });
+      onComplete();
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Unable to save your profile",
+        description: "Please try again or check your network.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return <StepRenderer steps={steps} step={step} setStep={setStep} onComplete={handleComplete} onBack={onBack} />;
 };
 
 // ─── Shared Step Renderer ───

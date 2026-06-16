@@ -318,7 +318,7 @@ const AdvancedFilters = ({
           <div className="space-y-3">
             {[
               { key: "verified" as const, label: "Verified Only", icon: "✓", show: true },
-              { key: "smileIdVerified" as const, label: "Verified by Smile ID", icon: "😊", show: true },
+              { key: "smileIdVerified" as const, label: "Verified by smile.id", icon: "😊", show: true },
               { key: "furnished" as const, label: "Furnished", icon: "🏠", show: !isCommercial && !isServices },
               { key: "petFriendly" as const, label: "Pet Friendly", icon: "🐾", show: !isCommercial && !isServices },
             ].filter(t => t.show).map((toggle) => (

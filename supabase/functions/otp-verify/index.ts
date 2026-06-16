@@ -14,6 +14,7 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const OTP_PASSWORD_SECRET = Deno.env.get("OTP_PASSWORD_SECRET") ?? "replace-with-strong-secret";
 
 const PHONE_FAIL_LIMIT = 5;            // failed attempts before lockout
 const PHONE_FAIL_WINDOW_SECONDS = 900; // 15 min
@@ -34,6 +35,58 @@ const json = (body: unknown, status = 200) =>
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+
+const derivePassword = async (phone: string) => {
+  const data = new TextEncoder().encode(`${phone}:${OTP_PASSWORD_SECRET}`);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")
+    .slice(0, 32);
+};
+
+const ensureAuthUser = async (phone: string) => {
+  const password = await derivePassword(phone);
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+      apikey: SERVICE_ROLE_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      phone,
+      password,
+      email_confirm: true,
+      user_metadata: { provider: "otp" },
+    }),
+  });
+
+  if (response.ok) return;
+
+  const payload = await response.json().catch(() => null);
+  const duplicate = payload?.statusCode === 409 || payload?.message?.toLowerCase().includes("already exists");
+  if (duplicate) return;
+
+  throw new Error(`Could not ensure auth user: ${JSON.stringify(payload)}`);
+};
+
+const signInWithPassword = async (phone: string) => {
+  const password = await derivePassword(phone);
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: {
+      apikey: SERVICE_ROLE_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ phone, password }),
+  });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok || !payload?.access_token) {
+    throw new Error(`Failed to sign in: ${JSON.stringify(payload)}`);
+  }
+  return payload;
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -61,7 +114,6 @@ Deno.serve(async (req) => {
   const oneHourAgo = new Date(now - 3600_000).toISOString();
   const failWindowAgo = new Date(now - PHONE_FAIL_WINDOW_SECONDS * 1000).toISOString();
 
-  // 1) Per-phone failure lockout
   const { data: recentFails, error: failsErr } = await supabase
     .from("otp_verify_attempts")
     .select("created_at")
@@ -89,7 +141,6 @@ Deno.serve(async (req) => {
     );
   }
 
-  // 2) Per-phone hourly cap (any attempt)
   const { count: phoneCount, error: phoneCountErr } = await supabase
     .from("otp_verify_attempts")
     .select("id", { count: "exact", head: true })
@@ -106,7 +157,6 @@ Deno.serve(async (req) => {
     );
   }
 
-  // 3) Per-IP hourly cap
   const { count: ipCount, error: ipCountErr } = await supabase
     .from("otp_verify_attempts")
     .select("id", { count: "exact", head: true })
@@ -123,17 +173,22 @@ Deno.serve(async (req) => {
     );
   }
 
-  // 4) DEMO MODE — accept the mock code "123456" without a real auth session.
-  // Phone provider isn't configured; this lets the UX/UI flow proceed.
-  const success = token === "123456";
+  const { data: codeData, error: codeErr } = await supabase
+    .from("otp_codes")
+    .select("id, expires_at, used_at")
+    .eq("phone", phone)
+    .eq("code", token)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
 
-  // Record the attempt (best-effort)
+  const success = !!codeData && !codeErr && !codeData.used_at && new Date(codeData.expires_at) >= new Date();
+
   const { error: insertErr } = await supabase
     .from("otp_verify_attempts")
     .insert({ phone, ip, success });
   if (insertErr) console.error("failed to record verify attempt", insertErr);
 
-  // Best-effort housekeeping
   supabase.rpc("purge_old_otp_verify_attempts").then(({ error }) => {
     if (error) console.error("purge failed", error);
   });
@@ -149,6 +204,17 @@ Deno.serve(async (req) => {
     );
   }
 
-  // No real session in demo mode — client proceeds to PIN step regardless.
-  return json({ ok: true, demo: true });
+  await supabase
+    .from("otp_codes")
+    .update({ used_at: new Date().toISOString() })
+    .eq("id", codeData.id);
+
+  try {
+    await ensureAuthUser(phone);
+    const session = await signInWithPassword(phone);
+    return json({ ok: true, demo: false, session });
+  } catch (error) {
+    console.error("auth user creation/sign-in failed", error);
+    return json({ error: "Verification succeeded, but could not create auth session." }, 500);
+  }
 });

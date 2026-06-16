@@ -41,7 +41,7 @@ const SmileIDLogo = () => (
     <path d="M8 16c0 0 2.5 4 6 4s6-4 6-4" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" />
     <circle cx="10" cy="11" r="1.5" fill="hsl(var(--primary-foreground))" />
     <circle cx="18" cy="11" r="1.5" fill="hsl(var(--primary-foreground))" />
-    <text x="32" y="19" fill="currentColor" fontSize="14" fontWeight="700" fontFamily="system-ui">Smile ID</text>
+    <text x="32" y="19" fill="currentColor" fontSize="14" fontWeight="700" fontFamily="system-ui">smile.id</text>
   </svg>
 );
 
@@ -123,7 +123,7 @@ const AIPhotoVerification = ({ mode, onComplete, simulateMatch = true }: AIPhoto
 
   return (
     <div className="space-y-3">
-      {/* Smile ID branded card */}
+      {/* smile.id branded card */}
       <div className="p-4 rounded-2xl bg-card card-shadow border border-border">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-11 h-11 rounded-xl gradient-trust flex items-center justify-center">
@@ -167,7 +167,7 @@ const AIPhotoVerification = ({ mode, onComplete, simulateMatch = true }: AIPhoto
           <div className="space-y-1.5">
             <Progress value={progress} className="h-2" />
             <div className="flex items-center justify-between">
-              <p className="text-[10px] text-muted-foreground">Processing with Smile ID...</p>
+              <p className="text-[10px] text-muted-foreground">Processing with smile.id...</p>
               <p className="text-[10px] font-semibold text-primary">{progress}%</p>
             </div>
           </div>
@@ -196,8 +196,8 @@ const AIPhotoVerification = ({ mode, onComplete, simulateMatch = true }: AIPhoto
               <p className="text-[10px] text-muted-foreground">
                 {passed
                   ? mode === "listing"
-                    ? "All photos passed Smile ID authenticity checks"
-                    : "Biometric match confirmed by Smile ID"
+                    ? "All photos passed smile.id authenticity checks"
+                    : "Biometric match confirmed by smile.id"
                   : mode === "listing"
                     ? "Some photos failed authenticity checks"
                     : "Identity could not be verified — please retry"}
@@ -249,10 +249,10 @@ const AIPhotoVerification = ({ mode, onComplete, simulateMatch = true }: AIPhoto
         </div>
       )}
 
-      {/* Smile ID footer */}
+      {/* smile.id footer */}
       {status !== "idle" && (
         <p className="text-[9px] text-center text-muted-foreground">
-          Powered by Smile ID · Africa's leading identity verification
+          Powered by smile.id · Africa's leading identity verification
         </p>
       )}
     </div>
