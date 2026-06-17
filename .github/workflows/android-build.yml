@@ -25,8 +25,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install dependencies
-        run: npm ci || npm install
+      - name: Install dependencies (diagnostic)
+        run: |
+          set -o pipefail
+          node -v || true
+          npm -v || true
+          pnpm -v || true
+          bun -v || true
+          echo "Files in workspace:"
+          ls -la
+          echo "Attempting npm ci (verbose)." 
+          npm ci --loglevel verbose 2>&1 | tee install.log || (npm install --loglevel verbose 2>&1 | tee -a install.log)
+
+      - name: Upload install log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-log
+          path: install.log
 
       - name: Build web assets (Vite)
         run: npm run build
