@@ -95,10 +95,10 @@ jobs:
           set -o pipefail
           ./gradlew assembleRelease --no-daemon --stacktrace | tee build-release.log
 
-      - name: Upload release APK artifact (if produced)
-        if: ${{ secrets.KEYSTORE_BASE64 && secrets.KEYSTORE_PASSWORD && secrets.KEY_ALIAS && secrets.KEY_PASSWORD }}
-        uses: actions/upload-artifact@v4
+      - name: Upload release APK artifact and logs
         if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
           name: app-release-apk
           path: |
