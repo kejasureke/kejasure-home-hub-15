@@ -155,6 +155,13 @@
   .pt-safe {
     padding-top: calc(env(safe-area-inset-top, 0px) + 1.5rem);
   }
+  /* For compact fixed headers: adds the safe-area inset on top of a small base pad */
+  .pt-safe-compact {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+  }
+  .mt-safe {
+    margin-top: env(safe-area-inset-top, 0px);
+  }
 }
 
 @layer components {
