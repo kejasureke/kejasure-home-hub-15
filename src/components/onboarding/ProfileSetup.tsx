@@ -544,9 +544,6 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
     try {
       await upsertProfile({
         role: "serviceprovider",
-        first_name: firstName || null,
-        last_name: lastName || null,
-        display_name: `${firstName} ${lastName}`.trim() || null,
         service_category: type || null,
         agency_name: category || null,
         preferred_counties: serviceCounties.length ? serviceCounties : null,

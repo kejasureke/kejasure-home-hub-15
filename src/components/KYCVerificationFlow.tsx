@@ -245,6 +245,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             <h2 className="text-lg font-bold mb-1">Your Details</h2>
             <p className="text-sm text-muted-foreground mb-4">
               We'll verify your name matches the phone number registered with your mobile provider via smile.id.
+            </p>
 
             <div className="space-y-3">
               <div>
