@@ -1,9 +1,8 @@
 import { supabase } from "./client";
-import type { Database } from "./types";
 
 export type UpsertProfileArgs = {
   phone?: string | null;
-  role?: Database["public"]["Tables"]["profiles"]["Row"]["role"];
+  role?: string | null;
   first_name?: string | null;
   last_name?: string | null;
   display_name?: string | null;
@@ -15,17 +14,18 @@ export type UpsertProfileArgs = {
   property_count?: string | null;
   stay_type?: string | null;
   bio?: string | null;
+  plan_name?: string | null;
 };
 
 export type CreateSubscriptionArgs = {
   plan_id?: string | null;
   plan_name: string;
-  role: Database["public"]["Tables"]["subscriptions"]["Row"]["role"];
+  role: string;
   price: number;
   duration: string;
   auto_renew?: boolean;
   currency?: string;
-  metadata?: Database["public"]["Tables"]["subscriptions"]["Row"]["metadata"];
+  metadata?: Record<string, unknown> | null;
 };
 
 export type CreatePaymentArgs = {
@@ -34,19 +34,19 @@ export type CreatePaymentArgs = {
   amount: number;
   currency?: string;
   method: string;
-  status?: Database["public"]["Tables"]["payments"]["Row"]["status"];
+  status?: string | null;
   transaction_id?: string | null;
-  metadata?: Database["public"]["Tables"]["payments"]["Row"]["metadata"];
+  metadata?: Record<string, unknown> | null;
 };
 
 export const upsertProfile = async (args: UpsertProfileArgs) => {
-  return supabase.rpc("upsert_profile", args);
+  return supabase.rpc("upsert_profile" as never, args as never);
 };
 
 export const createSubscription = async (args: CreateSubscriptionArgs) => {
-  return supabase.rpc("create_subscription", args);
+  return supabase.rpc("create_subscription" as never, args as never);
 };
 
 export const recordPayment = async (args: CreatePaymentArgs) => {
-  return supabase.rpc("create_payment", args);
+  return supabase.rpc("create_payment" as never, args as never);
 };
