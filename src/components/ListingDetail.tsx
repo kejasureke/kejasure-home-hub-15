@@ -62,7 +62,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           stickyHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
         }`}
       >
-        <div className="flex items-center gap-3 px-4 py-3">
+        <div className="flex items-center gap-3 px-4 pb-3 pt-safe-compact">
           <button onClick={triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
             <ArrowLeft className="w-4 h-4 text-foreground" />
           </button>
@@ -93,7 +93,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           bottomOffsetClass="bottom-4"
         />
 
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-10">
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 pt-safe-compact z-10">
           <button onClick={triggerClose} className="w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
