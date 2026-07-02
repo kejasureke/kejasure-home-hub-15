@@ -136,7 +136,7 @@ const ProfileScreen = () => {
 
 
   return (
-    <div className="pb-32 px-4 pt-5">
+    <div className="pb-32 px-4 pt-safe">
       {/* Profile header */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-16 h-16 rounded-2xl gradient-trust flex items-center justify-center relative">

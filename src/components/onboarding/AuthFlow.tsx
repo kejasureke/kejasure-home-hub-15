@@ -336,7 +336,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
   return (
     <div className="fixed inset-0 z-[90] bg-background flex flex-col">
       {/* Header */}
-      <div className="px-5 pt-5 flex items-center gap-3">
+      <div className="px-5 pt-safe flex items-center gap-3">
         <button onClick={goBack} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
           <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>

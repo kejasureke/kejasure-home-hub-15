@@ -78,7 +78,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   return (
     <div className="pb-32">
       {/* Header */}
-      <div className="px-4 pt-6 mb-4">
+      <div className="px-4 pt-safe mb-4">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-bold text-foreground">Messages</h1>

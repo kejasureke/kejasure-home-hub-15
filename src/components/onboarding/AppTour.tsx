@@ -61,7 +61,7 @@ const AppTour = ({ onFinish }: AppTourProps) => {
   return (
     <div className="fixed inset-0 z-[95] bg-background flex flex-col animate-fade-in">
       {/* Header */}
-      <div className="px-5 pt-5 flex items-center gap-3">
+      <div className="px-5 pt-safe flex items-center gap-3">
         <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full gradient-trust rounded-full transition-all duration-500"

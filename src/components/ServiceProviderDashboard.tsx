@@ -383,7 +383,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
         />
       )}
       {/* Header */}
-      <div className="px-4 pt-5 pb-8" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--trust-light)))" }}>
+      <div className="px-4 pt-safe pb-8" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--trust-light)))" }}>
         <div className="flex items-center gap-3 mb-5">
           <button onClick={onBack} className="p-1"><ArrowLeft className="w-5 h-5 text-primary-foreground" /></button>
           <h1 className="text-lg font-bold text-primary-foreground">Service Dashboard</h1>
