@@ -46,7 +46,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
   return (
     <div className="fixed inset-0 z-[80] bg-background flex flex-col">
       {/* Header */}
-      <div className="px-5 pt-5 pb-3 flex items-center gap-3 border-b border-border">
+      <div className="px-5 pt-safe pb-3 flex items-center gap-3 border-b border-border">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
           <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>

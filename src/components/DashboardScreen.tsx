@@ -162,7 +162,7 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
         </div>
       )}
       {/* Header */}
-      <div className="gradient-trust px-4 pt-5 pb-8">
+      <div className="gradient-trust px-4 pt-safe pb-8">
         <div className="flex items-center gap-3 mb-5">
           <button onClick={onBack} className="p-1">
             <ArrowLeft className="w-5 h-5 text-primary-foreground" />

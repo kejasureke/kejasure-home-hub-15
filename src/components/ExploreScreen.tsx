@@ -212,7 +212,7 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
   return (
     <div className="pb-32">
       {/* Header */}
-      <div className="px-4 pt-5 pb-3">
+      <div className="px-4 pt-safe pb-3">
         <div className="flex items-center gap-3 mb-4">
           {showingResults ? (
             <button
