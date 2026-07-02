@@ -100,7 +100,7 @@ const WelcomeScreens = ({ onComplete, onSkip, onLogin }: WelcomeScreensProps) =>
       onTouchEnd={handleTouchEnd}
     >
       {/* Top bar: trust micro-badge + Skip */}
-      <div className="relative flex items-center justify-center px-5 pt-5">
+      <div className="relative flex items-center justify-center px-5 pt-safe">
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/15">
           <ShieldCheck className="w-3 h-3 text-primary" />
           <span className="text-[10px] font-semibold text-primary tracking-wide">
@@ -110,7 +110,7 @@ const WelcomeScreens = ({ onComplete, onSkip, onLogin }: WelcomeScreensProps) =>
         {onSkip && !isLast && (
           <button
             onClick={onSkip}
-            className="absolute right-5 top-5 text-xs font-semibold text-muted-foreground active:text-foreground px-2 py-1"
+            className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground active:text-foreground px-2 py-1"
           >
             Skip
           </button>
