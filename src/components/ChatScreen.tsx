@@ -149,7 +149,7 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
   return (
     <div className="fixed inset-0 z-40 bg-background flex flex-col animate-slide-up">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border glass-surface">
+      <div className="flex items-center gap-3 px-4 pb-3 pt-safe-compact border-b border-border glass-surface">
         <button onClick={onBack} className="p-1">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
