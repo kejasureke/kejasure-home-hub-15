@@ -130,7 +130,7 @@ const stayHostPlans = [
 const serviceProviderPlans = [
   {
     name: "Basic",
-    price: 500,
+    price: 300,
     duration: "/month",
     badge: "Individual",
     features: ["1 service listing", "5 bookings/month", "Basic profile", "Client messaging"],
@@ -139,7 +139,7 @@ const serviceProviderPlans = [
   },
   {
     name: "Pro",
-    price: 1000,
+    price: 800,
     duration: "/month",
     badge: "Individual",
     features: ["3 service listings", "Unlimited bookings", "Priority chat", "Portfolio gallery", "Client reviews showcase"],
@@ -149,7 +149,7 @@ const serviceProviderPlans = [
   },
   {
     name: "Business Pro",
-    price: 3000,
+    price: 1000,
     duration: "/month",
     badge: "Business",
     features: ["10 service listings", "Team members", "CRM tools", "County analytics", "Featured profile", "Priority support"],
@@ -158,7 +158,7 @@ const serviceProviderPlans = [
   },
   {
     name: "Enterprise",
-    price: 5000,
+    price: 1500,
     duration: "/month",
     badge: "Business",
     features: ["Unlimited listings", "Unlimited team", "Full CRM", "County analytics", "Featured profile", "Priority support"],
