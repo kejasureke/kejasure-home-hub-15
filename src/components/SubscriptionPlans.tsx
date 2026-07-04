@@ -102,7 +102,7 @@ const agencyPlans = [
 const stayHostPlans = [
   {
     name: "Basic",
-    price: 1000,
+    price: 500,
     duration: "/month",
     features: ["2 stay listings", "Short stays only", "Basic calendar", "Guest chat", "Standard placement"],
     notIncluded: ["Corporate stays", "Smart pricing", "County heatmap"],
@@ -110,7 +110,7 @@ const stayHostPlans = [
   },
   {
     name: "Pro",
-    price: 2500,
+    price: 1000,
     duration: "/month",
     features: ["10 stay listings", "Short stays only", "Full calendar sync", "Priority chat", "Featured stays", "Booking analytics", "2 monthly boosts"],
     notIncluded: ["Corporate stays", "Smart pricing"],
@@ -119,7 +119,7 @@ const stayHostPlans = [
   },
   {
     name: "Premium",
-    price: 5000,
+    price: 1500,
     duration: "/month",
     features: ["Unlimited listings", "✨ Corporate stays (NGO/expat)", "Smart pricing AI", "Priority support", "County heatmaps", "Booking analytics", "5 monthly boosts"],
     notIncluded: [],
