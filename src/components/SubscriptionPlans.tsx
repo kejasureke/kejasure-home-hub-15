@@ -40,7 +40,7 @@ const tenantPlans = [
 const landlordPlans = [
   {
     name: "Basic",
-    price: 500,
+    price: 250,
     duration: "/month",
     badge: "Individual",
     features: ["1 active listing", "Residential rentals only", "Single-owner profile", "Guest inquiries via chat", "Standard placement"],
@@ -49,7 +49,7 @@ const landlordPlans = [
   },
   {
     name: "Pro",
-    price: 1500,
+    price: 1000,
     duration: "/month",
     badge: "Individual",
     features: ["5 active listings", "Residential rentals only", "Basic analytics", "Priority chat replies", "1 monthly boost"],
@@ -59,7 +59,7 @@ const landlordPlans = [
   },
   {
     name: "Premium",
-    price: 2500,
+    price: 1500,
     duration: "/month",
     badge: "Individual",
     features: ["15 active listings", "Residential + ✨ Commercial premises", "✨ Corporate stays (NGO/expat)", "Full owner analytics", "2 monthly boosts", "Verified owner badge"],
