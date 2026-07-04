@@ -9,19 +9,19 @@ type ModalState = "select" | "processing" | "success";
 
 const tiers = [
   {
-    price: 50,
+    price: 30,
     duration: "24 Hours",
     label: "Quick Look",
     popular: false,
   },
   {
-    price: 100,
+    price: 50,
     duration: "3 Days",
     label: "Best Value",
     popular: true,
   },
   {
-    price: 200,
+    price: 100,
     duration: "7 Days",
     label: "Power User",
     popular: false,

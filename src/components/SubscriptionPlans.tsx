@@ -12,7 +12,7 @@ interface SubscriptionPlansProps {
 const tenantPlans = [
   {
     name: "24 Hours",
-    price: 50,
+    price: 30,
     duration: "",
     features: ["Exact map pin location", "Full landlord phone number", "In-app chat access", "Direct service contact", "Short stay booking confirmation"],
     notIncluded: ["Unlimited favorites", "Advanced filters", "Verified featured listings first"],
@@ -20,7 +20,7 @@ const tenantPlans = [
   },
   {
     name: "3 Days",
-    price: 100,
+    price: 50,
     duration: "",
     features: ["Everything in 24 Hours", "Unlimited favorites", "Advanced filters", "Priority county alerts", "Verified featured listings first"],
     notIncluded: ["Price drop alerts"],
@@ -29,7 +29,7 @@ const tenantPlans = [
   },
   {
     name: "7 Days",
-    price: 200,
+    price: 100,
     duration: "",
     features: ["Everything in 3 Days", "Price drop alerts", "Neighborhood safety scores", "Verified-only feed", "Priority support"],
     notIncluded: [],
