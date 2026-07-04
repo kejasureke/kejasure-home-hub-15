@@ -71,7 +71,7 @@ const landlordPlans = [
 const agencyPlans = [
   {
     name: "Starter",
-    price: 2000,
+    price: 1000,
     duration: "/month",
     badge: "Agency",
     features: ["3 agent accounts", "25 listings", "Agency-branded profile", "Lead assignment & inbox", "Basic CRM", "Bulk listing upload"],
@@ -80,7 +80,7 @@ const agencyPlans = [
   },
   {
     name: "Growth",
-    price: 5000,
+    price: 2500,
     duration: "/month",
     badge: "Agency",
     features: ["10 agent accounts", "100 listings", "✨ Commercial premises (shops/offices)", "Full CRM with pipelines", "Agent performance analytics", "5 monthly boosts", "Featured agency badge", "County heatmaps"],
@@ -90,7 +90,7 @@ const agencyPlans = [
   },
   {
     name: "Enterprise",
-    price: 10000,
+    price: 4500,
     duration: "/month",
     badge: "Agency",
     features: ["Unlimited agents", "Unlimited listings", "✨ Commercial premises", "✨ Corporate stays (NGO/expat)", "Full CRM + lead routing", "White-label custom branding", "Dedicated account manager", "Priority support 24/7"],
