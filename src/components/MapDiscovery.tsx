@@ -36,6 +36,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [showHereTooltip, setShowHereTooltip] = useState(false);
   const [gpsFix, setGpsFix] = useState<{ accuracy: number; ts: number } | null>(null);
   const [locError, setLocError] = useState<null | "off" | "denied" | "unavailable" | "timeout">(null);
+  const [heading, setHeading] = useState<number | null>(null);
   const [, forceTick] = useState(0);
   const [locationEnabled, setLocationEnabled] = useState(() => {
     try { return localStorage.getItem(LOCATION_KEY) === "true"; } catch { return false; }
@@ -43,6 +44,20 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [autoRecenter, setAutoRecenter] = useState(() => {
     try { return localStorage.getItem(AUTO_RECENTER_KEY) === "true"; } catch { return false; }
   });
+
+  // Live compass heading (device orientation). Uses webkitCompassHeading on
+  // iOS/Despia when available, otherwise falls back to `alpha`.
+  useEffect(() => {
+    if (!locationEnabled) return;
+    const onOrient = (e: DeviceOrientationEvent & { webkitCompassHeading?: number }) => {
+      const h = typeof e.webkitCompassHeading === "number"
+        ? e.webkitCompassHeading
+        : e.alpha != null ? 360 - e.alpha : null;
+      if (h != null && !Number.isNaN(h)) setHeading(h);
+    };
+    window.addEventListener("deviceorientation", onOrient, true);
+    return () => window.removeEventListener("deviceorientation", onOrient, true);
+  }, [locationEnabled]);
 
   useEffect(() => {
     if (!showHereTooltip) return;
