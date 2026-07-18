@@ -6,6 +6,7 @@ import {
 import AIPhotoVerification from "./AIPhotoVerification";
 import { kenyaCounties } from "@/data/kenyaCounties";
 import { validateCaption } from "@/utils/captionSafety";
+import { openCamera, haptic } from "@/lib/despia";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
 
