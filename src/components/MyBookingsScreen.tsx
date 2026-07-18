@@ -37,6 +37,25 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
   const { bookings, counts, cancelBooking, updateBooking } = useBookings();
   const [tab, setTab] = useState<BookingStatus | "all">("pending");
   const [actionFor, setActionFor] = useState<Booking | null>(null);
+  const [rescheduleFor, setRescheduleFor] = useState<Booking | null>(null);
+  const [reviewed, setReviewed] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("kejasure_reviewed_bookings") || "[]")); } catch { return new Set(); }
+  });
+  const [, tick] = useState(0);
+
+  // Re-render every 30s so check-in countdowns stay fresh
+  useEffect(() => {
+    const id = setInterval(() => tick((n) => n + 1), 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  const markReviewed = (id: string) => {
+    const next = new Set(reviewed);
+    next.add(id);
+    setReviewed(next);
+    try { localStorage.setItem("kejasure_reviewed_bookings", JSON.stringify([...next])); } catch {}
+    toast.success("Thanks for your review!");
+  };
   
 
   const filtered = useMemo(() => {
