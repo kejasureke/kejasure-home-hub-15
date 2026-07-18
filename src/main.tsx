@@ -1,14 +1,13 @@
 import { createRoot } from "react-dom/client";
-import { Capacitor } from "@capacitor/core";
-import { StatusBar, Style } from "@capacitor/status-bar";
 import App from "./App.tsx";
 import "./index.css";
+import { isDespia, registerBiometricCallbacks, syncStatusBarWithTheme } from "./lib/despia.ts";
 
-// On native (Android/iOS), draw the web content behind the status bar so the
-// app fills the entire screen edge-to-edge instead of leaving a gap at the top.
-if (Capacitor.isNativePlatform()) {
-  StatusBar.setOverlaysWebView({ overlay: true }).catch(() => {});
-  StatusBar.setStyle({ style: Style.Light }).catch(() => {});
+// Initialize native runtime helpers on app launch.
+if (isDespia()) {
+  registerBiometricCallbacks();
+  const currentTheme = document.documentElement.classList.contains("dark") ? "dark" : "light";
+  syncStatusBarWithTheme(currentTheme);
 }
 
 createRoot(document.getElementById("root")!).render(<App />);

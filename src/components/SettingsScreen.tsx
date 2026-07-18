@@ -2,10 +2,15 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Sun, Eye, Shield, ChevronRight, ToggleLeft, ToggleRight, Smartphone, MapPin, Volume2 } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useTheme } from "@/hooks/useTheme";
+import { toast } from "@/hooks/use-toast";
+import { isDespia, requestBiometric, getCurrentLocation, openNativeSettings } from "@/lib/despia";
 
 interface SettingsScreenProps {
   onBack: () => void;
 }
+
+const BIOMETRIC_KEY = "kejasure_biometric_enabled";
+const LOCATION_KEY = "kejasure_location_enabled";
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const { closing, triggerClose } = useOverlayClose(onBack);
@@ -14,8 +19,12 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const [smsEnabled, setSmsEnabled] = useState(true);
   const [priceAlerts, setPriceAlerts] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [locationEnabled, setLocationEnabled] = useState(true);
-  const [biometricEnabled, setBiometricEnabled] = useState(true);
+  const [locationEnabled, setLocationEnabled] = useState(() => {
+    try { return localStorage.getItem(LOCATION_KEY) === "true"; } catch { return false; }
+  });
+  const [biometricEnabled, setBiometricEnabled] = useState(() => {
+    try { return localStorage.getItem(BIOMETRIC_KEY) === "true"; } catch { return false; }
+  });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [language, setLanguage] = useState("en");
   const [showVisibility, setShowVisibility] = useState(false);
@@ -36,6 +45,55 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     const t = setInterval(() => setOtpResendIn((v) => v - 1), 1000);
     return () => clearInterval(t);
   }, [otpResendIn]);
+
+  const toggleBiometric = async () => {
+    if (!biometricEnabled) {
+      if (!isDespia()) {
+        toast({
+          title: "Biometric login unavailable",
+          description: "This feature is only available inside the Despia native app.",
+          variant: "destructive",
+        });
+        return;
+      }
+      const result = await requestBiometric();
+      if (result.success) {
+        setBiometricEnabled(true);
+        try { localStorage.setItem(BIOMETRIC_KEY, "true"); } catch {}
+        toast({ title: "Biometric login enabled", description: "You can now unlock with fingerprint or face" });
+      } else {
+        toast({
+          title: "Biometric setup failed",
+          description: result.error || "Try again later in Settings.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setBiometricEnabled(false);
+      try { localStorage.setItem(BIOMETRIC_KEY, "false"); } catch {}
+    }
+  };
+
+  const toggleLocation = async () => {
+    if (!locationEnabled) {
+      try {
+        await getCurrentLocation();
+        setLocationEnabled(true);
+        try { localStorage.setItem(LOCATION_KEY, "true"); } catch {}
+        toast({ title: "Location enabled", description: "Nearby listings and maps will use your location." });
+      } catch (err: any) {
+        toast({
+          title: "Location unavailable",
+          description: err?.message || "Check your device location settings.",
+          variant: "destructive",
+        });
+        if (isDespia()) openNativeSettings();
+      }
+    } else {
+      setLocationEnabled(false);
+      try { localStorage.setItem(LOCATION_KEY, "false"); } catch {}
+    }
+  };
 
   const generateOtp = () => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -135,8 +193,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         </Section>
 
         <Section title="Privacy & Security">
-          <SettingRow icon={Lock} label="Biometric Login" subtitle="Use fingerprint or face unlock" right={<Toggle enabled={biometricEnabled} onToggle={() => setBiometricEnabled(!biometricEnabled)} />} />
-          <SettingRow icon={MapPin} label="Location Services" subtitle="Nearby listings & map features" right={<Toggle enabled={locationEnabled} onToggle={() => setLocationEnabled(!locationEnabled)} />} />
+          <SettingRow icon={Lock} label="Biometric Login" subtitle="Use fingerprint or face unlock" right={<Toggle enabled={biometricEnabled} onToggle={toggleBiometric} />} />
+          <SettingRow icon={MapPin} label="Location Services" subtitle="Nearby listings & map features" right={<Toggle enabled={locationEnabled} onToggle={toggleLocation} />} />
           <SettingRow icon={Eye} label="Profile Visibility" subtitle={visibilityLabel} right={<ChevronRight className="w-4 h-4 text-muted-foreground" />} onClick={() => setShowVisibility(true)} />
           <SettingRow icon={Shield} label="Change PIN" subtitle="Update your 4-digit PIN" right={<ChevronRight className="w-4 h-4 text-muted-foreground" />} onClick={() => setShowPinFlow(true)} />
         </Section>

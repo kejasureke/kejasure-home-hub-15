@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { syncStatusBarWithTheme } from "@/lib/despia";
 
 type Theme = "light" | "dark";
 
@@ -22,11 +23,15 @@ export const useTheme = () => {
     setThemeState(t);
     localStorage.setItem(STORAGE_KEY, t);
     applyTheme(t);
+    // Status bar text color must be updated after the CSS transition completes
+    // so iOS sees the final background color and accepts the change.
+    window.setTimeout(() => syncStatusBarWithTheme(t), 320);
   }, []);
 
   useEffect(() => {
     applyTheme(theme);
-  }, []);
+    syncStatusBarWithTheme(theme);
+  }, [theme]);
 
   return { theme, resolvedTheme: theme, setTheme };
 };

@@ -8,6 +8,7 @@
   :root {
     --background: 140 10% 97%;
     --foreground: 150 25% 12%;
+    color-scheme: light;
 
     --card: 0 0% 100%;
     --card-foreground: 150 25% 12%;
@@ -59,6 +60,7 @@
   }
 
   .dark {
+    color-scheme: dark;
     --background: 150 20% 7%;
     --foreground: 140 15% 93%;
     --card: 150 20% 11%;
@@ -147,20 +149,20 @@
     text-wrap: balance;
   }
   .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: var(--safe-area-bottom, env(safe-area-inset-bottom, 0px));
   }
   .safe-top {
-    padding-top: env(safe-area-inset-top, 0px);
+    padding-top: var(--safe-area-top, env(safe-area-inset-top, 0px));
   }
   .pt-safe {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 1.5rem);
+    padding-top: calc(1.5rem + var(--safe-area-top, env(safe-area-inset-top, 0px)));
   }
   /* For compact fixed headers: adds the safe-area inset on top of a small base pad */
   .pt-safe-compact {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+    padding-top: calc(0.75rem + var(--safe-area-top, env(safe-area-inset-top, 0px)));
   }
   .mt-safe {
-    margin-top: env(safe-area-inset-top, 0px);
+    margin-top: var(--safe-area-top, env(safe-area-inset-top, 0px));
   }
 }
 

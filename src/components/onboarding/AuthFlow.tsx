@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { haptic, requestBiometric } from "@/lib/despia";
 
 type AuthStep = "phone" | "otp" | "pin" | "confirm-pin" | "biometric";
 
@@ -263,34 +264,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     setStep("confirm-pin");
   };
 
-  // Cross-platform haptic feedback (Android via Vibration API, iOS via Capacitor Haptics if available, web AudioContext fallback)
-  const triggerErrorHaptic = async () => {
-    if (typeof window === "undefined") return;
-    try {
-      // 1. Capacitor Haptics (iOS + Android native shells)
-      const cap = (window as any).Capacitor;
-      if (cap?.isPluginAvailable?.("Haptics")) {
-        const plugins = (window as any).Capacitor.Plugins;
-        if (plugins?.Haptics?.notification) {
-          await plugins.Haptics.notification({ type: "ERROR" });
-          return;
-        }
-        if (plugins?.Haptics?.vibrate) {
-          await plugins.Haptics.vibrate({ duration: 120 });
-          return;
-        }
-      }
-      // 2. Web Vibration API (Android Chrome / some Android browsers)
-      if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
-        navigator.vibrate([60, 40, 60]);
-        return;
-      }
-      // 3. iOS Safari fallback: brief silent AudioContext blip (no audible sound, just a subtle cue)
-      // iOS doesn't expose vibration to web; we silently no-op so nothing errors.
-    } catch {
-      // Swallow — haptics are a progressive enhancement, never block the flow
-    }
-  };
+  const triggerErrorHaptic = () => haptic("error");
 
   const handleConfirmPinSubmit = () => {
     if (pin.join("") !== confirmPin.join("")) {
@@ -303,6 +277,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
       return;
     }
     setPinError("");
+    haptic("success");
     setStep("biometric");
   };
 
@@ -573,7 +548,23 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
 
             <div className="w-full space-y-3 mt-auto pb-10">
               <button
-                onClick={() => { try { localStorage.removeItem(AUTH_STATE_KEY); } catch {} onComplete(); }}
+                onClick={async () => {
+                  haptic("heavy");
+                  const result = await requestBiometric();
+                  if (result.success) {
+                    try { localStorage.setItem("kejasure_biometric_enabled", "true"); } catch {}
+                    haptic("success");
+                  } else {
+                    triggerErrorHaptic();
+                    toast({
+                      title: "Biometric setup",
+                      description: result.error || "Could not enable biometrics. You can try again in Settings.",
+                      variant: "destructive",
+                    });
+                  }
+                  try { localStorage.removeItem(AUTH_STATE_KEY); } catch {}
+                  onComplete();
+                }}
                 className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
               >
                 Enable Biometrics
