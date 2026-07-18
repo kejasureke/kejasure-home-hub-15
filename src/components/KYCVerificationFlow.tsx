@@ -549,8 +549,10 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
             <div
               onClick={() => {
-                setSelfieCapture("capturing");
-                setTimeout(() => setSelfieCapture("done"), 1500);
+                openCamera(() => {
+                  setSelfieCapture("capturing");
+                  setTimeout(() => { haptic("success"); setSelfieCapture("done"); }, 1500);
+                });
               }}
               className={`aspect-square max-w-[280px] mx-auto rounded-[50%] border-4 flex items-center justify-center cursor-pointer transition-all ${
                 selfieCapture === "done" ? "border-primary bg-primary/5" : selfieCapture === "capturing" ? "border-accent animate-pulse bg-accent/5" : "border-dashed border-border bg-card"
