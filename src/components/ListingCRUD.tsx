@@ -310,9 +310,12 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     const placeholders = [
       "🏠", "🏡", "🏢", "🏘️", "🛋️", "🛏️", "🍳", "🚿",
     ];
-    if (form.photos.length < 10) {
+    if (form.photos.length >= 10) return;
+    // Launch native camera / web fallback; UI advances optimistically with a placeholder.
+    openCamera(() => {
+      haptic("light");
       update({ photos: [...form.photos, placeholders[form.photos.length % placeholders.length]] });
-    }
+    });
   };
 
   const removePhoto = (i: number) => {
