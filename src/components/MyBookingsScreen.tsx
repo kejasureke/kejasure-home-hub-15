@@ -167,6 +167,22 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                         <Clock className="w-3 h-3" /> Avg response: {b.responseTime}
                       </div>
                     )}
+                    {b.status === "accepted" && (() => {
+                      const target = new Date(b.date).getTime();
+                      const diff = target - Date.now();
+                      if (diff < -86400000) return null; // >1 day past
+                      const days = Math.ceil(diff / 86400000);
+                      const label =
+                        diff < 0 ? (isStay ? "Check-in today" : "Viewing today") :
+                        days === 0 ? (isStay ? "Check-in today" : "Viewing today") :
+                        days === 1 ? (isStay ? "Check-in tomorrow" : "Viewing tomorrow") :
+                        `${isStay ? "Check-in" : "Viewing"} in ${days} days`;
+                      return (
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold text-trust pt-1">
+                          <CalendarClock className="w-3 h-3" /> {label}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Actions */}
