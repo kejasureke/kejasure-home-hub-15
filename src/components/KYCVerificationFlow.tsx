@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, AlertCircle, User, Building2, Fingerprint, X, ChevronRight, Phone, Smartphone } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import AIPhotoVerification from "./AIPhotoVerification";
+import { openCamera, haptic } from "@/lib/despia";
 
 interface KYCVerificationFlowProps {
   onClose: (completed?: boolean) => void;
