@@ -278,6 +278,69 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
         </button>
       </div>
 
+      {/* Location error banner */}
+      {locError && (
+        <div className="px-4 pb-3 animate-fade-in">
+          <div className={`rounded-xl border p-3 flex gap-3 ${
+            locError === "denied"
+              ? "bg-destructive/10 border-destructive/30"
+              : "bg-secondary border-border"
+          }`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+              locError === "denied" ? "bg-destructive/20 text-destructive" : "bg-primary/15 text-primary"
+            }`}>
+              {locError === "denied" ? <AlertTriangle className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-foreground">
+                {locError === "off" && "Location Services are off"}
+                {locError === "denied" && "Location permission denied"}
+                {locError === "unavailable" && "Location unavailable"}
+                {locError === "timeout" && "Couldn't get a GPS fix"}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+                {locError === "off" && "Turn on Location Services to see nearby listings and center the map on you."}
+                {locError === "denied" && "KejaSure needs Location permission from your device to show your position on the map."}
+                {locError === "unavailable" && "Your device can't get a signal right now. Move to an open area and try again."}
+                {locError === "timeout" && "The GPS took too long to respond. Try again in a moment."}
+              </p>
+              <div className="flex gap-2 mt-2">
+                {locError === "off" && (
+                  <button
+                    onClick={enableInAppLocation}
+                    className="px-3 py-1.5 rounded-full gradient-trust text-primary-foreground text-[10px] font-semibold"
+                  >
+                    Turn on Location
+                  </button>
+                )}
+                {(locError === "denied" || locError === "unavailable") && (
+                  <button
+                    onClick={handleOpenSettings}
+                    className="px-3 py-1.5 rounded-full gradient-trust text-primary-foreground text-[10px] font-semibold flex items-center gap-1"
+                  >
+                    <SettingsIcon className="w-3 h-3" />
+                    Open Settings
+                  </button>
+                )}
+                {(locError === "timeout" || locError === "unavailable") && (
+                  <button
+                    onClick={() => fetchFix()}
+                    className="px-3 py-1.5 rounded-full bg-background border border-border text-[10px] font-semibold text-foreground"
+                  >
+                    Try again
+                  </button>
+                )}
+                <button
+                  onClick={() => setLocError(null)}
+                  className="px-3 py-1.5 rounded-full text-[10px] font-medium text-muted-foreground ml-auto"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mock Map */}
       <div
