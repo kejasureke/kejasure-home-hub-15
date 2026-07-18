@@ -74,26 +74,52 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
 
   const fetchFix = useCallback(async (opts: { silent?: boolean } = {}) => {
     if (!locationEnabled) {
-      if (!opts.silent) {
-        toast({
-          title: "Location Services off",
-          description: "Enable Location Services in Settings to use GPS.",
-        });
-      }
+      setLocError("off");
       return null;
     }
     try {
       const fix = await getCurrentLocation();
       setGpsFix({ accuracy: fix.accuracy ?? 0, ts: Date.now() });
+      setLocError(null);
       if (!opts.silent) haptic("light");
       return fix;
     } catch (err: any) {
-      if (!opts.silent && err?.message && !/denied|unavailable/i.test(err.message)) {
-        toast({ title: "Location unavailable", description: err.message });
+      const msg = String(err?.message || "").toLowerCase();
+      const kind: "denied" | "timeout" | "unavailable" =
+        /denied|permission/.test(msg) ? "denied"
+        : /timeout|timed out/.test(msg) ? "timeout"
+        : "unavailable";
+      setLocError(kind);
+      if (!opts.silent && kind === "timeout") {
+        toast({ title: "GPS timed out", description: "Try again with a clearer view of the sky." });
       }
       return null;
     }
   }, [locationEnabled, toast]);
+
+  const enableInAppLocation = () => {
+    try { localStorage.setItem(LOCATION_KEY, "true"); } catch {}
+    setLocationEnabled(true);
+    haptic("light");
+    // Immediately attempt a fix so the user sees progress.
+    fetchFix({ silent: true });
+  };
+
+  const handleOpenSettings = () => {
+    haptic("light");
+    if (isDespia()) {
+      openNativeSettings();
+      toast({
+        title: "Opening device settings",
+        description: "Enable Location for KejaSure, then return to the app.",
+      });
+    } else {
+      toast({
+        title: "Open your device settings",
+        description: "Go to Settings › Apps › KejaSure › Permissions › Location and allow access.",
+      });
+    }
+  };
 
   const handleRecenter = async () => {
     recenter();
