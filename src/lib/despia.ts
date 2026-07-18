@@ -1,0 +1,139 @@
+import despia from "despia-native";
+
+export const DESPIA_UA = "despia";
+
+export function isDespia(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return navigator.userAgent.toLowerCase().includes(DESPIA_UA);
+}
+
+export function haptic(type: "light" | "heavy" | "success" | "warning" | "error") {
+  if (!isDespia()) return;
+  const schemes: Record<typeof type, string> = {
+    light: "lighthaptic://",
+    heavy: "heavyhaptic://",
+    success: "successhaptic://",
+    warning: "warninghaptic://",
+    error: "errorhaptic://",
+  };
+  try {
+    despia(schemes[type]);
+  } catch {
+    // Haptics are a progressive enhancement; never crash the app.
+  }
+}
+
+export function syncStatusBarWithTheme(theme: "light" | "dark") {
+  if (!isDespia()) return;
+  const color = theme === "dark" ? "white" : "black";
+  try {
+    despia(`statusbartextcolor://${color}`);
+  } catch {
+    // Ignore failures; the editor default will still apply.
+  }
+}
+
+let bioResolve: ((result: { success: boolean; error?: string }) => void) | null = null;
+
+export function registerBiometricCallbacks() {
+  if (typeof window === "undefined") return;
+
+  (window as any).onBioAuthSuccess = () => {
+    bioResolve?.({ success: true });
+    bioResolve = null;
+  };
+
+  (window as any).onBioAuthFailure = (_code: string, message: string) => {
+    bioResolve?.({ success: false, error: message });
+    bioResolve = null;
+  };
+
+  (window as any).onBioAuthUnavailable = () => {
+    bioResolve?.({ success: false, error: "Biometric authentication is unavailable on this device" });
+    bioResolve = null;
+  };
+}
+
+export function requestBiometric(): Promise<{ success: boolean; error?: string }> {
+  if (!isDespia()) {
+    return Promise.resolve({
+      success: false,
+      error: "Biometric login is only available in the Despia native app",
+    });
+  }
+
+  registerBiometricCallbacks();
+
+  return new Promise((resolve) => {
+    bioResolve = resolve;
+    try {
+      despia("bioauth://");
+    } catch {
+      resolve({ success: false, error: "Could not start biometric authentication" });
+    }
+  });
+}
+
+export interface LocationFix {
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+  altitude?: number | null;
+  heading?: number | null;
+  speed?: number | null;
+  timestamp?: number;
+}
+
+export function getCurrentLocation(): Promise<LocationFix> {
+  return new Promise((resolve, reject) => {
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+      reject(new Error("Location services are not available"));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        resolve({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+          altitude: pos.coords.altitude,
+          heading: pos.coords.heading,
+          speed: pos.coords.speed,
+          timestamp: pos.timestamp,
+        }),
+      (err) => reject(new Error(err.message)),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+    );
+  });
+}
+
+export function linkPushUserId(userId: string) {
+  if (!isDespia()) return;
+  try {
+    despia(`setonesignalplayerid://?user_id=${encodeURIComponent(userId)}`);
+  } catch {
+    // Ignore; push linking is a best-effort enhancement.
+  }
+}
+
+export async function checkPushPermission(): Promise<boolean | null> {
+  if (!isDespia()) return null;
+  try {
+    const result = (await despia("checkNativePushPermissions://", ["nativePushEnabled"])) as {
+      nativePushEnabled?: boolean;
+    };
+    return result?.nativePushEnabled ?? false;
+  } catch {
+    return false;
+  }
+}
+
+export function openNativeSettings() {
+  if (!isDespia()) return;
+  try {
+    despia("settingsapp://");
+  } catch {
+    // Fallback silently if the runtime doesn't support it.
+  }
+}
