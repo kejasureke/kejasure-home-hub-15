@@ -548,7 +548,23 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
 
             <div className="w-full space-y-3 mt-auto pb-10">
               <button
-                onClick={() => { try { localStorage.removeItem(AUTH_STATE_KEY); } catch {} onComplete(); }}
+                onClick={async () => {
+                  haptic("heavy");
+                  const result = await requestBiometric();
+                  if (result.success) {
+                    try { localStorage.setItem("kejasure_biometric_enabled", "true"); } catch {}
+                    haptic("success");
+                  } else {
+                    triggerErrorHaptic();
+                    toast({
+                      title: "Biometric setup",
+                      description: result.error || "Could not enable biometrics. You can try again in Settings.",
+                      variant: "destructive",
+                    });
+                  }
+                  try { localStorage.removeItem(AUTH_STATE_KEY); } catch {}
+                  onComplete();
+                }}
                 className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
               >
                 Enable Biometrics
