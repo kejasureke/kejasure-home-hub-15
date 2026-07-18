@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ArrowLeft, Navigation, Crosshair, CircleOff } from "lucide-react";
+import { ArrowLeft, Navigation, Crosshair, CircleOff, MapPin, Settings as SettingsIcon, AlertTriangle } from "lucide-react";
 import { properties, serviceProviders } from "@/data/mockData";
 import { useMapPan } from "@/hooks/useMapPan";
 import MapPins, { type Pin, type PinType } from "./map/MapPins";
 import SelectedCard from "./map/SelectedCard";
 import ZoomControls from "./map/ZoomControls";
-import { getCurrentLocation, haptic } from "@/lib/despia";
+import { getCurrentLocation, haptic, isDespia, openNativeSettings } from "@/lib/despia";
 import { useToast } from "@/hooks/use-toast";
 
 const LOCATION_KEY = "kejasure_location_enabled";
