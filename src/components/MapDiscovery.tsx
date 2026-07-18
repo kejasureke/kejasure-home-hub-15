@@ -227,6 +227,31 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
         ))}
       </div>
 
+      {/* GPS status + auto-recenter */}
+      <div className="px-4 pb-3 flex items-center gap-2">
+        <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-medium ${
+          gpsFix ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
+        }`}>
+          {gpsFix ? <Crosshair className="w-3 h-3" /> : <CircleOff className="w-3 h-3" />}
+          {gpsFix
+            ? <>±{Math.round(gpsFix.accuracy)}m · {formatAgo(gpsFix.ts)}</>
+            : locationEnabled ? "No GPS fix yet" : "Location off"}
+        </div>
+        <button
+          onClick={toggleAutoRecenter}
+          className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold transition-colors ${
+            autoRecenter && locationEnabled
+              ? "gradient-trust text-primary-foreground"
+              : "bg-secondary text-secondary-foreground"
+          } ${!locationEnabled ? "opacity-60" : ""}`}
+          aria-pressed={autoRecenter}
+        >
+          <Navigation className="w-3 h-3" />
+          Auto-recenter {autoRecenter && locationEnabled ? "on" : "off"}
+        </button>
+      </div>
+
+
       {/* Mock Map */}
       <div
         className="flex-1 relative bg-muted overflow-hidden mx-4 rounded-2xl touch-none"
