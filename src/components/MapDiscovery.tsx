@@ -35,6 +35,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [filter, setFilter] = useState<"all" | "rentals" | "shortstays" | "services">("all");
   const [showHereTooltip, setShowHereTooltip] = useState(false);
   const [gpsFix, setGpsFix] = useState<{ accuracy: number; ts: number } | null>(null);
+  const [locError, setLocError] = useState<null | "off" | "denied" | "unavailable" | "timeout">(null);
   const [, forceTick] = useState(0);
   const [locationEnabled, setLocationEnabled] = useState(() => {
     try { return localStorage.getItem(LOCATION_KEY) === "true"; } catch { return false; }
