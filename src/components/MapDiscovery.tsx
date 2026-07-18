@@ -150,12 +150,10 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
 
   const toggleAutoRecenter = () => {
     if (!locationEnabled) {
-      toast({
-        title: "Enable Location first",
-        description: "Turn on Location Services in Settings to use auto-recenter.",
-      });
+      setLocError("off");
       return;
     }
+
     setAutoRecenter((v) => {
       const next = !v;
       try { localStorage.setItem(AUTO_RECENTER_KEY, String(next)); } catch {}
