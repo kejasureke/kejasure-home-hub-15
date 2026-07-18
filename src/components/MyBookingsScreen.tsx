@@ -1,6 +1,8 @@
-import { useState, useMemo } from "react";
-import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, ShieldAlert, Calendar, MoreVertical } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, ShieldAlert, Calendar, MoreVertical, CalendarClock, Star } from "lucide-react";
 import { useBookings, type BookingStatus, type Booking } from "@/hooks/useBookings";
+import BookingRescheduleModal from "./BookingRescheduleModal";
+import { toast } from "sonner";
 
 interface MyBookingsScreenProps {
   onBack: () => void;
