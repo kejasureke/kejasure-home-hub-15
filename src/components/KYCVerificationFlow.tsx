@@ -494,7 +494,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             {/* Back (only for national ID) */}
             {(docType === "national_id") && (
               <div
-                onClick={() => setIdBackUploaded(true)}
+                onClick={() => openCamera(() => { haptic("success"); setIdBackUploaded(true); })}
                 className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
                   idBackUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
                 }`}
