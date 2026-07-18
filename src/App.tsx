@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SplashScreen from "@/components/SplashScreen";
 import DesktopBlocker from "@/components/DesktopBlocker";
+import OfflineBanner from "@/components/OfflineBanner";
 import OnboardingFlow, { isOnboarded } from "@/components/onboarding/OnboardingFlow";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -40,6 +41,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <OfflineBanner />
         {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
         {!showSplash && !onboarded && (
           <OnboardingFlow onComplete={() => setOnboarded(true)} />

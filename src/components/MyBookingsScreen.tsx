@@ -1,6 +1,8 @@
-import { useState, useMemo } from "react";
-import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, ShieldAlert, Calendar, MoreVertical } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, ShieldAlert, Calendar, MoreVertical, CalendarClock, Star } from "lucide-react";
 import { useBookings, type BookingStatus, type Booking } from "@/hooks/useBookings";
+import BookingRescheduleModal from "./BookingRescheduleModal";
+import { toast } from "sonner";
 
 interface MyBookingsScreenProps {
   onBack: () => void;
@@ -35,6 +37,25 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
   const { bookings, counts, cancelBooking, updateBooking } = useBookings();
   const [tab, setTab] = useState<BookingStatus | "all">("pending");
   const [actionFor, setActionFor] = useState<Booking | null>(null);
+  const [rescheduleFor, setRescheduleFor] = useState<Booking | null>(null);
+  const [reviewed, setReviewed] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("kejasure_reviewed_bookings") || "[]")); } catch { return new Set(); }
+  });
+  const [, tick] = useState(0);
+
+  // Re-render every 30s so check-in countdowns stay fresh
+  useEffect(() => {
+    const id = setInterval(() => tick((n) => n + 1), 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  const markReviewed = (id: string) => {
+    const next = new Set(reviewed);
+    next.add(id);
+    setReviewed(next);
+    try { localStorage.setItem("kejasure_reviewed_bookings", JSON.stringify([...next])); } catch {}
+    toast.success("Thanks for your review!");
+  };
   
 
   const filtered = useMemo(() => {
@@ -146,6 +167,22 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                         <Clock className="w-3 h-3" /> Avg response: {b.responseTime}
                       </div>
                     )}
+                    {b.status === "accepted" && (() => {
+                      const target = new Date(b.date).getTime();
+                      const diff = target - Date.now();
+                      if (diff < -86400000) return null; // >1 day past
+                      const days = Math.ceil(diff / 86400000);
+                      const label =
+                        diff < 0 ? (isStay ? "Check-in today" : "Viewing today") :
+                        days === 0 ? (isStay ? "Check-in today" : "Viewing today") :
+                        days === 1 ? (isStay ? "Check-in tomorrow" : "Viewing tomorrow") :
+                        `${isStay ? "Check-in" : "Viewing"} in ${days} days`;
+                      return (
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold text-trust pt-1">
+                          <CalendarClock className="w-3 h-3" /> {label}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Actions */}
@@ -165,6 +202,12 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                       >
                         <MessageCircle className="w-3.5 h-3.5" /> Chat
                       </button>
+                      <button
+                        onClick={() => setRescheduleFor(b)}
+                        className="flex-1 py-2.5 rounded-xl bg-secondary text-xs font-semibold text-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
+                      >
+                        <CalendarClock className="w-3.5 h-3.5" /> Reschedule
+                      </button>
                     </div>
                   )}
 
@@ -175,6 +218,25 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                       <p className="text-[10px] text-muted-foreground leading-relaxed">
                         <span className="font-semibold text-accent-foreground">Safety:</span> Arrange payment directly with the host on arrival. KejaSure does not handle rent or deposits — never send money before viewing.
                       </p>
+                    </div>
+                  )}
+
+                  {/* Post-stay review prompt */}
+                  {b.status === "completed" && !reviewed.has(b.id) && (
+                    <div className="mx-3 mb-3 p-3 rounded-xl bg-gold/10 border border-gold/30 flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gold/20 flex items-center justify-center shrink-0">
+                        <Star className="w-4 h-4 text-gold-foreground fill-gold-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-foreground">How was your experience?</p>
+                        <p className="text-[10px] text-muted-foreground">Help others by leaving a quick review.</p>
+                      </div>
+                      <button
+                        onClick={() => markReviewed(b.id)}
+                        className="shrink-0 px-3 py-1.5 rounded-lg gradient-trust text-[10px] font-bold text-primary-foreground active:scale-95"
+                      >
+                        Rate
+                      </button>
                     </div>
                   )}
                 </div>
@@ -193,6 +255,14 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
             <p className="text-[11px] text-muted-foreground mb-4">{statusBadge(actionFor.status).label}</p>
 
             <div className="space-y-2">
+              {(actionFor.status === "pending" || actionFor.status === "accepted") && (
+                <button
+                  onClick={() => { setRescheduleFor(actionFor); setActionFor(null); }}
+                  className="w-full py-3 rounded-xl bg-secondary text-sm font-semibold text-foreground active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <CalendarClock className="w-4 h-4" /> Reschedule
+                </button>
+              )}
               {(actionFor.status === "pending" || actionFor.status === "accepted") && (
                 <button
                   onClick={() => { cancelBooking(actionFor.id); setActionFor(null); }}
@@ -218,6 +288,14 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
             </div>
           </div>
         </div>
+      )}
+
+      {rescheduleFor && (
+        <BookingRescheduleModal
+          booking={rescheduleFor}
+          onClose={() => setRescheduleFor(null)}
+          onSave={(patch) => updateBooking(rescheduleFor.id, patch)}
+        />
       )}
 
     </div>

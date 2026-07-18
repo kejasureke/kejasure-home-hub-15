@@ -36,6 +36,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [showHereTooltip, setShowHereTooltip] = useState(false);
   const [gpsFix, setGpsFix] = useState<{ accuracy: number; ts: number } | null>(null);
   const [locError, setLocError] = useState<null | "off" | "denied" | "unavailable" | "timeout">(null);
+  const [heading, setHeading] = useState<number | null>(null);
   const [, forceTick] = useState(0);
   const [locationEnabled, setLocationEnabled] = useState(() => {
     try { return localStorage.getItem(LOCATION_KEY) === "true"; } catch { return false; }
@@ -43,6 +44,20 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [autoRecenter, setAutoRecenter] = useState(() => {
     try { return localStorage.getItem(AUTO_RECENTER_KEY) === "true"; } catch { return false; }
   });
+
+  // Live compass heading (device orientation). Uses webkitCompassHeading on
+  // iOS/Despia when available, otherwise falls back to `alpha`.
+  useEffect(() => {
+    if (!locationEnabled) return;
+    const onOrient = (e: DeviceOrientationEvent & { webkitCompassHeading?: number }) => {
+      const h = typeof e.webkitCompassHeading === "number"
+        ? e.webkitCompassHeading
+        : e.alpha != null ? 360 - e.alpha : null;
+      if (h != null && !Number.isNaN(h)) setHeading(h);
+    };
+    window.addEventListener("deviceorientation", onOrient, true);
+    return () => window.removeEventListener("deviceorientation", onOrient, true);
+  }, [locationEnabled]);
 
   useEffect(() => {
     if (!showHereTooltip) return;
@@ -374,7 +389,24 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
           className="absolute z-30"
           style={{ left: MAP_W / 2 + pan.x, top: MAP_H / 2 + pan.y, transform: "translate(-50%, -50%)" }}
         >
-          <div className="w-4 h-4 rounded-full bg-blue-500 border-3 border-card shadow-lg animate-pulse" />
+          {/* Compass cone (heading) */}
+          {heading != null && (
+            <div
+              className="absolute left-1/2 top-1/2 pointer-events-none"
+              style={{ transform: `translate(-50%, -50%) rotate(${heading}deg)` }}
+            >
+              <div
+                className="w-0 h-0 -translate-y-6"
+                style={{
+                  borderLeft: "10px solid transparent",
+                  borderRight: "10px solid transparent",
+                  borderBottom: "16px solid rgba(59,130,246,0.55)",
+                  filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.25))",
+                }}
+              />
+            </div>
+          )}
+          <div className="w-4 h-4 rounded-full bg-blue-500 border-3 border-card shadow-lg animate-pulse relative z-10" />
           <div className="absolute -inset-3 rounded-full bg-blue-500/20 animate-ping" />
           {showHereTooltip && (
             <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2.5 py-1 rounded-lg bg-foreground text-background text-[10px] font-semibold whitespace-nowrap shadow-lg animate-fade-in pointer-events-none">
