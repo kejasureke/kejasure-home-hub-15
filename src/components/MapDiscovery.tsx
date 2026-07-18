@@ -5,6 +5,8 @@ import { useMapPan } from "@/hooks/useMapPan";
 import MapPins, { type Pin, type PinType } from "./map/MapPins";
 import SelectedCard from "./map/SelectedCard";
 import ZoomControls from "./map/ZoomControls";
+import { getCurrentLocation, haptic } from "@/lib/despia";
+import { useToast } from "@/hooks/use-toast";
 
 interface MapDiscoveryProps {
   onBack: () => void;
@@ -27,9 +29,25 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
     return () => clearTimeout(t);
   }, [showHereTooltip]);
 
-  const handleRecenter = () => {
+  const { toast } = useToast();
+
+  const handleRecenter = async () => {
     recenter();
     setShowHereTooltip(true);
+    // Use real GPS when available so the "Here" pin matches the device.
+    try {
+      const fix = await getCurrentLocation();
+      haptic("light");
+      toast({
+        title: "Location updated",
+        description: `Centered on your position (±${Math.round(fix.accuracy ?? 0)}m).`,
+      });
+    } catch (err: any) {
+      // Silent when preview/web denies; only toast if it looks like a real device error.
+      if (err?.message && !/denied|unavailable/i.test(err.message)) {
+        toast({ title: "Location unavailable", description: err.message });
+      }
+    }
   };
 
   const {

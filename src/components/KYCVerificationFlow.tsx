@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, AlertCircle, User, Building2, Fingerprint, X, ChevronRight, Phone, Smartphone } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import AIPhotoVerification from "./AIPhotoVerification";
+import { openCamera, haptic } from "@/lib/despia";
 
 interface KYCVerificationFlowProps {
   onClose: (completed?: boolean) => void;
@@ -468,7 +469,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
             {/* Front */}
             <div
-              onClick={() => setIdFrontUploaded(true)}
+              onClick={() => openCamera(() => { haptic("success"); setIdFrontUploaded(true); })}
               className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
                 idFrontUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
               }`}
@@ -493,7 +494,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             {/* Back (only for national ID) */}
             {(docType === "national_id") && (
               <div
-                onClick={() => setIdBackUploaded(true)}
+                onClick={() => openCamera(() => { haptic("success"); setIdBackUploaded(true); })}
                 className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
                   idBackUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
                 }`}
@@ -548,8 +549,10 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
             <div
               onClick={() => {
-                setSelfieCapture("capturing");
-                setTimeout(() => setSelfieCapture("done"), 1500);
+                openCamera(() => {
+                  setSelfieCapture("capturing");
+                  setTimeout(() => { haptic("success"); setSelfieCapture("done"); }, 1500);
+                });
               }}
               className={`aspect-square max-w-[280px] mx-auto rounded-[50%] border-4 flex items-center justify-center cursor-pointer transition-all ${
                 selfieCapture === "done" ? "border-primary bg-primary/5" : selfieCapture === "capturing" ? "border-accent animate-pulse bg-accent/5" : "border-dashed border-border bg-card"

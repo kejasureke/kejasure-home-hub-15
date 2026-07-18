@@ -137,6 +137,57 @@ export async function checkPushPermission(): Promise<boolean | null> {
   }
 }
 
+/**
+ * Ask the native shell to prompt the OS push permission dialog (iOS/Android 13+).
+ * Safe to call multiple times; the OS only prompts once.
+ */
+export function requestPushPermission() {
+  if (!isDespia()) return;
+  try {
+    despia("registerpush://");
+  } catch {
+    // Ignore.
+  }
+}
+
+/**
+ * Open the native camera. On Despia we invoke the native camera scheme.
+ * On the web we fall back to a hidden <input type=file capture> so the flow
+ * still works in the preview. Resolves once the user picks/cancels.
+ */
+export function openCamera(onCapture?: (file: File | null) => void): void {
+  // Native camera on Despia
+  if (isDespia()) {
+    try {
+      despia("camera://");
+    } catch {
+      // fall through to web fallback
+    }
+    // Despia camera returns via the app's own upload plumbing; we still fire
+    // the callback so UI can advance optimistically.
+    onCapture?.(null);
+    return;
+  }
+
+  if (typeof document === "undefined") {
+    onCapture?.(null);
+    return;
+  }
+
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.setAttribute("capture", "environment");
+  input.style.display = "none";
+  input.onchange = () => {
+    const file = input.files?.[0] ?? null;
+    onCapture?.(file);
+    input.remove();
+  };
+  document.body.appendChild(input);
+  input.click();
+}
+
 export function openNativeSettings() {
   if (!isDespia()) return;
   try {
