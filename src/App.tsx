@@ -41,6 +41,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <OfflineBanner />
         {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
         {!showSplash && !onboarded && (
           <OnboardingFlow onComplete={() => setOnboarded(true)} />
