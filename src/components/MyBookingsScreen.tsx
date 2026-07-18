@@ -202,6 +202,12 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                       >
                         <MessageCircle className="w-3.5 h-3.5" /> Chat
                       </button>
+                      <button
+                        onClick={() => setRescheduleFor(b)}
+                        className="flex-1 py-2.5 rounded-xl bg-secondary text-xs font-semibold text-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
+                      >
+                        <CalendarClock className="w-3.5 h-3.5" /> Reschedule
+                      </button>
                     </div>
                   )}
 
@@ -212,6 +218,25 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                       <p className="text-[10px] text-muted-foreground leading-relaxed">
                         <span className="font-semibold text-accent-foreground">Safety:</span> Arrange payment directly with the host on arrival. KejaSure does not handle rent or deposits — never send money before viewing.
                       </p>
+                    </div>
+                  )}
+
+                  {/* Post-stay review prompt */}
+                  {b.status === "completed" && !reviewed.has(b.id) && (
+                    <div className="mx-3 mb-3 p-3 rounded-xl bg-gold/10 border border-gold/30 flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gold/20 flex items-center justify-center shrink-0">
+                        <Star className="w-4 h-4 text-gold-foreground fill-gold-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-foreground">How was your experience?</p>
+                        <p className="text-[10px] text-muted-foreground">Help others by leaving a quick review.</p>
+                      </div>
+                      <button
+                        onClick={() => markReviewed(b.id)}
+                        className="shrink-0 px-3 py-1.5 rounded-lg gradient-trust text-[10px] font-bold text-primary-foreground active:scale-95"
+                      >
+                        Rate
+                      </button>
                     </div>
                   )}
                 </div>
@@ -230,6 +255,14 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
             <p className="text-[11px] text-muted-foreground mb-4">{statusBadge(actionFor.status).label}</p>
 
             <div className="space-y-2">
+              {(actionFor.status === "pending" || actionFor.status === "accepted") && (
+                <button
+                  onClick={() => { setRescheduleFor(actionFor); setActionFor(null); }}
+                  className="w-full py-3 rounded-xl bg-secondary text-sm font-semibold text-foreground active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <CalendarClock className="w-4 h-4" /> Reschedule
+                </button>
+              )}
               {(actionFor.status === "pending" || actionFor.status === "accepted") && (
                 <button
                   onClick={() => { cancelBooking(actionFor.id); setActionFor(null); }}
