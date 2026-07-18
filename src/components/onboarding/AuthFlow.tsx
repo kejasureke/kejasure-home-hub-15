@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { haptic, requestBiometric } from "@/lib/despia";
 
 type AuthStep = "phone" | "otp" | "pin" | "confirm-pin" | "biometric";
 
