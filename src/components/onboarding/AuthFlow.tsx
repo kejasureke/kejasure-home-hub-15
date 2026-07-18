@@ -277,6 +277,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
       return;
     }
     setPinError("");
+    haptic("success");
     setStep("biometric");
   };
 
