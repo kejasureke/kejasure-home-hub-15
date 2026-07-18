@@ -193,8 +193,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         </Section>
 
         <Section title="Privacy & Security">
-          <SettingRow icon={Lock} label="Biometric Login" subtitle="Use fingerprint or face unlock" right={<Toggle enabled={biometricEnabled} onToggle={() => setBiometricEnabled(!biometricEnabled)} />} />
-          <SettingRow icon={MapPin} label="Location Services" subtitle="Nearby listings & map features" right={<Toggle enabled={locationEnabled} onToggle={() => setLocationEnabled(!locationEnabled)} />} />
+          <SettingRow icon={Lock} label="Biometric Login" subtitle="Use fingerprint or face unlock" right={<Toggle enabled={biometricEnabled} onToggle={toggleBiometric} />} />
+          <SettingRow icon={MapPin} label="Location Services" subtitle="Nearby listings & map features" right={<Toggle enabled={locationEnabled} onToggle={toggleLocation} />} />
           <SettingRow icon={Eye} label="Profile Visibility" subtitle={visibilityLabel} right={<ChevronRight className="w-4 h-4 text-muted-foreground" />} onClick={() => setShowVisibility(true)} />
           <SettingRow icon={Shield} label="Change PIN" subtitle="Update your 4-digit PIN" right={<ChevronRight className="w-4 h-4 text-muted-foreground" />} onClick={() => setShowPinFlow(true)} />
         </Section>
