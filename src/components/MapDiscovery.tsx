@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ArrowLeft, Navigation } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { ArrowLeft, Navigation, Crosshair, CircleOff } from "lucide-react";
 import { properties, serviceProviders } from "@/data/mockData";
 import { useMapPan } from "@/hooks/useMapPan";
 import MapPins, { type Pin, type PinType } from "./map/MapPins";
@@ -7,6 +7,18 @@ import SelectedCard from "./map/SelectedCard";
 import ZoomControls from "./map/ZoomControls";
 import { getCurrentLocation, haptic } from "@/lib/despia";
 import { useToast } from "@/hooks/use-toast";
+
+const LOCATION_KEY = "kejasure_location_enabled";
+const AUTO_RECENTER_KEY = "kejasure_map_auto_recenter";
+
+const formatAgo = (ts: number) => {
+  const s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+  if (s < 5) return "just now";
+  if (s < 60) return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  return `${Math.floor(m / 60)}h ago`;
+};
 
 interface MapDiscoveryProps {
   onBack: () => void;
