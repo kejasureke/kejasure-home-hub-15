@@ -31,7 +31,7 @@ export const useTheme = () => {
   useEffect(() => {
     applyTheme(theme);
     syncStatusBarWithTheme(theme);
-  }, []);
+  }, [theme]);
 
   return { theme, resolvedTheme: theme, setTheme };
 };
