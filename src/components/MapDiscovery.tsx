@@ -5,6 +5,8 @@ import { useMapPan } from "@/hooks/useMapPan";
 import MapPins, { type Pin, type PinType } from "./map/MapPins";
 import SelectedCard from "./map/SelectedCard";
 import ZoomControls from "./map/ZoomControls";
+import { getCurrentLocation, haptic } from "@/lib/despia";
+import { useToast } from "@/hooks/use-toast";
 
 interface MapDiscoveryProps {
   onBack: () => void;
