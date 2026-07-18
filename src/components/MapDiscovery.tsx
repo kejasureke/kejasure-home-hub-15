@@ -34,6 +34,14 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [selectedPin, setSelectedPin] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "rentals" | "shortstays" | "services">("all");
   const [showHereTooltip, setShowHereTooltip] = useState(false);
+  const [gpsFix, setGpsFix] = useState<{ accuracy: number; ts: number } | null>(null);
+  const [, forceTick] = useState(0);
+  const [locationEnabled, setLocationEnabled] = useState(() => {
+    try { return localStorage.getItem(LOCATION_KEY) === "true"; } catch { return false; }
+  });
+  const [autoRecenter, setAutoRecenter] = useState(() => {
+    try { return localStorage.getItem(AUTO_RECENTER_KEY) === "true"; } catch { return false; }
+  });
 
   useEffect(() => {
     if (!showHereTooltip) return;
@@ -41,26 +49,14 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
     return () => clearTimeout(t);
   }, [showHereTooltip]);
 
-  const { toast } = useToast();
+  // Refresh "last updated" label every 15s while a fix exists.
+  useEffect(() => {
+    if (!gpsFix) return;
+    const t = setInterval(() => forceTick((n) => n + 1), 15000);
+    return () => clearInterval(t);
+  }, [gpsFix]);
 
-  const handleRecenter = async () => {
-    recenter();
-    setShowHereTooltip(true);
-    // Use real GPS when available so the "Here" pin matches the device.
-    try {
-      const fix = await getCurrentLocation();
-      haptic("light");
-      toast({
-        title: "Location updated",
-        description: `Centered on your position (±${Math.round(fix.accuracy ?? 0)}m).`,
-      });
-    } catch (err: any) {
-      // Silent when preview/web denies; only toast if it looks like a real device error.
-      if (err?.message && !/denied|unavailable/i.test(err.message)) {
-        toast({ title: "Location unavailable", description: err.message });
-      }
-    }
-  };
+  const { toast } = useToast();
 
   const {
     zoom,
@@ -74,6 +70,86 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
     project,
     touchHandlers,
   } = useMapPan(CENTER, MAP_W, MAP_H);
+
+  const fetchFix = useCallback(async (opts: { silent?: boolean } = {}) => {
+    if (!locationEnabled) {
+      if (!opts.silent) {
+        toast({
+          title: "Location Services off",
+          description: "Enable Location Services in Settings to use GPS.",
+        });
+      }
+      return null;
+    }
+    try {
+      const fix = await getCurrentLocation();
+      setGpsFix({ accuracy: fix.accuracy ?? 0, ts: Date.now() });
+      if (!opts.silent) haptic("light");
+      return fix;
+    } catch (err: any) {
+      if (!opts.silent && err?.message && !/denied|unavailable/i.test(err.message)) {
+        toast({ title: "Location unavailable", description: err.message });
+      }
+      return null;
+    }
+  }, [locationEnabled, toast]);
+
+  const handleRecenter = async () => {
+    recenter();
+    setShowHereTooltip(true);
+    const fix = await fetchFix();
+    if (fix) {
+      toast({
+        title: "Location updated",
+        description: `Centered on your position (±${Math.round(fix.accuracy ?? 0)}m).`,
+      });
+    }
+  };
+
+  // Auto-recenter: poll GPS every 20s and softly recenter map.
+  const autoTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (autoTimer.current) { clearInterval(autoTimer.current); autoTimer.current = null; }
+    if (!autoRecenter || !locationEnabled) return;
+    // Kick off immediately, then interval.
+    fetchFix({ silent: true }).then((f) => { if (f) recenter(); });
+    autoTimer.current = window.setInterval(() => {
+      fetchFix({ silent: true }).then((f) => { if (f) recenter(); });
+    }, 20000);
+    return () => {
+      if (autoTimer.current) { clearInterval(autoTimer.current); autoTimer.current = null; }
+    };
+  }, [autoRecenter, locationEnabled, fetchFix, recenter]);
+
+  const toggleAutoRecenter = () => {
+    if (!locationEnabled) {
+      toast({
+        title: "Enable Location first",
+        description: "Turn on Location Services in Settings to use auto-recenter.",
+      });
+      return;
+    }
+    setAutoRecenter((v) => {
+      const next = !v;
+      try { localStorage.setItem(AUTO_RECENTER_KEY, String(next)); } catch {}
+      haptic("light");
+      toast({
+        title: next ? "Auto-recenter on" : "Auto-recenter off",
+        description: next ? "Map will follow your location every 20s." : "Map will stay put.",
+      });
+      return next;
+    });
+  };
+
+  // Sync location toggle if changed elsewhere (Settings).
+  useEffect(() => {
+    const onStorage = () => {
+      try { setLocationEnabled(localStorage.getItem(LOCATION_KEY) === "true"); } catch {}
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
 
   const propertyPins: Pin[] = properties
     .filter((p) => p.county === "Nairobi")
