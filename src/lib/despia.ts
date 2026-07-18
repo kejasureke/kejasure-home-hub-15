@@ -33,22 +33,30 @@ export function syncStatusBarWithTheme(theme: "light" | "dark") {
   }
 }
 
+declare global {
+  interface Window {
+    onBioAuthSuccess?: () => void;
+    onBioAuthFailure?: (code: string, message: string) => void;
+    onBioAuthUnavailable?: () => void;
+  }
+}
+
 let bioResolve: ((result: { success: boolean; error?: string }) => void) | null = null;
 
 export function registerBiometricCallbacks() {
   if (typeof window === "undefined") return;
 
-  (window as any).onBioAuthSuccess = () => {
+  window.onBioAuthSuccess = () => {
     bioResolve?.({ success: true });
     bioResolve = null;
   };
 
-  (window as any).onBioAuthFailure = (_code: string, message: string) => {
+  window.onBioAuthFailure = (_code: string, message: string) => {
     bioResolve?.({ success: false, error: message });
     bioResolve = null;
   };
 
-  (window as any).onBioAuthUnavailable = () => {
+  window.onBioAuthUnavailable = () => {
     bioResolve?.({ success: false, error: "Biometric authentication is unavailable on this device" });
     bioResolve = null;
   };
