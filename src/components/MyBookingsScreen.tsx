@@ -290,6 +290,14 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
         </div>
       )}
 
+      {rescheduleFor && (
+        <BookingRescheduleModal
+          booking={rescheduleFor}
+          onClose={() => setRescheduleFor(null)}
+          onSave={(patch) => updateBooking(rescheduleFor.id, patch)}
+        />
+      )}
+
     </div>
   );
 };
