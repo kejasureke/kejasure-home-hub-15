@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { Image as ImageIcon } from "lucide-react";
+import BlurImage from "./BlurImage";
 
 interface SwipeableImageGalleryProps {
   images: string[];
