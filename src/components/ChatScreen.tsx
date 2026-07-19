@@ -226,9 +226,9 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
         </div>
 
         {(() => {
-          // Find the first inbound message after my last read message → show "Unread" divider
-          const lastMineSeenIdx = [...messages].map((m, i) => ({ m, i })).reverse().find(({ m }) => m.sender === "me")?.i ?? -1;
-          const firstUnreadIdx = messages.findIndex((m, i) => m.sender === "other" && i > lastMineSeenIdx);
+          // Find the first inbound message after my last sent message → show "Unread" divider
+          const lastMineIdx = [...messages].map((m, i) => ({ m, i })).reverse().find(({ m }) => m.sender === "me")?.i ?? -1;
+          const firstUnreadIdx = messages.findIndex((m, i) => m.sender === "other" && i > lastMineIdx);
           return messages.map((msg, i) => (
             <div key={msg.id}>
               {i === firstUnreadIdx && firstUnreadIdx > 0 && (
@@ -239,47 +239,46 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
                 </div>
               )}
               <div className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"} animate-fade-in`}>
-
-
-        {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"} animate-fade-in`}>
-            <div className={`max-w-[80%] ${
-              msg.image ? "rounded-2xl overflow-hidden" : `px-4 py-2.5 rounded-2xl ${
-                msg.sender === "me"
-                  ? "gradient-trust text-primary-foreground rounded-br-md"
-                  : "bg-card card-shadow text-foreground rounded-bl-md"
-              }`
-            }`}>
-              {msg.image ? (
-                <div className="relative">
-                  <div className="w-48 h-48 bg-secondary rounded-2xl flex items-center justify-center">
-                    <Image className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <div className={`absolute bottom-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full ${
-                    msg.sender === "me" ? "bg-foreground/30" : "bg-card/80"
-                  }`}>
-                    <span className="text-[10px] text-card">{msg.time}</span>
-                  </div>
+                <div className={`max-w-[80%] ${
+                  msg.image ? "rounded-2xl overflow-hidden" : `px-4 py-2.5 rounded-2xl ${
+                    msg.sender === "me"
+                      ? "gradient-trust text-primary-foreground rounded-br-md"
+                      : "bg-card card-shadow text-foreground rounded-bl-md"
+                  }`
+                }`}>
+                  {msg.image ? (
+                    <div className="relative">
+                      <div className="w-48 h-48 bg-secondary rounded-2xl flex items-center justify-center">
+                        <Image className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                      <div className={`absolute bottom-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full ${
+                        msg.sender === "me" ? "bg-foreground/30" : "bg-card/80"
+                      }`}>
+                        <span className="text-[10px] text-card">{msg.time}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm leading-relaxed">{msg.text}</p>
+                      <div className={`flex items-center gap-1 mt-1 ${msg.sender === "me" ? "justify-end" : ""}`}>
+                        <span className={`text-[10px] ${msg.sender === "me" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                          {msg.time}
+                        </span>
+                        {msg.status === "sending" && (
+                          <div className="w-3 h-3 rounded-full border border-primary-foreground/40 border-t-transparent animate-spin" />
+                        )}
+                        {msg.status === "sent" && <Check className="w-3 h-3 text-primary-foreground/50" />}
+                        {msg.status === "delivered" && <CheckCheck className="w-3 h-3 text-primary-foreground/50" />}
+                        {msg.status === "seen" && <CheckCheck className="w-3 h-3 text-primary-foreground" />}
+                      </div>
+                    </>
+                  )}
                 </div>
-              ) : (
-                <>
-                  <p className="text-sm leading-relaxed">{msg.text}</p>
-                  <div className={`flex items-center gap-1 mt-1 ${msg.sender === "me" ? "justify-end" : ""}`}>
-                    <span className={`text-[10px] ${msg.sender === "me" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                      {msg.time}
-                    </span>
-                    {msg.status === "sending" && (
-                      <div className="w-3 h-3 rounded-full border border-primary-foreground/40 border-t-transparent animate-spin" />
-                    )}
-                    {msg.status === "sent" && <Check className="w-3 h-3 text-primary-foreground/50" />}
-                    {msg.status === "delivered" && <CheckCheck className="w-3 h-3 text-primary-foreground/50" />}
-                    {msg.status === "seen" && <CheckCheck className="w-3 h-3 text-primary-foreground" />}
-                  </div>
-                </>
-              )}
+              </div>
             </div>
-          </div>
-        ))}
+          ));
+        })()}
+
 
         {/* Typing indicator */}
         {isTyping && (
