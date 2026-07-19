@@ -188,7 +188,20 @@ const HomeFeed = () => {
     saveSearch({ label, county, subcounty: subcounty, estate, segment });
   };
 
+  const handleRefresh = async () => {
+    await new Promise((r) => setTimeout(r, 700));
+    toast("Feed refreshed");
+  };
+
+  // Android hardware back — close overlays before allowing app exit.
+  useHardwareBack(showFilters, () => setShowFilters(false));
+  useHardwareBack(showCompareSelector, () => {
+    setShowCompareSelector(false);
+    setCompareFromProperty(null);
+  });
+
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="pb-32">
       {/* Header */}
       <div className="gradient-trust px-4 pt-safe pb-5">
