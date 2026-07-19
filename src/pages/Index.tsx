@@ -21,6 +21,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { properties } from "@/data/mockData";
 import PropertyCard from "@/components/PropertyCard";
 import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
