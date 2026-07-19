@@ -694,6 +694,12 @@ const HomeFeed = () => {
                         <p className="text-xs font-bold text-primary mt-0.5">
                           KES {(p.price / 1000).toFixed(0)}K<span className="font-normal text-muted-foreground">{p.priceUnit}</span>
                         </p>
+                        {recentMap.get(p.id) && (
+                          <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5" />
+                            {formatRelativeTime(recentMap.get(p.id)!)}
+                          </p>
+                        )}
                       </div>
                     </button>
                   ))}
