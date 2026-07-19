@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { toast } from "sonner";
 import WelcomeScreens from "./WelcomeScreens";
 import RoleSelection, { type UserRole } from "./RoleSelection";
 import AuthFlow from "./AuthFlow";
