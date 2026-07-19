@@ -1,4 +1,5 @@
 import { Home, Search, MessageCircle, User, Heart, LayoutDashboard } from "lucide-react";
+import { haptic } from "@/lib/despia";
 
 interface BottomNavProps {
   activeTab: string;
@@ -24,6 +25,18 @@ const BottomNav = ({ activeTab, onTabChange, chatBadge = 0, profileBadge = 0, sh
     return 0;
   };
 
+  const handleTap = (id: string) => {
+    if (id === activeTab) {
+      // Re-tap same tab: scroll active view to top
+      haptic("light");
+      window.dispatchEvent(new CustomEvent("tab-reselected", { detail: { tab: id } }));
+      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch {}
+      return;
+    }
+    haptic("light");
+    onTabChange(id);
+  };
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass-surface border-t border-border safe-bottom">
       <div className="flex items-center justify-around px-2 py-2 max-w-lg mx-auto">
@@ -33,7 +46,7 @@ const BottomNav = ({ activeTab, onTabChange, chatBadge = 0, profileBadge = 0, sh
           return (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => handleTap(tab.id)}
               className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all duration-200 relative"
             >
               <div className={`p-1.5 rounded-xl transition-all duration-200 relative ${isActive ? "bg-primary/10" : ""}`}>
