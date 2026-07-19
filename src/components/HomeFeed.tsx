@@ -56,9 +56,38 @@ const HomeFeed = () => {
     maxSqft: 100000,
   });
 
-  const { recentIds, addRecent } = useRecentlyViewed();
+  const { recentIds, recentMap, addRecent } = useRecentlyViewed();
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { searches, saveSearch, removeSearch } = useSavedSearches();
+
+  // Skeleton on segment change / first mount for perceived speed
+  const [loadingSegment, setLoadingSegment] = useState(true);
+  useEffect(() => {
+    setLoadingSegment(true);
+    const t = setTimeout(() => setLoadingSegment(false), 320);
+    return () => clearTimeout(t);
+  }, [segment]);
+
+  // Search suggestions state
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [recentQueries, setRecentQueries] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem("kejasure_recent_queries") || "[]"); } catch { return []; }
+  });
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+  const commitQuery = (q: string) => {
+    const trimmed = q.trim();
+    if (!trimmed) return;
+    const next = [trimmed, ...recentQueries.filter(x => x.toLowerCase() !== trimmed.toLowerCase())].slice(0, 5);
+    setRecentQueries(next);
+    try { localStorage.setItem("kejasure_recent_queries", JSON.stringify(next)); } catch {}
+  };
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) setSearchFocused(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const filteredProperties = useMemo(() => {
     let result = properties.filter((p) => {
