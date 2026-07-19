@@ -75,6 +75,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   ];
 
   const filtered = contacts
+    .filter((c) => !archived.has(c.id))
     .filter((c) => {
       if (search) {
         const q = search.toLowerCase();
