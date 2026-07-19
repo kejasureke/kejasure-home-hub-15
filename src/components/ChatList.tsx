@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users } from "lucide-react";
+import PullToRefresh from "./PullToRefresh";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 interface ChatContact {
   id: string;
@@ -75,7 +78,15 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
     }
   };
 
+  const handleRefresh = async () => {
+    await new Promise((r) => setTimeout(r, 700));
+    toast("Chats refreshed");
+  };
+
+  useHardwareBack(showNewChat, () => { setShowNewChat(false); setNewChatSearch(""); });
+
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="pb-32">
       {/* Header */}
       <div className="px-4 pt-safe mb-4">
@@ -285,6 +296,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 };
 

@@ -1,5 +1,6 @@
 import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench, Sparkles, Building2, X, BookmarkPlus, Bookmark, SearchX } from "lucide-react";
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 
 import PropertyCard from "./PropertyCard";
 import ServiceCard from "./ServiceCard";
@@ -9,11 +10,13 @@ import CompareProperties from "./CompareProperties";
 import CompareSelectionModal from "./CompareSelectionModal";
 import AIPropertyMatch from "./AIPropertyMatch";
 import NeighborhoodIntelligence from "./NeighborhoodIntelligence";
+import PullToRefresh from "./PullToRefresh";
 import { properties, serviceProviders } from "@/data/mockData";
 import MapDiscovery from "./MapDiscovery";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 const segments = ["Rentals", "Short Stays", "Business Spaces", "Corporate Stay", "Services"] as const;
 
@@ -185,7 +188,20 @@ const HomeFeed = () => {
     saveSearch({ label, county, subcounty: subcounty, estate, segment });
   };
 
+  const handleRefresh = async () => {
+    await new Promise((r) => setTimeout(r, 700));
+    toast("Feed refreshed");
+  };
+
+  // Android hardware back — close overlays before allowing app exit.
+  useHardwareBack(showFilters, () => setShowFilters(false));
+  useHardwareBack(showCompareSelector, () => {
+    setShowCompareSelector(false);
+    setCompareFromProperty(null);
+  });
+
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="pb-32">
       {/* Header */}
       <div className="gradient-trust px-4 pt-safe pb-5">
@@ -790,6 +806,7 @@ const HomeFeed = () => {
         segment={segment}
       />
     </div>
+    </PullToRefresh>
   );
 };
 
