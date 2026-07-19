@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle
 import { useBookings, type BookingStatus, type Booking } from "@/hooks/useBookings";
 import BookingRescheduleModal from "./BookingRescheduleModal";
 import { toast } from "sonner";
+import EmptyIllustration from "./EmptyIllustration";
 
 interface MyBookingsScreenProps {
   onBack: () => void;
