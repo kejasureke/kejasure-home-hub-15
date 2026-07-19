@@ -76,6 +76,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
     const timer = setTimeout(() => {
       _bookingsApi.patch(submittedId, { status: "accepted" });
       setStep("accepted");
+      haptic("success");
       pushGlobalAlert({
         type: "booking",
         title: `${isShortStay ? "Booking" : "Viewing"} Accepted! 🎉`,
