@@ -1,5 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
+import { haptic } from "@/lib/despia";
+
+
 
 const STORAGE_KEY = "kejasure_favorites";
 
