@@ -167,70 +167,71 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
       {/* Chat List */}
       <div className="px-4 space-y-1.5">
         {filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
-              <MessageCircle className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <p className="text-sm font-medium text-foreground mb-1">No conversations found</p>
-            <p className="text-xs text-muted-foreground">Try adjusting your filters</p>
+          <div className="flex flex-col items-center justify-center py-12">
+            <EmptyIllustration variant="chats" className="w-28 h-28 mb-3" />
+            <p className="text-sm font-semibold text-foreground mb-1">No conversations yet</p>
+            <p className="text-xs text-muted-foreground text-center px-6">
+              Chats with landlords, hosts and service pros will appear here.
+            </p>
           </div>
         )}
 
         {filtered.map((chat) => (
-          <button
-            key={chat.id}
-            onClick={() => onOpenChat(chat)}
-            className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform relative"
-          >
-            {/* Avatar */}
-            <div className="relative shrink-0">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                chat.avatar.length > 2 ? "bg-secondary text-lg" : "bg-primary/10"
-              }`}>
-                {chat.avatar.length > 2 ? (
-                  <span>{chat.avatar}</span>
-                ) : (
-                  <span className="text-sm font-semibold text-primary">{chat.avatar}</span>
-                )}
-              </div>
-              {chat.online && (
-                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-trust border-2 border-card" />
-              )}
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 text-left min-w-0">
-              <div className="flex items-center justify-between mb-0.5">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  {chat.pinned && <Pin className="w-3 h-3 text-primary shrink-0 rotate-45" />}
-                  <h3 className="text-sm font-semibold truncate">{chat.name}</h3>
-                  {chat.verified && <ShieldCheck className="w-3.5 h-3.5 text-trust shrink-0" />}
-                  {chat.muted && <BellOff className="w-3 h-3 text-muted-foreground shrink-0" />}
+          <SwipeableChatRow key={chat.id} onArchive={() => archiveChat(chat.id)}>
+            <button
+              onClick={() => onOpenChat(chat)}
+              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform relative"
+            >
+              {/* Avatar */}
+              <div className="relative shrink-0">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  chat.avatar.length > 2 ? "bg-secondary text-lg" : "bg-primary/10"
+                }`}>
+                  {chat.avatar.length > 2 ? (
+                    <span>{chat.avatar}</span>
+                  ) : (
+                    <span className="text-sm font-semibold text-primary">{chat.avatar}</span>
+                  )}
                 </div>
-                <span className={`text-[10px] shrink-0 ml-2 ${chat.unread > 0 ? "text-primary font-semibold" : "text-muted-foreground"}`}>
-                  {chat.time}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${roleColor(chat.role)}`}>
-                  {chat.role}
-                </span>
-                {chat.property && (
-                  <span className="text-[10px] text-muted-foreground truncate">· {chat.property}</span>
+                {chat.online && (
+                  <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-trust border-2 border-card" />
                 )}
               </div>
-              <p className={`text-xs truncate mt-0.5 ${chat.unread > 0 ? "text-foreground font-medium" : "text-muted-foreground"}`}>
-                {chat.lastMessage}
-              </p>
-            </div>
 
-            {/* Unread badge */}
-            {chat.unread > 0 && (
-              <div className="w-5 h-5 rounded-full gradient-trust flex items-center justify-center shrink-0">
-                <span className="text-[10px] font-bold text-primary-foreground">{chat.unread}</span>
+              {/* Content */}
+              <div className="flex-1 text-left min-w-0">
+                <div className="flex items-center justify-between mb-0.5">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    {chat.pinned && <Pin className="w-3 h-3 text-primary shrink-0 rotate-45" />}
+                    <h3 className="text-sm font-semibold truncate">{chat.name}</h3>
+                    {chat.verified && <ShieldCheck className="w-3.5 h-3.5 text-trust shrink-0" />}
+                    {chat.muted && <BellOff className="w-3 h-3 text-muted-foreground shrink-0" />}
+                  </div>
+                  <span className={`text-[10px] shrink-0 ml-2 ${chat.unread > 0 ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+                    {chat.time}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${roleColor(chat.role)}`}>
+                    {chat.role}
+                  </span>
+                  {chat.property && (
+                    <span className="text-[10px] text-muted-foreground truncate">· {chat.property}</span>
+                  )}
+                </div>
+                <p className={`text-xs truncate mt-0.5 ${chat.unread > 0 ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                  {chat.lastMessage}
+                </p>
               </div>
-            )}
-          </button>
+
+              {/* Unread badge */}
+              {chat.unread > 0 && (
+                <div className="w-5 h-5 rounded-full gradient-trust flex items-center justify-center shrink-0">
+                  <span className="text-[10px] font-bold text-primary-foreground">{chat.unread}</span>
+                </div>
+              )}
+            </button>
+          </SwipeableChatRow>
         ))}
       </div>
 
