@@ -41,6 +41,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
   const [showVideoTour, setShowVideoTour] = useState(false);
   const [showFullscreen, setShowFullscreen] = useState(false);
   const [stickyHeader, setStickyHeader] = useState(false);
+  const [showReportNudge, setShowReportNudge] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -50,6 +51,13 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Show report nudge after 5s dwell on unverified listings
+  useEffect(() => {
+    if (property.verified) return;
+    const t = setTimeout(() => setShowReportNudge(true), 5000);
+    return () => clearTimeout(t);
+  }, [property.verified]);
 
   // Edge-swipe from left to close, and hardware back on Android
   useHardwareBack(true, triggerClose);
