@@ -296,6 +296,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 };
 
