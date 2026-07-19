@@ -1,6 +1,8 @@
 import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2, Lock, GitCompare } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { useSwipeBack } from "@/hooks/useSwipeBack";
 import type { Property } from "@/data/mockData";
 import HostCard from "./listing/HostCard";
 import SimilarListingsRail from "./listing/SimilarListingsRail";
