@@ -191,18 +191,28 @@ const Index = () => {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
-                <Heart className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <p className="text-sm font-medium text-foreground mb-1">Keja Safi, Keja Sure.</p>
-              <p className="text-xs text-muted-foreground text-center">
-                Properties you save will appear here
+            <div className="flex flex-col items-center justify-center py-16">
+              <EmptyIllustration variant="favorites" className="w-28 h-28 mb-3" />
+              <p className="text-sm font-semibold text-foreground mb-1">Keja Safi, Keja Sure.</p>
+              <p className="text-xs text-muted-foreground text-center px-8">
+                Tap the heart on any listing to save it here for later.
               </p>
             </div>
           )}
         </div>
       )}
+
+      {activeTab === "chats" && (
+        <ChatList
+          onOpenChat={(contact) => {
+            setChatContact(contact);
+            setShowChat(true);
+          }}
+        />
+      )}
+
+      {activeTab === "profile" && <ProfileScreen />}
+      </div>
 
       {activeTab === "chats" && (
         <ChatList
