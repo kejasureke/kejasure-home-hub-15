@@ -327,5 +327,45 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   );
 };
 
+const SwipeableChatRow = ({ children, onArchive }: { children: React.ReactNode; onArchive: () => void }) => {
+  const [dx, setDx] = useState(0);
+  const startX = useRef<number | null>(null);
+
+  const onStart = (x: number) => { startX.current = x; };
+  const onMove = (x: number) => {
+    if (startX.current == null) return;
+    const delta = Math.min(0, x - startX.current);
+    setDx(Math.max(delta, -120));
+  };
+  const onEnd = () => {
+    if (dx < -80) {
+      setDx(-400);
+      setTimeout(onArchive, 180);
+    } else {
+      setDx(0);
+    }
+    startX.current = null;
+  };
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl">
+      <div className="absolute inset-0 flex items-center justify-end pr-5 bg-accent/90 rounded-2xl">
+        <div className="flex items-center gap-1.5 text-accent-foreground">
+          <Archive className="w-4 h-4" />
+          <span className="text-xs font-bold">Archive</span>
+        </div>
+      </div>
+      <div
+        style={{ transform: `translateX(${dx}px)`, transition: startX.current == null ? "transform 0.2s ease-out" : "none" }}
+        onTouchStart={(e) => onStart(e.touches[0].clientX)}
+        onTouchMove={(e) => onMove(e.touches[0].clientX)}
+        onTouchEnd={onEnd}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export default ChatList;
 export type { ChatContact };
