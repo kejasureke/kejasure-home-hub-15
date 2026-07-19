@@ -481,6 +481,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
         </div>
       </div>
     </div>
+    </>
   );
 };
 
