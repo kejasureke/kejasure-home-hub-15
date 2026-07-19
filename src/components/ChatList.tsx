@@ -78,7 +78,6 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
     }
   };
 
-  return (
   const handleRefresh = async () => {
     await new Promise((r) => setTimeout(r, 700));
     toast("Chats refreshed");
