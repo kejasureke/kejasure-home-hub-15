@@ -54,6 +54,21 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   const [role, setRole] = useState<UserRole | null>(initial.role);
   const [loginMode, setLoginMode] = useState(initial.loginMode);
 
+  // One-time resume toast when a saved step is restored past welcome
+  useEffect(() => {
+    if (initial.step !== "welcome") {
+      const labels: Record<OnboardingStep, string> = {
+        welcome: "Welcome",
+        role: "Choose your role",
+        auth: "Verify your phone",
+        profile: "Complete your profile",
+        tour: "App tour",
+      };
+      toast(`Welcome back — continuing at "${labels[initial.step]}"`, { duration: 2600 });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Persist progress on every change
   useEffect(() => {
     try {
