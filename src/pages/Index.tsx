@@ -22,6 +22,7 @@ import { properties } from "@/data/mockData";
 import PropertyCard from "@/components/PropertyCard";
 import SwipeablePropertyCard from "@/components/SwipeablePropertyCard";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { setAppBadgeCount } from "@/lib/despia";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -82,6 +83,11 @@ const Index = () => {
   // Badge counts
   const chatBadge = 2;
   const profileBadge = storedUnread + liveUnread;
+
+  // Sync native/PWA app icon badge with total unread (chats + notifications).
+  useEffect(() => {
+    setAppBadgeCount(chatBadge + profileBadge);
+  }, [chatBadge, profileBadge]);
 
   // Hardware back — pop screens in reverse order of depth.
   useHardwareBack(!!selectedProperty, () => setSelectedProperty(null));
