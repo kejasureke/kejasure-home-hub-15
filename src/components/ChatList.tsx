@@ -43,6 +43,29 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   const [filter, setFilter] = useState<FilterType>("all");
   const [showNewChat, setShowNewChat] = useState(false);
   const [newChatSearch, setNewChatSearch] = useState("");
+  const [archived, setArchived] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("kejasure_archived_chats") || "[]")); } catch { return new Set(); }
+  });
+
+  const archiveChat = (id: string) => {
+    setArchived((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      try { localStorage.setItem("kejasure_archived_chats", JSON.stringify([...next])); } catch {}
+      return next;
+    });
+    haptic("success");
+    toast("Chat archived", {
+      action: {
+        label: "Undo",
+        onClick: () => setArchived((p) => {
+          const n = new Set(p); n.delete(id);
+          try { localStorage.setItem("kejasure_archived_chats", JSON.stringify([...n])); } catch {}
+          return n;
+        }),
+      },
+    });
+  };
 
   const filters: { key: FilterType; label: string }[] = [
     { key: "all", label: "All" },
