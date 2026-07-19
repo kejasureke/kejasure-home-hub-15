@@ -11,10 +11,10 @@ interface PullToRefreshProps {
 }
 
 /**
- * Native-feeling pull-to-refresh wrapper for scrollable screens. Only activates
- * when the inner scroll container is already at the top, so it never interferes
- * with regular scrolling. Emits a light haptic when the user crosses the
- * trigger threshold.
+ * Native-feeling pull-to-refresh wrapper for screens that scroll at the
+ * window/body level (the default in this app). Only arms when the page is
+ * scrolled to the very top so it never fights regular scrolling.
+ * Emits a light haptic when the user crosses the trigger threshold.
  */
 const PullToRefresh = ({
   onRefresh,
@@ -22,18 +22,18 @@ const PullToRefresh = ({
   className = "",
   threshold = 72,
 }: PullToRefreshProps) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const startY = useRef<number | null>(null);
   const armed = useRef(false);
   const crossedThreshold = useRef(false);
   const [pull, setPull] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
+  const atTop = () =>
+    (window.scrollY || document.documentElement.scrollTop || 0) <= 0;
+
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     if (refreshing) return;
-    const el = scrollRef.current;
-    if (!el) return;
-    if (el.scrollTop > 0) return;
+    if (!atTop()) return;
     startY.current = e.touches[0].clientY;
     armed.current = true;
     crossedThreshold.current = false;
@@ -46,7 +46,6 @@ const PullToRefresh = ({
       setPull(0);
       return;
     }
-    // Rubber-band damping so it doesn't feel unlimited.
     const damped = Math.min(dy * 0.5, threshold * 1.4);
     setPull(damped);
     if (!crossedThreshold.current && damped >= threshold) {
@@ -77,31 +76,42 @@ const PullToRefresh = ({
   const progress = Math.min(1, pull / threshold);
 
   return (
-    <div className={`relative ${className}`}>
+    <div
+      className={`relative ${className}`}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={finish}
+      onTouchCancel={finish}
+    >
       {/* Indicator */}
       <div
-        className="pointer-events-none absolute left-0 right-0 flex items-start justify-center overflow-hidden transition-[height] duration-150"
-        style={{ height: pull, top: 0 }}
+        className="pointer-events-none fixed left-0 right-0 z-40 flex items-start justify-center overflow-hidden transition-[height] duration-150"
+        style={{
+          height: pull,
+          top: "var(--safe-area-top, env(safe-area-inset-top, 0px))",
+        }}
       >
         <div
-          className="mt-3 w-9 h-9 rounded-full bg-card card-shadow flex items-center justify-center"
-          style={{ transform: `scale(${0.6 + progress * 0.4})`, opacity: 0.4 + progress * 0.6 }}
+          className="mt-2 w-9 h-9 rounded-full bg-card card-shadow flex items-center justify-center"
+          style={{
+            transform: `scale(${0.6 + progress * 0.4})`,
+            opacity: 0.4 + progress * 0.6,
+          }}
         >
           <RefreshCw
             className={`w-4 h-4 text-primary ${refreshing ? "animate-spin" : ""}`}
-            style={{ transform: refreshing ? undefined : `rotate(${progress * 270}deg)` }}
+            style={{
+              transform: refreshing ? undefined : `rotate(${progress * 270}deg)`,
+            }}
           />
         </div>
       </div>
 
       <div
-        ref={scrollRef}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={finish}
-        onTouchCancel={finish}
-        className="h-full overflow-y-auto scrollbar-none"
-        style={{ transform: `translateY(${pull}px)`, transition: pull === 0 ? "transform 200ms" : undefined }}
+        style={{
+          transform: `translateY(${pull}px)`,
+          transition: pull === 0 ? "transform 200ms" : undefined,
+        }}
       >
         {children}
       </div>
