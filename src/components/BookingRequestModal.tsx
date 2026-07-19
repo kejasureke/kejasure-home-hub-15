@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import type { Property } from "@/data/mockData";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { useBookings, _bookingsApi } from "@/hooks/useBookings";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 interface BookingRequestModalProps {
   property: Property;
@@ -34,6 +35,10 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
   const [guests, setGuests] = useState(1);
   const [note, setNote] = useState("");
   const [submittedId, setSubmittedId] = useState<string | null>(null);
+
+  useHardwareBack(true, onClose);
+
+
 
   const isShortStay = property.type === "shortstay";
   const title = isShortStay ? "Book Your Stay" : "Request a Viewing";

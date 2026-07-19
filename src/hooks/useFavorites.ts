@@ -1,5 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
+import { haptic } from "@/lib/despia";
+
+
 
 const STORAGE_KEY = "kejasure_favorites";
 
@@ -32,10 +35,13 @@ export const useFavorites = () => {
       window.dispatchEvent(new Event("favorites-updated"));
 
       if (removing) {
+        haptic("light");
         toast("Removed from Saved", { description: "Property removed from your favorites" });
       } else {
+        haptic("success");
         toast.success("Saved!", { description: "Property added to your favorites" });
       }
+
 
       return next;
     });

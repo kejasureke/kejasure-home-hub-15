@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Calendar, Clock, X, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Booking } from "@/hooks/useBookings";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 interface Props {
   booking: Booking;
@@ -24,6 +25,9 @@ const BookingRescheduleModal = ({ booking, onClose, onSave }: Props) => {
   const [date, setDate] = useState(booking.date.slice(0, 10));
   const [checkOut, setCheckOut] = useState(booking.checkOut?.slice(0, 10) || isoIn(3));
   const [time, setTime] = useState(booking.time || times[1]);
+
+  useHardwareBack(true, onClose);
+
 
   const dateOptions = Array.from({ length: 10 }, (_, i) => isoIn(i + 1));
 

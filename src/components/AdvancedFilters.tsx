@@ -1,6 +1,7 @@
 import { X, SlidersHorizontal, Building2, Ruler, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import LocationSelector from "./LocationSelector";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 interface Filters {
   minPrice: number;
@@ -87,6 +88,8 @@ const AdvancedFilters = ({
   segment,
 }: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>({ ...filters });
+
+  useHardwareBack(isOpen, onClose);
 
   const isCommercial = segment === "Business Spaces";
   const isServices = segment === "Services";

@@ -3,6 +3,7 @@ import {
   Phone, CheckCircle2, XCircle, Clock, Receipt, RefreshCw, Zap,
   ShieldCheck, AlertTriangle, ArrowLeft, X
 } from "lucide-react";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 export interface MpesaPlan {
   name: string;
@@ -36,6 +37,10 @@ const MpesaPaymentFlow = ({
   const [state, setState] = useState<PaymentState>("select");
   const [countdown, setCountdown] = useState(30);
   const [transactionId, setTransactionId] = useState("");
+
+  useHardwareBack(state !== "processing", onClose);
+
+
 
   // Countdown timer during processing
   useEffect(() => {
