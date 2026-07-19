@@ -170,11 +170,22 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                         <span className="font-medium text-foreground">{formatDate(b.date)} · {b.time}</span>
                       </div>
                     )}
-                    {b.status === "pending" && b.responseTime && (
-                      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground pt-1">
-                        <Clock className="w-3 h-3" /> Avg response: {b.responseTime}
-                      </div>
-                    )}
+                    {b.status === "pending" && (() => {
+                      // 24h SLA — count down from creation
+                      const elapsed = Date.now() - b.createdAt;
+                      const remaining = 24 * 60 * 60 * 1000 - elapsed;
+                      const hrs = Math.max(0, Math.floor(remaining / 3600000));
+                      const mins = Math.max(0, Math.floor((remaining % 3600000) / 60000));
+                      const overdue = remaining <= 0;
+                      return (
+                        <div className={`flex items-center gap-1.5 text-[10px] pt-1 font-semibold ${overdue ? "text-destructive" : "text-accent-foreground"}`}>
+                          <Clock className={`w-3 h-3 ${overdue ? "" : "animate-pulse"}`} />
+                          {overdue
+                            ? "Response overdue — try nudging or messaging"
+                            : `Response expected in ${hrs > 0 ? `${hrs}h ` : ""}${mins}m`}
+                        </div>
+                      );
+                    })()}
                     {b.status === "accepted" && (() => {
                       const target = new Date(b.date).getTime();
                       const diff = target - Date.now();
