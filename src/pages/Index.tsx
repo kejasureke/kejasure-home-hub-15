@@ -14,6 +14,7 @@ import ExploreScreen from "@/components/ExploreScreen";
 import ListingDetail from "@/components/ListingDetail";
 import type { Property } from "@/data/mockData";
 import { Heart } from "lucide-react";
+import EmptyIllustration from "@/components/EmptyIllustration";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
