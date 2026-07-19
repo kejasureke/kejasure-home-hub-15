@@ -261,39 +261,88 @@ const HomeFeed = () => {
             </div>
           );
         })()}
-        <div className="relative flex items-center">
-          <Search className="absolute left-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Search properties, estates, landmarks..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-11 py-3 rounded-xl bg-card text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 card-shadow"
-          />
-          {(() => {
-            const count = [
-              commCategory !== "All",
-              !!county,
-              filters.bedrooms.length > 0,
-              filters.amenities.length > 0,
-              filters.commercialTypes.length > 0,
-              filters.verified,
-              filters.furnished,
-              filters.petFriendly,
-              filters.minPrice > 0 || filters.maxPrice < 500000,
-              filters.minSqft > 0 || filters.maxSqft < 100000,
-            ].filter(Boolean).length;
-            return (
-              <button onClick={() => setShowFilters(true)} className="absolute right-1.5 p-2 rounded-lg hover:bg-secondary/80 transition-colors">
-                <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
-                {count > 0 && (
-                  <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full gradient-trust flex items-center justify-center px-1">
-                    <span className="text-[9px] font-bold text-primary-foreground">{count}</span>
-                  </div>
-                )}
-              </button>
-            );
-          })()}
+        <div ref={searchWrapRef} className="relative">
+          <div className="relative flex items-center">
+            <Search className="absolute left-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search properties, estates, landmarks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onKeyDown={(e) => { if (e.key === "Enter") { commitQuery(searchQuery); setSearchFocused(false); (e.target as HTMLInputElement).blur(); } }}
+              className="w-full pl-10 pr-11 py-3 rounded-xl bg-card text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 card-shadow"
+            />
+            {(() => {
+              const count = [
+                commCategory !== "All",
+                !!county,
+                filters.bedrooms.length > 0,
+                filters.amenities.length > 0,
+                filters.commercialTypes.length > 0,
+                filters.verified,
+                filters.furnished,
+                filters.petFriendly,
+                filters.minPrice > 0 || filters.maxPrice < 500000,
+                filters.minSqft > 0 || filters.maxSqft < 100000,
+              ].filter(Boolean).length;
+              return (
+                <button onClick={() => setShowFilters(true)} className="absolute right-1.5 p-2 rounded-lg hover:bg-secondary/80 transition-colors">
+                  <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+                  {count > 0 && (
+                    <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full gradient-trust flex items-center justify-center px-1">
+                      <span className="text-[9px] font-bold text-primary-foreground">{count}</span>
+                    </div>
+                  )}
+                </button>
+              );
+            })()}
+          </div>
+
+          {/* Search Suggestions Dropdown */}
+          {searchFocused && (recentQueries.length > 0 || !searchQuery) && (
+            <div className="absolute top-full left-0 right-0 mt-2 z-30 bg-card rounded-xl card-shadow border border-border overflow-hidden animate-fade-in">
+              {recentQueries.length > 0 && (
+                <div className="p-2">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 pt-1 pb-1.5">Recent searches</p>
+                  {recentQueries.map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => { setSearchQuery(q); commitQuery(q); setSearchFocused(false); }}
+                      className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-left text-xs text-foreground hover:bg-secondary active:scale-[0.98] transition-all"
+                    >
+                      <Clock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <span className="flex-1 truncate">{q}</span>
+                      <X
+                        className="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const next = recentQueries.filter(x => x !== q);
+                          setRecentQueries(next);
+                          try { localStorage.setItem("kejasure_recent_queries", JSON.stringify(next)); } catch {}
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="p-2 border-t border-border">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 pt-1 pb-1.5 flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3" /> Trending
+                </p>
+                {["Kilimani 2BR", "Westlands furnished", "Diani short stay", "Karen villa", "CBD office"].map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => { setSearchQuery(q); commitQuery(q); setSearchFocused(false); }}
+                    className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-left text-xs text-foreground hover:bg-secondary active:scale-[0.98] transition-all"
+                  >
+                    <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <span className="flex-1 truncate">{q}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Active Filter Chips */}
