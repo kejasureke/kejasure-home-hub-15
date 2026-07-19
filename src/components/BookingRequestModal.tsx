@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import type { Property } from "@/data/mockData";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { useBookings, _bookingsApi } from "@/hooks/useBookings";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 interface BookingRequestModalProps {
   property: Property;
