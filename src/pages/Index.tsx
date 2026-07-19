@@ -84,6 +84,11 @@ const Index = () => {
   const chatBadge = 2;
   const profileBadge = storedUnread + liveUnread;
 
+  // Sync native/PWA app icon badge with total unread (chats + notifications).
+  useEffect(() => {
+    setAppBadgeCount(chatBadge + profileBadge);
+  }, [chatBadge, profileBadge]);
+
   // Hardware back — pop screens in reverse order of depth.
   useHardwareBack(!!selectedProperty, () => setSelectedProperty(null));
   useHardwareBack(showChat, () => setShowChat(false));
