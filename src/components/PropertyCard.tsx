@@ -231,6 +231,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         </div>
       </div>
     </button>
+    </>
   );
 };
 
