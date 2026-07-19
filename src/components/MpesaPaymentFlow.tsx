@@ -3,6 +3,7 @@ import {
   Phone, CheckCircle2, XCircle, Clock, Receipt, RefreshCw, Zap,
   ShieldCheck, AlertTriangle, ArrowLeft, X
 } from "lucide-react";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 export interface MpesaPlan {
   name: string;
