@@ -1,10 +1,14 @@
 import { Heart, Bed, Bath, MapPin, ShieldCheck, Star, GitCompare, AlertTriangle, Ruler, Store, Building2, Factory, Hotel, UtensilsCrossed, Scissors, Pill, Dumbbell, GraduationCap, Church, Fuel, Music, ShoppingCart, Wrench, Palette, Laptop } from "lucide-react";
+import { useState } from "react";
 import type { Property } from "@/data/mockData";
 import { getScamRiskScore } from "@/utils/scamDetection";
 import ScamWarningBadge from "./ScamWarningBadge";
 import PriceDropBadge from "./PriceDropBadge";
 import SmileIDBadge from "./SmileIDBadge";
 import SwipeableImageGallery from "./SwipeableImageGallery";
+import PropertyQuickActions from "./PropertyQuickActions";
+import { useLongPress } from "@/hooks/useLongPress";
+import { toast } from "sonner";
 interface PropertyCardProps {
   property: Property;
   onPress: (id: string) => void;
@@ -18,14 +22,32 @@ interface PropertyCardProps {
 const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareMode, isComparing, onToggleCompare }: PropertyCardProps) => {
   const scamRisk = getScamRiskScore(property);
   const oldPrice = property.priceHistory?.[0]?.price;
-  
+  const [quickOpen, setQuickOpen] = useState(false);
+  const { handlers, didFire } = useLongPress(() => setQuickOpen(true));
+
   const formatPrice = (price: number) => {
     return price >= 1000 ? `KES ${(price / 1000).toFixed(price % 1000 === 0 ? 0 : 1)}K` : `KES ${price}`;
   };
 
   return (
+    <>
+    <PropertyQuickActions
+      open={quickOpen}
+      onClose={() => setQuickOpen(false)}
+      title={property.title}
+      isFavorite={liked}
+      onToggleFavorite={() => onToggleLike?.(property.id)}
+      onShare={() => {
+        const text = `Check out ${property.title} on KejaSure — ${property.estate}, ${property.county}.`;
+        if (navigator.share) navigator.share({ title: property.title, text }).catch(() => {});
+        else { navigator.clipboard?.writeText(text); toast.success("Copied share message"); }
+      }}
+      onCompare={onToggleCompare ? () => onToggleCompare(property.id) : undefined}
+      onHide={() => toast("Listing hidden", { description: "We'll show fewer like this." })}
+    />
     <button
-      onClick={() => onPress(property.id)}
+      onClick={(e) => { if (didFire()) { e.preventDefault(); return; } onPress(property.id); }}
+      {...handlers}
       className={`w-full text-left bg-card rounded-2xl card-shadow overflow-hidden transition-all duration-300 hover:card-shadow-hover active:scale-[0.98] animate-fade-in ${
         isComparing ? "ring-2 ring-primary" : ""
       }`}
@@ -209,6 +231,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         </div>
       </div>
     </button>
+    </>
   );
 };
 

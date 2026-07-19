@@ -14,6 +14,7 @@ import ExploreScreen from "@/components/ExploreScreen";
 import ListingDetail from "@/components/ListingDetail";
 import type { Property } from "@/data/mockData";
 import { Heart } from "lucide-react";
+import EmptyIllustration from "@/components/EmptyIllustration";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
@@ -167,11 +168,12 @@ const Index = () => {
         />
       )}
 
-      {activeTab === "home" && <HomeFeed />}
+      <div key={activeTab} className="animate-fade-in">
+        {activeTab === "home" && <HomeFeed />}
 
-      {activeTab === "dashboard" && renderDashboard()}
+        {activeTab === "dashboard" && renderDashboard()}
 
-      {activeTab === "search" && <ExploreScreen initialSearch={exploreSearchQuery} key={exploreSearchQuery} />}
+        {activeTab === "search" && <ExploreScreen initialSearch={exploreSearchQuery} key={exploreSearchQuery} />}
 
       {activeTab === "favorites" && (
         <div className="px-4 pt-6 pb-32">
@@ -189,13 +191,11 @@ const Index = () => {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
-                <Heart className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <p className="text-sm font-medium text-foreground mb-1">Keja Safi, Keja Sure.</p>
-              <p className="text-xs text-muted-foreground text-center">
-                Properties you save will appear here
+            <div className="flex flex-col items-center justify-center py-16">
+              <EmptyIllustration variant="favorites" className="w-28 h-28 mb-3" />
+              <p className="text-sm font-semibold text-foreground mb-1">Keja Safi, Keja Sure.</p>
+              <p className="text-xs text-muted-foreground text-center px-8">
+                Tap the heart on any listing to save it here for later.
               </p>
             </div>
           )}
@@ -212,6 +212,7 @@ const Index = () => {
       )}
 
       {activeTab === "profile" && <ProfileScreen />}
+      </div>
 
       <BottomNav
         activeTab={activeTab}

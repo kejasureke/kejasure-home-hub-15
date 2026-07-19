@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle
 import { useBookings, type BookingStatus, type Booking } from "@/hooks/useBookings";
 import BookingRescheduleModal from "./BookingRescheduleModal";
 import { toast } from "sonner";
+import EmptyIllustration from "./EmptyIllustration";
 
 interface MyBookingsScreenProps {
   onBack: () => void;
@@ -109,12 +110,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
       <div className="flex-1 overflow-y-auto px-4 pt-2 pb-32 scrollbar-none">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-20 px-6 animate-fade-in">
-            <div className="w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center mb-4 relative">
-              <Calendar className="w-8 h-8 text-muted-foreground" />
-              <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-sm">✨</span>
-              </div>
-            </div>
+            <EmptyIllustration variant="bookings" className="w-32 h-32 mb-3" />
             <h3 className="text-base font-bold text-foreground mb-1">
               {tab === "pending" ? "No pending requests" : tab === "accepted" ? "No accepted bookings yet" : tab === "completed" ? "No past bookings" : "No bookings yet"}
             </h3>

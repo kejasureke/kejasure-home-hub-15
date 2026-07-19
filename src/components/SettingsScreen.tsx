@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Sun, Eye, Shield, ChevronRight, ToggleLeft, ToggleRight, Smartphone, MapPin, Volume2 } from "lucide-react";
+import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Sun, Eye, Shield, ChevronRight, ToggleLeft, ToggleRight, Smartphone, MapPin, Volume2, Share2 } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useTheme } from "@/hooks/useTheme";
 import { toast } from "@/hooks/use-toast";
@@ -242,6 +242,32 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               </select>
             }
           />
+        </Section>
+
+        <Section title="Share KejaSure">
+          <button
+            onClick={async () => {
+              const shareText = "Pata Keja, Be Sure 🇰🇪 — I'm using KejaSure to find verified rentals across Kenya. Try it: https://kejasure.co.ke";
+              try {
+                if (navigator.share) {
+                  await navigator.share({ title: "KejaSure", text: shareText });
+                } else {
+                  await navigator.clipboard.writeText(shareText);
+                  toast({ title: "Link copied", description: "Share it with a friend on WhatsApp" });
+                }
+              } catch {}
+            }}
+            className="w-full flex items-center gap-3 p-4"
+          >
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <Share2 className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold">Share with a friend</p>
+              <p className="text-[11px] text-muted-foreground">Send them a WhatsApp invite</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
         </Section>
 
         <Section title="Account">

@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
-import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users } from "lucide-react";
+import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users, Archive } from "lucide-react";
 import PullToRefresh from "./PullToRefresh";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { haptic } from "@/lib/despia";
+import EmptyIllustration from "./EmptyIllustration";
 
 interface ChatContact {
   id: string;
@@ -41,6 +43,29 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   const [filter, setFilter] = useState<FilterType>("all");
   const [showNewChat, setShowNewChat] = useState(false);
   const [newChatSearch, setNewChatSearch] = useState("");
+  const [archived, setArchived] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("kejasure_archived_chats") || "[]")); } catch { return new Set(); }
+  });
+
+  const archiveChat = (id: string) => {
+    setArchived((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      try { localStorage.setItem("kejasure_archived_chats", JSON.stringify([...next])); } catch {}
+      return next;
+    });
+    haptic("success");
+    toast("Chat archived", {
+      action: {
+        label: "Undo",
+        onClick: () => setArchived((p) => {
+          const n = new Set(p); n.delete(id);
+          try { localStorage.setItem("kejasure_archived_chats", JSON.stringify([...n])); } catch {}
+          return n;
+        }),
+      },
+    });
+  };
 
   const filters: { key: FilterType; label: string }[] = [
     { key: "all", label: "All" },
@@ -50,6 +75,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   ];
 
   const filtered = contacts
+    .filter((c) => !archived.has(c.id))
     .filter((c) => {
       if (search) {
         const q = search.toLowerCase();
@@ -141,70 +167,71 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
       {/* Chat List */}
       <div className="px-4 space-y-1.5">
         {filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
-              <MessageCircle className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <p className="text-sm font-medium text-foreground mb-1">No conversations found</p>
-            <p className="text-xs text-muted-foreground">Try adjusting your filters</p>
+          <div className="flex flex-col items-center justify-center py-12">
+            <EmptyIllustration variant="chats" className="w-28 h-28 mb-3" />
+            <p className="text-sm font-semibold text-foreground mb-1">No conversations yet</p>
+            <p className="text-xs text-muted-foreground text-center px-6">
+              Chats with landlords, hosts and service pros will appear here.
+            </p>
           </div>
         )}
 
         {filtered.map((chat) => (
-          <button
-            key={chat.id}
-            onClick={() => onOpenChat(chat)}
-            className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform relative"
-          >
-            {/* Avatar */}
-            <div className="relative shrink-0">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                chat.avatar.length > 2 ? "bg-secondary text-lg" : "bg-primary/10"
-              }`}>
-                {chat.avatar.length > 2 ? (
-                  <span>{chat.avatar}</span>
-                ) : (
-                  <span className="text-sm font-semibold text-primary">{chat.avatar}</span>
-                )}
-              </div>
-              {chat.online && (
-                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-trust border-2 border-card" />
-              )}
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 text-left min-w-0">
-              <div className="flex items-center justify-between mb-0.5">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  {chat.pinned && <Pin className="w-3 h-3 text-primary shrink-0 rotate-45" />}
-                  <h3 className="text-sm font-semibold truncate">{chat.name}</h3>
-                  {chat.verified && <ShieldCheck className="w-3.5 h-3.5 text-trust shrink-0" />}
-                  {chat.muted && <BellOff className="w-3 h-3 text-muted-foreground shrink-0" />}
+          <SwipeableChatRow key={chat.id} onArchive={() => archiveChat(chat.id)}>
+            <button
+              onClick={() => onOpenChat(chat)}
+              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform relative"
+            >
+              {/* Avatar */}
+              <div className="relative shrink-0">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  chat.avatar.length > 2 ? "bg-secondary text-lg" : "bg-primary/10"
+                }`}>
+                  {chat.avatar.length > 2 ? (
+                    <span>{chat.avatar}</span>
+                  ) : (
+                    <span className="text-sm font-semibold text-primary">{chat.avatar}</span>
+                  )}
                 </div>
-                <span className={`text-[10px] shrink-0 ml-2 ${chat.unread > 0 ? "text-primary font-semibold" : "text-muted-foreground"}`}>
-                  {chat.time}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${roleColor(chat.role)}`}>
-                  {chat.role}
-                </span>
-                {chat.property && (
-                  <span className="text-[10px] text-muted-foreground truncate">· {chat.property}</span>
+                {chat.online && (
+                  <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-trust border-2 border-card" />
                 )}
               </div>
-              <p className={`text-xs truncate mt-0.5 ${chat.unread > 0 ? "text-foreground font-medium" : "text-muted-foreground"}`}>
-                {chat.lastMessage}
-              </p>
-            </div>
 
-            {/* Unread badge */}
-            {chat.unread > 0 && (
-              <div className="w-5 h-5 rounded-full gradient-trust flex items-center justify-center shrink-0">
-                <span className="text-[10px] font-bold text-primary-foreground">{chat.unread}</span>
+              {/* Content */}
+              <div className="flex-1 text-left min-w-0">
+                <div className="flex items-center justify-between mb-0.5">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    {chat.pinned && <Pin className="w-3 h-3 text-primary shrink-0 rotate-45" />}
+                    <h3 className="text-sm font-semibold truncate">{chat.name}</h3>
+                    {chat.verified && <ShieldCheck className="w-3.5 h-3.5 text-trust shrink-0" />}
+                    {chat.muted && <BellOff className="w-3 h-3 text-muted-foreground shrink-0" />}
+                  </div>
+                  <span className={`text-[10px] shrink-0 ml-2 ${chat.unread > 0 ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+                    {chat.time}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${roleColor(chat.role)}`}>
+                    {chat.role}
+                  </span>
+                  {chat.property && (
+                    <span className="text-[10px] text-muted-foreground truncate">· {chat.property}</span>
+                  )}
+                </div>
+                <p className={`text-xs truncate mt-0.5 ${chat.unread > 0 ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                  {chat.lastMessage}
+                </p>
               </div>
-            )}
-          </button>
+
+              {/* Unread badge */}
+              {chat.unread > 0 && (
+                <div className="w-5 h-5 rounded-full gradient-trust flex items-center justify-center shrink-0">
+                  <span className="text-[10px] font-bold text-primary-foreground">{chat.unread}</span>
+                </div>
+              )}
+            </button>
+          </SwipeableChatRow>
         ))}
       </div>
 
@@ -297,6 +324,46 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
       )}
     </div>
     </PullToRefresh>
+  );
+};
+
+const SwipeableChatRow = ({ children, onArchive }: { children: React.ReactNode; onArchive: () => void }) => {
+  const [dx, setDx] = useState(0);
+  const startX = useRef<number | null>(null);
+
+  const onStart = (x: number) => { startX.current = x; };
+  const onMove = (x: number) => {
+    if (startX.current == null) return;
+    const delta = Math.min(0, x - startX.current);
+    setDx(Math.max(delta, -120));
+  };
+  const onEnd = () => {
+    if (dx < -80) {
+      setDx(-400);
+      setTimeout(onArchive, 180);
+    } else {
+      setDx(0);
+    }
+    startX.current = null;
+  };
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl">
+      <div className="absolute inset-0 flex items-center justify-end pr-5 bg-accent/90 rounded-2xl">
+        <div className="flex items-center gap-1.5 text-accent-foreground">
+          <Archive className="w-4 h-4" />
+          <span className="text-xs font-bold">Archive</span>
+        </div>
+      </div>
+      <div
+        style={{ transform: `translateX(${dx}px)`, transition: startX.current == null ? "transform 0.2s ease-out" : "none" }}
+        onTouchStart={(e) => onStart(e.touches[0].clientX)}
+        onTouchMove={(e) => onMove(e.touches[0].clientX)}
+        onTouchEnd={onEnd}
+      >
+        {children}
+      </div>
+    </div>
   );
 };
 
