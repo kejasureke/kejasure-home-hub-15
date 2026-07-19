@@ -68,14 +68,41 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [lastSeen] = useState(contactOnline ? "Online" : "Last seen today, 2:45 PM");
+  const [showJumpPill, setShowJumpPill] = useState(false);
+  const [newIncoming, setNewIncoming] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const replyIdx = useRef(0);
 
   const initials = contactName.split(" ").map((n) => n[0]).join("");
 
+  const isNearBottom = () => {
+    const el = scrollRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+  };
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (isNearBottom()) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      setShowJumpPill(false);
+      setNewIncoming(0);
+    } else {
+      // A new message arrived off-screen
+      const last = messages[messages.length - 1];
+      if (last && last.sender === "other") {
+        setShowJumpPill(true);
+        setNewIncoming((n) => n + 1);
+      }
+    }
   }, [messages, isTyping]);
+
+  const onMessagesScroll = () => {
+    if (isNearBottom()) {
+      setShowJumpPill(false);
+      setNewIncoming(0);
+    }
+  };
 
   const sendMessage = () => {
     if (!message.trim()) return;
