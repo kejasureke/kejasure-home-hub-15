@@ -83,10 +83,10 @@ const SwipeableImageGallery = ({
       >
         {images.map((src, i) => (
           <div key={i} className="w-full h-full shrink-0 snap-center">
-            <img
+            <BlurImage
               src={src}
               alt={`${alt} ${i + 1}`}
-              loading={lazy ? "lazy" : "eager"}
+              wrapperClassName="w-full h-full"
               onClick={(e) => {
                 if (onImageClick) {
                   e.stopPropagation();
