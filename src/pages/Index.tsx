@@ -168,11 +168,12 @@ const Index = () => {
         />
       )}
 
-      {activeTab === "home" && <HomeFeed />}
+      <div key={activeTab} className="animate-fade-in">
+        {activeTab === "home" && <HomeFeed />}
 
-      {activeTab === "dashboard" && renderDashboard()}
+        {activeTab === "dashboard" && renderDashboard()}
 
-      {activeTab === "search" && <ExploreScreen initialSearch={exploreSearchQuery} key={exploreSearchQuery} />}
+        {activeTab === "search" && <ExploreScreen initialSearch={exploreSearchQuery} key={exploreSearchQuery} />}
 
       {activeTab === "favorites" && (
         <div className="px-4 pt-6 pb-32">
