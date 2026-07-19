@@ -196,3 +196,29 @@ export function openNativeSettings() {
     // Fallback silently if the runtime doesn't support it.
   }
 }
+
+/**
+ * Sets the app icon badge count (iOS + supported Android launchers).
+ * Best-effort — silently no-ops if the native shell doesn't support it.
+ */
+export function setAppBadgeCount(count: number) {
+  const safe = Math.max(0, Math.floor(count));
+  // Web platform (PWA) badge API
+  try {
+    const nav = navigator as Navigator & {
+      setAppBadge?: (n?: number) => Promise<void>;
+      clearAppBadge?: () => Promise<void>;
+    };
+    if (safe === 0 && nav.clearAppBadge) nav.clearAppBadge().catch(() => {});
+    else nav.setAppBadge?.(safe).catch(() => {});
+  } catch {
+    // ignore
+  }
+  if (!isDespia()) return;
+  try {
+    despia(`applicationiconbadgenumber://?number=${safe}`);
+  } catch {
+    // ignore
+  }
+}
+
