@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
-import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users } from "lucide-react";
+import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users, Archive } from "lucide-react";
 import PullToRefresh from "./PullToRefresh";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { haptic } from "@/lib/despia";
+import EmptyIllustration from "./EmptyIllustration";
 
 interface ChatContact {
   id: string;
