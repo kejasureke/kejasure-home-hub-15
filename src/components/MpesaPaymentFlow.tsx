@@ -38,6 +38,10 @@ const MpesaPaymentFlow = ({
   const [countdown, setCountdown] = useState(30);
   const [transactionId, setTransactionId] = useState("");
 
+  useHardwareBack(state !== "processing", onClose);
+
+
+
   // Countdown timer during processing
   useEffect(() => {
     if (state !== "processing") return;
