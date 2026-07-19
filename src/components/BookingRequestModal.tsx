@@ -4,6 +4,8 @@ import type { Property } from "@/data/mockData";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { useBookings, _bookingsApi } from "@/hooks/useBookings";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { haptic } from "@/lib/despia";
+import Confetti from "./Confetti";
 
 interface BookingRequestModalProps {
   property: Property;
