@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Calendar, Clock, X, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Booking } from "@/hooks/useBookings";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 interface Props {
   booking: Booking;
