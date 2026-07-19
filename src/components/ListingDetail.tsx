@@ -51,13 +51,22 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
     return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Edge-swipe from left to close, and hardware back on Android
+  useHardwareBack(true, triggerClose);
+  const swipeRef = useSwipeBack(true, triggerClose);
+  const setRefs = (el: HTMLDivElement | null) => {
+    scrollRef.current = el;
+    (swipeRef as { current: HTMLElement | null }).current = el;
+  };
+
   const formatPrice = (price: number) => new Intl.NumberFormat("en-KE").format(price);
   const scamRisk = getScamRiskScore(property);
   const oldPrice = property.priceHistory?.[0]?.price;
 
 
   return (
-    <div ref={scrollRef} className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
+    <div ref={setRefs} className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
+
       {/* Sticky compact header (appears after gallery) */}
       <div
         className={`fixed top-0 left-0 right-0 z-20 max-w-lg mx-auto glass-surface border-b border-border transition-all duration-200 ${
