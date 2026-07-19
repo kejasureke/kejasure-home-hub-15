@@ -36,7 +36,18 @@ export const useFavorites = () => {
 
       if (removing) {
         haptic("light");
-        toast("Removed from Saved", { description: "Property removed from your favorites" });
+        toast("Removed from Saved", {
+          description: "Property removed from your favorites",
+          action: {
+            label: "Undo",
+            onClick: () => {
+              const restored = [...JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"), id];
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
+              window.dispatchEvent(new Event("favorites-updated"));
+              haptic("success");
+            },
+          },
+        });
       } else {
         haptic("success");
         toast.success("Saved!", { description: "Property added to your favorites" });
