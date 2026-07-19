@@ -1,5 +1,6 @@
 import { Home, Search, MessageCircle, User, Heart, LayoutDashboard } from "lucide-react";
 import { haptic } from "@/lib/despia";
+import { useHideOnScroll } from "@/hooks/useHideOnScroll";
 
 interface BottomNavProps {
   activeTab: string;
