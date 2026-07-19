@@ -898,8 +898,34 @@ const HomeFeed = () => {
         onLocationChange={(c, sc, w, e) => { setCounty(c); setSubcounty(sc); setWard(w); setEstate(e); }}
         segment={segment}
       />
+
+      {/* Compare tray peek */}
+      {compareIds.length > 0 && (
+        <div className="fixed left-0 right-0 z-40 pointer-events-none flex justify-center px-4" style={{ bottom: "calc(5rem + env(safe-area-inset-bottom, 0px))" }}>
+          <div className="pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-full gradient-trust text-primary-foreground shadow-2xl animate-fade-in max-w-md w-full">
+            <GitCompare className="w-4 h-4 shrink-0" />
+            <span className="text-xs font-bold flex-1 truncate">
+              {compareIds.length} selected {compareIds.length < 2 && "· pick 1 more"}
+            </span>
+            <button
+              onClick={() => setCompareIds([])}
+              className="text-[11px] font-semibold px-2 py-1 rounded-full bg-primary-foreground/15 active:scale-95"
+            >
+              Clear
+            </button>
+            <button
+              disabled={compareIds.length < 2}
+              onClick={() => setShowCompare(true)}
+              className="text-[11px] font-bold px-3 py-1.5 rounded-full bg-primary-foreground text-primary disabled:opacity-50 active:scale-95"
+            >
+              Compare
+            </button>
+          </div>
+        </div>
+      )}
     </div>
     </PullToRefresh>
+
   );
 };
 
