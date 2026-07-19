@@ -1,5 +1,6 @@
 import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench, Sparkles, Building2, X, BookmarkPlus, Bookmark, SearchX } from "lucide-react";
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 
 import PropertyCard from "./PropertyCard";
 import ServiceCard from "./ServiceCard";
@@ -9,11 +10,13 @@ import CompareProperties from "./CompareProperties";
 import CompareSelectionModal from "./CompareSelectionModal";
 import AIPropertyMatch from "./AIPropertyMatch";
 import NeighborhoodIntelligence from "./NeighborhoodIntelligence";
+import PullToRefresh from "./PullToRefresh";
 import { properties, serviceProviders } from "@/data/mockData";
 import MapDiscovery from "./MapDiscovery";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 const segments = ["Rentals", "Short Stays", "Business Spaces", "Corporate Stay", "Services"] as const;
 
