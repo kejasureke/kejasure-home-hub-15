@@ -36,6 +36,10 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
   const [note, setNote] = useState("");
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
+  useHardwareBack(true, onClose);
+
+
+
   const isShortStay = property.type === "shortstay";
   const title = isShortStay ? "Book Your Stay" : "Request a Viewing";
   const host = useMemo(() => deriveHost(property.id), [property.id]);
