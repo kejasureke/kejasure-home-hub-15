@@ -806,6 +806,7 @@ const HomeFeed = () => {
         segment={segment}
       />
     </div>
+    </PullToRefresh>
   );
 };
 
