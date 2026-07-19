@@ -225,6 +225,22 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
           <div className="flex-1 h-px bg-border" />
         </div>
 
+        {(() => {
+          // Find the first inbound message after my last read message → show "Unread" divider
+          const lastMineSeenIdx = [...messages].map((m, i) => ({ m, i })).reverse().find(({ m }) => m.sender === "me")?.i ?? -1;
+          const firstUnreadIdx = messages.findIndex((m, i) => m.sender === "other" && i > lastMineSeenIdx);
+          return messages.map((msg, i) => (
+            <div key={msg.id}>
+              {i === firstUnreadIdx && firstUnreadIdx > 0 && (
+                <div className="flex items-center gap-3 py-1 animate-fade-in">
+                  <div className="flex-1 h-px bg-accent/30" />
+                  <span className="text-[10px] font-bold text-accent uppercase tracking-wider">Unread messages</span>
+                  <div className="flex-1 h-px bg-accent/30" />
+                </div>
+              )}
+              <div className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"} animate-fade-in`}>
+
+
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"} animate-fade-in`}>
             <div className={`max-w-[80%] ${
