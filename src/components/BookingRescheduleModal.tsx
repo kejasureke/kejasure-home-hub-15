@@ -26,6 +26,9 @@ const BookingRescheduleModal = ({ booking, onClose, onSave }: Props) => {
   const [checkOut, setCheckOut] = useState(booking.checkOut?.slice(0, 10) || isoIn(3));
   const [time, setTime] = useState(booking.time || times[1]);
 
+  useHardwareBack(true, onClose);
+
+
   const dateOptions = Array.from({ length: 10 }, (_, i) => isoIn(i + 1));
 
   const save = () => {
