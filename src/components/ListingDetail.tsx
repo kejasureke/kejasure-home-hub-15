@@ -451,8 +451,32 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
         </button>
       </div>
 
+      {/* Report nudge (unverified listings) */}
+      {showReportNudge && !property.verified && (
+        <div className="fixed left-0 right-0 z-30 flex justify-center px-4 animate-fade-in pointer-events-none" style={{ bottom: "calc(6rem + env(safe-area-inset-bottom, 0px))" }}>
+          <div className="pointer-events-auto flex items-center gap-2 px-3 py-2 rounded-full bg-destructive/95 text-destructive-foreground shadow-2xl max-w-sm">
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+            <span className="text-[11px] font-semibold flex-1">Something feel off? Report this listing</span>
+            <button
+              onClick={() => { setShowReportNudge(false); setShowReport(true); }}
+              className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-destructive-foreground text-destructive active:scale-95"
+            >
+              Report
+            </button>
+            <button
+              onClick={() => setShowReportNudge(false)}
+              className="text-[10px] font-medium opacity-80 active:opacity-100"
+              aria-label="Dismiss"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Bottom CTA — Book first, contacts after acceptance */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
+
         <div className="flex gap-3 max-w-lg mx-auto">
           <button
             onClick={() => setShowBooking(true)}
