@@ -108,16 +108,28 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
       {/* List */}
       <div className="flex-1 overflow-y-auto px-4 pt-2 pb-32 scrollbar-none">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center py-20 px-6">
-            <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
-              <Calendar className="w-7 h-7 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center text-center py-20 px-6 animate-fade-in">
+            <div className="w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center mb-4 relative">
+              <Calendar className="w-8 h-8 text-muted-foreground" />
+              <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-sm">✨</span>
+              </div>
             </div>
-            <h3 className="text-base font-bold text-foreground mb-1">No bookings yet</h3>
-            <p className="text-xs text-muted-foreground max-w-xs">
-              Browse listings and tap "Book a Viewing" or "Book Stay" to send a request.
+            <h3 className="text-base font-bold text-foreground mb-1">
+              {tab === "pending" ? "No pending requests" : tab === "accepted" ? "No accepted bookings yet" : tab === "completed" ? "No past bookings" : "No bookings yet"}
+            </h3>
+            <p className="text-xs text-muted-foreground max-w-xs mb-5">
+              Browse listings and tap "Book a Viewing" or "Book Stay" to send a request. Hosts respond within 2 hours.
             </p>
+            <button
+              onClick={onBack}
+              className="px-5 py-2.5 rounded-xl gradient-trust text-xs font-bold text-primary-foreground active:scale-95 transition-transform"
+            >
+              Browse Rentals
+            </button>
           </div>
         ) : (
+
           <div className="space-y-3">
             {filtered.map((b) => {
               const badge = statusBadge(b.status);
