@@ -139,14 +139,45 @@ const ProfileScreen = () => {
     <div className="pb-32 px-4 pt-safe">
       {/* Profile header */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 rounded-2xl gradient-trust flex items-center justify-center relative">
-          <span className="text-xl font-bold text-primary-foreground">JK</span>
-          {isVerified && (
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center border-2 border-background">
-              <ShieldCheck className="w-3.5 h-3.5 text-primary-foreground" />
-            </div>
-          )}
-        </div>
+        {(() => {
+          // KYC tiers: phone, id, biz — verified status per tier stored in localStorage.
+          const tiers = [
+            { key: "phone", label: "Phone", done: true }, // always true post-OTP
+            { key: "id", label: "ID", done: isVerified },
+            { key: "biz", label: "Biz", done: !isTenant && localStorage.getItem(`kejasure_kyc_verified_biz_${role}`) === "true" },
+          ];
+          const completed = tiers.filter(t => t.done).length;
+          const pct = completed / tiers.length;
+          const dash = 2 * Math.PI * 30; // radius 30
+          return (
+            <button
+              onClick={() => !isVerified && setShowKYC(true)}
+              className="relative w-16 h-16 shrink-0"
+              aria-label={`KYC verification: ${completed} of ${tiers.length} complete`}
+            >
+              <svg className="absolute inset-0 -rotate-90" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="30" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" />
+                <circle
+                  cx="32" cy="32" r="30" fill="none"
+                  stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinecap="round"
+                  strokeDasharray={`${dash * pct} ${dash}`}
+                  className="transition-all duration-500"
+                />
+              </svg>
+              <div className="absolute inset-1.5 rounded-2xl gradient-trust flex items-center justify-center">
+                <span className="text-xl font-bold text-primary-foreground">JK</span>
+              </div>
+              {isVerified && (
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center border-2 border-background">
+                  <ShieldCheck className="w-3.5 h-3.5 text-primary-foreground" />
+                </div>
+              )}
+              <div className="absolute -top-1 -left-1 px-1.5 py-0.5 rounded-full bg-card text-[9px] font-bold text-primary shadow-sm border border-border">
+                {completed}/{tiers.length}
+              </div>
+            </button>
+          );
+        })()}
         <div className="flex-1">
           <div className="flex items-center gap-1.5">
             <h2 className="text-lg font-bold">John Kamau</h2>
