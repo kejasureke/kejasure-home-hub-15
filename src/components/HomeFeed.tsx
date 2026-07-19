@@ -829,15 +829,22 @@ const HomeFeed = () => {
               {segment === "Short Stays" ? "All Short Stays" : segment === "Corporate Stay" ? "All Corporate & Expat Listings" : segment === "Business Spaces" ? "All Business Spaces" : "All Rentals"}
             </h2>
             <div className="space-y-4">
-              {filteredProperties.map((p) => (
-                <PropertyCard
-                  key={p.id}
-                  property={p}
-                  onPress={handleSelectProperty}
-                  liked={isFavorite(p.id)}
-                  onToggleLike={toggleFavorite}
-                />
-              ))}
+              {loadingSegment ? (
+                Array.from({ length: 3 }).map((_, i) => <PropertyCardSkeleton key={i} />)
+              ) : (
+                filteredProperties.map((p) => (
+                  <PropertyCard
+                    key={p.id}
+                    property={p}
+                    onPress={handleSelectProperty}
+                    liked={isFavorite(p.id)}
+                    onToggleLike={toggleFavorite}
+                    compareMode={compareIds.length > 0}
+                    isComparing={compareIds.includes(p.id)}
+                    onToggleCompare={(id) => setCompareIds((prev) => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id].slice(0, 3))}
+                  />
+                ))
+              )}
             </div>
 
             {filteredProperties.length === 0 && (
