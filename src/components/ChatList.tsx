@@ -79,6 +79,15 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   };
 
   return (
+  const handleRefresh = async () => {
+    await new Promise((r) => setTimeout(r, 700));
+    toast("Chats refreshed");
+  };
+
+  useHardwareBack(showNewChat, () => { setShowNewChat(false); setNewChatSearch(""); });
+
+  return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="pb-32">
       {/* Header */}
       <div className="px-4 pt-safe mb-4">
