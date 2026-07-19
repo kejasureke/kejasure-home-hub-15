@@ -89,6 +89,8 @@ const AdvancedFilters = ({
 }: AdvancedFiltersProps) => {
   const [local, setLocal] = useState<Filters>({ ...filters });
 
+  useHardwareBack(isOpen, onClose);
+
   const isCommercial = segment === "Business Spaces";
   const isServices = segment === "Services";
 
