@@ -38,8 +38,14 @@ const BottomNav = ({ activeTab, onTabChange, chatBadge = 0, profileBadge = 0, sh
     onTabChange(id);
   };
 
+  const hidden = useHideOnScroll();
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass-surface border-t border-border safe-bottom">
+    <nav
+      className={`fixed bottom-0 left-0 right-0 z-50 glass-surface border-t border-border safe-bottom transition-transform duration-300 ${
+        hidden ? "translate-y-full" : "translate-y-0"
+      }`}
+    >
       <div className="flex items-center justify-around px-2 py-2 max-w-lg mx-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
