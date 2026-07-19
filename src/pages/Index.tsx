@@ -214,17 +214,6 @@ const Index = () => {
       {activeTab === "profile" && <ProfileScreen />}
       </div>
 
-      {activeTab === "chats" && (
-        <ChatList
-          onOpenChat={(contact) => {
-            setChatContact(contact);
-            setShowChat(true);
-          }}
-        />
-      )}
-
-      {activeTab === "profile" && <ProfileScreen />}
-
       <BottomNav
         activeTab={activeTab}
         onTabChange={setActiveTab}
