@@ -231,7 +231,19 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+      <div ref={scrollRef} onScroll={onMessagesScroll} className="flex-1 overflow-y-auto px-4 py-4 space-y-3 relative">
+        {showJumpPill && (
+          <button
+            onClick={() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+              setShowJumpPill(false);
+              setNewIncoming(0);
+            }}
+            className="fixed left-1/2 -translate-x-1/2 bottom-24 z-30 px-3 py-1.5 rounded-full gradient-trust text-primary-foreground text-[11px] font-semibold shadow-lg flex items-center gap-1.5 animate-fade-in"
+          >
+            <span>↓ New message{newIncoming > 1 ? `s (${newIncoming})` : ""}</span>
+          </button>
+        )}
         {/* Quick action chips */}
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {quickChips.map((chip) => (
