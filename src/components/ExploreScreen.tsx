@@ -103,8 +103,18 @@ interface ExploreScreenProps {
   initialSearch?: string;
 }
 
+const EXPLORE_SEGMENT_KEY = "kejasure_explore_segment";
 const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
-  const [segment, setSegment] = useState<Segment>("Rentals");
+  const [segment, setSegmentState] = useState<Segment>(() => {
+    try {
+      const saved = localStorage.getItem(EXPLORE_SEGMENT_KEY) as Segment | null;
+      return saved && segments.includes(saved) ? saved : "Rentals";
+    } catch { return "Rentals"; }
+  });
+  const setSegment = (s: Segment) => {
+    setSegmentState(s);
+    try { localStorage.setItem(EXPLORE_SEGMENT_KEY, s); } catch {}
+  };
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [activePriceRange, setActivePriceRange] = useState<typeof priceRanges[number] | null>(null);
   const [activeServiceCategory, setActiveServiceCategory] = useState<string | null>(null);
@@ -112,6 +122,7 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [insightsCollapsed, setInsightsCollapsed] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [showQuickFilter, setShowQuickFilter] = useState(false);
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { addRecent } = useRecentlyViewed();
 
