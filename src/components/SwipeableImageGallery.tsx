@@ -115,9 +115,12 @@ const SwipeableImageGallery = ({
         </>
       )}
 
-      {/* Counter */}
-      <div className={`absolute ${bottomOffsetClass} right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm pointer-events-none`}>
-        <span className="text-[10px] font-semibold text-white flex items-center gap-1">
+      {/* Counter — key on index to fade-in on change */}
+      <div className={`absolute ${bottomOffsetClass} right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm pointer-events-none overflow-hidden`}>
+        <span
+          key={activeIndex}
+          className="text-[10px] font-semibold text-white flex items-center gap-1 animate-fade-in"
+        >
           <ImageIcon className="w-3 h-3" />
           {total > 1 ? `${activeIndex + 1} / ${total}` : total}
         </span>
