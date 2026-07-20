@@ -173,6 +173,34 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             )}
           </div>
 
+          {/* Neighborhood quick chips */}
+          {(() => {
+            const hood = neighborhoodProfiles.find((n) => n.estate === property.estate);
+            if (!hood) return null;
+            const chips = [
+              { label: "Safety", value: hood.safetyScore, icon: "🛡️" },
+              { label: "Water", value: hood.waterReliability, icon: "💧" },
+              { label: "Transit", value: hood.transitScore, icon: "🚌" },
+              { label: "Noise", value: 10 - hood.noiseLevel, icon: "🔇" },
+            ];
+            const chipCls = (v: number) =>
+              v >= 8 ? "bg-trust/10 text-trust border-trust/20"
+              : v >= 6 ? "bg-primary/10 text-primary border-primary/20"
+              : v >= 4 ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+              : "bg-destructive/10 text-destructive border-destructive/20";
+            return (
+              <div className="flex items-center gap-1.5 mt-2 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
+                {chips.map((c) => (
+                  <div key={c.label} className={`shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold border ${chipCls(c.value)}`}>
+                    <span>{c.icon}</span>
+                    <span>{c.label}</span>
+                    <span className="opacity-70">{c.value}/10</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
           {/* Corporate badge */}
           {property.corporate && (
             <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-xs font-semibold text-primary mt-2 w-fit">
