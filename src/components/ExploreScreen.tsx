@@ -588,21 +588,109 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
 
       {/* Quick filter bottom sheet */}
       {showQuickFilter && (
-        <QuickFilterSheet
-          segment={segment}
-          isServices={isServices}
-          categories={categories}
-          priceRanges={activePriceRanges}
-          serviceCategories={serviceCategories}
-          activeCategory={activeCategory}
-          activePriceRange={activePriceRange}
-          activeServiceCategory={activeServiceCategory}
-          onSelectCategory={setActiveCategory}
-          onSelectPriceRange={setActivePriceRange}
-          onSelectServiceCategory={setActiveServiceCategory}
-          onClearAll={() => { setActiveCategory(null); setActivePriceRange(null); setActiveServiceCategory(null); setActiveArea(null); }}
-          onClose={() => setShowQuickFilter(false)}
-        />
+        <div
+          className="fixed inset-0 z-[75] bg-foreground/40 backdrop-blur-sm flex items-end animate-fade-in"
+          onClick={() => setShowQuickFilter(false)}
+        >
+          <div
+            className="w-full max-w-lg mx-auto bg-card rounded-t-3xl safe-bottom pb-4 max-h-[75vh] flex flex-col animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </div>
+            <div className="px-5 pt-2 pb-3 flex items-center justify-between">
+              <div>
+                <p className="text-base font-bold text-foreground">Quick filters</p>
+                <p className="text-[11px] text-muted-foreground">{segment} · Tap to apply instantly</p>
+              </div>
+              <button onClick={() => setShowQuickFilter(false)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-5 space-y-5 pb-2">
+              {!isServices && (
+                <>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-2">Category</p>
+                    <div className="flex flex-wrap gap-2">
+                      {activeCategories.map((cat) => {
+                        const Icon = cat.icon;
+                        const active = activeCategory?.label === cat.label;
+                        return (
+                          <button
+                            key={cat.label}
+                            onClick={() => { haptic("light"); setActiveCategory(active ? null : cat); }}
+                            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-foreground border-border"}`}
+                          >
+                            <Icon className="w-3.5 h-3.5" />
+                            {cat.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-2">Price range</p>
+                    <div className="flex flex-wrap gap-2">
+                      {activePriceRanges.map((range) => {
+                        const active = activePriceRange?.label === range.label;
+                        return (
+                          <button
+                            key={range.label}
+                            onClick={() => { haptic("light"); setActivePriceRange(active ? null : range); }}
+                            className={`px-3 py-2 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-foreground border-border"}`}
+                          >
+                            {range.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+              {isServices && (
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-2">Service category</p>
+                  <div className="flex flex-wrap gap-2">
+                    {serviceCategories.map((cat) => {
+                      const active = activeServiceCategory === cat.label;
+                      const Icon = cat.icon;
+                      return (
+                        <button
+                          key={cat.label}
+                          onClick={() => { haptic("light"); setActiveServiceCategory(active ? null : cat.label); }}
+                          className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-foreground border-border"}`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          {cat.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="px-5 pt-3 flex items-center gap-2">
+              <button
+                onClick={() => {
+                  haptic("light");
+                  setActiveCategory(null); setActivePriceRange(null);
+                  setActiveServiceCategory(null); setActiveArea(null);
+                }}
+                className="flex-1 py-3 rounded-xl bg-secondary text-sm font-semibold text-foreground"
+              >
+                Clear all
+              </button>
+              <button
+                onClick={() => setShowQuickFilter(false)}
+                className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold"
+              >
+                Show results
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
