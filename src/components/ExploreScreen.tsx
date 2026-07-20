@@ -585,6 +585,25 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
           )}
         </div>
       )}
+
+      {/* Quick filter bottom sheet */}
+      {showQuickFilter && (
+        <QuickFilterSheet
+          segment={segment}
+          isServices={isServices}
+          categories={categories}
+          priceRanges={activePriceRanges}
+          serviceCategories={serviceCategories}
+          activeCategory={activeCategory}
+          activePriceRange={activePriceRange}
+          activeServiceCategory={activeServiceCategory}
+          onSelectCategory={setActiveCategory}
+          onSelectPriceRange={setActivePriceRange}
+          onSelectServiceCategory={setActiveServiceCategory}
+          onClearAll={() => { setActiveCategory(null); setActivePriceRange(null); setActiveServiceCategory(null); setActiveArea(null); }}
+          onClose={() => setShowQuickFilter(false)}
+        />
+      )}
     </div>
   );
 };
