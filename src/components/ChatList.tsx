@@ -1,8 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
-import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users, Archive } from "lucide-react";
+import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users, Archive, Bell, EyeOff, Ban, Trash2 } from "lucide-react";
 import PullToRefresh from "./PullToRefresh";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { useLongPress } from "@/hooks/useLongPress";
 import { haptic } from "@/lib/despia";
 import EmptyIllustration from "./EmptyIllustration";
 
@@ -43,9 +44,61 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   const [filter, setFilter] = useState<FilterType>("all");
   const [showNewChat, setShowNewChat] = useState(false);
   const [newChatSearch, setNewChatSearch] = useState("");
+  const [longPressed, setLongPressed] = useState<ChatContact | null>(null);
+  const [mutedIds, setMutedIds] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("kejasure_muted_chats") || "[]")); } catch { return new Set(); }
+  });
+  const [markedUnread, setMarkedUnread] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("kejasure_marked_unread") || "[]")); } catch { return new Set(); }
+  });
+  const [, tick] = useState(0);
+  // Auto-tick every 30s so "just now / Xm ago" style timestamps stay fresh.
+  useEffect(() => {
+    const id = setInterval(() => tick((n) => n + 1), 30000);
+    return () => clearInterval(id);
+  }, []);
   const [archived, setArchived] = useState<Set<string>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem("kejasure_archived_chats") || "[]")); } catch { return new Set(); }
   });
+
+  const persistSet = (key: string, s: Set<string>) => {
+    try { localStorage.setItem(key, JSON.stringify([...s])); } catch {}
+  };
+
+  const toggleMute = (id: string) => {
+    setMutedIds((prev) => {
+      const next = new Set(prev);
+      const wasMuted = next.has(id);
+      if (wasMuted) next.delete(id); else next.add(id);
+      persistSet("kejasure_muted_chats", next);
+      haptic("success");
+      toast(wasMuted ? "Chat unmuted" : "Chat muted", { description: wasMuted ? "You'll get notifications again" : "Notifications silenced" });
+      return next;
+    });
+  };
+
+  const toggleUnread = (id: string) => {
+    setMarkedUnread((prev) => {
+      const next = new Set(prev);
+      const was = next.has(id);
+      if (was) next.delete(id); else next.add(id);
+      persistSet("kejasure_marked_unread", next);
+      haptic("light");
+      toast(was ? "Marked as read" : "Marked as unread");
+      return next;
+    });
+  };
+
+  const blockChat = (id: string) => {
+    haptic("warning");
+    setArchived((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      persistSet("kejasure_archived_chats", next);
+      return next;
+    });
+    toast("User blocked", { description: "You won't receive messages from them" });
+  };
 
   const archiveChat = (id: string) => {
     setArchived((prev) => {
