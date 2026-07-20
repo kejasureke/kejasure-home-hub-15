@@ -136,6 +136,9 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
     setActiveArea(null);
   }, [segment]);
 
+  useHardwareBack(showQuickFilter, () => setShowQuickFilter(false));
+
+
   const activeCategories: Category[] =
     segment === "Rentals" ? rentalCategories :
     segment === "Short Stays" ? shortStayCategories :
