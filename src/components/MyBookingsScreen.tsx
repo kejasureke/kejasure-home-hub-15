@@ -149,6 +149,29 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                         <Icon className={`w-3 h-3 ${badge.spin ? "animate-spin" : ""}`} />
                         {badge.label}
                       </div>
+                      {/* Timeline stepper */}
+                      {b.status !== "declined" && b.status !== "cancelled" && (() => {
+                        const target = new Date(b.date).getTime();
+                        const arrived = target - Date.now() <= 0 || b.status === "completed";
+                        const steps = [
+                          { key: "req", label: "Requested", done: true },
+                          { key: "acc", label: "Accepted", done: b.status === "accepted" || b.status === "completed" },
+                          { key: "in", label: isStay ? "Check-in" : "Move-in", done: arrived && (b.status === "accepted" || b.status === "completed") },
+                        ];
+                        return (
+                          <div className="flex items-center gap-1 mt-3">
+                            {steps.map((s, idx) => (
+                              <div key={s.key} className="flex items-center gap-1 flex-1">
+                                <div className={`w-2.5 h-2.5 rounded-full transition-colors ${s.done ? "bg-trust" : "bg-border"} ${s.done && idx === steps.findIndex((x) => !x.done) - 1 ? "ring-2 ring-trust/30" : ""}`} />
+                                <span className={`text-[9px] font-semibold ${s.done ? "text-foreground" : "text-muted-foreground"}`}>{s.label}</span>
+                                {idx < steps.length - 1 && (
+                                  <div className={`flex-1 h-0.5 rounded-full ${steps[idx + 1].done ? "bg-trust" : "bg-border"}`} />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
