@@ -56,10 +56,11 @@ const BottomNav = ({ activeTab, onTabChange, chatBadge = 0, profileBadge = 0, sh
               onClick={() => handleTap(tab.id)}
               className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all duration-200 relative"
             >
-              <div className={`p-1.5 rounded-xl transition-all duration-200 relative ${isActive ? "bg-primary/10" : ""}`}>
+              <div className={`p-1.5 rounded-xl transition-all duration-300 relative ${isActive ? "bg-primary/10 scale-110" : "scale-100"}`} style={{ transitionTimingFunction: isActive ? "cubic-bezier(0.34, 1.56, 0.64, 1)" : "ease-out" }}>
                 <tab.icon
+                  key={isActive ? `${tab.id}-active` : tab.id}
                   className={`w-5 h-5 transition-colors duration-200 ${
-                    isActive ? "text-primary" : "text-muted-foreground"
+                    isActive ? "text-primary animate-scale-in" : "text-muted-foreground"
                   }`}
                   strokeWidth={isActive ? 2.5 : 1.8}
                 />

@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
-import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints, Volume2, Bus, GraduationCap, Cross, ShoppingBag, TreePine, Wifi, ChevronDown, ChevronUp, Briefcase, Store, Warehouse, Hotel, Wrench, Truck, Sparkles, Star, Palmtree, Plane } from "lucide-react";
+import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints, Volume2, Bus, GraduationCap, Cross, ShoppingBag, TreePine, Wifi, ChevronDown, ChevronUp, Briefcase, Store, Warehouse, Hotel, Wrench, Truck, Sparkles, Star, Palmtree, Plane, SlidersHorizontal, X } from "lucide-react";
+import { haptic } from "@/lib/despia";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { properties, serviceProviders } from "@/data/mockData";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
@@ -103,8 +105,18 @@ interface ExploreScreenProps {
   initialSearch?: string;
 }
 
+const EXPLORE_SEGMENT_KEY = "kejasure_explore_segment";
 const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
-  const [segment, setSegment] = useState<Segment>("Rentals");
+  const [segment, setSegmentState] = useState<Segment>(() => {
+    try {
+      const saved = localStorage.getItem(EXPLORE_SEGMENT_KEY) as Segment | null;
+      return saved && segments.includes(saved) ? saved : "Rentals";
+    } catch { return "Rentals"; }
+  });
+  const setSegment = (s: Segment) => {
+    setSegmentState(s);
+    try { localStorage.setItem(EXPLORE_SEGMENT_KEY, s); } catch {}
+  };
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [activePriceRange, setActivePriceRange] = useState<typeof priceRanges[number] | null>(null);
   const [activeServiceCategory, setActiveServiceCategory] = useState<string | null>(null);
@@ -112,6 +124,7 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [insightsCollapsed, setInsightsCollapsed] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [showQuickFilter, setShowQuickFilter] = useState(false);
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
   const { addRecent } = useRecentlyViewed();
 
@@ -122,6 +135,9 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
     setActiveServiceCategory(null);
     setActiveArea(null);
   }, [segment]);
+
+  useHardwareBack(showQuickFilter, () => setShowQuickFilter(false));
+
 
   const activeCategories: Category[] =
     segment === "Rentals" ? rentalCategories :
@@ -237,20 +253,32 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
         </div>
 
         {/* Segment selector */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 mb-4 pb-1">
-          {segments.map((seg) => (
-            <button
-              key={seg}
-              onClick={() => setSegment(seg)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
-                segment === seg
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card text-muted-foreground card-shadow"
-              }`}
-            >
-              {seg}
-            </button>
-          ))}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex-1 flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+            {segments.map((seg) => (
+              <button
+                key={seg}
+                onClick={() => { haptic("light"); setSegment(seg); }}
+                className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+                  segment === seg
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-muted-foreground card-shadow"
+                }`}
+              >
+                {seg}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => { haptic("light"); setShowQuickFilter(true); }}
+            aria-label="Quick filters"
+            className="shrink-0 w-9 h-9 rounded-full bg-card card-shadow flex items-center justify-center relative"
+          >
+            <SlidersHorizontal className="w-4 h-4 text-foreground" />
+            {(activeCategory || activePriceRange || activeServiceCategory || activeArea) && (
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent" />
+            )}
+          </button>
         </div>
 
         {/* Search */}
@@ -558,6 +586,113 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
               <p className="text-xs text-muted-foreground mt-1">Try a different category or search term</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Quick filter bottom sheet */}
+      {showQuickFilter && (
+        <div
+          className="fixed inset-0 z-[75] bg-foreground/40 backdrop-blur-sm flex items-end animate-fade-in"
+          onClick={() => setShowQuickFilter(false)}
+        >
+          <div
+            className="w-full max-w-lg mx-auto bg-card rounded-t-3xl safe-bottom pb-4 max-h-[75vh] flex flex-col animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </div>
+            <div className="px-5 pt-2 pb-3 flex items-center justify-between">
+              <div>
+                <p className="text-base font-bold text-foreground">Quick filters</p>
+                <p className="text-[11px] text-muted-foreground">{segment} · Tap to apply instantly</p>
+              </div>
+              <button onClick={() => setShowQuickFilter(false)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-5 space-y-5 pb-2">
+              {!isServices && (
+                <>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-2">Category</p>
+                    <div className="flex flex-wrap gap-2">
+                      {activeCategories.map((cat) => {
+                        const Icon = cat.icon;
+                        const active = activeCategory?.label === cat.label;
+                        return (
+                          <button
+                            key={cat.label}
+                            onClick={() => { haptic("light"); setActiveCategory(active ? null : cat); }}
+                            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-foreground border-border"}`}
+                          >
+                            <Icon className="w-3.5 h-3.5" />
+                            {cat.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-2">Price range</p>
+                    <div className="flex flex-wrap gap-2">
+                      {activePriceRanges.map((range) => {
+                        const active = activePriceRange?.label === range.label;
+                        return (
+                          <button
+                            key={range.label}
+                            onClick={() => { haptic("light"); setActivePriceRange(active ? null : range); }}
+                            className={`px-3 py-2 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-foreground border-border"}`}
+                          >
+                            {range.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+              {isServices && (
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-2">Service category</p>
+                  <div className="flex flex-wrap gap-2">
+                    {serviceCategories.map((cat) => {
+                      const active = activeServiceCategory === cat.label;
+                      const Icon = cat.icon;
+                      return (
+                        <button
+                          key={cat.label}
+                          onClick={() => { haptic("light"); setActiveServiceCategory(active ? null : cat.label); }}
+                          className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-foreground border-border"}`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          {cat.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="px-5 pt-3 flex items-center gap-2">
+              <button
+                onClick={() => {
+                  haptic("light");
+                  setActiveCategory(null); setActivePriceRange(null);
+                  setActiveServiceCategory(null); setActiveArea(null);
+                }}
+                className="flex-1 py-3 rounded-xl bg-secondary text-sm font-semibold text-foreground"
+              >
+                Clear all
+              </button>
+              <button
+                onClick={() => setShowQuickFilter(false)}
+                className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold"
+              >
+                Show results
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

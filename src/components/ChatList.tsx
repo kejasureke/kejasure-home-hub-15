@@ -1,8 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
-import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users, Archive } from "lucide-react";
+import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users, Archive, Bell, EyeOff, Ban, Trash2 } from "lucide-react";
 import PullToRefresh from "./PullToRefresh";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { useLongPress } from "@/hooks/useLongPress";
 import { haptic } from "@/lib/despia";
 import EmptyIllustration from "./EmptyIllustration";
 
@@ -38,14 +39,133 @@ const contacts: ChatContact[] = [
 
 type FilterType = "all" | "unread" | "landlords" | "services";
 
+const roleColorStatic = (role: string) => {
+  switch (role) {
+    case "landlord": return "bg-primary/10 text-primary";
+    case "agent": return "bg-purple-100 text-purple-700";
+    case "service": return "bg-accent/10 text-accent-foreground";
+    case "host": return "bg-trust/10 text-trust";
+    case "tenant": return "bg-secondary text-muted-foreground";
+    default: return "bg-secondary text-muted-foreground";
+  }
+};
+
+const ChatRowButton = ({
+  chat,
+  isMuted,
+  isUnread,
+  onOpen,
+  onLongPress,
+}: {
+  chat: ChatContact;
+  isMuted: boolean;
+  isUnread: boolean;
+  onOpen: () => void;
+  onLongPress: () => void;
+}) => {
+  const lp = useLongPress(onLongPress, { delay: 480 });
+  const displayUnread = chat.unread > 0 ? chat.unread : isUnread ? 1 : 0;
+  return (
+    <button
+      onClick={() => { if (!lp.didFire()) onOpen(); }}
+      {...lp.handlers}
+      className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform relative"
+    >
+      <div className="relative shrink-0">
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${chat.avatar.length > 2 ? "bg-secondary text-lg" : "bg-primary/10"}`}>
+          {chat.avatar.length > 2 ? <span>{chat.avatar}</span> : <span className="text-sm font-semibold text-primary">{chat.avatar}</span>}
+        </div>
+        {chat.online && <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-trust border-2 border-card" />}
+      </div>
+      <div className="flex-1 text-left min-w-0">
+        <div className="flex items-center justify-between mb-0.5">
+          <div className="flex items-center gap-1.5 min-w-0">
+            {chat.pinned && <Pin className="w-3 h-3 text-primary shrink-0 rotate-45" />}
+            <h3 className="text-sm font-semibold truncate">{chat.name}</h3>
+            {chat.verified && <ShieldCheck className="w-3.5 h-3.5 text-trust shrink-0" />}
+            {(chat.muted || isMuted) && <BellOff className="w-3 h-3 text-muted-foreground shrink-0" />}
+          </div>
+          <span className={`text-[10px] shrink-0 ml-2 ${displayUnread > 0 ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+            {chat.time}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${roleColorStatic(chat.role)}`}>{chat.role}</span>
+          {chat.property && <span className="text-[10px] text-muted-foreground truncate">· {chat.property}</span>}
+        </div>
+        <p className={`text-xs truncate mt-0.5 ${displayUnread > 0 ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+          {chat.lastMessage}
+        </p>
+      </div>
+      {displayUnread > 0 && (
+        <div className="w-5 h-5 rounded-full gradient-trust flex items-center justify-center shrink-0">
+          <span className="text-[10px] font-bold text-primary-foreground">{displayUnread > 9 ? "9+" : displayUnread}</span>
+        </div>
+      )}
+    </button>
+  );
+};
+
 const ChatList = ({ onOpenChat }: ChatListProps) => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [showNewChat, setShowNewChat] = useState(false);
   const [newChatSearch, setNewChatSearch] = useState("");
+  const [longPressed, setLongPressed] = useState<ChatContact | null>(null);
+  const [mutedIds, setMutedIds] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("kejasure_muted_chats") || "[]")); } catch { return new Set(); }
+  });
+  const [markedUnread, setMarkedUnread] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("kejasure_marked_unread") || "[]")); } catch { return new Set(); }
+  });
+  const [, tick] = useState(0);
+  // Auto-tick every 30s so "just now / Xm ago" style timestamps stay fresh.
+  useEffect(() => {
+    const id = setInterval(() => tick((n) => n + 1), 30000);
+    return () => clearInterval(id);
+  }, []);
   const [archived, setArchived] = useState<Set<string>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem("kejasure_archived_chats") || "[]")); } catch { return new Set(); }
   });
+
+  const persistSet = (key: string, s: Set<string>) => {
+    try { localStorage.setItem(key, JSON.stringify([...s])); } catch {}
+  };
+
+  const toggleMute = (id: string) => {
+    setMutedIds((prev) => {
+      const next = new Set(prev);
+      const wasMuted = next.has(id);
+      if (wasMuted) next.delete(id); else next.add(id);
+      persistSet("kejasure_muted_chats", next);
+      haptic("success");
+      toast(wasMuted ? "Chat unmuted" : "Chat muted", { description: wasMuted ? "You'll get notifications again" : "Notifications silenced" });
+      return next;
+    });
+  };
+
+  const toggleUnread = (id: string) => {
+    setMarkedUnread((prev) => {
+      const next = new Set(prev);
+      const was = next.has(id);
+      if (was) next.delete(id); else next.add(id);
+      persistSet("kejasure_marked_unread", next);
+      haptic("light");
+      toast(was ? "Marked as read" : "Marked as unread");
+      return next;
+    });
+  };
+
+  const blockChat = (id: string) => {
+    haptic("warning");
+    setArchived((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      persistSet("kejasure_archived_chats", next);
+      return next;
+    });
+    toast("User blocked", { description: "You won't receive messages from them" });
+  };
 
   const archiveChat = (id: string) => {
     setArchived((prev) => {
@@ -178,62 +298,83 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
 
         {filtered.map((chat) => (
           <SwipeableChatRow key={chat.id} onArchive={() => archiveChat(chat.id)}>
-            <button
-              onClick={() => onOpenChat(chat)}
-              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.98] transition-transform relative"
-            >
-              {/* Avatar */}
-              <div className="relative shrink-0">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  chat.avatar.length > 2 ? "bg-secondary text-lg" : "bg-primary/10"
-                }`}>
-                  {chat.avatar.length > 2 ? (
-                    <span>{chat.avatar}</span>
-                  ) : (
-                    <span className="text-sm font-semibold text-primary">{chat.avatar}</span>
-                  )}
-                </div>
-                {chat.online && (
-                  <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-trust border-2 border-card" />
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 text-left min-w-0">
-                <div className="flex items-center justify-between mb-0.5">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    {chat.pinned && <Pin className="w-3 h-3 text-primary shrink-0 rotate-45" />}
-                    <h3 className="text-sm font-semibold truncate">{chat.name}</h3>
-                    {chat.verified && <ShieldCheck className="w-3.5 h-3.5 text-trust shrink-0" />}
-                    {chat.muted && <BellOff className="w-3 h-3 text-muted-foreground shrink-0" />}
-                  </div>
-                  <span className={`text-[10px] shrink-0 ml-2 ${chat.unread > 0 ? "text-primary font-semibold" : "text-muted-foreground"}`}>
-                    {chat.time}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${roleColor(chat.role)}`}>
-                    {chat.role}
-                  </span>
-                  {chat.property && (
-                    <span className="text-[10px] text-muted-foreground truncate">· {chat.property}</span>
-                  )}
-                </div>
-                <p className={`text-xs truncate mt-0.5 ${chat.unread > 0 ? "text-foreground font-medium" : "text-muted-foreground"}`}>
-                  {chat.lastMessage}
-                </p>
-              </div>
-
-              {/* Unread badge */}
-              {chat.unread > 0 && (
-                <div className="w-5 h-5 rounded-full gradient-trust flex items-center justify-center shrink-0">
-                  <span className="text-[10px] font-bold text-primary-foreground">{chat.unread}</span>
-                </div>
-              )}
-            </button>
+            <ChatRowButton
+              chat={chat}
+              isMuted={mutedIds.has(chat.id)}
+              isUnread={markedUnread.has(chat.id)}
+              onOpen={() => {
+                if (markedUnread.has(chat.id)) toggleUnread(chat.id);
+                onOpenChat(chat);
+              }}
+              onLongPress={() => setLongPressed(chat)}
+            />
           </SwipeableChatRow>
         ))}
       </div>
+
+      {/* Long-press action sheet */}
+      {longPressed && (
+        <div
+          className="fixed inset-0 z-[80] bg-foreground/40 backdrop-blur-sm flex items-end animate-fade-in"
+          onClick={() => setLongPressed(null)}
+        >
+          <div
+            className="w-full max-w-lg mx-auto bg-card rounded-t-3xl safe-bottom pb-3 animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </div>
+            <div className="px-5 py-2">
+              <p className="text-sm font-bold text-foreground truncate">{longPressed.name}</p>
+              <p className="text-[11px] text-muted-foreground truncate">{longPressed.property || longPressed.role}</p>
+            </div>
+            <div className="px-2 pb-1">
+              {[
+                {
+                  icon: mutedIds.has(longPressed.id) ? Bell : BellOff,
+                  label: mutedIds.has(longPressed.id) ? "Unmute conversation" : "Mute conversation",
+                  onClick: () => { toggleMute(longPressed.id); setLongPressed(null); },
+                },
+                {
+                  icon: EyeOff,
+                  label: markedUnread.has(longPressed.id) ? "Mark as read" : "Mark as unread",
+                  onClick: () => { toggleUnread(longPressed.id); setLongPressed(null); },
+                },
+                {
+                  icon: Archive,
+                  label: "Archive",
+                  onClick: () => { archiveChat(longPressed.id); setLongPressed(null); },
+                },
+                {
+                  icon: Ban,
+                  label: "Block user",
+                  destructive: true,
+                  onClick: () => { blockChat(longPressed.id); setLongPressed(null); },
+                },
+              ].map((a) => {
+                const Icon = a.icon;
+                return (
+                  <button
+                    key={a.label}
+                    onClick={a.onClick}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl active:bg-secondary/60 ${a.destructive ? "text-destructive" : "text-foreground"}`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-sm font-medium">{a.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setLongPressed(null)}
+              className="mx-4 mt-1 mb-1 py-3 rounded-xl bg-secondary text-sm font-semibold text-foreground"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* New Chat Modal */}
       {showNewChat && (

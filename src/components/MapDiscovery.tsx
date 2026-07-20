@@ -37,6 +37,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [gpsFix, setGpsFix] = useState<{ accuracy: number; ts: number } | null>(null);
   const [locError, setLocError] = useState<null | "off" | "denied" | "unavailable" | "timeout">(null);
   const [heading, setHeading] = useState<number | null>(null);
+  const [mapSnap, setMapSnap] = useState<"peek" | "expanded">("expanded");
   const [, forceTick] = useState(0);
   const [locationEnabled, setLocationEnabled] = useState(() => {
     try { return localStorage.getItem(LOCATION_KEY) === "true"; } catch { return false; }
@@ -428,12 +429,55 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
         />
       </div>
 
-      {/* Selected card */}
-      {selected && (
-        <div className="px-4 py-3 animate-fade-in">
-          <SelectedCard selected={selected} onSelectProperty={onSelectProperty} />
-        </div>
-      )}
+      {/* Selected card — snap points: peek / expanded */}
+      {selected && (() => {
+        const isProp = "bedrooms" in selected;
+        const title = isProp ? (selected as any).title : (selected as any).name;
+        const subtitle = isProp
+          ? `${(selected as any).estate}, ${(selected as any).county}`
+          : (selected as any).category;
+        const priceLabel = isProp
+          ? `KES ${(selected as any).price.toLocaleString()}`
+          : `KES ${(selected as any).priceFrom?.toLocaleString?.() ?? ""}`;
+        return (
+          <div className="px-4 pt-1 pb-3 animate-fade-in">
+            <div
+              onClick={() => { haptic("light"); setMapSnap(mapSnap === "peek" ? "expanded" : "peek"); }}
+              onTouchStart={(e) => { (e.currentTarget as any)._startY = e.touches[0].clientY; }}
+              onTouchEnd={(e) => {
+                const startY = (e.currentTarget as any)._startY;
+                if (startY == null) return;
+                const dy = e.changedTouches[0].clientY - startY;
+                if (dy < -40) { haptic("light"); setMapSnap("expanded"); }
+                else if (dy > 40) { haptic("light"); setMapSnap("peek"); }
+              }}
+              className="flex justify-center py-1 cursor-pointer active:opacity-70"
+            >
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </div>
+            {mapSnap === "expanded" ? (
+              <SelectedCard selected={selected} onSelectProperty={onSelectProperty} />
+            ) : (
+              <button
+                onClick={() => onSelectProperty(selected.id)}
+                className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.99] transition-transform"
+              >
+                <div className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center text-lg shrink-0">
+                  {isProp ? "🏠" : (selected as any).avatar}
+                </div>
+                <div className="flex-1 text-left min-w-0">
+                  <p className="text-sm font-semibold truncate">{title}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">{subtitle}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-bold text-primary">{priceLabel}</p>
+                  <p className="text-[10px] text-muted-foreground">Tap to expand</p>
+                </div>
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       {!selected && (
         <div className="px-4 py-3 text-center">

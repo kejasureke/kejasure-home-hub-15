@@ -22,8 +22,18 @@ import { useHardwareBack } from "@/hooks/useHardwareBack";
 
 const segments = ["Rentals", "Short Stays", "Business Spaces", "Corporate Stay", "Services"] as const;
 
+const SEGMENT_KEY = "kejasure_home_segment";
 const HomeFeed = () => {
-  const [segment, setSegment] = useState<(typeof segments)[number]>("Rentals");
+  const [segment, setSegmentState] = useState<(typeof segments)[number]>(() => {
+    try {
+      const saved = localStorage.getItem(SEGMENT_KEY) as (typeof segments)[number] | null;
+      return saved && segments.includes(saved) ? saved : "Rentals";
+    } catch { return "Rentals"; }
+  });
+  const setSegment = (s: (typeof segments)[number]) => {
+    setSegmentState(s);
+    try { localStorage.setItem(SEGMENT_KEY, s); } catch {}
+  };
   const [county, setCounty] = useState("");
   const [subcounty, setSubcounty] = useState("");
   const [ward, setWard] = useState("");

@@ -305,7 +305,24 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
           </button>
         </div>
         <div className="space-y-3 pb-8">
-          {myListings.map((listing, i) => (
+          {myListings.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-card/60 p-6 text-center animate-fade-in">
+              <div className="w-16 h-16 mx-auto rounded-2xl gradient-trust flex items-center justify-center mb-3 text-3xl">
+                🏠
+              </div>
+              <h4 className="text-base font-bold text-foreground mb-1">No listings yet</h4>
+              <p className="text-xs text-muted-foreground max-w-[240px] mx-auto mb-4">
+                Post your first property to start reaching thousands of verified tenants across Kenya.
+              </p>
+              <button
+                onClick={() => setShowCRUD(true)}
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold active:scale-95 transition-transform"
+              >
+                <Plus className="w-4 h-4" /> Create your first listing
+              </button>
+              <p className="text-[10px] text-muted-foreground mt-3">Free · Takes ~3 minutes</p>
+            </div>
+          ) : myListings.map((listing, i) => (
             <div key={listing.title} className="flex items-center gap-3 p-3 rounded-xl bg-card card-shadow">
               <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-lg">🏠</div>
               <div className="flex-1">
