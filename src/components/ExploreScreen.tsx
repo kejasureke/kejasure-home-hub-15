@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
-import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints, Volume2, Bus, GraduationCap, Cross, ShoppingBag, TreePine, Wifi, ChevronDown, ChevronUp, Briefcase, Store, Warehouse, Hotel, Wrench, Truck, Sparkles, Star, Palmtree, Plane } from "lucide-react";
+import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints, Volume2, Bus, GraduationCap, Cross, ShoppingBag, TreePine, Wifi, ChevronDown, ChevronUp, Briefcase, Store, Warehouse, Hotel, Wrench, Truck, Sparkles, Star, Palmtree, Plane, SlidersHorizontal, X } from "lucide-react";
+import { haptic } from "@/lib/despia";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { properties, serviceProviders } from "@/data/mockData";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
@@ -248,20 +250,32 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
         </div>
 
         {/* Segment selector */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 mb-4 pb-1">
-          {segments.map((seg) => (
-            <button
-              key={seg}
-              onClick={() => setSegment(seg)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
-                segment === seg
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card text-muted-foreground card-shadow"
-              }`}
-            >
-              {seg}
-            </button>
-          ))}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex-1 flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+            {segments.map((seg) => (
+              <button
+                key={seg}
+                onClick={() => { haptic("light"); setSegment(seg); }}
+                className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+                  segment === seg
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-muted-foreground card-shadow"
+                }`}
+              >
+                {seg}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => { haptic("light"); setShowQuickFilter(true); }}
+            aria-label="Quick filters"
+            className="shrink-0 w-9 h-9 rounded-full bg-card card-shadow flex items-center justify-center relative"
+          >
+            <SlidersHorizontal className="w-4 h-4 text-foreground" />
+            {(activeCategory || activePriceRange || activeServiceCategory || activeArea) && (
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent" />
+            )}
+          </button>
         </div>
 
         {/* Search */}
