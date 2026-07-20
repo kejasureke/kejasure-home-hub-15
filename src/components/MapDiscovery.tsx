@@ -428,12 +428,49 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
         />
       </div>
 
-      {/* Selected card */}
-      {selected && (
-        <div className="px-4 py-3 animate-fade-in">
-          <SelectedCard selected={selected} onSelectProperty={onSelectProperty} />
-        </div>
-      )}
+      {/* Selected card — snap points: peek / expanded */}
+      {selected && (() => {
+        const [snap, setSnap] = [mapSnap, setMapSnap];
+        return (
+          <div className="px-4 pt-1 pb-3 animate-fade-in">
+            <div
+              onClick={() => {
+                haptic("light");
+                setSnap(snap === "peek" ? "expanded" : "peek");
+              }}
+              onTouchStart={(e) => { (e.currentTarget as any)._startY = e.touches[0].clientY; }}
+              onTouchEnd={(e) => {
+                const startY = (e.currentTarget as any)._startY;
+                if (startY == null) return;
+                const dy = e.changedTouches[0].clientY - startY;
+                if (dy < -40) { haptic("light"); setSnap("expanded"); }
+                else if (dy > 40) { haptic("light"); setSnap("peek"); }
+              }}
+              className="flex justify-center py-1 cursor-pointer active:opacity-70"
+            >
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </div>
+            {snap === "expanded" ? (
+              <SelectedCard selected={selected} onSelectProperty={onSelectProperty} />
+            ) : (
+              <button
+                onClick={() => onSelectProperty(selected.property)}
+                className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card card-shadow active:scale-[0.99] transition-transform"
+              >
+                <div className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center text-lg shrink-0">🏠</div>
+                <div className="flex-1 text-left min-w-0">
+                  <p className="text-sm font-semibold truncate">{selected.property.title}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">{selected.property.estate}, {selected.property.county}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-bold text-primary">KES {selected.property.price.toLocaleString()}</p>
+                  <p className="text-[10px] text-muted-foreground">Tap for more</p>
+                </div>
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       {!selected && (
         <div className="px-4 py-3 text-center">
