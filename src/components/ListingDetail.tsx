@@ -177,11 +177,11 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           {(() => {
             const hood = neighborhoodProfiles.find((n) => n.estate === property.estate);
             if (!hood) return null;
+            const noiseScore = hood.noiseLevel === "Quiet" ? 9 : hood.noiseLevel === "Moderate" ? 6 : 3;
             const chips = [
-              { label: "Safety", value: hood.safetyScore, icon: "🛡️" },
+              { label: "Safety", value: hood.safetyRating, icon: "🛡️" },
               { label: "Water", value: hood.waterReliability, icon: "💧" },
-              { label: "Transit", value: hood.transitScore, icon: "🚌" },
-              { label: "Noise", value: 10 - hood.noiseLevel, icon: "🔇" },
+              { label: "Noise", value: noiseScore, icon: "🔇" },
             ];
             const chipCls = (v: number) =>
               v >= 8 ? "bg-trust/10 text-trust border-trust/20"
