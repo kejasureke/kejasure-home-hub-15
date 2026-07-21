@@ -158,6 +158,24 @@ const HomeFeed = () => {
 
   const property = selectedProperty ? properties.find((p) => p.id === selectedProperty) : null;
 
+  const handleSaveSearch = () => {
+    const label = [estate, ward, subcounty, county].filter(Boolean).join(", ") || "All Kenya";
+    saveSearch({ label, county, subcounty: subcounty, estate, segment });
+  };
+
+  const handleRefresh = async () => {
+    await new Promise((r) => setTimeout(r, 700));
+    toast("Feed refreshed");
+  };
+
+  // Android hardware back — close overlays before allowing app exit.
+  // Must run before any early returns to satisfy the Rules of Hooks.
+  useHardwareBack(showFilters, () => setShowFilters(false));
+  useHardwareBack(showCompareSelector, () => {
+    setShowCompareSelector(false);
+    setCompareFromProperty(null);
+  });
+
   if (property) {
     return (
       <ListingDetail
@@ -224,25 +242,9 @@ const HomeFeed = () => {
     );
   }
 
-  const handleSaveSearch = () => {
-    const label = [estate, ward, subcounty, county].filter(Boolean).join(", ") || "All Kenya";
-    saveSearch({ label, county, subcounty: subcounty, estate, segment });
-  };
-
-  const handleRefresh = async () => {
-    await new Promise((r) => setTimeout(r, 700));
-    toast("Feed refreshed");
-  };
-
-  // Android hardware back — close overlays before allowing app exit.
-  useHardwareBack(showFilters, () => setShowFilters(false));
-  useHardwareBack(showCompareSelector, () => {
-    setShowCompareSelector(false);
-    setCompareFromProperty(null);
-  });
-
   return (
     <PullToRefresh onRefresh={handleRefresh}>
+
     <div className="pb-32">
       {/* Header */}
       <div className="gradient-trust px-4 pt-safe pb-5">
