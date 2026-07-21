@@ -148,6 +148,18 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
           },
         ];
       });
+
+      // Fire a global alert for the incoming host/agent message when the user
+      // is not actively viewing this chat (backgrounded tab / minimized app).
+      if (typeof document !== "undefined" && document.hidden) {
+        const roleLabel = contactRole === "host" ? "host" : contactRole === "service" ? "provider" : "landlord";
+        pushGlobalAlert({
+          type: "message",
+          title: `New message from ${contactName || "your " + roleLabel}`,
+          body: replyText,
+          action: "open-chats",
+        });
+      }
     }, delay);
   };
 
