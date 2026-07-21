@@ -1,5 +1,6 @@
 import { ArrowLeft, Send, Paperclip, Phone, MoreVertical, Check, CheckCheck, ShieldCheck, Image, Camera, X, Smile, Mic } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 
 interface ChatScreenProps {
   onBack: () => void;
