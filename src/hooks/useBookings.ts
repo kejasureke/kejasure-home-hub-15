@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
+import { pushGlobalAlert } from "./useInAppNotifications";
 
 const STORAGE_KEY = "kejasure_bookings";
 const EVENT = "bookings-updated";
@@ -44,9 +45,44 @@ const read = (): Booking[] => {
   }
 };
 
-const write = (list: Booking[]) => {
+// Alert templates per booking status transition
+const alertForStatus = (b: Booking): { title: string; body: string; type: "booking" } | null => {
+  const label = b.propertyTitle;
+  switch (b.status) {
+    case "pending":
+      return { type: "booking", title: "Booking requested", body: `Your request for ${label} was sent to the host.` };
+    case "accepted":
+      return b.kind === "shortstay"
+        ? { type: "booking", title: "Short stay confirmed", body: `${label} is booked. Check-in details are ready.` }
+        : { type: "booking", title: "Viewing confirmed", body: `Your viewing for ${label} was accepted by the host.` };
+    case "declined":
+      return { type: "booking", title: "Request declined", body: `The host declined your request for ${label}.` };
+    case "cancelled":
+      return { type: "booking", title: "Booking cancelled", body: `${label} booking was cancelled.` };
+    case "completed":
+      return b.kind === "shortstay"
+        ? { type: "booking", title: "Stay completed", body: `Hope you enjoyed ${label}. Tap to leave a review.` }
+        : { type: "booking", title: "Move-in complete", body: `Welcome home! ${label} is marked as moved-in.` };
+    default:
+      return null;
+  }
+};
+
+const write = (list: Booking[], prev?: Booking[]) => {
+  const prevList = prev ?? read();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   window.dispatchEvent(new Event(EVENT));
+
+  try {
+    const prevMap = new Map(prevList.map((b) => [b.id, b.status]));
+    list.forEach((b) => {
+      const before = prevMap.get(b.id);
+      if (before !== b.status) {
+        const alert = alertForStatus(b);
+        if (alert) pushGlobalAlert({ ...alert, action: "open-dashboard" });
+      }
+    });
+  } catch {}
 };
 
 export const useBookings = () => {
