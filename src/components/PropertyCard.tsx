@@ -45,10 +45,13 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
       onCompare={onToggleCompare ? () => onToggleCompare(property.id) : undefined}
       onHide={() => toast("Listing hidden", { description: "We'll show fewer like this." })}
     />
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={(e) => { if (didFire()) { e.preventDefault(); return; } onPress(property.id); }}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPress(property.id); } }}
       {...handlers}
-      className={`w-full text-left bg-card rounded-2xl card-shadow overflow-hidden transition-all duration-300 hover:card-shadow-hover active:scale-[0.98] animate-fade-in ${
+      className={`w-full text-left bg-card rounded-2xl card-shadow overflow-hidden transition-all duration-300 hover:card-shadow-hover active:scale-[0.98] animate-fade-in cursor-pointer ${
         isComparing ? "ring-2 ring-primary" : ""
       }`}
     >
@@ -230,7 +233,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
           )}
         </div>
       </div>
-    </button>
+    </div>
     </>
   );
 };
