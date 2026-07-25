@@ -151,11 +151,27 @@ export const recentsApi = {
 export const bookingsApi = {
   listMine: () => supabase.from("bookings").select("*, listings(*)").order("created_at", { ascending: false }),
   listAsHost: () => supabase.from("bookings").select("*, listings(*)").order("created_at", { ascending: false }),
-  create: async (row: Omit<Tables["bookings"]["Insert"], "guest_id">) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not signed in");
-    return supabase.from("bookings").insert({ ...row, guest_id: user.id }).select().single();
+  // Routed through edge function: rate-limited + validates host/self-booking.
+  create: async (row: {
+    listing_id: string;
+    type: Database["public"]["Enums"]["booking_type"];
+    check_in?: string | null;
+    check_out?: string | null;
+    guests?: number | null;
+    message?: string | null;
+    total_kes?: number | null;
+  }) => {
+    return invokeGuarded<Tables["bookings"]["Row"]>("booking-create", {
+      listingId: row.listing_id,
+      type: row.type,
+      checkIn: row.check_in ?? undefined,
+      checkOut: row.check_out ?? undefined,
+      guests: row.guests ?? undefined,
+      message: row.message ?? undefined,
+      totalKes: row.total_kes ?? undefined,
+    });
   },
+
   updateStatus: (id: string, status: Tables["bookings"]["Update"]["status"]) =>
     supabase.from("bookings").update({ status }).eq("id", id).select().single(),
   events: (bookingId: string) =>
