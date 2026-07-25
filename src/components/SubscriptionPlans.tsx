@@ -119,7 +119,7 @@ const stayHostPlans = [
   },
   {
     name: "Premium",
-    price: 1500,
+    price: 3500,
     duration: "/month",
     features: ["Unlimited listings", "✨ Corporate stays (NGO/expat)", "Smart pricing AI", "Priority support", "County heatmaps", "Booking analytics", "5 monthly boosts"],
     notIncluded: [],
