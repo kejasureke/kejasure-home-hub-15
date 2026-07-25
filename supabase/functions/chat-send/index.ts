@@ -5,9 +5,9 @@ import {
   getClientIp,
   getUserFromAuthHeader,
   logAttempt,
-  readAttestation,
   supabaseAdmin,
 } from "../_shared/rateLimit.ts";
+import { shouldBlock, verifyAttestation } from "../_shared/verifyAttestation.ts";
 
 const BodySchema = z.object({
   conversationId: z.string().uuid(),
@@ -54,7 +54,14 @@ Deno.serve(async (req) => {
     });
   }
 
-  readAttestation(req);
+  const attest = verifyAttestation(req);
+  if (shouldBlock(attest)) {
+    await logAttempt("chat:send", ctx, false, { reason: "attestation_blocked" }, attest);
+    return new Response(JSON.stringify({ error: "Device integrity check failed" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   // Ensure sender is a participant in this conversation
   const { data: convo } = await supabaseAdmin
@@ -77,7 +84,7 @@ Deno.serve(async (req) => {
     attachment_url: parsed.data.attachmentUrl ?? null,
   }).select().single();
 
-  await logAttempt("chat:send", ctx, !error);
+  await logAttempt("chat:send", ctx, !error, {}, attest);
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,

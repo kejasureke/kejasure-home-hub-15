@@ -841,6 +841,7 @@ export type Database = {
           action: string
           created_at: string
           device_id: string | null
+          device_integrity: Json
           id: string
           ip: string | null
           meta: Json
@@ -851,6 +852,7 @@ export type Database = {
           action: string
           created_at?: string
           device_id?: string | null
+          device_integrity?: Json
           id?: string
           ip?: string | null
           meta?: Json
@@ -861,6 +863,7 @@ export type Database = {
           action?: string
           created_at?: string
           device_id?: string | null
+          device_integrity?: Json
           id?: string
           ip?: string | null
           meta?: Json

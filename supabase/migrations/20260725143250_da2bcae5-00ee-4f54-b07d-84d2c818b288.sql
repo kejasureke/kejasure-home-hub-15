@@ -1,0 +1,2 @@
+ALTER TABLE public.request_attempts ADD COLUMN IF NOT EXISTS device_integrity jsonb NOT NULL DEFAULT '{}'::jsonb;
+CREATE INDEX IF NOT EXISTS request_attempts_device_integrity_verdict_idx ON public.request_attempts ((device_integrity->>'verdict'));

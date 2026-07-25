@@ -5,9 +5,9 @@ import {
   getClientIp,
   getUserFromAuthHeader,
   logAttempt,
-  readAttestation,
   supabaseAdmin,
 } from "../_shared/rateLimit.ts";
+import { shouldBlock, verifyAttestation } from "../_shared/verifyAttestation.ts";
 
 const BodySchema = z.object({
   listingId: z.string().uuid(),
@@ -58,7 +58,14 @@ Deno.serve(async (req) => {
     });
   }
 
-  readAttestation(req);
+  const attest = verifyAttestation(req);
+  if (shouldBlock(attest)) {
+    await logAttempt("booking:create", ctx, false, { reason: "attestation_blocked" }, attest);
+    return new Response(JSON.stringify({ error: "Device integrity check failed" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   // Look up listing to resolve host and prevent self-booking
   const { data: listing } = await supabaseAdmin
@@ -93,7 +100,7 @@ Deno.serve(async (req) => {
     total_kes: parsed.data.totalKes ?? null,
   }).select().single();
 
-  await logAttempt("booking:create", ctx, !error);
+  await logAttempt("booking:create", ctx, !error, {}, attest);
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
