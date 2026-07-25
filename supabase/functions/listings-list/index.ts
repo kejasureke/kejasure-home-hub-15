@@ -5,9 +5,9 @@ import {
   getClientIp,
   getUserFromAuthHeader,
   logAttempt,
-  readAttestation,
   supabaseAdmin,
 } from "../_shared/rateLimit.ts";
+import { shouldBlock, verifyAttestation } from "../_shared/verifyAttestation.ts";
 
 const FiltersSchema = z.object({
   segment: z.enum(["rental", "short_stay", "commercial", "corporate", "service"]).optional(),
