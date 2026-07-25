@@ -8,6 +8,34 @@ import type { Database } from "@/integrations/supabase/types";
 
 type Tables = Database["public"]["Tables"];
 
+// ---------- Attestation slot ----------
+// Play Integrity / App Attest token is set here by the native shell (Despia)
+// once wired. Included on rate-limited edge-function calls as `x-attestation-token`.
+let attestationToken: string | null = null;
+export function setAttestationToken(token: string | null) {
+  attestationToken = token;
+}
+function attHeaders(): Record<string, string> {
+  return attestationToken ? { "x-attestation-token": attestationToken } : {};
+}
+
+async function invokeGuarded<T>(fn: string, body?: unknown): Promise<{ data: T | null; error: (Error & { retryAfter?: number }) | null }> {
+  const { data, error } = await supabase.functions.invoke(fn, {
+    body: body ?? {},
+    headers: attHeaders(),
+  });
+  if (error) return { data: null, error: error as Error };
+  const payload = data as { data?: T; error?: string; retryAfter?: number } | null;
+  if (payload?.error) {
+    const err = new Error(payload.error) as Error & { retryAfter?: number };
+    if (payload.retryAfter) err.retryAfter = payload.retryAfter;
+    return { data: null, error: err };
+  }
+  return { data: (payload?.data ?? null) as T | null, error: null };
+}
+
+
+
 // ---------- Profile ----------
 export const profileApi = {
   async me() {
