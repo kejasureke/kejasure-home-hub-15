@@ -238,35 +238,22 @@ export const billingApi = {
       .order("ends_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
-  subscribe: async (planId: string, mpesaReceipt?: string) => {
+  subscribe: async (planId: string) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not signed in");
-    const starts = new Date();
-    const ends = new Date();
-    ends.setMonth(ends.getMonth() + 1);
+    // Client can only request a pending subscription. A trusted server function
+    // must verify the M-Pesa payment and activate it (set status, dates, receipt).
     return supabase.from("subscriptions").insert({
       user_id: user.id,
       plan_id: planId,
-      status: "active",
-      starts_at: starts.toISOString(),
-      ends_at: ends.toISOString(),
-      mpesa_receipt: mpesaReceipt ?? null,
+      status: "pending",
     });
   },
-  boost: async (listingId: string, pkg: string, priceKes: number, days: number, mpesaReceipt?: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not signed in");
-    const expires = new Date();
-    expires.setDate(expires.getDate() + days);
-    await supabase.from("boost_purchases").insert({
-      listing_id: listingId,
-      user_id: user.id,
-      package: pkg,
-      price_kes: priceKes,
-      expires_at: expires.toISOString(),
-      mpesa_receipt: mpesaReceipt ?? null,
-    });
-    await supabase.from("listings").update({ boost_expires_at: expires.toISOString() }).eq("id", listingId);
+  boost: async (_listingId: string, _pkg: string, _priceKes: number, _days: number) => {
+    // Boost activation is server-only. Trigger the payment/verification edge function
+    // (e.g. supabase.functions.invoke('mpesa-boost-callback', ...)) — clients cannot
+    // insert into boost_purchases directly.
+    throw new Error("Boost activation must go through the server-side payment verification function.");
   },
 };
 
