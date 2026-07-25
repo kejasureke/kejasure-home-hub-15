@@ -66,6 +66,7 @@ export const rolesApi = {
 
 // ---------- Listings ----------
 export const listingsApi = {
+  // Routed through edge function for per-user/IP rate limiting.
   async list(filters?: {
     segment?: Database["public"]["Enums"]["listing_segment"];
     county?: string;
@@ -73,19 +74,9 @@ export const listingsApi = {
     maxPrice?: number;
     limit?: number;
   }) {
-    let q = supabase
-      .from("listings")
-      .select("*, listing_images(url, is_cover, sort_order)")
-      .eq("status", "active")
-      .order("boost_expires_at", { ascending: false, nullsFirst: false })
-      .order("created_at", { ascending: false });
-    if (filters?.segment) q = q.eq("segment", filters.segment);
-    if (filters?.county) q = q.eq("county", filters.county);
-    if (filters?.minPrice != null) q = q.gte("price_kes", filters.minPrice);
-    if (filters?.maxPrice != null) q = q.lte("price_kes", filters.maxPrice);
-    if (filters?.limit) q = q.limit(filters.limit);
-    return q;
+    return invokeGuarded<unknown[]>("listings-list", filters ?? {});
   },
+
   get: (id: string) =>
     supabase
       .from("listings")
