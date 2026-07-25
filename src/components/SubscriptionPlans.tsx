@@ -139,7 +139,7 @@ const serviceProviderPlans = [
   },
   {
     name: "Pro",
-    price: 800,
+    price: 1000,
     duration: "/month",
     badge: "Individual",
     features: ["3 service listings", "Unlimited bookings", "Priority chat", "Portfolio gallery", "Client reviews showcase"],
@@ -149,7 +149,7 @@ const serviceProviderPlans = [
   },
   {
     name: "Business Pro",
-    price: 1000,
+    price: 2500,
     duration: "/month",
     badge: "Business",
     features: ["10 service listings", "Team members", "CRM tools", "County analytics", "Featured profile", "Priority support"],
@@ -158,7 +158,7 @@ const serviceProviderPlans = [
   },
   {
     name: "Enterprise",
-    price: 1500,
+    price: 4000,
     duration: "/month",
     badge: "Business",
     features: ["Unlimited listings", "Unlimited team", "Full CRM", "County analytics", "Featured profile", "Priority support"],
