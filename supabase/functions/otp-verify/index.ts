@@ -14,7 +14,10 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const OTP_PASSWORD_SECRET = Deno.env.get("OTP_PASSWORD_SECRET") ?? "replace-with-strong-secret";
+const OTP_PASSWORD_SECRET = Deno.env.get("OTP_PASSWORD_SECRET");
+if (!OTP_PASSWORD_SECRET || OTP_PASSWORD_SECRET.length < 16) {
+  throw new Error("OTP_PASSWORD_SECRET is not configured; refusing to start with weak/default secret.");
+}
 
 const PHONE_FAIL_LIMIT = 5;            // failed attempts before lockout
 const PHONE_FAIL_WINDOW_SECONDS = 900; // 15 min
