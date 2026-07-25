@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
     total_kes: parsed.data.totalKes ?? null,
   }).select().single();
 
-  await logAttempt("booking:create", ctx, !error);
+  await logAttempt("booking:create", ctx, !error, {}, attest);
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
