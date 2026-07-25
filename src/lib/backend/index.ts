@@ -205,16 +205,15 @@ export const chatApi = {
   },
   messages: (conversationId: string) =>
     supabase.from("messages").select("*").eq("conversation_id", conversationId).order("created_at"),
+  // Routed through edge function: per-user/IP rate limiting + participant check.
   send: async (conversationId: string, body: string, attachmentUrl?: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not signed in");
-    return supabase.from("messages").insert({
-      conversation_id: conversationId,
-      sender_id: user.id,
-      body,
-      attachment_url: attachmentUrl ?? null,
+    return invokeGuarded<Tables["messages"]["Row"]>("chat-send", {
+      conversationId,
+      body: body || undefined,
+      attachmentUrl: attachmentUrl || undefined,
     });
   },
+
   markRead: (messageId: string) =>
     supabase.from("messages").update({ read_at: new Date().toISOString() }).eq("id", messageId),
   subscribe: (conversationId: string, onInsert: (msg: Tables["messages"]["Row"]) => void) => {
