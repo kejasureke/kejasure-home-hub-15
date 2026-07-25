@@ -5,9 +5,9 @@ import {
   getClientIp,
   getUserFromAuthHeader,
   logAttempt,
-  readAttestation,
   supabaseAdmin,
 } from "../_shared/rateLimit.ts";
+import { shouldBlock, verifyAttestation } from "../_shared/verifyAttestation.ts";
 
 const BodySchema = z.object({
   conversationId: z.string().uuid(),
