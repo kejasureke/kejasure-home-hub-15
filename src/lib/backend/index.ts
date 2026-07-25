@@ -98,7 +98,7 @@ export const savedSearchesApi = {
   create: async (name: string, filters: Record<string, unknown>, notify = true) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not signed in");
-    return supabase.from("saved_searches").insert({ user_id: user.id, name, filters, notify }).select().single();
+    return supabase.from("saved_searches").insert({ user_id: user.id, name, filters: filters as never, notify }).select().single();
   },
   remove: (id: string) => supabase.from("saved_searches").delete().eq("id", id),
 };
