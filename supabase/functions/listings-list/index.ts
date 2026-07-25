@@ -49,7 +49,14 @@ Deno.serve(async (req) => {
     });
   }
 
-  readAttestation(req); // slot: verification wired later
+  const attest = verifyAttestation(req);
+  if (shouldBlock(attest)) {
+    await logAttempt("listings:list", ctx, false, { reason: "attestation_blocked" }, attest);
+    return new Response(JSON.stringify({ error: "Device integrity check failed" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   const f = parsed.data;
   let q = supabaseAdmin
@@ -65,7 +72,7 @@ Deno.serve(async (req) => {
   q = q.limit(f.limit ?? 50);
 
   const { data, error } = await q;
-  await logAttempt("listings:list", ctx, !error);
+  await logAttempt("listings:list", ctx, !error, {}, attest);
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
