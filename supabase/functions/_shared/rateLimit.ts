@@ -89,6 +89,7 @@ export async function logAttempt(
   ctx: RateLimitCtx,
   success: boolean,
   meta: Record<string, unknown> = {},
+  deviceIntegrity: Record<string, unknown> = {},
 ) {
   await admin.from("request_attempts").insert({
     action,
@@ -97,13 +98,8 @@ export async function logAttempt(
     device_id: ctx.deviceId ?? null,
     success,
     meta,
+    device_integrity: deviceIntegrity,
   });
-}
-
-// Attestation token slot: currently no verification (Play Integrity / App Attest
-// wiring depends on Despia support). We only record presence for later audit.
-export function readAttestation(req: Request): string | null {
-  return req.headers.get("x-attestation-token");
 }
 
 export const supabaseAdmin = admin;
