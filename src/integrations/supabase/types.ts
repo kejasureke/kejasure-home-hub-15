@@ -836,6 +836,39 @@ export type Database = {
         }
         Relationships: []
       }
+      request_attempts: {
+        Row: {
+          action: string
+          created_at: string
+          device_id: string | null
+          id: string
+          ip: string | null
+          meta: Json
+          success: boolean
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          ip?: string | null
+          meta?: Json
+          success?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          ip?: string | null
+          meta?: Json
+          success?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       review_helpful: {
         Row: {
           created_at: string
@@ -1069,6 +1102,7 @@ export type Database = {
       }
       purge_old_otp_attempts: { Args: never; Returns: undefined }
       purge_old_otp_verify_attempts: { Args: never; Returns: undefined }
+      purge_old_request_attempts: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role:

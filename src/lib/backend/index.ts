@@ -8,6 +8,34 @@ import type { Database } from "@/integrations/supabase/types";
 
 type Tables = Database["public"]["Tables"];
 
+// ---------- Attestation slot ----------
+// Play Integrity / App Attest token is set here by the native shell (Despia)
+// once wired. Included on rate-limited edge-function calls as `x-attestation-token`.
+let attestationToken: string | null = null;
+export function setAttestationToken(token: string | null) {
+  attestationToken = token;
+}
+function attHeaders(): Record<string, string> {
+  return attestationToken ? { "x-attestation-token": attestationToken } : {};
+}
+
+async function invokeGuarded<T>(fn: string, body?: unknown): Promise<{ data: T | null; error: (Error & { retryAfter?: number }) | null }> {
+  const { data, error } = await supabase.functions.invoke(fn, {
+    body: body ?? {},
+    headers: attHeaders(),
+  });
+  if (error) return { data: null, error: error as Error };
+  const payload = data as { data?: T; error?: string; retryAfter?: number } | null;
+  if (payload?.error) {
+    const err = new Error(payload.error) as Error & { retryAfter?: number };
+    if (payload.retryAfter) err.retryAfter = payload.retryAfter;
+    return { data: null, error: err };
+  }
+  return { data: (payload?.data ?? null) as T | null, error: null };
+}
+
+
+
 // ---------- Profile ----------
 export const profileApi = {
   async me() {
@@ -38,6 +66,7 @@ export const rolesApi = {
 
 // ---------- Listings ----------
 export const listingsApi = {
+  // Routed through edge function for per-user/IP rate limiting.
   async list(filters?: {
     segment?: Database["public"]["Enums"]["listing_segment"];
     county?: string;
@@ -45,19 +74,9 @@ export const listingsApi = {
     maxPrice?: number;
     limit?: number;
   }) {
-    let q = supabase
-      .from("listings")
-      .select("*, listing_images(url, is_cover, sort_order)")
-      .eq("status", "active")
-      .order("boost_expires_at", { ascending: false, nullsFirst: false })
-      .order("created_at", { ascending: false });
-    if (filters?.segment) q = q.eq("segment", filters.segment);
-    if (filters?.county) q = q.eq("county", filters.county);
-    if (filters?.minPrice != null) q = q.gte("price_kes", filters.minPrice);
-    if (filters?.maxPrice != null) q = q.lte("price_kes", filters.maxPrice);
-    if (filters?.limit) q = q.limit(filters.limit);
-    return q;
+    return invokeGuarded<unknown[]>("listings-list", filters ?? {});
   },
+
   get: (id: string) =>
     supabase
       .from("listings")
@@ -132,11 +151,27 @@ export const recentsApi = {
 export const bookingsApi = {
   listMine: () => supabase.from("bookings").select("*, listings(*)").order("created_at", { ascending: false }),
   listAsHost: () => supabase.from("bookings").select("*, listings(*)").order("created_at", { ascending: false }),
-  create: async (row: Omit<Tables["bookings"]["Insert"], "guest_id">) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not signed in");
-    return supabase.from("bookings").insert({ ...row, guest_id: user.id }).select().single();
+  // Routed through edge function: rate-limited + validates host/self-booking.
+  create: async (row: {
+    listing_id: string;
+    type: Database["public"]["Enums"]["booking_type"];
+    check_in?: string | null;
+    check_out?: string | null;
+    guests?: number | null;
+    message?: string | null;
+    total_kes?: number | null;
+  }) => {
+    return invokeGuarded<Tables["bookings"]["Row"]>("booking-create", {
+      listingId: row.listing_id,
+      type: row.type,
+      checkIn: row.check_in ?? undefined,
+      checkOut: row.check_out ?? undefined,
+      guests: row.guests ?? undefined,
+      message: row.message ?? undefined,
+      totalKes: row.total_kes ?? undefined,
+    });
   },
+
   updateStatus: (id: string, status: Tables["bookings"]["Update"]["status"]) =>
     supabase.from("bookings").update({ status }).eq("id", id).select().single(),
   events: (bookingId: string) =>
@@ -170,16 +205,15 @@ export const chatApi = {
   },
   messages: (conversationId: string) =>
     supabase.from("messages").select("*").eq("conversation_id", conversationId).order("created_at"),
+  // Routed through edge function: per-user/IP rate limiting + participant check.
   send: async (conversationId: string, body: string, attachmentUrl?: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not signed in");
-    return supabase.from("messages").insert({
-      conversation_id: conversationId,
-      sender_id: user.id,
-      body,
-      attachment_url: attachmentUrl ?? null,
+    return invokeGuarded<Tables["messages"]["Row"]>("chat-send", {
+      conversationId,
+      body: body || undefined,
+      attachmentUrl: attachmentUrl || undefined,
     });
   },
+
   markRead: (messageId: string) =>
     supabase.from("messages").update({ read_at: new Date().toISOString() }).eq("id", messageId),
   subscribe: (conversationId: string, onInsert: (msg: Tables["messages"]["Row"]) => void) => {
