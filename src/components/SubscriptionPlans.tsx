@@ -40,7 +40,7 @@ const tenantPlans = [
 const landlordPlans = [
   {
     name: "Basic",
-    price: 250,
+    price: 500,
     duration: "/month",
     badge: "Individual",
     features: ["1 active listing", "Residential rentals only", "Single-owner profile", "Guest inquiries via chat", "Standard placement"],
