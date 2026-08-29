@@ -3,6 +3,8 @@ import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, 
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import AIPhotoVerification from "./AIPhotoVerification";
 import { openCamera, haptic } from "@/lib/despia";
+import { submitSmileIdJob, waitForVerdict } from "@/lib/kyc/smileid";
+
 
 interface KYCVerificationFlowProps {
   onClose: (completed?: boolean) => void;
