@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ArrowLeft, ArrowRight, Camera, Video, X, Check, Zap, MapPin,
   Home, Bed, Bath, DollarSign, FileText, Star, Sparkles, Trash2, Edit3, Image, Wand2
 } from "lucide-react";
-import AIPhotoVerification from "./AIPhotoVerification";
+import ListingPhotoIntegrity from "./ListingPhotoIntegrity";
 import { kenyaCounties } from "@/data/kenyaCounties";
 import { validateCaption } from "@/utils/captionSafety";
 import { openCamera, haptic } from "@/lib/despia";
+import { fileToDataUrl } from "@/lib/imageIntegrity";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
 
@@ -193,8 +194,15 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [polishEnabled, setPolishEnabled] = useState(true);
   const [polishCandidate, setPolishCandidate] = useState<{ idx: number; original: string; polished: string } | null>(null);
   const [captionErrors, setCaptionErrors] = useState<Record<number, string>>({});
+  // Real image files keyed by their index in form.photos (placeholders have no file)
+  const [photoFiles, setPhotoFiles] = useState<Record<number, File>>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const update = (partial: Partial<ListingFormData>) => setForm((f) => ({ ...f, ...partial }));
+
+  const realPhotos = form.photos
+    .map((preview, idx) => ({ file: photoFiles[idx], previewUrl: preview }))
+    .filter((p): p is { file: File; previewUrl: string } => !!p.file);
 
   const generateKejaAIDescription = () => {
     setAiGenerating(true);
@@ -307,15 +315,27 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   };
 
   const addFakePhoto = () => {
-    const placeholders = [
-      "🏠", "🏡", "🏢", "🏘️", "🛋️", "🛏️", "🍳", "🚿",
-    ];
     if (form.photos.length >= 10) return;
-    // Launch native camera / web fallback; UI advances optimistically with a placeholder.
-    openCamera(() => {
-      haptic("light");
-      update({ photos: [...form.photos, placeholders[form.photos.length % placeholders.length]] });
+    // Native camera on device, file picker on web — both hand back real bytes.
+    openCamera(() => haptic("light"));
+    fileInputRef.current?.click();
+  };
+
+  const onPickFiles = async (list: FileList | null) => {
+    if (!list?.length) return;
+    const room = 10 - form.photos.length;
+    const picked = Array.from(list).filter((f) => f.type.startsWith("image/")).slice(0, room);
+    if (!picked.length) return;
+
+    const dataUrls = await Promise.all(picked.map((f) => fileToDataUrl(f)));
+    const startIdx = form.photos.length;
+    setPhotoFiles((prev) => {
+      const next = { ...prev };
+      picked.forEach((f, i) => { next[startIdx + i] = f; });
+      return next;
     });
+    update({ photos: [...form.photos, ...dataUrls] });
+    haptic("light");
   };
 
   const removePhoto = (i: number) => {
@@ -332,6 +352,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     };
     setPhotoCaptions(rekey);
     setCaptionErrors(rekey);
+    setPhotoFiles(rekey);
     setEditingCaption(null);
   };
 
@@ -970,7 +991,11 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                             : "border-transparent"
                       }`}
                     >
-                      <span className="text-3xl">{p}</span>
+                      {p.startsWith("data:") ? (
+                        <img src={p} alt={`Listing photo ${i + 1}`} className="absolute inset-0 w-full h-full object-cover rounded-xl" />
+                      ) : (
+                        <span className="text-3xl">{p}</span>
+                      )}
                       {i === 0 && (
                         <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[8px] font-bold">
                           COVER
@@ -1056,6 +1081,15 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                 </button>
               )}
             </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => { void onPickFiles(e.target.files); e.target.value = ""; }}
+            />
 
             {/* Per-photo suggestion picker */}
             {activeSuggestPhoto !== null && form.photos[activeSuggestPhoto] !== undefined && (
@@ -1354,9 +1388,15 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
             )}
 
             {/* AI Photo Verification */}
-            {form.photos.length >= 1 && (
-              <AIPhotoVerification mode="listing" />
-            )}
+            {realPhotos.length > 0 ? (
+              <ListingPhotoIntegrity key={realPhotos.map((r) => r.previewUrl.slice(-24)).join("|")} files={realPhotos} />
+            ) : form.photos.length >= 1 ? (
+              <div className="p-3 rounded-xl bg-secondary/60 border border-border">
+                <p className="text-[11px] text-muted-foreground">
+                  Add real photos from your camera or gallery to run the integrity check (fingerprint, duplicate scan, camera metadata and AI review).
+                </p>
+              </div>
+            ) : null}
 
             <div className="p-3 rounded-xl bg-accent/10">
               <p className="text-xs text-muted-foreground">
