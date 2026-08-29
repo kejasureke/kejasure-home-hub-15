@@ -333,6 +333,80 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_image_checks: {
+        Row: {
+          ai_verdict: Json | null
+          byte_size: number | null
+          camera_make: string | null
+          captured_at: string | null
+          checks: Json
+          created_at: string
+          duplicate_of: string | null
+          has_exif: boolean
+          has_gps: boolean
+          height: number | null
+          id: string
+          listing_id: string | null
+          mime_type: string | null
+          phash: string | null
+          score: number
+          sha256: string
+          status: string
+          user_id: string
+          width: number | null
+        }
+        Insert: {
+          ai_verdict?: Json | null
+          byte_size?: number | null
+          camera_make?: string | null
+          captured_at?: string | null
+          checks?: Json
+          created_at?: string
+          duplicate_of?: string | null
+          has_exif?: boolean
+          has_gps?: boolean
+          height?: number | null
+          id?: string
+          listing_id?: string | null
+          mime_type?: string | null
+          phash?: string | null
+          score?: number
+          sha256: string
+          status?: string
+          user_id: string
+          width?: number | null
+        }
+        Update: {
+          ai_verdict?: Json | null
+          byte_size?: number | null
+          camera_make?: string | null
+          captured_at?: string | null
+          checks?: Json
+          created_at?: string
+          duplicate_of?: string | null
+          has_exif?: boolean
+          has_gps?: boolean
+          height?: number | null
+          id?: string
+          listing_id?: string | null
+          mime_type?: string | null
+          phash?: string | null
+          score?: number
+          sha256?: string
+          status?: string
+          user_id?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_image_checks_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "listing_image_checks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_images: {
         Row: {
           created_at: string
