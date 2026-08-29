@@ -3,6 +3,8 @@ import { ArrowLeft, ShieldCheck, Camera, Upload, FileText, CheckCircle2, Clock, 
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import AIPhotoVerification from "./AIPhotoVerification";
 import { openCamera, haptic } from "@/lib/despia";
+import { submitSmileIdJob, waitForVerdict } from "@/lib/kyc/smileid";
+
 
 interface KYCVerificationFlowProps {
   onClose: (completed?: boolean) => void;
@@ -31,6 +33,14 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const [kraUploaded, setKraUploaded] = useState(false);
   const [selfieCapture, setSelfieCapture] = useState<"none" | "capturing" | "done">("none");
   const [result, setResult] = useState<VerificationResult>("pending");
+  const [failReason, setFailReason] = useState<string | null>(null);
+
+  // Captured media (sent to smile.id)
+  const [selfieFile, setSelfieFile] = useState<File | null>(null);
+  const [idFrontFile, setIdFrontFile] = useState<File | null>(null);
+  const [idBackFile, setIdBackFile] = useState<File | null>(null);
+  const [kraFile, setKraFile] = useState<File | null>(null);
+  const [idNumber, setIdNumber] = useState("");
 
   // Tenant-specific state
   const [firstName, setFirstName] = useState("");
@@ -51,18 +61,64 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
     { type: "cr12" as BusinessDocType, label: "CR12 Form", desc: "Company directors form", icon: FileText },
   ];
 
-  const handleProcessing = () => {
+  const markVerifiedLocally = () => {
+    if (!verificationCategory) return;
+    localStorage.setItem(`kejasure_kyc_status_${activeRole}`, "verified");
+    localStorage.setItem(`kejasure_kyc_category_${activeRole}`, verificationCategory);
+    localStorage.setItem("kejasure_kyc_status", "verified");
+  };
+
+  const handleProcessing = async () => {
     setStep("processing");
-    setTimeout(() => {
-      const outcome = Math.random() > 0.2 ? "success" : "failed";
-      setResult(outcome);
-      if (outcome === "success" && verificationCategory) {
-        localStorage.setItem(`kejasure_kyc_status_${activeRole}`, "verified");
-        localStorage.setItem(`kejasure_kyc_category_${activeRole}`, verificationCategory);
-        localStorage.setItem("kejasure_kyc_status", "verified");
+    setFailReason(null);
+    try {
+      const check = verificationCategory === "business"
+        ? "doc_verification"
+        : selfieFile
+        ? "biometric_kyc"
+        : "enhanced_kyc";
+
+      const { submissionId, status, sync } = await submitSmileIdJob({
+        check,
+        idType: docType === "passport"
+          ? "PASSPORT"
+          : docType === "kra_pin" || docType === "business_cert" || docType === "cr12"
+          ? "BUSINESS_REGISTRATION"
+          : "NATIONAL_ID",
+        idNumber: idNumber.trim() || undefined,
+        firstName: firstName.trim() || undefined,
+        lastName: lastName.trim() || undefined,
+        selfie: selfieFile,
+        idPhoto: idFrontFile,
+        idPhotoBack: idBackFile,
+        businessDocs: verificationCategory === "business" ? [idFrontFile, kraFile] : undefined,
+      });
+
+      let verdict = status;
+      let reason: string | null | undefined = null;
+      if (!sync && verdict === "pending") {
+        const polled = await waitForVerdict(submissionId);
+        verdict = polled.status;
+        reason = polled.reason;
       }
-      setStep("result");
-    }, 4000);
+
+      if (verdict === "approved") {
+        haptic("success");
+        markVerifiedLocally();
+        setResult("success");
+      } else if (verdict === "pending") {
+        setResult("pending");
+        setFailReason("Your documents are still under review. We'll notify you as soon as smile.id responds.");
+      } else {
+        haptic("error");
+        setResult("failed");
+        setFailReason(reason ?? "We couldn't verify your details. Please check them and try again.");
+      }
+    } catch (e) {
+      setResult("failed");
+      setFailReason((e as Error).message);
+    }
+    setStep("result");
   };
 
   const handleSendOtp = () => {
@@ -73,9 +129,17 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const handleVerifyOtp = () => {
     if (otp.length === 6) {
       setOtpVerified(true);
-      setTimeout(() => handleProcessing(), 500);
+      // Tenant tier is phone-only — no smile.id job needed.
+      setStep("processing");
+      setTimeout(() => {
+        markVerifiedLocally();
+        setResult("success");
+        setStep("result");
+      }, 1800);
     }
   };
+
+
 
   const getProgressSteps = () => {
     if (verificationCategory === "tenant") return ["Info", "Phone", "OTP", "Verify"];
@@ -406,7 +470,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             </p>
 
             <div
-              onClick={() => setKraUploaded(true)}
+              onClick={() => openCamera((f) => { haptic("success"); setKraFile(f); setKraUploaded(true); })}
+
               className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
                 kraUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
               }`}
@@ -469,7 +534,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
             {/* Front */}
             <div
-              onClick={() => openCamera(() => { haptic("success"); setIdFrontUploaded(true); })}
+              onClick={() => openCamera((f) => { haptic("success"); setIdFrontFile(f); setIdFrontUploaded(true); })}
               className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
                 idFrontUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
               }`}
@@ -494,7 +559,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             {/* Back (only for national ID) */}
             {(docType === "national_id") && (
               <div
-                onClick={() => openCamera(() => { haptic("success"); setIdBackUploaded(true); })}
+                onClick={() => openCamera((f) => { haptic("success"); setIdBackFile(f); setIdBackUploaded(true); })}
                 className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
                   idBackUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
                 }`}
@@ -517,6 +582,25 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               </div>
             )}
 
+            {verificationCategory !== "business" && (
+              <div>
+                <label className="text-xs font-semibold text-foreground mb-1.5 block">
+                  {docType === "passport" ? "Passport number" : "National ID number"}
+                </label>
+                <input
+                  value={idNumber}
+                  onChange={(e) => setIdNumber(e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase())}
+                  inputMode={docType === "passport" ? "text" : "numeric"}
+                  placeholder={docType === "passport" ? "AK1234567" : "12345678"}
+                  maxLength={20}
+                  className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium tracking-wide outline-none focus:border-primary"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1.5">
+                  Must match the number printed on your document — smile.id checks it against the national register.
+                </p>
+              </div>
+            )}
+
             <div className="p-3 rounded-xl bg-accent/10 border border-accent/20">
               <p className="text-[11px] text-muted-foreground">
                 📸 <span className="font-semibold text-accent-foreground">Tips:</span> Ensure good lighting, avoid glare, capture all four corners clearly.
@@ -525,9 +609,14 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
             <button
               onClick={() => setStep("selfie")}
-              disabled={!idFrontUploaded || (docType === "national_id" && !idBackUploaded)}
+              disabled={
+                !idFrontUploaded ||
+                (docType === "national_id" && !idBackUploaded) ||
+                (verificationCategory !== "business" && idNumber.trim().length < 5)
+              }
               className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
             >
+
               Continue to Selfie
             </button>
 
@@ -549,10 +638,12 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
             <div
               onClick={() => {
-                openCamera(() => {
+                openCamera((f) => {
+                  setSelfieFile(f);
                   setSelfieCapture("capturing");
                   setTimeout(() => { haptic("success"); setSelfieCapture("done"); }, 1500);
                 });
+
               }}
               className={`aspect-square max-w-[280px] mx-auto rounded-[50%] border-4 flex items-center justify-center cursor-pointer transition-all ${
                 selfieCapture === "done" ? "border-primary bg-primary/5" : selfieCapture === "capturing" ? "border-accent animate-pulse bg-accent/5" : "border-dashed border-border bg-card"
@@ -671,6 +762,24 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                   ))}
                 </div>
               </>
+            ) : result === "pending" ? (
+              <>
+                <div className="w-20 h-20 rounded-full bg-accent/15 flex items-center justify-center mb-5">
+                  <Clock className="w-10 h-10 text-accent-foreground" />
+                </div>
+                <h2 className="text-xl font-bold text-foreground mb-2">Under Review</h2>
+                <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
+                  {failReason ?? "Your documents are being reviewed. We'll notify you as soon as there's a result."}
+                </p>
+                <div className="w-full max-w-xs space-y-2 mb-6">
+                  {["You can keep using the app meanwhile", "Most checks clear within a few minutes", "You'll get a notification with the outcome"].map((t) => (
+                    <div key={t} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Clock className="w-3 h-3 text-primary shrink-0" />
+                      <span>{t}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
               <>
                 <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mb-5">
@@ -678,14 +787,15 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 </div>
                 <h2 className="text-xl font-bold text-foreground mb-2">Verification Failed</h2>
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
-                  {verificationCategory === "tenant"
-                    ? "We couldn't match your name to the phone number. Please check your details and try again."
-                    : "We couldn't verify your identity. This could be due to poor image quality or a mismatch. Please try again."}
+                  {failReason ??
+                    (verificationCategory === "tenant"
+                      ? "We couldn't match your name to the phone number. Please check your details and try again."
+                      : "We couldn't verify your identity. This could be due to poor image quality or a mismatch. Please try again.")}
                 </p>
                 <div className="w-full max-w-xs space-y-2 mb-6">
                   {(verificationCategory === "tenant"
                     ? ["Check first and last name spelling", "Use the number registered in your name", "Ensure OTP was entered correctly"]
-                    : ["Ensure document is not expired", "Use better lighting", "Remove any obstructions from face", "Make sure all text is readable"]
+                    : ["Check the ID number matches the document", "Ensure document is not expired", "Use better lighting", "Remove any obstructions from face"]
                   ).map((t) => (
                     <div key={t} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <AlertCircle className="w-3 h-3 text-destructive shrink-0" />
@@ -697,23 +807,29 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             )}
 
             <button
-              onClick={result === "success" ? () => onClose(true) : () => {
-                if (verificationCategory === "tenant") {
-                  setStep("tenant_info");
-                  setOtp("");
-                  setOtpSent(false);
-                  setOtpVerified(false);
-                } else {
-                  setStep("id_upload");
-                  setIdFrontUploaded(false);
-                  setIdBackUploaded(false);
-                  setSelfieCapture("none");
-                }
-              }}
+              onClick={result === "success" || result === "pending"
+                ? () => onClose(result === "success")
+                : () => {
+                    if (verificationCategory === "tenant") {
+                      setStep("tenant_info");
+                      setOtp("");
+                      setOtpSent(false);
+                      setOtpVerified(false);
+                    } else {
+                      setStep("id_upload");
+                      setIdFrontUploaded(false);
+                      setIdBackUploaded(false);
+                      setIdFrontFile(null);
+                      setIdBackFile(null);
+                      setSelfieFile(null);
+                      setSelfieCapture("none");
+                    }
+                  }}
               className="w-full max-w-xs py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all mt-4"
             >
-              {result === "success" ? "Done" : "Try Again"}
+              {result === "success" ? "Done" : result === "pending" ? "Close" : "Try Again"}
             </button>
+
           </div>
         )}
       </div>
