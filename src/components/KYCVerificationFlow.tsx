@@ -534,7 +534,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
             {/* Front */}
             <div
-              onClick={() => openCamera(() => { haptic("success"); setIdFrontUploaded(true); })}
+              onClick={() => openCamera((f) => { haptic("success"); setIdFrontFile(f); setIdFrontUploaded(true); })}
               className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
                 idFrontUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
               }`}
