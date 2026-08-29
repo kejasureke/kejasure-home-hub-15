@@ -270,11 +270,16 @@ export type Database = {
       kyc_submissions: {
         Row: {
           business_docs: Json | null
+          confidence: number | null
           created_at: string
           id: string
           id_number: string | null
           id_photo_url: string | null
           id_type: string | null
+          provider: string | null
+          provider_job_id: string | null
+          provider_job_type: number | null
+          provider_result: Json | null
           rejection_reason: string | null
           reviewed_at: string | null
           reviewer_id: string | null
@@ -286,11 +291,16 @@ export type Database = {
         }
         Insert: {
           business_docs?: Json | null
+          confidence?: number | null
           created_at?: string
           id?: string
           id_number?: string | null
           id_photo_url?: string | null
           id_type?: string | null
+          provider?: string | null
+          provider_job_id?: string | null
+          provider_job_type?: number | null
+          provider_result?: Json | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewer_id?: string | null
@@ -302,11 +312,16 @@ export type Database = {
         }
         Update: {
           business_docs?: Json | null
+          confidence?: number | null
           created_at?: string
           id?: string
           id_number?: string | null
           id_photo_url?: string | null
           id_type?: string | null
+          provider?: string | null
+          provider_job_id?: string | null
+          provider_job_type?: number | null
+          provider_result?: Json | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewer_id?: string | null
