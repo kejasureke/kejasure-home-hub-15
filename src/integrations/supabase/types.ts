@@ -656,6 +656,33 @@ export type Database = {
         }
         Relationships: []
       }
+      otp_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          phone: string
+          used_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          phone: string
+          used_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       otp_verify_attempts: {
         Row: {
           created_at: string
@@ -1119,6 +1146,7 @@ export type Database = {
         Returns: boolean
       }
       purge_old_otp_attempts: { Args: never; Returns: undefined }
+      purge_old_otp_codes: { Args: never; Returns: undefined }
       purge_old_otp_verify_attempts: { Args: never; Returns: undefined }
       purge_old_request_attempts: { Args: never; Returns: undefined }
     }
