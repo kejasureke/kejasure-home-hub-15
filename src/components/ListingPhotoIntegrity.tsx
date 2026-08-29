@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, XCircle, AlertTriangle, Shield, Eye, RotateCcw, ScanLine } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
@@ -127,12 +127,16 @@ const ListingPhotoIntegrity = ({ files, listingId, onComplete }: Props) => {
     setRunning(false);
   };
 
-  // Notify the parent once every photo has settled.
-  if (done && running === false && started && onComplete) {
-    // guarded by referential stability of the callback in practice
-  }
+  const notified = useRef(false);
+  useEffect(() => {
+    if (done && !running && !notified.current) {
+      notified.current = true;
+      onComplete?.(allPassed, averageScore);
+    }
+  }, [done, running, allPassed, averageScore, onComplete]);
 
   const reset = () => {
+    notified.current = false;
     setStarted(false);
     setPhotos([]);
   };
