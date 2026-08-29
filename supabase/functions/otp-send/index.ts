@@ -106,9 +106,11 @@ Deno.serve(async (req) => {
 
   const code = isAfricasTalkingConfigured() ? generateOtp() : "123456";
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_SECONDS * 1000).toISOString();
-  const { error: codeInsertErr } = await supabase
+  const { data: codeRow, error: codeInsertErr } = await supabase
     .from("otp_codes")
-    .insert({ phone, code, expires_at: expiresAt });
+    .insert({ phone, code, expires_at: expiresAt })
+    .select("id")
+    .maybeSingle();
   if (codeInsertErr) {
     console.error("failed to record otp code", codeInsertErr);
   }
@@ -123,7 +125,16 @@ Deno.serve(async (req) => {
     );
     smsSent = sendResult.ok;
     smsError = sendResult.ok ? null : sendResult.error;
+
+    if (sendResult.ok && codeRow?.id) {
+      const { error: updErr } = await supabase
+        .from("otp_codes")
+        .update({ message_id: sendResult.messageId, delivery_status: "Sent" })
+        .eq("id", codeRow.id);
+      if (updErr) console.error("failed to store message id", updErr);
+    }
   }
+
 
   const { error: insertErr } = await supabase
     .from("otp_attempts")
