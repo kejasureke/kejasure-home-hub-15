@@ -33,6 +33,14 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const [kraUploaded, setKraUploaded] = useState(false);
   const [selfieCapture, setSelfieCapture] = useState<"none" | "capturing" | "done">("none");
   const [result, setResult] = useState<VerificationResult>("pending");
+  const [failReason, setFailReason] = useState<string | null>(null);
+
+  // Captured media (sent to smile.id)
+  const [selfieFile, setSelfieFile] = useState<File | null>(null);
+  const [idFrontFile, setIdFrontFile] = useState<File | null>(null);
+  const [idBackFile, setIdBackFile] = useState<File | null>(null);
+  const [kraFile, setKraFile] = useState<File | null>(null);
+  const [idNumber, setIdNumber] = useState("");
 
   // Tenant-specific state
   const [firstName, setFirstName] = useState("");
@@ -53,18 +61,64 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
     { type: "cr12" as BusinessDocType, label: "CR12 Form", desc: "Company directors form", icon: FileText },
   ];
 
-  const handleProcessing = () => {
+  const markVerifiedLocally = () => {
+    if (!verificationCategory) return;
+    localStorage.setItem(`kejasure_kyc_status_${activeRole}`, "verified");
+    localStorage.setItem(`kejasure_kyc_category_${activeRole}`, verificationCategory);
+    localStorage.setItem("kejasure_kyc_status", "verified");
+  };
+
+  const handleProcessing = async () => {
     setStep("processing");
-    setTimeout(() => {
-      const outcome = Math.random() > 0.2 ? "success" : "failed";
-      setResult(outcome);
-      if (outcome === "success" && verificationCategory) {
-        localStorage.setItem(`kejasure_kyc_status_${activeRole}`, "verified");
-        localStorage.setItem(`kejasure_kyc_category_${activeRole}`, verificationCategory);
-        localStorage.setItem("kejasure_kyc_status", "verified");
+    setFailReason(null);
+    try {
+      const check = verificationCategory === "business"
+        ? "doc_verification"
+        : selfieFile
+        ? "biometric_kyc"
+        : "enhanced_kyc";
+
+      const { submissionId, status, sync } = await submitSmileIdJob({
+        check,
+        idType: docType === "passport"
+          ? "PASSPORT"
+          : docType === "kra_pin" || docType === "business_cert" || docType === "cr12"
+          ? "BUSINESS_REGISTRATION"
+          : "NATIONAL_ID",
+        idNumber: idNumber.trim() || undefined,
+        firstName: firstName.trim() || undefined,
+        lastName: lastName.trim() || undefined,
+        selfie: selfieFile,
+        idPhoto: idFrontFile,
+        idPhotoBack: idBackFile,
+        businessDocs: verificationCategory === "business" ? [idFrontFile, kraFile] : undefined,
+      });
+
+      let verdict = status;
+      let reason: string | null | undefined = null;
+      if (!sync && verdict === "pending") {
+        const polled = await waitForVerdict(submissionId);
+        verdict = polled.status;
+        reason = polled.reason;
       }
-      setStep("result");
-    }, 4000);
+
+      if (verdict === "approved") {
+        haptic("success");
+        markVerifiedLocally();
+        setResult("success");
+      } else if (verdict === "pending") {
+        setResult("pending");
+        setFailReason("Your documents are still under review. We'll notify you as soon as smile.id responds.");
+      } else {
+        haptic("error");
+        setResult("failed");
+        setFailReason(reason ?? "We couldn't verify your details. Please check them and try again.");
+      }
+    } catch (e) {
+      setResult("failed");
+      setFailReason((e as Error).message);
+    }
+    setStep("result");
   };
 
   const handleSendOtp = () => {
@@ -78,6 +132,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
       setTimeout(() => handleProcessing(), 500);
     }
   };
+
 
   const getProgressSteps = () => {
     if (verificationCategory === "tenant") return ["Info", "Phone", "OTP", "Verify"];
