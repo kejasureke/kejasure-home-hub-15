@@ -129,9 +129,16 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const handleVerifyOtp = () => {
     if (otp.length === 6) {
       setOtpVerified(true);
-      setTimeout(() => handleProcessing(), 500);
+      // Tenant tier is phone-only — no smile.id job needed.
+      setStep("processing");
+      setTimeout(() => {
+        markVerifiedLocally();
+        setResult("success");
+        setStep("result");
+      }, 1800);
     }
   };
+
 
 
   const getProgressSteps = () => {
