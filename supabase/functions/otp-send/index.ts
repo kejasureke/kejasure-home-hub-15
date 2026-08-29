@@ -3,6 +3,7 @@
 // - Per-IP:     max 10 sends per hour (cross-phone abuse cap)
 // - Returns precise retryAfter (seconds) so the client cooldown matches the server.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { sendSms, isAfricasTalkingConfigured } from "../_shared/africastalking.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,8 +14,6 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const AT_USERNAME = Deno.env.get("AFRICASTALKING_USERNAME") ?? Deno.env.get("AT_USERNAME");
-const AT_API_KEY = Deno.env.get("AFRICASTALKING_API_KEY") ?? Deno.env.get("AT_API_KEY");
 const OTP_EXPIRY_SECONDS = 5 * 60;
 
 // Limits (tweak here)
@@ -40,39 +39,6 @@ const json = (body: unknown, status = 200) =>
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-const sendSmsViaAfricastalking = async (phone: string, message: string) => {
-  if (!AT_USERNAME || !AT_API_KEY) {
-    return { ok: false, error: "Africa's Talking credentials are not configured." };
-  }
-
-  const params = new URLSearchParams({
-    username: AT_USERNAME,
-    to: phone,
-    message,
-  });
-
-  const response = await fetch("https://api.africastalking.com/version1/messaging", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      apiKey: AT_API_KEY,
-    },
-    body: params.toString(),
-  });
-
-  const payload = await response.json().catch(() => null);
-  if (!response.ok) {
-    return { ok: false, error: payload?.errorMessage || "Africa's Talking sms request failed." };
-  }
-
-  const recipients = payload?.SMSMessageData?.Recipients;
-  if (!Array.isArray(recipients) || recipients.some((r: any) => r.status !== "Success")) {
-    return { ok: false, error: "SMS delivery failed." };
-  }
-
-  return { ok: true, payload };
-};
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -94,7 +60,51 @@ Deno.serve(async (req) => {
     auth: { persistSession: false },
   });
 
-  const code = AT_USERNAME && AT_API_KEY ? generateOtp() : "123456";
+  const nowMs = Date.now();
+  const hourAgo = new Date(nowMs - 3600_000).toISOString();
+
+  const { data: recent, error: recentErr } = await supabase
+    .from("otp_attempts")
+    .select("phone, ip, created_at")
+    .gte("created_at", hourAgo);
+
+  if (recentErr) {
+    console.error("rate-limit lookup failed", recentErr);
+  } else {
+    const forPhone = recent.filter((r) => r.phone === phone);
+    const lastForPhone = forPhone
+      .map((r) => new Date(r.created_at).getTime())
+      .sort((a, b) => b - a)[0];
+
+    if (lastForPhone) {
+      const elapsed = Math.floor((nowMs - lastForPhone) / 1000);
+      if (elapsed < PHONE_COOLDOWN_SECONDS) {
+        return json(
+          { error: "Please wait before requesting another code.", retryAfter: PHONE_COOLDOWN_SECONDS - elapsed },
+          429,
+        );
+      }
+    }
+
+    if (forPhone.length >= PHONE_HOURLY_LIMIT) {
+      const oldest = Math.min(...forPhone.map((r) => new Date(r.created_at).getTime()));
+      return json(
+        { error: "Too many codes requested for this number. Try again later.", retryAfter: Math.max(60, Math.ceil((oldest + 3600_000 - nowMs) / 1000)) },
+        429,
+      );
+    }
+
+    const forIp = recent.filter((r) => r.ip === ip);
+    if (ip !== "unknown" && forIp.length >= IP_HOURLY_LIMIT) {
+      const oldest = Math.min(...forIp.map((r) => new Date(r.created_at).getTime()));
+      return json(
+        { error: "Too many requests from this network. Try again later.", retryAfter: Math.max(60, Math.ceil((oldest + 3600_000 - nowMs) / 1000)) },
+        429,
+      );
+    }
+  }
+
+  const code = isAfricasTalkingConfigured() ? generateOtp() : "123456";
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_SECONDS * 1000).toISOString();
   const { error: codeInsertErr } = await supabase
     .from("otp_codes")
@@ -106,8 +116,11 @@ Deno.serve(async (req) => {
   let smsSent = false;
   let smsError: string | null = null;
 
-  if (AT_USERNAME && AT_API_KEY) {
-    const sendResult = await sendSmsViaAfricastalking(phone, `Your KejaSure verification code is ${code}.`);
+  if (isAfricasTalkingConfigured()) {
+    const sendResult = await sendSms(
+      phone,
+      `${code} is your KejaSure verification code. It expires in 5 minutes. Do not share it with anyone.`,
+    );
     smsSent = sendResult.ok;
     smsError = sendResult.ok ? null : sendResult.error;
   }
@@ -123,7 +136,7 @@ Deno.serve(async (req) => {
     if (error) console.error("purge failed", error);
   });
 
-  if (AT_USERNAME && AT_API_KEY && !smsSent) {
+  if (isAfricasTalkingConfigured() && !smsSent) {
     console.error("Africa's Talking SMS failed", smsError);
     return json({ error: "Failed to send SMS. Please try again later." }, 500);
   }
