@@ -660,24 +660,36 @@ export type Database = {
         Row: {
           code: string
           created_at: string
+          delivered_at: string | null
+          delivery_failure_reason: string | null
+          delivery_status: string | null
           expires_at: string
           id: string
+          message_id: string | null
           phone: string
           used_at: string | null
         }
         Insert: {
           code: string
           created_at?: string
+          delivered_at?: string | null
+          delivery_failure_reason?: string | null
+          delivery_status?: string | null
           expires_at: string
           id?: string
+          message_id?: string | null
           phone: string
           used_at?: string | null
         }
         Update: {
           code?: string
           created_at?: string
+          delivered_at?: string | null
+          delivery_failure_reason?: string | null
+          delivery_status?: string | null
           expires_at?: string
           id?: string
+          message_id?: string | null
           phone?: string
           used_at?: string | null
         }
@@ -1032,6 +1044,39 @@ export type Database = {
           notify?: boolean
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      sms_delivery_reports: {
+        Row: {
+          created_at: string
+          failure_reason: string | null
+          id: string
+          message_id: string | null
+          network_code: string | null
+          phone: string | null
+          raw: Json | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          message_id?: string | null
+          network_code?: string | null
+          phone?: string | null
+          raw?: Json | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          message_id?: string | null
+          network_code?: string | null
+          phone?: string | null
+          raw?: Json | null
+          status?: string | null
         }
         Relationships: []
       }
