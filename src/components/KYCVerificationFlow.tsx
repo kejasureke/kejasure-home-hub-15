@@ -582,6 +582,25 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               </div>
             )}
 
+            {verificationCategory !== "business" && (
+              <div>
+                <label className="text-xs font-semibold text-foreground mb-1.5 block">
+                  {docType === "passport" ? "Passport number" : "National ID number"}
+                </label>
+                <input
+                  value={idNumber}
+                  onChange={(e) => setIdNumber(e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase())}
+                  inputMode={docType === "passport" ? "text" : "numeric"}
+                  placeholder={docType === "passport" ? "AK1234567" : "12345678"}
+                  maxLength={20}
+                  className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium tracking-wide outline-none focus:border-primary"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1.5">
+                  Must match the number printed on your document — smile.id checks it against the national register.
+                </p>
+              </div>
+            )}
+
             <div className="p-3 rounded-xl bg-accent/10 border border-accent/20">
               <p className="text-[11px] text-muted-foreground">
                 📸 <span className="font-semibold text-accent-foreground">Tips:</span> Ensure good lighting, avoid glare, capture all four corners clearly.
@@ -590,9 +609,14 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
             <button
               onClick={() => setStep("selfie")}
-              disabled={!idFrontUploaded || (docType === "national_id" && !idBackUploaded)}
+              disabled={
+                !idFrontUploaded ||
+                (docType === "national_id" && !idBackUploaded) ||
+                (verificationCategory !== "business" && idNumber.trim().length < 5)
+              }
               className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
             >
+
               Continue to Selfie
             </button>
 
