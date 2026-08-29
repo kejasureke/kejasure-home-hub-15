@@ -470,7 +470,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             </p>
 
             <div
-              onClick={() => setKraUploaded(true)}
+              onClick={() => openCamera((f) => { haptic("success"); setKraFile(f); setKraUploaded(true); })}
+
               className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
                 kraUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
               }`}
