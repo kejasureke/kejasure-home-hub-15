@@ -762,6 +762,24 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                   ))}
                 </div>
               </>
+            ) : result === "pending" ? (
+              <>
+                <div className="w-20 h-20 rounded-full bg-accent/15 flex items-center justify-center mb-5">
+                  <Clock className="w-10 h-10 text-accent-foreground" />
+                </div>
+                <h2 className="text-xl font-bold text-foreground mb-2">Under Review</h2>
+                <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
+                  {failReason ?? "Your documents are being reviewed. We'll notify you as soon as there's a result."}
+                </p>
+                <div className="w-full max-w-xs space-y-2 mb-6">
+                  {["You can keep using the app meanwhile", "Most checks clear within a few minutes", "You'll get a notification with the outcome"].map((t) => (
+                    <div key={t} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Clock className="w-3 h-3 text-primary shrink-0" />
+                      <span>{t}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
               <>
                 <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mb-5">
@@ -769,14 +787,15 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 </div>
                 <h2 className="text-xl font-bold text-foreground mb-2">Verification Failed</h2>
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
-                  {verificationCategory === "tenant"
-                    ? "We couldn't match your name to the phone number. Please check your details and try again."
-                    : "We couldn't verify your identity. This could be due to poor image quality or a mismatch. Please try again."}
+                  {failReason ??
+                    (verificationCategory === "tenant"
+                      ? "We couldn't match your name to the phone number. Please check your details and try again."
+                      : "We couldn't verify your identity. This could be due to poor image quality or a mismatch. Please try again.")}
                 </p>
                 <div className="w-full max-w-xs space-y-2 mb-6">
                   {(verificationCategory === "tenant"
                     ? ["Check first and last name spelling", "Use the number registered in your name", "Ensure OTP was entered correctly"]
-                    : ["Ensure document is not expired", "Use better lighting", "Remove any obstructions from face", "Make sure all text is readable"]
+                    : ["Check the ID number matches the document", "Ensure document is not expired", "Use better lighting", "Remove any obstructions from face"]
                   ).map((t) => (
                     <div key={t} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <AlertCircle className="w-3 h-3 text-destructive shrink-0" />
@@ -786,6 +805,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 </div>
               </>
             )}
+
 
             <button
               onClick={result === "success" ? () => onClose(true) : () => {
