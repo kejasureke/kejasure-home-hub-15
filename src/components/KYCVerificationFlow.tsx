@@ -806,25 +806,30 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               </>
             )}
 
-
             <button
-              onClick={result === "success" ? () => onClose(true) : () => {
-                if (verificationCategory === "tenant") {
-                  setStep("tenant_info");
-                  setOtp("");
-                  setOtpSent(false);
-                  setOtpVerified(false);
-                } else {
-                  setStep("id_upload");
-                  setIdFrontUploaded(false);
-                  setIdBackUploaded(false);
-                  setSelfieCapture("none");
-                }
-              }}
+              onClick={result === "success" || result === "pending"
+                ? () => onClose(result === "success")
+                : () => {
+                    if (verificationCategory === "tenant") {
+                      setStep("tenant_info");
+                      setOtp("");
+                      setOtpSent(false);
+                      setOtpVerified(false);
+                    } else {
+                      setStep("id_upload");
+                      setIdFrontUploaded(false);
+                      setIdBackUploaded(false);
+                      setIdFrontFile(null);
+                      setIdBackFile(null);
+                      setSelfieFile(null);
+                      setSelfieCapture("none");
+                    }
+                  }}
               className="w-full max-w-xs py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all mt-4"
             >
-              {result === "success" ? "Done" : "Try Again"}
+              {result === "success" ? "Done" : result === "pending" ? "Close" : "Try Again"}
             </button>
+
           </div>
         )}
       </div>
