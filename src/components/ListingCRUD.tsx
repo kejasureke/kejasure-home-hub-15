@@ -3,7 +3,6 @@ import {
   ArrowLeft, ArrowRight, Camera, Video, X, Check, Zap, MapPin,
   Home, Bed, Bath, DollarSign, FileText, Star, Sparkles, Trash2, Edit3, Image, Wand2
 } from "lucide-react";
-import AIPhotoVerification from "./AIPhotoVerification";
 import ListingPhotoIntegrity from "./ListingPhotoIntegrity";
 import { kenyaCounties } from "@/data/kenyaCounties";
 import { validateCaption } from "@/utils/captionSafety";
