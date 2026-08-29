@@ -41,6 +41,15 @@ const b64ToBytes = (b64: string) => {
   return out;
 };
 
+const bytesToB64 = (bytes: Uint8Array) => {
+  let bin = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    bin += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(bin);
+};
+
 /** 64-bit difference hash: 9x8 grayscale, compare each pixel to its right neighbour. */
 async function computeDHash(bytes: Uint8Array) {
   const img = await decode(bytes);
@@ -70,7 +79,7 @@ async function computeDHash(bytes: Uint8Array) {
   const preview = scale < 1 ? src.clone().resize(Math.round(width * scale), Math.round(height * scale)) : src;
   const jpeg = await preview.encodeJPEG(80);
 
-  return { hex, width, height, previewB64: btoa(String.fromCharCode(...new Uint8Array(jpeg))) };
+  return { hex, width, height, previewB64: bytesToB64(new Uint8Array(jpeg)) };
 }
 
 const hamming = (a: string, b: string) => {
