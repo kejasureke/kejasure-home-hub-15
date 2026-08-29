@@ -123,9 +123,13 @@ function v(
   };
 }
 
+import { isAllowlistedIp } from "./adminGate.ts";
+
 export function verifyAttestation(req: Request): AttestationVerdict {
   const mode = getAttestationMode();
   if (mode === "off") return v("skipped", "unknown");
+  // Trusted operator networks (admin console, support, CI) bypass attestation.
+  if (isAllowlistedIp(req)) return v("skipped", "unknown", "allowlisted_ip");
 
   const token = req.headers.get("x-attestation-token");
   if (!token) return v("missing", "unknown", "no_header");
