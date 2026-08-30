@@ -3,8 +3,9 @@ import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartph
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { haptic, requestBiometric } from "@/lib/despia";
+import { hasStoredPin, getStoredPhone, storePin, verifyPin } from "@/lib/pinAuth";
 
-type AuthStep = "phone" | "otp" | "pin" | "confirm-pin" | "biometric";
+type AuthStep = "unlock" | "phone" | "otp" | "pin" | "confirm-pin" | "biometric";
 
 const AUTH_STATE_KEY = "kejasure_auth_progress";
 const OTP_DURATION = 60; // seconds
@@ -28,7 +29,7 @@ const loadAuthState = (): Partial<PersistedAuth> => {
     const raw = localStorage.getItem(AUTH_STATE_KEY);
     if (!raw) return {};
     const p = JSON.parse(raw) as PersistedAuth;
-    const valid: AuthStep[] = ["phone", "otp", "pin", "confirm-pin", "biometric"];
+    const valid: AuthStep[] = ["unlock", "phone", "otp", "pin", "confirm-pin", "biometric"];
     if (!valid.includes(p.step)) return {};
     return p;
   } catch {
@@ -39,12 +40,21 @@ const loadAuthState = (): Partial<PersistedAuth> => {
 interface AuthFlowProps {
   onComplete: () => void;
   onBack: () => void;
+  /** "login" returning users unlock with their PIN — no SMS is sent. */
+  mode?: "signup" | "login";
 }
 
-const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
+const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
   const initial = loadAuthState();
-  const [step, setStep] = useState<AuthStep>(initial.step ?? "phone");
+  const pinKnown = hasStoredPin();
+  const startStep: AuthStep =
+    mode === "login" && pinKnown ? "unlock" : initial.step && initial.step !== "unlock" ? initial.step : "phone";
+  const [step, setStep] = useState<AuthStep>(startStep);
   const [phone, setPhone] = useState(initial.phone ?? "");
+  const [unlockPin, setUnlockPin] = useState<string[]>(["", "", "", ""]);
+  const [unlockError, setUnlockError] = useState("");
+  const unlockRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const storedPhone = getStoredPhone();
   const [otp, setOtp] = useState<string[]>(initial.otp ?? ["", "", "", "", "", ""]);
   const [pin, setPin] = useState<string[]>(initial.pin ?? ["", "", "", ""]);
   const [confirmPin, setConfirmPin] = useState<string[]>(initial.confirmPin ?? ["", "", "", ""]);
@@ -278,6 +288,7 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     }
     setPinError("");
     haptic("success");
+    void storePin(toE164(phone), confirmPin.join(""));
     setStep("biometric");
   };
 
@@ -298,10 +309,33 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
     }
   }, [step, isConfirmFilled]);
 
+  const handleUnlockSubmit = async (code: string) => {
+    if (await verifyPin(code)) {
+      haptic("success");
+      try { localStorage.removeItem(AUTH_STATE_KEY); } catch {}
+      onComplete();
+      return;
+    }
+    setUnlockError("Incorrect PIN. Try again.");
+    setShakeError(true);
+    setUnlockPin(["", "", "", ""]);
+    unlockRefs.current[0]?.focus();
+    triggerErrorHaptic();
+    setTimeout(() => setShakeError(false), 450);
+  };
+
+  useEffect(() => {
+    if (step === "unlock" && unlockPin.every((d) => d !== "")) {
+      const t = setTimeout(() => handleUnlockSubmit(unlockPin.join("")), 80);
+      return () => clearTimeout(t);
+    }
+  }, [step, unlockPin]);
+
   const stepIndex = ["phone", "otp", "pin", "confirm-pin", "biometric"].indexOf(step);
-  const progress = ((stepIndex + 1) / 5) * 100;
+  const progress = step === "unlock" ? 100 : ((stepIndex + 1) / 5) * 100;
 
   const goBack = () => {
+    if (step === "unlock") return onBack();
     const steps: AuthStep[] = ["phone", "otp", "pin", "confirm-pin", "biometric"];
     const idx = steps.indexOf(step);
     if (idx === 0) onBack();
@@ -321,6 +355,84 @@ const AuthFlow = ({ onComplete, onBack }: AuthFlowProps) => {
       </div>
 
       <div className="flex-1 flex flex-col px-6 pt-8">
+        {/* Unlock with PIN (returning users — no SMS) */}
+        {step === "unlock" && (
+          <div className="flex-1 flex flex-col animate-fade-in">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+              <Lock className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="text-2xl font-extrabold text-foreground mb-2">Welcome back</h1>
+            <p className="text-sm text-muted-foreground mb-8">
+              Enter your 4-digit PIN to unlock
+              {storedPhone ? (
+                <span className="block text-xs mt-1">{storedPhone.replace(/(\+254)(\d{3})(\d+)(\d{2})/, "$1 $2 ••• $4")}</span>
+              ) : null}
+            </p>
+
+            <div className={`flex gap-4 justify-center mb-4 ${shakeError ? "animate-shake" : ""}`}>
+              {unlockPin.map((digit, i) => (
+                <input
+                  key={i}
+                  ref={(el) => (unlockRefs.current[i] = el)}
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => {
+                    if (unlockError) setUnlockError("");
+                    handleCodeInput(e.target.value, i, unlockPin, setUnlockPin, unlockRefs, 4);
+                  }}
+                  onKeyDown={(e) => handleKeyDown(e, i, unlockPin, setUnlockPin, unlockRefs)}
+                  className={`w-14 h-16 rounded-xl text-center text-2xl font-bold border-2 transition-colors outline-none ${
+                    unlockError
+                      ? "border-destructive bg-destructive/5 text-destructive"
+                      : digit
+                      ? "border-primary bg-card"
+                      : "border-border bg-card"
+                  }`}
+                  autoFocus={i === 0}
+                />
+              ))}
+            </div>
+
+            {unlockError && (
+              <p className="text-xs text-destructive text-center font-semibold mb-2 animate-fade-in">{unlockError}</p>
+            )}
+
+            <div className="mt-auto pb-10 space-y-3">
+              <button
+                onClick={async () => {
+                  haptic("heavy");
+                  const result = await requestBiometric();
+                  if (result.success) {
+                    haptic("success");
+                    try { localStorage.removeItem(AUTH_STATE_KEY); } catch {}
+                    onComplete();
+                  } else {
+                    triggerErrorHaptic();
+                    toast({ title: "Biometric unlock", description: result.error || "Use your PIN instead." });
+                  }
+                }}
+                className="w-full py-4 rounded-2xl bg-secondary text-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+              >
+                <Fingerprint className="w-5 h-5" />
+                Unlock with biometrics
+              </button>
+              <button
+                onClick={() => {
+                  setUnlockPin(["", "", "", ""]);
+                  setUnlockError("");
+                  setPhone(storedPhone.replace("+254", ""));
+                  setStep("phone");
+                }}
+                className="w-full py-3 rounded-2xl text-sm font-medium text-muted-foreground"
+              >
+                Forgot PIN? Verify by SMS
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Phone Input */}
         {step === "phone" && (
           <div className="flex-1 flex flex-col animate-fade-in">
