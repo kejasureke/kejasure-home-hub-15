@@ -48,8 +48,13 @@ const derivePassword = async (phone: string) => {
     .slice(0, 32);
 };
 
+// Supabase's phone provider is disabled (we send our own SMS via Africa's Talking),
+// so the password grant must run against a deterministic internal email identity.
+const emailForPhone = (phone: string) => `${phone.replace(/^\+/, "")}@phone.kejasure.app`;
+
 const ensureAuthUser = async (phone: string) => {
   const password = await derivePassword(phone);
+  const email = emailForPhone(phone);
   const response = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
     method: "POST",
     headers: {
@@ -58,23 +63,27 @@ const ensureAuthUser = async (phone: string) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      email,
       phone,
       password,
+      email_confirm: true,
       phone_confirm: true,
-      user_metadata: { provider: "otp" },
+      user_metadata: { provider: "otp", phone },
     }),
   });
-
 
   if (response.ok) return;
 
   const payload = await response.json().catch(() => null);
-  const duplicate = payload?.statusCode === 409 || payload?.message?.toLowerCase().includes("already exists");
+  const duplicate =
+    payload?.statusCode === 409 ||
+    response.status === 422 ||
+    payload?.message?.toLowerCase().includes("already");
   if (duplicate) {
-    // Existing accounts (incl. ones created before phone_confirm was set) must be
-    // confirmed + password-synced, otherwise the password grant below fails.
+    // Existing accounts (incl. phone-only ones created earlier) need the email
+    // identity + password synced, otherwise the grant below fails.
     const list = await fetch(
-      `${SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=1&filter=${encodeURIComponent(phone)}`,
+      `${SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=50`,
       {
         headers: {
           Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
@@ -83,7 +92,10 @@ const ensureAuthUser = async (phone: string) => {
       },
     );
     const listPayload = await list.json().catch(() => null);
-    const existing = listPayload?.users?.find((u: any) => u.phone === phone.replace(/^\+/, "") || u.phone === phone);
+    const bare = phone.replace(/^\+/, "");
+    const existing = listPayload?.users?.find(
+      (u: any) => u.phone === bare || u.phone === phone || u.email === email,
+    );
     if (existing?.id) {
       await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${existing.id}`, {
         method: "PUT",
@@ -92,7 +104,7 @@ const ensureAuthUser = async (phone: string) => {
           apikey: SERVICE_ROLE_KEY,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ password, phone_confirm: true }),
+        body: JSON.stringify({ email, password, email_confirm: true }),
       });
     }
     return;
@@ -110,7 +122,7 @@ const signInWithPassword = async (phone: string) => {
       apikey: SERVICE_ROLE_KEY,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ phone, password }),
+    body: JSON.stringify({ email: emailForPhone(phone), password }),
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok || !payload?.access_token) {
@@ -118,6 +130,7 @@ const signInWithPassword = async (phone: string) => {
   }
   return payload;
 };
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
