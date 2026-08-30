@@ -48,8 +48,13 @@ const derivePassword = async (phone: string) => {
     .slice(0, 32);
 };
 
+// Supabase's phone provider is disabled (we send our own SMS via Africa's Talking),
+// so the password grant must run against a deterministic internal email identity.
+const emailForPhone = (phone: string) => `${phone.replace(/^\+/, "")}@phone.kejasure.app`;
+
 const ensureAuthUser = async (phone: string) => {
   const password = await derivePassword(phone);
+  const email = emailForPhone(phone);
   const response = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
     method: "POST",
     headers: {
@@ -58,21 +63,56 @@ const ensureAuthUser = async (phone: string) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      email,
       phone,
       password,
       email_confirm: true,
-      user_metadata: { provider: "otp" },
+      phone_confirm: true,
+      user_metadata: { provider: "otp", phone },
     }),
   });
 
   if (response.ok) return;
 
   const payload = await response.json().catch(() => null);
-  const duplicate = payload?.statusCode === 409 || payload?.message?.toLowerCase().includes("already exists");
-  if (duplicate) return;
+  const duplicate =
+    payload?.statusCode === 409 ||
+    response.status === 422 ||
+    payload?.message?.toLowerCase().includes("already");
+  if (duplicate) {
+    // Existing accounts (incl. phone-only ones created earlier) need the email
+    // identity + password synced, otherwise the grant below fails.
+    const list = await fetch(
+      `${SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=50`,
+      {
+        headers: {
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          apikey: SERVICE_ROLE_KEY,
+        },
+      },
+    );
+    const listPayload = await list.json().catch(() => null);
+    const bare = phone.replace(/^\+/, "");
+    const existing = listPayload?.users?.find(
+      (u: any) => u.phone === bare || u.phone === phone || u.email === email,
+    );
+    if (existing?.id) {
+      await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${existing.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          apikey: SERVICE_ROLE_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, email_confirm: true }),
+      });
+    }
+    return;
+  }
 
   throw new Error(`Could not ensure auth user: ${JSON.stringify(payload)}`);
 };
+
 
 const signInWithPassword = async (phone: string) => {
   const password = await derivePassword(phone);
@@ -82,7 +122,7 @@ const signInWithPassword = async (phone: string) => {
       apikey: SERVICE_ROLE_KEY,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ phone, password }),
+    body: JSON.stringify({ email: emailForPhone(phone), password }),
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok || !payload?.access_token) {
@@ -90,6 +130,7 @@ const signInWithPassword = async (phone: string) => {
   }
   return payload;
 };
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -207,15 +248,17 @@ Deno.serve(async (req) => {
     );
   }
 
-  await supabase
-    .from("otp_codes")
-    .update({ used_at: new Date().toISOString() })
-    .eq("id", codeData.id);
-
   try {
     await ensureAuthUser(phone);
     const session = await signInWithPassword(phone);
+    // Only burn the code once a session actually exists, so a transient auth
+    // failure doesn't strand the user with a consumed code.
+    await supabase
+      .from("otp_codes")
+      .update({ used_at: new Date().toISOString() })
+      .eq("id", codeData.id);
     return json({ ok: true, demo: false, session });
+
   } catch (error) {
     console.error("auth user creation/sign-in failed", error);
     return json({ error: "Verification succeeded, but could not create auth session." }, 500);
