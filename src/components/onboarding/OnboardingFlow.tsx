@@ -111,9 +111,11 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     case "auth":
       return (
         <AuthFlow
+          mode={loginMode ? "login" : "signup"}
           onComplete={() => (loginMode ? finish() : setStep("profile"))}
           onBack={() => setStep(loginMode ? "welcome" : "role")}
         />
+
       );
     case "profile":
       return role ? (
