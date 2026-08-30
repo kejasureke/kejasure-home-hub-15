@@ -70,10 +70,37 @@ const ensureAuthUser = async (phone: string) => {
 
   const payload = await response.json().catch(() => null);
   const duplicate = payload?.statusCode === 409 || payload?.message?.toLowerCase().includes("already exists");
-  if (duplicate) return;
+  if (duplicate) {
+    // Existing accounts (incl. ones created before phone_confirm was set) must be
+    // confirmed + password-synced, otherwise the password grant below fails.
+    const list = await fetch(
+      `${SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=1&filter=${encodeURIComponent(phone)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          apikey: SERVICE_ROLE_KEY,
+        },
+      },
+    );
+    const listPayload = await list.json().catch(() => null);
+    const existing = listPayload?.users?.find((u: any) => u.phone === phone.replace(/^\+/, "") || u.phone === phone);
+    if (existing?.id) {
+      await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${existing.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          apikey: SERVICE_ROLE_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password, phone_confirm: true }),
+      });
+    }
+    return;
+  }
 
   throw new Error(`Could not ensure auth user: ${JSON.stringify(payload)}`);
 };
+
 
 const signInWithPassword = async (phone: string) => {
   const password = await derivePassword(phone);
