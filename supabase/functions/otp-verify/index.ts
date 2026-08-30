@@ -60,10 +60,11 @@ const ensureAuthUser = async (phone: string) => {
     body: JSON.stringify({
       phone,
       password,
-      email_confirm: true,
+      phone_confirm: true,
       user_metadata: { provider: "otp" },
     }),
   });
+
 
   if (response.ok) return;
 
