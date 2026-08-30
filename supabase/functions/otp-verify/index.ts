@@ -248,15 +248,17 @@ Deno.serve(async (req) => {
     );
   }
 
-  await supabase
-    .from("otp_codes")
-    .update({ used_at: new Date().toISOString() })
-    .eq("id", codeData.id);
-
   try {
     await ensureAuthUser(phone);
     const session = await signInWithPassword(phone);
+    // Only burn the code once a session actually exists, so a transient auth
+    // failure doesn't strand the user with a consumed code.
+    await supabase
+      .from("otp_codes")
+      .update({ used_at: new Date().toISOString() })
+      .eq("id", codeData.id);
     return json({ ok: true, demo: false, session });
+
   } catch (error) {
     console.error("auth user creation/sign-in failed", error);
     return json({ error: "Verification succeeded, but could not create auth session." }, 500);
