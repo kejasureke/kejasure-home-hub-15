@@ -135,6 +135,17 @@ Deno.serve(async (req) => {
     }
   }
 
+  if (isAfricasTalkingConfigured() && !smsSent) {
+    // Provider failure — don't burn the user's rate-limit budget on it.
+    console.error("Africa's Talking SMS failed", smsError);
+    if (codeRow?.id) {
+      await supabase
+        .from("otp_codes")
+        .update({ delivery_status: "Failed" })
+        .eq("id", codeRow.id);
+    }
+    return json({ error: "Failed to send SMS. Please try again later." }, 500);
+  }
 
   const { error: insertErr } = await supabase
     .from("otp_attempts")
@@ -147,10 +158,6 @@ Deno.serve(async (req) => {
     if (error) console.error("purge failed", error);
   });
 
-  if (isAfricasTalkingConfigured() && !smsSent) {
-    console.error("Africa's Talking SMS failed", smsError);
-    return json({ error: "Failed to send SMS. Please try again later." }, 500);
-  }
 
   return json({
     ok: true,
