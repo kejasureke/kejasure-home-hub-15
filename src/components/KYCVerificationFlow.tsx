@@ -217,12 +217,12 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 </div>
                 <div className="flex-1">
                   <h3 className="text-base font-bold">Tenant</h3>
-                  <p className="text-xs text-muted-foreground">Phone number & name verification</p>
+                  <p className="text-xs text-muted-foreground">Phone ownership verification</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="space-y-1.5 ml-15">
-                {["Phone number verified via OTP", "Name match to phone data", "smile.id phone verification"].map((f) => (
+                {["Phone number verified via OTP", "Confirms you control the number", "Does not verify your legal name"].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <CheckCircle2 className="w-3 h-3 text-blue-600 shrink-0" />
                     <span>{f}</span>
@@ -309,7 +309,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold mb-1">Your Details</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              We'll verify your name matches the phone number registered with your mobile provider via smile.id.
+              We’ll send a code to confirm that you control this phone number. This check does not verify your legal name.
             </p>
 
             <div className="space-y-3">
@@ -352,7 +352,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               <div className="flex items-start gap-2">
                 <Smartphone className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                 <p className="text-[11px] text-muted-foreground">
-                  smile.id will verify that the name you provide matches the registered owner of this phone number.
+                  Your entered name remains unverified until you complete ID verification.
                 </p>
               </div>
             </div>
@@ -706,7 +706,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             </h2>
             <p className="text-sm text-muted-foreground text-center mb-6 max-w-[260px]">
               {verificationCategory === "tenant"
-                ? "Matching your name against phone number registration data..."
+                ? "Confirming that you control this phone number..."
                 : "Cross-referencing your document with your selfie. This usually takes a few seconds..."}
             </p>
             <div className="flex items-center gap-2">
@@ -716,7 +716,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             </div>
             <div className="mt-8 space-y-2 w-full max-w-xs">
               {(verificationCategory === "tenant"
-                ? ["Phone number verification", "Name match check", "smile.id validation"]
+                ? ["Checking your code", "Confirming phone ownership", "Adding phone verified status"]
                 : ["Document quality check", "Face matching", "Database verification"]
               ).map((s, i) => (
                 <div key={s} className="flex items-center gap-2 text-xs text-muted-foreground animate-fade-in" style={{ animationDelay: `${i * 1.2}s` }}>
@@ -736,9 +736,13 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-5 animate-[pulse_1s_ease-in-out_2]">
                   <CheckCircle2 className="w-10 h-10 text-primary" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground mb-2">Verified! ✓</h2>
+                <h2 className="text-xl font-bold text-foreground mb-2">
+                  {verificationCategory === "tenant" ? "Phone Verified! ✓" : "Identity Verified! ✓"}
+                </h2>
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
-                  Your identity has been verified successfully. You now have the trusted badge on your profile.
+                  {verificationCategory === "tenant"
+                    ? "You confirmed that you control this phone number. Your legal name remains unverified until you complete ID verification."
+                    : "Your identity has been verified successfully. You now have the trusted badge on your profile."}
                 </p>
                 {verificationCategory && (
                   <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 ${categoryBadgeConfig[verificationCategory].bgColor} border ${categoryBadgeConfig[verificationCategory].borderColor}`}>
@@ -789,12 +793,12 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
                   {failReason ??
                     (verificationCategory === "tenant"
-                      ? "We couldn't match your name to the phone number. Please check your details and try again."
+                       ? "We couldn't verify this phone number. Check the number and code, then try again."
                       : "We couldn't verify your identity. This could be due to poor image quality or a mismatch. Please try again.")}
                 </p>
                 <div className="w-full max-w-xs space-y-2 mb-6">
                   {(verificationCategory === "tenant"
-                    ? ["Check first and last name spelling", "Use the number registered in your name", "Ensure OTP was entered correctly"]
+                    ? ["Check the phone number", "Request a fresh code", "Ensure the latest code was entered correctly"]
                     : ["Check the ID number matches the document", "Ensure document is not expired", "Use better lighting", "Remove any obstructions from face"]
                   ).map((t) => (
                     <div key={t} className="flex items-center gap-2 text-xs text-muted-foreground">
