@@ -24,6 +24,65 @@ const computeRemaining = (expiresAt: number | null): number => {
   return Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
 };
 
+const FN_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+
+/**
+ * Calls an edge function. Uses supabase-js first; if the request itself never
+ * reaches the network (webview/flaky mobile data), retries with a plain fetch.
+ * Returns { data, error, payload } where payload is the parsed error body.
+ */
+const callFunction = async (
+  name: string,
+  body: Record<string, unknown>,
+): Promise<{ data: any; error: any; payload: any }> => {
+  try {
+    const { data, error } = await supabase.functions.invoke(name, { body });
+    if (!error) return { data, error: null, payload: null };
+    let payload: any = null;
+    try {
+      payload = await (error as any).context?.response?.json?.();
+    } catch {
+      /* non-JSON error body */
+    }
+    // Only a transport failure (no response at all) is worth retrying
+    if (payload) return { data: null, error, payload };
+  } catch {
+    /* fall through to direct fetch */
+  }
+
+  let lastErr: any = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(`${FN_BASE}/${name}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: ANON_KEY,
+          Authorization: `Bearer ${ANON_KEY}`,
+        },
+        body: JSON.stringify(body),
+      });
+      const parsed = await res.json().catch(() => null);
+      if (res.ok) return { data: parsed, error: null, payload: null };
+      return {
+        data: null,
+        error: new Error(parsed?.error ?? `Request failed (${res.status})`),
+        payload: parsed,
+      };
+    } catch (e) {
+      lastErr = e;
+      await new Promise((r) => setTimeout(r, 800));
+    }
+  }
+  return {
+    data: null,
+    error: new Error("No internet connection. Check your data and try again."),
+    payload: null,
+  };
+};
+
+
 const loadAuthState = (): Partial<PersistedAuth> => {
   try {
     const raw = localStorage.getItem(AUTH_STATE_KEY);
