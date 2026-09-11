@@ -209,9 +209,11 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
   };
 
   const isPhoneValid = phone.length >= 9;
+  const canSubmitPhone = isPhoneValid && (mode !== "signup" || agreed);
   const isOtpFilled = otp.every((d) => d !== "");
   const isPinFilled = pin.every((d) => d !== "");
   const isConfirmFilled = confirmPin.every((d) => d !== "");
+
 
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -510,18 +512,59 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
               />
             </div>
 
+            {mode === "signup" && (
+              <label className="flex items-start gap-3 mt-6 px-1 active:opacity-80">
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={agreed}
+                  onClick={() => setAgreed((v) => !v)}
+                  className={`mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    agreed ? "bg-primary border-primary" : "border-border bg-card"
+                  }`}
+                >
+                  {agreed && <Check className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={3} />}
+                </button>
+                <span className="text-xs leading-relaxed text-muted-foreground">
+                  I agree to KejaSure's{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); setDoc("terms"); }}
+                    className="font-semibold text-primary underline underline-offset-2"
+                  >
+                    Terms of Use
+                  </button>{" "}
+                  and{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); setDoc("privacy"); }}
+                    className="font-semibold text-primary underline underline-offset-2"
+                  >
+                    Privacy Policy
+                  </button>
+                  . KejaSure connects you with landlords, hosts and service providers — it never collects rent, deposits or service payments.
+                </span>
+              </label>
+            )}
+
             <div className="mt-auto pb-10">
               <button
                 onClick={handlePhoneSubmit}
-                disabled={!isPhoneValid}
+                disabled={!canSubmitPhone}
                 className={`w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
-                  isPhoneValid ? "gradient-trust text-primary-foreground active:scale-[0.98]" : "bg-muted text-muted-foreground"
+                  canSubmitPhone ? "gradient-trust text-primary-foreground active:scale-[0.98]" : "bg-muted text-muted-foreground"
                 }`}
               >
                 Send Code
                 <ChevronRight className="w-5 h-5" />
               </button>
+              {mode === "signup" && !agreed && isPhoneValid && (
+                <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                  Tick the box above to continue
+                </p>
+              )}
             </div>
+
           </div>
         )}
 
