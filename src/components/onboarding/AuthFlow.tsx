@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartphone } from "lucide-react";
+import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartphone, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { haptic, requestBiometric } from "@/lib/despia";
@@ -123,6 +123,18 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
   const [otpTimer, setOtpTimer] = useState<number>(computeRemaining(initial.otpExpiresAt ?? null));
   const [lockoutExpiresAt, setLockoutExpiresAt] = useState<number | null>(null);
   const [lockoutTimer, setLockoutTimer] = useState<number>(0);
+  const [agreed, setAgreed] = useState(() => {
+    try { return localStorage.getItem("kejasure_terms_accepted") === "true"; } catch { return false; }
+  });
+  const [doc, setDoc] = useState<null | "terms" | "privacy">(null);
+
+  useEffect(() => {
+    try {
+      if (agreed) localStorage.setItem("kejasure_terms_accepted", "true");
+      else localStorage.removeItem("kejasure_terms_accepted");
+    } catch {}
+  }, [agreed]);
+
 
   // Persist on every relevant change
   useEffect(() => {
@@ -209,9 +221,11 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
   };
 
   const isPhoneValid = phone.length >= 9;
+  const canSubmitPhone = isPhoneValid && (mode !== "signup" || agreed);
   const isOtpFilled = otp.every((d) => d !== "");
   const isPinFilled = pin.every((d) => d !== "");
   const isConfirmFilled = confirmPin.every((d) => d !== "");
+
 
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -273,7 +287,17 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
     }
   };
 
-  const handlePhoneSubmit = () => sendOtp(false);
+  const handlePhoneSubmit = () => {
+    if (mode === "signup" && !agreed) {
+      toast({
+        title: "Please accept the terms",
+        description: "Tick the box to agree to our Terms of Use and Privacy Policy.",
+      });
+      return;
+    }
+    void sendOtp(false);
+  };
+
 
   const handleOtpSubmit = async () => {
     if (verifying) return;
@@ -510,18 +534,59 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
               />
             </div>
 
+            {mode === "signup" && (
+              <label className="flex items-start gap-3 mt-6 px-1 active:opacity-80">
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={agreed}
+                  onClick={() => setAgreed((v) => !v)}
+                  className={`mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    agreed ? "bg-primary border-primary" : "border-border bg-card"
+                  }`}
+                >
+                  {agreed && <Check className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={3} />}
+                </button>
+                <span className="text-xs leading-relaxed text-muted-foreground">
+                  I agree to KejaSure's{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); setDoc("terms"); }}
+                    className="font-semibold text-primary underline underline-offset-2"
+                  >
+                    Terms of Use
+                  </button>{" "}
+                  and{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); setDoc("privacy"); }}
+                    className="font-semibold text-primary underline underline-offset-2"
+                  >
+                    Privacy Policy
+                  </button>
+                  . KejaSure connects you with landlords, hosts and service providers — it never collects rent, deposits or service payments.
+                </span>
+              </label>
+            )}
+
             <div className="mt-auto pb-10">
               <button
                 onClick={handlePhoneSubmit}
-                disabled={!isPhoneValid}
+                disabled={!canSubmitPhone}
                 className={`w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
-                  isPhoneValid ? "gradient-trust text-primary-foreground active:scale-[0.98]" : "bg-muted text-muted-foreground"
+                  canSubmitPhone ? "gradient-trust text-primary-foreground active:scale-[0.98]" : "bg-muted text-muted-foreground"
                 }`}
               >
                 Send Code
                 <ChevronRight className="w-5 h-5" />
               </button>
+              {mode === "signup" && !agreed && isPhoneValid && (
+                <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                  Tick the box above to continue
+                </p>
+              )}
             </div>
+
           </div>
         )}
 
@@ -745,7 +810,62 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
           </div>
         )}
       </div>
+
+      {/* Terms / Privacy sheet */}
+      {doc && (
+        <div className="fixed inset-0 z-[95] flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setDoc(null)} />
+          <div className="relative bg-background rounded-t-3xl max-h-[82vh] flex flex-col animate-slide-in-right">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <h2 className="text-base font-extrabold text-foreground">
+                {doc === "terms" ? "Terms of Use" : "Privacy Policy"}
+              </h2>
+              <button
+                onClick={() => setDoc(null)}
+                className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4 text-foreground" />
+              </button>
+            </div>
+            <div className="overflow-y-auto px-5 py-4 space-y-4 text-sm leading-relaxed text-muted-foreground">
+              {doc === "terms" ? (
+                <>
+                  <p><span className="font-semibold text-foreground">1. What KejaSure does.</span> KejaSure Ltd connects tenants and guests with landlords, hosts, agencies and home service providers across Kenya. We are not an agent, broker or party to any agreement you make.</p>
+                  <p><span className="font-semibold text-foreground">2. No payments through the app.</span> KejaSure never collects rent, deposits, viewing fees or service payments. Pay only in person, after you have confirmed the property or service yourself. Anyone asking you to send money through the app is a scam — report them.</p>
+                  <p><span className="font-semibold text-foreground">3. Your account.</span> Your phone number is verified by SMS at signup and protected by your 4-digit PIN. Keep your PIN private; activity on your account is treated as yours.</p>
+                  <p><span className="font-semibold text-foreground">4. Honest listings.</span> Listings must be real, currently available and use your own photos. Fake, duplicated or misleading listings are removed and the account may be suspended.</p>
+                  <p><span className="font-semibold text-foreground">5. Subscriptions.</span> Paid plans unlock listing slots and premium features. Subscription fees are the only money KejaSure charges, and they are non-refundable once the period begins.</p>
+                  <p><span className="font-semibold text-foreground">6. Conduct.</span> No harassment, discrimination, spam, scraping or attempts to break the app's security.</p>
+                  <p><span className="font-semibold text-foreground">7. Reports and disputes.</span> Report suspicious users or listings in the app. We may suspend accounts while we investigate and may share verified identity records with the authorities where the law requires it.</p>
+                  <p className="pb-6">Questions? Reach us through Help &amp; Support in the app.</p>
+                </>
+              ) : (
+                <>
+                  <p><span className="font-semibold text-foreground">What we collect.</span> Your name, phone number, role and profile preferences; listings, photos and messages you create; and basic device and usage information that keeps the app secure.</p>
+                  <p><span className="font-semibold text-foreground">Identity checks.</span> If you verify your identity, your ID document and selfie are checked by our verification partner. We keep only the result and a reference, never a copy of your ID number in the app.</p>
+                  <p><span className="font-semibold text-foreground">How we use it.</span> To verify your phone, show you relevant homes and services, connect you with the other party, prevent fraud, and support you when something goes wrong.</p>
+                  <p><span className="font-semibold text-foreground">What others see.</span> Your name, photo and verification badges. Phone numbers stay hidden until a booking request is accepted.</p>
+                  <p><span className="font-semibold text-foreground">Location.</span> Used only while you are browsing the map, and only if you allow it. You can turn it off any time in Settings.</p>
+                  <p><span className="font-semibold text-foreground">Sharing.</span> We do not sell your data. We share it only with the service providers who run verification, SMS and hosting for us, or when Kenyan law requires it.</p>
+                  <p><span className="font-semibold text-foreground">Your rights.</span> Under the Data Protection Act, 2019 you may request a copy of your data, correct it, or ask us to delete your account through Help &amp; Support.</p>
+                  <p className="pb-6">KejaSure Ltd, Nairobi, Kenya.</p>
+                </>
+              )}
+            </div>
+            <div className="px-5 pb-8 pt-3 border-t border-border">
+              <button
+                onClick={() => { setAgreed(true); setDoc(null); }}
+                className="w-full py-3.5 rounded-2xl gradient-trust text-primary-foreground font-semibold text-sm active:scale-[0.98] transition-transform"
+              >
+                I Agree
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
 
