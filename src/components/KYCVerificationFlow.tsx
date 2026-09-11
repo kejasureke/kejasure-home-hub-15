@@ -14,7 +14,7 @@ interface KYCVerificationFlowProps {
 type VerificationCategory = "tenant" | "individual" | "business";
 type DocType = "national_id" | "passport" | "kra_pin";
 type BusinessDocType = "business_cert" | "kra_pin" | "cr12";
-type Step = "type_select" | "tenant_info" | "tenant_otp" | "doc_select" | "kra_upload" | "id_upload" | "selfie" | "processing" | "result";
+type Step = "type_select" | "doc_select" | "kra_upload" | "id_upload" | "selfie" | "processing" | "result";
 type VerificationResult = "success" | "failed" | "pending";
 
 const categoryBadgeConfig: Record<VerificationCategory, { label: string; color: string; bgColor: string; borderColor: string }> = {
@@ -46,9 +46,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [otpVerified, setOtpVerified] = useState(false);
+
+
 
   const individualDocs = [
     { type: "national_id" as DocType, label: "National ID", desc: "Kenyan National ID card", icon: FileText },
@@ -674,21 +673,15 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               onClick={result === "success" || result === "pending"
                 ? () => onClose(result === "success")
                 : () => {
-                    if (verificationCategory === "tenant") {
-                      setStep("tenant_info");
-                      setOtp("");
-                      setOtpSent(false);
-                      setOtpVerified(false);
-                    } else {
-                      setStep("id_upload");
-                      setIdFrontUploaded(false);
-                      setIdBackUploaded(false);
-                      setIdFrontFile(null);
-                      setIdBackFile(null);
-                      setSelfieFile(null);
-                      setSelfieCapture("none");
-                    }
+                    setStep("id_upload");
+                    setIdFrontUploaded(false);
+                    setIdBackUploaded(false);
+                    setIdFrontFile(null);
+                    setIdBackFile(null);
+                    setSelfieFile(null);
+                    setSelfieCapture("none");
                   }}
+
               className="w-full max-w-xs py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all mt-4"
             >
               {result === "success" ? "Done" : result === "pending" ? "Close" : "Try Again"}
