@@ -36,7 +36,7 @@ const STEPS: TourStep[] = [
   {
     icon: ShieldCheck,
     title: "Stay protected",
-    description: "Never pay rent or deposits outside the app. Report anything suspicious instantly.",
+    description: "KejaSure doesn't collect rent or deposits. Pay in person only after confirming with the landlord, host, or service provider.",
     accent: "from-destructive/20 to-primary/10",
   },
   {
