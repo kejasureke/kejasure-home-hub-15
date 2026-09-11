@@ -14,7 +14,7 @@ interface KYCVerificationFlowProps {
 type VerificationCategory = "tenant" | "individual" | "business";
 type DocType = "national_id" | "passport" | "kra_pin";
 type BusinessDocType = "business_cert" | "kra_pin" | "cr12";
-type Step = "type_select" | "tenant_info" | "tenant_otp" | "doc_select" | "kra_upload" | "id_upload" | "selfie" | "processing" | "result";
+type Step = "type_select" | "doc_select" | "kra_upload" | "id_upload" | "selfie" | "processing" | "result";
 type VerificationResult = "success" | "failed" | "pending";
 
 const categoryBadgeConfig: Record<VerificationCategory, { label: string; color: string; bgColor: string; borderColor: string }> = {
@@ -46,9 +46,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [otpVerified, setOtpVerified] = useState(false);
+
+
 
   const individualDocs = [
     { type: "national_id" as DocType, label: "National ID", desc: "Kenyan National ID card", icon: FileText },
@@ -121,23 +120,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
     setStep("result");
   };
 
-  const handleSendOtp = () => {
-    setOtpSent(true);
-    // Mock OTP sent
-  };
 
-  const handleVerifyOtp = () => {
-    if (otp.length === 6) {
-      setOtpVerified(true);
-      // Tenant tier is phone-only — no smile.id job needed.
-      setStep("processing");
-      setTimeout(() => {
-        markVerifiedLocally();
-        setResult("success");
-        setStep("result");
-      }, 1800);
-    }
-  };
+
 
 
 
@@ -206,34 +190,23 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               <p className="text-sm text-muted-foreground mt-1">Choose your verification type to get the trusted badge</p>
             </div>
 
-            {/* Tenant */}
-            <button
-              onClick={() => { setVerificationCategory("tenant"); setStep("tenant_info"); }}
-              className="w-full text-left p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
-            >
+            {/* Phone status — already confirmed at signup */}
+            <div className="w-full text-left p-4 rounded-2xl border-2 border-border bg-card card-shadow">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
                   <Phone className="w-6 h-6 text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-base font-bold">Tenant</h3>
-                  <p className="text-xs text-muted-foreground">Phone ownership verification</p>
+                  <h3 className="text-base font-bold">Phone confirmed</h3>
+                  <p className="text-xs text-muted-foreground">Done when you signed up — nothing more needed</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                <CheckCircle2 className="w-5 h-5 text-blue-600" />
               </div>
-              <div className="space-y-1.5 ml-15">
-                {["Phone number verified via OTP", "Confirms you control the number", "Does not verify your legal name"].map((f) => (
-                  <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3 h-3 text-blue-600 shrink-0" />
-                    <span>{f}</span>
-                  </div>
-                ))}
-              </div>
-              <div className={`inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 rounded-full ${categoryBadgeConfig.tenant.bgColor} border ${categoryBadgeConfig.tenant.borderColor}`}>
-                <Phone className="w-3 h-3 text-blue-600" />
-                <span className={`text-[10px] font-semibold ${categoryBadgeConfig.tenant.color}`}>{categoryBadgeConfig.tenant.label}</span>
-              </div>
-            </button>
+              <p className="text-[11px] text-muted-foreground">
+                This confirms you control your number. To get a verified identity badge, complete ID verification below.
+              </p>
+            </div>
+
 
             {/* Individual */}
             <button
@@ -304,122 +277,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </div>
         )}
 
-        {/* Tenant Flow: Name + Phone Input */}
-        {step === "tenant_info" && (
-          <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-bold mb-1">Your Details</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              We’ll send a code to confirm that you control this phone number. This check does not verify your legal name.
-            </p>
 
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">First Name</label>
-                <input
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="e.g. John"
-                  className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Last Name</label>
-                <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="e.g. Kamau"
-                  className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Phone Number</label>
-                <div className="flex items-center gap-2">
-                  <div className="px-3 py-3.5 rounded-xl bg-secondary text-sm font-bold text-muted-foreground">+254</div>
-                  <input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, "").slice(0, 9))}
-                    placeholder="7XX XXX XXX"
-                    className="flex-1 px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-              </div>
-            </div>
 
-            <div className="p-3 rounded-xl bg-blue-50 border border-blue-200">
-              <div className="flex items-start gap-2">
-                <Smartphone className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-muted-foreground">
-                  Your entered name remains unverified until you complete ID verification.
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => { handleSendOtp(); setStep("tenant_otp"); }}
-              disabled={!firstName.trim() || !lastName.trim() || phoneNumber.length !== 9}
-              className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
-            >
-              Send OTP to verify
-            </button>
-
-            <button onClick={() => setStep("type_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
-              ← Back
-            </button>
-          </div>
-        )}
-
-        {/* Tenant Flow: OTP Verification */}
-        {step === "tenant_otp" && (
-          <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-bold mb-1">Verify OTP</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Enter the 6-digit code sent to +254{phoneNumber}
-            </p>
-
-            <div className="flex justify-center gap-2">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-11 h-14 rounded-xl border-2 flex items-center justify-center text-lg font-bold transition-colors ${
-                    otp[i] ? "border-primary bg-primary/5" : "border-border bg-card"
-                  }`}
-                >
-                  {otp[i] || ""}
-                </div>
-              ))}
-            </div>
-
-            <input
-              type="tel"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="w-full text-center py-3 rounded-xl bg-card border-2 border-border text-lg font-mono tracking-[0.5em] focus:outline-none focus:border-primary"
-              placeholder="______"
-              autoFocus
-            />
-
-            <div className="text-center">
-              <button onClick={handleSendOtp} className="text-xs font-semibold text-primary">
-                Resend OTP
-              </button>
-            </div>
-
-            <button
-              onClick={handleVerifyOtp}
-              disabled={otp.length !== 6}
-              className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
-            >
-              Verify & Submit
-            </button>
-
-            <button onClick={() => setStep("tenant_info")} className="w-full py-2 text-sm font-medium text-muted-foreground">
-              ← Back
-            </button>
-          </div>
-        )}
 
         {/* Document Selection (Individual & Business) */}
         {step === "doc_select" && (
@@ -814,21 +673,15 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               onClick={result === "success" || result === "pending"
                 ? () => onClose(result === "success")
                 : () => {
-                    if (verificationCategory === "tenant") {
-                      setStep("tenant_info");
-                      setOtp("");
-                      setOtpSent(false);
-                      setOtpVerified(false);
-                    } else {
-                      setStep("id_upload");
-                      setIdFrontUploaded(false);
-                      setIdBackUploaded(false);
-                      setIdFrontFile(null);
-                      setIdBackFile(null);
-                      setSelfieFile(null);
-                      setSelfieCapture("none");
-                    }
+                    setStep("id_upload");
+                    setIdFrontUploaded(false);
+                    setIdBackUploaded(false);
+                    setIdFrontFile(null);
+                    setIdBackFile(null);
+                    setSelfieFile(null);
+                    setSelfieCapture("none");
                   }}
+
               className="w-full max-w-xs py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all mt-4"
             >
               {result === "success" ? "Done" : result === "pending" ? "Close" : "Try Again"}
