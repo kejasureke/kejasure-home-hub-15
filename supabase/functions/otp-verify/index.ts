@@ -52,6 +52,44 @@ const derivePassword = async (phone: string) => {
 // so the password grant must run against a deterministic internal email identity.
 const emailForPhone = (phone: string) => `${phone.replace(/^\+/, "")}@phone.kejasure.app`;
 
+const adminHeaders = {
+  Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+  apikey: SERVICE_ROLE_KEY,
+};
+
+// Finds an existing auth user by phone or the derived internal email.
+// Uses GoTrue's server-side filter first, then falls back to paging so
+// accounts beyond the first page are still matched.
+const findAuthUser = async (phone: string, email: string) => {
+  const bare = phone.replace(/^\+/, "");
+  const matches = (u: any) =>
+    u?.phone === bare || u?.phone === phone || u?.email === email;
+
+  for (const term of [email, bare]) {
+    const res = await fetch(
+      `${SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=50&filter=${encodeURIComponent(term)}`,
+      { headers: adminHeaders },
+    );
+    const payload = await res.json().catch(() => null);
+    const hit = payload?.users?.find(matches);
+    if (hit) return hit;
+  }
+
+  const PER_PAGE = 200;
+  for (let page = 1; page <= 50; page++) {
+    const res = await fetch(
+      `${SUPABASE_URL}/auth/v1/admin/users?page=${page}&per_page=${PER_PAGE}`,
+      { headers: adminHeaders },
+    );
+    const payload = await res.json().catch(() => null);
+    const users = payload?.users ?? [];
+    const hit = users.find(matches);
+    if (hit) return hit;
+    if (users.length < PER_PAGE) break;
+  }
+  return null;
+};
+
 const ensureAuthUser = async (phone: string) => {
   const password = await derivePassword(phone);
   const email = emailForPhone(phone);
@@ -82,20 +120,7 @@ const ensureAuthUser = async (phone: string) => {
   if (duplicate) {
     // Existing accounts (incl. phone-only ones created earlier) need the email
     // identity + password synced, otherwise the grant below fails.
-    const list = await fetch(
-      `${SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=50`,
-      {
-        headers: {
-          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
-          apikey: SERVICE_ROLE_KEY,
-        },
-      },
-    );
-    const listPayload = await list.json().catch(() => null);
-    const bare = phone.replace(/^\+/, "");
-    const existing = listPayload?.users?.find(
-      (u: any) => u.phone === bare || u.phone === phone || u.email === email,
-    );
+    const existing = await findAuthUser(phone, email);
     if (existing?.id) {
       await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${existing.id}`, {
         method: "PUT",
