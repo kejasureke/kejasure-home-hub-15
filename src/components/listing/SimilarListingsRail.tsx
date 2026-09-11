@@ -1,6 +1,8 @@
 import { ShieldCheck, MapPin } from "lucide-react";
+import BlurImage from "@/components/BlurImage";
 import type { Property } from "@/data/mockData";
 import { properties } from "@/data/mockData";
+
 
 interface SimilarListingsRailProps {
   current: Property;
@@ -40,12 +42,13 @@ const SimilarListingsRail = ({ current, onSelect }: SimilarListingsRailProps) =>
             className="shrink-0 w-44 text-left rounded-2xl bg-card border border-border overflow-hidden card-shadow active:scale-[0.97] transition-transform"
           >
             <div className="relative aspect-[4/3] bg-muted">
-              <img
+              <BlurImage
                 src={p.images[0]}
                 alt={p.title}
-                loading="lazy"
+                wrapperClassName="absolute inset-0"
                 className="w-full h-full object-cover"
               />
+
               <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-sm">
                 <span className="text-[10px] font-bold text-foreground">
                   KES {fmt(p.price)}

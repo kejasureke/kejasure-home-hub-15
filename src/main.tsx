@@ -34,5 +34,11 @@ if (isDespia()) {
     // best effort
   }
 }
+// Block save-image context menu / long-press menu on any photo in the app.
+document.addEventListener("contextmenu", (e) => {
+  const target = e.target as HTMLElement | null;
+  if (target && (target.tagName === "IMG" || target.closest("img"))) e.preventDefault();
+});
 
 createRoot(document.getElementById("root")!).render(<App />);
+
