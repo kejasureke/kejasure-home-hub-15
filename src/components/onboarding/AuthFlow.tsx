@@ -123,6 +123,18 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
   const [otpTimer, setOtpTimer] = useState<number>(computeRemaining(initial.otpExpiresAt ?? null));
   const [lockoutExpiresAt, setLockoutExpiresAt] = useState<number | null>(null);
   const [lockoutTimer, setLockoutTimer] = useState<number>(0);
+  const [agreed, setAgreed] = useState(() => {
+    try { return localStorage.getItem("kejasure_terms_accepted") === "true"; } catch { return false; }
+  });
+  const [doc, setDoc] = useState<null | "terms" | "privacy">(null);
+
+  useEffect(() => {
+    try {
+      if (agreed) localStorage.setItem("kejasure_terms_accepted", "true");
+      else localStorage.removeItem("kejasure_terms_accepted");
+    } catch {}
+  }, [agreed]);
+
 
   // Persist on every relevant change
   useEffect(() => {
