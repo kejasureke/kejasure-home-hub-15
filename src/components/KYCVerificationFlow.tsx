@@ -736,9 +736,13 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-5 animate-[pulse_1s_ease-in-out_2]">
                   <CheckCircle2 className="w-10 h-10 text-primary" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground mb-2">Verified! ✓</h2>
+                <h2 className="text-xl font-bold text-foreground mb-2">
+                  {verificationCategory === "tenant" ? "Phone Verified! ✓" : "Identity Verified! ✓"}
+                </h2>
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
-                  Your identity has been verified successfully. You now have the trusted badge on your profile.
+                  {verificationCategory === "tenant"
+                    ? "You confirmed that you control this phone number. Your legal name remains unverified until you complete ID verification."
+                    : "Your identity has been verified successfully. You now have the trusted badge on your profile."}
                 </p>
                 {verificationCategory && (
                   <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 ${categoryBadgeConfig[verificationCategory].bgColor} border ${categoryBadgeConfig[verificationCategory].borderColor}`}>
