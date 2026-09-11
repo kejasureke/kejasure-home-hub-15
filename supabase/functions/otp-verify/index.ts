@@ -82,20 +82,7 @@ const ensureAuthUser = async (phone: string) => {
   if (duplicate) {
     // Existing accounts (incl. phone-only ones created earlier) need the email
     // identity + password synced, otherwise the grant below fails.
-    const list = await fetch(
-      `${SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=50`,
-      {
-        headers: {
-          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
-          apikey: SERVICE_ROLE_KEY,
-        },
-      },
-    );
-    const listPayload = await list.json().catch(() => null);
-    const bare = phone.replace(/^\+/, "");
-    const existing = listPayload?.users?.find(
-      (u: any) => u.phone === bare || u.phone === phone || u.email === email,
-    );
+    const existing = await findAuthUser(phone, email);
     if (existing?.id) {
       await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${existing.id}`, {
         method: "PUT",
