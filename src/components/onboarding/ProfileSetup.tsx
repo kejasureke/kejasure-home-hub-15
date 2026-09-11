@@ -21,7 +21,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
   const [preference, setPreference] = useState("");
 
   const countyOptions = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu", "Uasin Gishu", "Machakos", "Kajiado"];
-  const budgetOptions = ["Under 15K", "15K–30K", "30K–50K", "50K–100K", "100K+"];
+  const budgetOptions = ["Under 15K", "15K–30K", "30K–50K", "50K–100K", "100K+", "Not decided yet"];
   const bedroomOptions = ["Studio", "1 BR", "2 BR", "3 BR", "4+ BR"];
 
   const steps = [
