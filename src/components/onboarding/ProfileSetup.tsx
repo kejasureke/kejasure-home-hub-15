@@ -28,7 +28,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
     {
       icon: User,
       title: "What's your name?",
-      subtitle: "Used for phone verification via smile.id",
+      subtitle: "This is how your name appears in the app",
       content: (
         <div className="space-y-3">
           <div>
@@ -53,7 +53,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
             <p className="text-[11px] text-muted-foreground">
-              📱 Your name will be matched against your phone number's registered owner via smile.id verification.
+              Your SMS code verifies that you control the phone number. Your name is verified separately during identity verification.
             </p>
           </div>
         </div>
@@ -187,7 +187,7 @@ const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
     {
       icon: User,
       title: "What's your name?",
-      subtitle: "Used for phone verification via smile.id",
+      subtitle: "This is how your name appears in the app",
       content: (
         <div className="space-y-3">
           <div>
@@ -201,7 +201,7 @@ const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via smile.id verification.</p>
+            <p className="text-[11px] text-muted-foreground">Your SMS code verifies that you control the phone number. Your name is verified separately during identity verification.</p>
           </div>
         </div>
       ),
@@ -260,7 +260,7 @@ const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
     {
       icon: User,
       title: "What's your name?",
-      subtitle: "Used for phone verification via smile.id",
+      subtitle: "This is how your name appears in the app",
       content: (
         <div className="space-y-3">
           <div>
@@ -274,7 +274,7 @@ const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via smile.id verification.</p>
+            <p className="text-[11px] text-muted-foreground">Your SMS code verifies that you control the phone number. Your name is verified separately during identity verification.</p>
           </div>
         </div>
       ),
@@ -328,7 +328,7 @@ const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
     {
       icon: User,
       title: "What's your name?",
-      subtitle: "Used for phone verification via smile.id",
+      subtitle: "This is how your name appears in the app",
       content: (
         <div className="space-y-3">
           <div>
@@ -342,7 +342,7 @@ const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">📱 Your name will be matched against your phone number's registered owner via smile.id verification.</p>
+            <p className="text-[11px] text-muted-foreground">Your SMS code verifies that you control the phone number. Your name is verified separately during identity verification.</p>
           </div>
         </div>
       ),
