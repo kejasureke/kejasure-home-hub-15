@@ -279,15 +279,13 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
     if (verifying) return;
     setVerifying(true);
     try {
-      const { data, error } = await supabase.functions.invoke("otp-verify", {
-        body: { phone: toE164(phone), token: otp.join("") },
+      const { data, error, payload } = await callFunction("otp-verify", {
+        phone: toE164(phone),
+        token: otp.join(""),
       });
 
       if (error) {
-        let payload: any = null;
-        try {
-          payload = await (error as any).context?.response?.json?.();
-        } catch {}
+
         const retry = payload?.retryAfter;
         const remaining = payload?.remainingAttempts;
         if (retry) {
