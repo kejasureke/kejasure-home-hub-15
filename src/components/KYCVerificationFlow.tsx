@@ -126,7 +126,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
 
   const getProgressSteps = () => {
-    if (verificationCategory === "tenant") return ["Info", "Phone", "OTP", "Verify"];
     if (verificationCategory === "business") return ["Type", "Document", "Upload", "Selfie", "Verify"];
     return ["Type", "Document", "KRA", "Upload", "Selfie", "Verify"];
   };
@@ -134,8 +133,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const getCurrentProgress = () => {
     const stepMap: Record<Step, number> = {
       type_select: 0,
-      tenant_info: 0,
-      tenant_otp: 1,
       doc_select: 1,
       kra_upload: 2,
       id_upload: verificationCategory === "individual" ? 3 : 2,
@@ -145,6 +142,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
     };
     return stepMap[step] || 0;
   };
+
 
   const progressSteps = getProgressSteps();
   const currentProgress = getCurrentProgress();
@@ -560,13 +558,9 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             <div className="w-20 h-20 rounded-full gradient-trust flex items-center justify-center mb-5 animate-pulse">
               <Fingerprint className="w-10 h-10 text-primary-foreground" />
             </div>
-            <h2 className="text-xl font-bold mb-2">
-              {verificationCategory === "tenant" ? "Verifying Your Phone" : "Verifying Your Identity"}
-            </h2>
+            <h2 className="text-xl font-bold mb-2">Verifying Your Identity</h2>
             <p className="text-sm text-muted-foreground text-center mb-6 max-w-[260px]">
-              {verificationCategory === "tenant"
-                ? "Confirming that you control this phone number..."
-                : "Cross-referencing your document with your selfie. This usually takes a few seconds..."}
+              Cross-referencing your document with your selfie. This usually takes a few seconds...
             </p>
             <div className="flex items-center gap-2">
               {[0, 1, 2].map((i) => (
@@ -574,10 +568,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               ))}
             </div>
             <div className="mt-8 space-y-2 w-full max-w-xs">
-              {(verificationCategory === "tenant"
-                ? ["Checking your code", "Confirming phone ownership", "Adding phone verified status"]
-                : ["Document quality check", "Face matching", "Database verification"]
-              ).map((s, i) => (
+              {["Document quality check", "Face matching", "Database verification"].map((s, i) => (
+
                 <div key={s} className="flex items-center gap-2 text-xs text-muted-foreground animate-fade-in" style={{ animationDelay: `${i * 1.2}s` }}>
                   <Clock className="w-3 h-3 text-primary shrink-0 animate-spin" />
                   <span>{s}...</span>
@@ -595,17 +587,12 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-5 animate-[pulse_1s_ease-in-out_2]">
                   <CheckCircle2 className="w-10 h-10 text-primary" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground mb-2">
-                  {verificationCategory === "tenant" ? "Phone Verified! ✓" : "Identity Verified! ✓"}
-                </h2>
+                <h2 className="text-xl font-bold text-foreground mb-2">Identity Verified! ✓</h2>
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
-                  {verificationCategory === "tenant"
-                    ? "You confirmed that you control this phone number. Your legal name remains unverified until you complete ID verification."
-                    : "Your identity has been verified successfully. You now have the trusted badge on your profile."}
+                  Your identity has been verified successfully. You now have the trusted badge on your profile.
                 </p>
                 {verificationCategory && (
                   <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 ${categoryBadgeConfig[verificationCategory].bgColor} border ${categoryBadgeConfig[verificationCategory].borderColor}`}>
-                    {verificationCategory === "tenant" && <Phone className="w-4 h-4 text-blue-600" />}
                     {verificationCategory === "individual" && <ShieldCheck className="w-4 h-4 text-primary" />}
                     {verificationCategory === "business" && <Building2 className="w-4 h-4 text-amber-600" />}
                     <span className={`text-sm font-semibold ${categoryBadgeConfig[verificationCategory].color}`}>
@@ -614,10 +601,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                   </div>
                 )}
                 <div className="w-full max-w-xs space-y-2">
-                  {(verificationCategory === "tenant"
-                    ? ["Phone verified badge on profile", "Trusted tenant status", "Higher response rates"]
-                    : ["Trusted badge on profile", "Priority in search results", "Higher response rates", "Access to premium features"]
-                  ).map((b) => (
+                  {["Trusted badge on profile", "Priority in search results", "Higher response rates", "Access to premium features"].map((b) => (
+
                     <div key={b} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
                       <span>{b}</span>
@@ -651,15 +636,11 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <h2 className="text-xl font-bold text-foreground mb-2">Verification Failed</h2>
                 <p className="text-sm text-muted-foreground text-center mb-6 max-w-[280px]">
                   {failReason ??
-                    (verificationCategory === "tenant"
-                       ? "We couldn't verify this phone number. Check the number and code, then try again."
-                      : "We couldn't verify your identity. This could be due to poor image quality or a mismatch. Please try again.")}
+                    "We couldn't verify your identity. This could be due to poor image quality or a mismatch. Please try again."}
                 </p>
                 <div className="w-full max-w-xs space-y-2 mb-6">
-                  {(verificationCategory === "tenant"
-                    ? ["Check the phone number", "Request a fresh code", "Ensure the latest code was entered correctly"]
-                    : ["Check the ID number matches the document", "Ensure document is not expired", "Use better lighting", "Remove any obstructions from face"]
-                  ).map((t) => (
+                  {["Check the ID number matches the document", "Ensure document is not expired", "Use better lighting", "Remove any obstructions from face"].map((t) => (
+
                     <div key={t} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <AlertCircle className="w-3 h-3 text-destructive shrink-0" />
                       <span>{t}</span>
