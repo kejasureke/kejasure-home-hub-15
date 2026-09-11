@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartphone } from "lucide-react";
+import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartphone, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { haptic, requestBiometric } from "@/lib/despia";
@@ -287,7 +287,17 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
     }
   };
 
-  const handlePhoneSubmit = () => sendOtp(false);
+  const handlePhoneSubmit = () => {
+    if (mode === "signup" && !agreed) {
+      toast({
+        title: "Please accept the terms",
+        description: "Tick the box to agree to our Terms of Use and Privacy Policy.",
+      });
+      return;
+    }
+    void sendOtp(false);
+  };
+
 
   const handleOtpSubmit = async () => {
     if (verifying) return;
