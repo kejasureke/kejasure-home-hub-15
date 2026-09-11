@@ -234,16 +234,12 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
     if (sending) return;
     setSending(true);
     try {
-      const { data, error } = await supabase.functions.invoke("otp-send", {
-        body: { phone: toE164(phone) },
+      const { data, error, payload } = await callFunction("otp-send", {
+        phone: toE164(phone),
       });
 
-      // FunctionsHttpError exposes the response so we can read structured 429 payloads
       if (error) {
-        let payload: any = null;
-        try {
-          payload = await (error as any).context?.response?.json?.();
-        } catch {}
+
         const retry = payload?.retryAfter ?? parseRetryAfter(payload?.error ?? error.message);
         if (retry) {
           setOtpExpiresAt(Date.now() + retry * 1000);
