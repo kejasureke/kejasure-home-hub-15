@@ -84,23 +84,32 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
     {
       icon: Wallet,
       title: "What's your budget?",
-      subtitle: "Monthly rent range",
+      subtitle: "Monthly rent range — you can skip this",
       content: (
         <div className="space-y-2.5">
-          {budgetOptions.map((b) => (
-            <button
-              key={b}
-              onClick={() => setBudget(b)}
-              className={`w-full p-4 rounded-2xl text-left text-sm font-semibold transition-all ${
-                budget === b ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
-              }`}
-            >
-              KES {b}
-            </button>
-          ))}
+          {budgetOptions.map((b) => {
+            const isOpen = b === "Not decided yet";
+            return (
+              <button
+                key={b}
+                onClick={() => setBudget(budget === b ? "" : b)}
+                className={`w-full p-4 rounded-2xl text-left text-sm font-semibold transition-all ${
+                  budget === b ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
+                }`}
+              >
+                {isOpen ? "Not decided yet — show me everything" : `KES ${b}`}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setBudget("")}
+            className="w-full pt-1 text-center text-xs font-semibold text-muted-foreground active:text-foreground"
+          >
+            Skip for now
+          </button>
         </div>
       ),
-      valid: !!budget,
+      valid: true,
     },
     {
       icon: Bed,
