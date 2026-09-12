@@ -84,7 +84,7 @@ const BlurImage = ({
 
       {/* Transparent shield: stops long-press "save image" reaching the <img> */}
       {watermark && (
-        <div aria-hidden className="absolute inset-0" style={{ WebkitTouchCallout: "none" }} onContextMenu={(e) => e.preventDefault()} />
+        <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ WebkitTouchCallout: "none" }} />
       )}
     </div>
   );
