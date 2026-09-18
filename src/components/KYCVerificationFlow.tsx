@@ -14,7 +14,7 @@ interface KYCVerificationFlowProps {
 type VerificationCategory = "tenant" | "individual" | "business";
 type DocType = "national_id" | "passport" | "kra_pin";
 type BusinessDocType = "business_cert" | "kra_pin" | "cr12";
-type Step = "type_select" | "doc_select" | "kra_upload" | "id_upload" | "selfie" | "processing" | "result";
+type Step = "type_select" | "doc_select" | "kra_enter" | "id_upload" | "selfie" | "processing" | "result";
 type VerificationResult = "success" | "failed" | "pending";
 
 const categoryBadgeConfig: Record<VerificationCategory, { label: string; color: string; bgColor: string; borderColor: string }> = {
@@ -30,7 +30,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const [docType, setDocType] = useState<DocType | BusinessDocType | null>(null);
   const [idFrontUploaded, setIdFrontUploaded] = useState(false);
   const [idBackUploaded, setIdBackUploaded] = useState(false);
-  const [kraUploaded, setKraUploaded] = useState(false);
+  const [kraPinNumber, setKraPinNumber] = useState("");
   const [selfieCapture, setSelfieCapture] = useState<"none" | "capturing" | "done">("none");
   const [result, setResult] = useState<VerificationResult>("pending");
   const [failReason, setFailReason] = useState<string | null>(null);
@@ -39,7 +39,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const [selfieFile, setSelfieFile] = useState<File | null>(null);
   const [idFrontFile, setIdFrontFile] = useState<File | null>(null);
   const [idBackFile, setIdBackFile] = useState<File | null>(null);
-  const [kraFile, setKraFile] = useState<File | null>(null);
   const [idNumber, setIdNumber] = useState("");
 
   // Tenant-specific state
