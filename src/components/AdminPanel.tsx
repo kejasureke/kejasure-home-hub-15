@@ -57,7 +57,7 @@ const fraudReports = [
 const verificationQueue = [
   { name: "Mary Wanjiku", type: "Landlord", doc: "National ID", submitted: "1 hr ago", status: "pending" },
   { name: "KejaPrime Agency", type: "Agency", doc: "Business Certificate", submitted: "3 hrs ago", status: "pending" },
-  { name: "SwiftMovers KE", type: "Service Provider", doc: "KRA PIN", submitted: "5 hrs ago", status: "pending" },
+  { name: "SwiftMovers KE", type: "Service Provider", doc: "National ID", submitted: "5 hrs ago", status: "pending" },
   { name: "David Ochieng", type: "Stay Host", doc: "National ID", submitted: "Yesterday", status: "review" },
   { name: "Grace Builders", type: "Agency", doc: "Agency Logo", submitted: "Yesterday", status: "review" },
   { name: "NetConnect KE", type: "Service Provider", doc: "Portfolio", submitted: "2 days ago", status: "approved" },

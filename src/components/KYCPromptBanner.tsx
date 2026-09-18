@@ -14,14 +14,14 @@ const roleConfig: Record<KYCRole, { title: string; subtitle: string; badge: stri
     title: "Complete your verification",
     subtitle: "Verify your identity to unlock all landlord features and earn a trust badge",
     badge: "Landlord Verified",
-    docs: ["National ID", "KRA PIN", "Ownership proof"],
+    docs: ["National ID", "Selfie check", "Ownership proof"],
     icon: ShieldCheck,
   },
   agency: {
     title: "Verify your agency",
     subtitle: "Upload business documents to get your Business Verified badge",
     badge: "Business Verified",
-    docs: ["Business Certificate", "KRA PIN", "CR12 Form"],
+    docs: ["Business Certificate", "CR12 Form", "Director selfie"],
     icon: Building2,
   },
   stayhost: {

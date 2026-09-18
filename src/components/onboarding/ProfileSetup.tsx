@@ -395,14 +395,11 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
   const [step, setStep] = useState(0);
   const [type, setType] = useState("");
   const [category, setCategory] = useState("");
-  const [kraUploaded, setKraUploaded] = useState(false);
   const [serviceCounties, setServiceCounties] = useState<string[]>([]);
   const [plan, setPlan] = useState("");
 
   const categories = ["Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers", "Security", "Painters", "Fumigators"];
   const countyOpts = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu", "Uasin Gishu", "Machakos", "Kajiado"];
-
-  const isIndividual = type === "Individual";
 
   const baseSteps = [
     {
