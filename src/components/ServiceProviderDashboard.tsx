@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
+import ProviderReferences from "./ProviderReferences";
 
 const PORTFOLIO_STORAGE_KEY = "kejasure_provider_portfolio_v1";
 
@@ -560,6 +561,9 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
         {/* Portfolio Tab */}
         {tab === "portfolio" && (
           <div className="pb-8">
+            <div className="mb-4">
+              <ProviderReferences />
+            </div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold">Your Work</h3>
               <div className="flex items-center gap-3">

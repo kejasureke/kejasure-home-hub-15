@@ -9,7 +9,8 @@ interface VerificationBadgeProps {
   details?: {
     phone?: boolean;
     id?: boolean;
-    ownership?: boolean;
+    selfie?: boolean;
+    photos?: boolean;
     business?: boolean;
   };
 }
@@ -21,13 +22,15 @@ const VerificationBadge = ({ isVerified, variant = "light", details }: Verificat
     ? [
         { label: "Phone number verified", ok: details?.phone ?? true },
         { label: "Government ID verified", ok: details?.id ?? true },
-        { label: "Ownership document", ok: details?.ownership ?? true },
+        { label: "Selfie matched to ID", ok: details?.selfie ?? true },
+        { label: "Listing photos checked for reuse", ok: details?.photos ?? true },
         ...(details?.business !== undefined ? [{ label: "Business registration", ok: details.business }] : []),
       ]
     : [
         { label: "Phone number verified", ok: details?.phone ?? false },
         { label: "Government ID verified", ok: false },
-        { label: "Ownership document", ok: false },
+        { label: "Selfie matched to ID", ok: false },
+        { label: "Listing photos checked for reuse", ok: details?.photos ?? false },
       ];
 
   const onTap = (e: React.MouseEvent) => {
