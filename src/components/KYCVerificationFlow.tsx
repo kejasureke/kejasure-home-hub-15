@@ -315,105 +315,15 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </div>
         )}
 
-        {/* KRA PIN Entry (Individual — optional, text input) */}
-        {step === "kra_enter" && (
-          <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-bold mb-1">KRA PIN</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              {isIndividualServiceProvider
-                ? "Enter your KRA PIN for service provider verification."
-                : "Enter your KRA PIN for enhanced verification (optional)."}
-            </p>
-
-            <div>
-              <label className="text-xs font-semibold text-foreground mb-1.5 block">
-                KRA PIN Number
-              </label>
-              <input
-                value={kraPinNumber}
-                onChange={(e) => setKraPinNumber(e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase())}
-                inputMode="text"
-                placeholder="A001234567X"
-                maxLength={11}
-                className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium tracking-wide outline-none focus:border-primary"
-              />
-              <p className="text-[10px] text-muted-foreground mt-1.5">
-                Your 11-character KRA PIN as printed on your certificate. Leave blank to skip.
-              </p>
-            </div>
-
-            {isIndividualServiceProvider && (
-              <div className="p-3 rounded-xl bg-destructive/5 border border-destructive/15">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-muted-foreground">
-                    <span className="font-semibold text-destructive">Required:</span> KRA PIN is mandatory for individual service providers.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <button
-              onClick={() => setStep("id_upload")}
-              disabled={isIndividualServiceProvider && kraPinNumber.trim().length < 5}
-              className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
-            >
-              {kraPinNumber.trim() ? "Continue" : isIndividualServiceProvider ? "Enter KRA PIN to continue" : "Skip for now"}
-            </button>
-
-            {!isIndividualServiceProvider && !kraPinNumber.trim() && (
-              <button onClick={() => setStep("id_upload")} className="w-full py-2 text-sm font-medium text-muted-foreground">
-                Skip →
-              </button>
-            )}
-
-            <button onClick={() => setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
-              ← Back
-            </button>
-          </div>
-        )}
-
         {/* ID Upload */}
         {step === "id_upload" && (
           <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-bold mb-1">
-              {verificationCategory === "business" && docType === "kra_pin" ? "KRA PIN (Business)" : "Upload Your Document"}
-            </h2>
+            <h2 className="text-lg font-bold mb-1">Upload Your Document</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              {verificationCategory === "business" && docType === "kra_pin"
-                ? "Enter your business KRA PIN registration number."
-                : `Take a clear photo of your ${docType === "national_id" ? "National ID" : docType === "passport" ? "Passport" : docType === "business_cert" ? "Business Certificate" : docType === "cr12" ? "CR12 Form" : "document"}`}
+              {`Take a clear photo of your ${docType === "national_id" ? "National ID" : docType === "passport" ? "Passport" : docType === "business_cert" ? "Business Certificate" : docType === "cr12" ? "CR12 Form" : "document"}`}
             </p>
 
-            {/* KRA PIN text input for business */}
-            {verificationCategory === "business" && docType === "kra_pin" ? (
-              <div>
-                <label className="text-xs font-semibold text-foreground mb-1.5 block">
-                  Business KRA PIN Number
-                </label>
-                <input
-                  value={kraPinNumber}
-                  onChange={(e) => setKraPinNumber(e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase())}
-                  inputMode="text"
-                  placeholder="P001234567X"
-                  maxLength={11}
-                  className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium tracking-wide outline-none focus:border-primary"
-                />
-                <p className="text-[10px] text-muted-foreground mt-1.5">
-                  Your 11-character business KRA PIN as printed on your registration certificate.
-                </p>
-                <button
-                  onClick={() => setStep("selfie")}
-                  disabled={kraPinNumber.trim().length < 5}
-                  className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40 mt-4"
-                >
-                  Continue to Selfie
-                </button>
-                <button onClick={() => setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
-                  ← Back
-                </button>
-              </div>
-            ) : (
+            {false ? null : (
               <>
             {/* Front */}
             <div
