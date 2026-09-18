@@ -1,6 +1,8 @@
 import { ArrowLeft, Send, Paperclip, Phone, MoreVertical, Check, CheckCheck, ShieldCheck, Image, Camera, X, Smile, Mic } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
+import { scanMessage } from "@/lib/trust";
+import { ShieldAlert } from "lucide-react";
 
 interface ChatScreenProps {
   onBack: () => void;
@@ -65,6 +67,7 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>(conversationsByContact[contactName] || conversationsByContact["John Kamau"]);
   const [isTyping, setIsTyping] = useState(false);
+  const [safetyDismissed, setSafetyDismissed] = useState(false);
   const [showPhoneReveal, setShowPhoneReveal] = useState(false);
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
