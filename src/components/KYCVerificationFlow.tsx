@@ -133,7 +133,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
     const stepMap: Record<Step, number> = {
       type_select: 0,
       doc_select: 1,
-      kra_upload: 2,
+      kra_enter: 2,
       id_upload: verificationCategory === "individual" ? 3 : 2,
       selfie: verificationCategory === "individual" ? 4 : 3,
       processing: verificationCategory === "individual" ? 5 : 4,
