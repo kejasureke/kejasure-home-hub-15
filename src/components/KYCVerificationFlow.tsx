@@ -79,10 +79,10 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
         check,
         idType: docType === "passport"
           ? "PASSPORT"
-          : docType === "kra_pin" || docType === "business_cert" || docType === "cr12"
+          : docType === "business_cert" || docType === "cr12"
           ? "BUSINESS_REGISTRATION"
           : "NATIONAL_ID",
-        idNumber: (docType === "kra_pin" ? kraPinNumber : idNumber).trim() || undefined,
+        idNumber: idNumber.trim() || undefined,
         firstName: firstName.trim() || undefined,
         lastName: lastName.trim() || undefined,
         selfie: selfieFile,
