@@ -291,7 +291,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 onClick={() => {
                   setDocType(doc.type);
                   if (verificationCategory === "individual") {
-                    setStep("kra_upload");
+                    setStep("kra_enter");
                   } else {
                     setStep("id_upload");
                   }
