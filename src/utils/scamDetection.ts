@@ -69,7 +69,7 @@ export function getScamRiskScore(property: Property): ScamRiskResult {
     score += 20;
     flags.push("Pushes you to chat outside KejaSure");
   }
-  if (/\b(deposit|booking fee|paybill|till number|send\s*(cash|money)|mpesa|m-pesa)\b/i.test(text)) {
+  if (/\b(pay(ment)?\s*(the\s*)?(deposit|booking fee|reservation fee)|(deposit|booking fee|reservation fee)\s*(first|kwanza|before|to\s*(confirm|secure|book|reserve))|paybill\s*\d|till\s*(no\.?|number)?\s*\d|send\s*(the\s*)?(cash|money|ksh|kes|\d{3,})|lipa\s*na\s*m-?pesa)\b/i.test(text)) {
     score += 25;
     flags.push("Asks for money before a viewing");
   }
