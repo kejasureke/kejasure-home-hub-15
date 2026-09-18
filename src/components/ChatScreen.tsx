@@ -189,6 +189,18 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
     ? ["📅 Confirm Dates", "🔑 Check-in Info", "📍 Share Location", "⭐ Rate Stay"]
     : ["📅 Confirm Viewing", "📍 Share Location", "💰 Discuss Price", "✅ Accept Booking", "📸 Request Photos", "🔑 Move-in Date"];
 
+  const safetySignals = safetyDismissed
+    ? []
+    : Array.from(
+        new Map(
+          messages
+            .slice(-8)
+            .filter((m) => m.sender === "other" && m.text)
+            .flatMap((m) => scanMessage(m.text!))
+            .map((s) => [s.kind, s]),
+        ).values(),
+      );
+
   return (
     <div className="fixed inset-0 z-40 bg-background flex flex-col animate-slide-up">
       {/* Header */}
@@ -237,6 +249,29 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
         <div className="px-4 py-2 bg-primary/5 border-b border-primary/10 flex items-center gap-2">
           <span className="text-xs">🏠</span>
           <span className="text-xs font-medium text-foreground">Re: {propertyContext}</span>
+        </div>
+      )}
+
+      {/* Safety signal banner */}
+      {safetySignals.length > 0 && (
+        <div className="px-4 py-2.5 bg-destructive/10 border-b border-destructive/20 animate-fade-in">
+          <div className="flex items-start gap-2">
+            <ShieldAlert className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-[11px] font-bold text-destructive">Careful with this chat</p>
+              <ul className="mt-0.5 space-y-0.5">
+                {safetySignals.map((s) => (
+                  <li key={s.kind} className="text-[10px] text-muted-foreground">• {s.label}</li>
+                ))}
+              </ul>
+              <p className="text-[10px] text-muted-foreground mt-1">
+                KejaSure never handles rent or deposits. Keep chatting here and view the place before you agree to anything.
+              </p>
+            </div>
+            <button onClick={() => setSafetyDismissed(true)} className="p-1 text-muted-foreground shrink-0">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
 
