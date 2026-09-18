@@ -12,9 +12,9 @@ interface KYCVerificationFlowProps {
 }
 
 type VerificationCategory = "tenant" | "individual" | "business";
-type DocType = "national_id" | "passport" | "kra_pin";
-type BusinessDocType = "business_cert" | "kra_pin" | "cr12";
-type Step = "type_select" | "doc_select" | "kra_enter" | "id_upload" | "selfie" | "processing" | "result";
+type DocType = "national_id" | "passport";
+type BusinessDocType = "business_cert" | "cr12";
+type Step = "type_select" | "doc_select" | "id_upload" | "selfie" | "processing" | "result";
 type VerificationResult = "success" | "failed" | "pending";
 
 const categoryBadgeConfig: Record<VerificationCategory, { label: string; color: string; bgColor: string; borderColor: string }> = {
@@ -30,7 +30,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const [docType, setDocType] = useState<DocType | BusinessDocType | null>(null);
   const [idFrontUploaded, setIdFrontUploaded] = useState(false);
   const [idBackUploaded, setIdBackUploaded] = useState(false);
-  const [kraPinNumber, setKraPinNumber] = useState("");
   const [selfieCapture, setSelfieCapture] = useState<"none" | "capturing" | "done">("none");
   const [result, setResult] = useState<VerificationResult>("pending");
   const [failReason, setFailReason] = useState<string | null>(null);
@@ -55,7 +54,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
   const businessDocs = [
     { type: "business_cert" as BusinessDocType, label: "Business Certificate", desc: "Certificate of incorporation", icon: Building2 },
-    { type: "kra_pin" as BusinessDocType, label: "KRA PIN (Business)", desc: "Business tax registration number", icon: FileText },
     { type: "cr12" as BusinessDocType, label: "CR12 Form", desc: "Company directors form", icon: FileText },
   ];
 
@@ -80,10 +78,10 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
         check,
         idType: docType === "passport"
           ? "PASSPORT"
-          : docType === "kra_pin" || docType === "business_cert" || docType === "cr12"
+          : docType === "business_cert" || docType === "cr12"
           ? "BUSINESS_REGISTRATION"
           : "NATIONAL_ID",
-        idNumber: (docType === "kra_pin" ? kraPinNumber : idNumber).trim() || undefined,
+        idNumber: idNumber.trim() || undefined,
         firstName: firstName.trim() || undefined,
         lastName: lastName.trim() || undefined,
         selfie: selfieFile,
@@ -124,20 +122,16 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
 
 
-  const getProgressSteps = () => {
-    if (verificationCategory === "business") return ["Type", "Document", "Upload", "Selfie", "Verify"];
-    return ["Type", "Document", "KRA", "Upload", "Selfie", "Verify"];
-  };
+  const getProgressSteps = () => ["Type", "Document", "Upload", "Selfie", "Verify"];
 
   const getCurrentProgress = () => {
     const stepMap: Record<Step, number> = {
       type_select: 0,
       doc_select: 1,
-      kra_enter: 2,
-      id_upload: verificationCategory === "individual" ? 3 : 2,
-      selfie: verificationCategory === "individual" ? 4 : 3,
-      processing: verificationCategory === "individual" ? 5 : 4,
-      result: verificationCategory === "individual" ? 5 : 4,
+      id_upload: 2,
+      selfie: 3,
+      processing: 4,
+      result: 4,
     };
     return stepMap[step] || 0;
   };
@@ -145,9 +139,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
   const progressSteps = getProgressSteps();
   const currentProgress = getCurrentProgress();
-
-  // Determine if individual service provider (KRA mandatory)
-  const isIndividualServiceProvider = verificationCategory === "individual" && activeRole === "serviceprovider";
 
   return (
     <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
@@ -221,7 +212,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="space-y-1.5 ml-15">
-                {["National ID / Passport", "KRA PIN (optional)", "Selfie verification"].map((f) => (
+                {["National ID / Passport", "Selfie / liveness check", "Instant government-register match"].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
                     <span>{f}</span>
@@ -250,7 +241,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="space-y-1.5 ml-15">
-                {["Business Certificate", "KRA PIN (Business)", "CR12 / Directors form"].map((f) => (
+                {["Business Certificate", "CR12 / Directors form", "Director selfie check"].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <CheckCircle2 className="w-3 h-3 text-amber-600 shrink-0" />
                     <span>{f}</span>
@@ -290,11 +281,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 key={doc.type}
                 onClick={() => {
                   setDocType(doc.type);
-                  if (verificationCategory === "individual") {
-                    setStep("kra_enter");
-                  } else {
-                    setStep("id_upload");
-                  }
+                  setStep("id_upload");
                 }}
                 className="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
               >
@@ -315,106 +302,15 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </div>
         )}
 
-        {/* KRA PIN Entry (Individual — optional, text input) */}
-        {step === "kra_enter" && (
-          <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-bold mb-1">KRA PIN</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              {isIndividualServiceProvider
-                ? "Enter your KRA PIN for service provider verification."
-                : "Enter your KRA PIN for enhanced verification (optional)."}
-            </p>
-
-            <div>
-              <label className="text-xs font-semibold text-foreground mb-1.5 block">
-                KRA PIN Number
-              </label>
-              <input
-                value={kraPinNumber}
-                onChange={(e) => setKraPinNumber(e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase())}
-                inputMode="text"
-                placeholder="A001234567X"
-                maxLength={11}
-                className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium tracking-wide outline-none focus:border-primary"
-              />
-              <p className="text-[10px] text-muted-foreground mt-1.5">
-                Your 11-character KRA PIN as printed on your certificate. Leave blank to skip.
-              </p>
-            </div>
-
-            {isIndividualServiceProvider && (
-              <div className="p-3 rounded-xl bg-destructive/5 border border-destructive/15">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-muted-foreground">
-                    <span className="font-semibold text-destructive">Required:</span> KRA PIN is mandatory for individual service providers.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <button
-              onClick={() => setStep("id_upload")}
-              disabled={isIndividualServiceProvider && kraPinNumber.trim().length < 5}
-              className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
-            >
-              {kraPinNumber.trim() ? "Continue" : isIndividualServiceProvider ? "Enter KRA PIN to continue" : "Skip for now"}
-            </button>
-
-            {!isIndividualServiceProvider && !kraPinNumber.trim() && (
-              <button onClick={() => setStep("id_upload")} className="w-full py-2 text-sm font-medium text-muted-foreground">
-                Skip →
-              </button>
-            )}
-
-            <button onClick={() => setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
-              ← Back
-            </button>
-          </div>
-        )}
-
         {/* ID Upload */}
         {step === "id_upload" && (
           <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-bold mb-1">
-              {verificationCategory === "business" && docType === "kra_pin" ? "KRA PIN (Business)" : "Upload Your Document"}
-            </h2>
+            <h2 className="text-lg font-bold mb-1">Upload Your Document</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              {verificationCategory === "business" && docType === "kra_pin"
-                ? "Enter your business KRA PIN registration number."
-                : `Take a clear photo of your ${docType === "national_id" ? "National ID" : docType === "passport" ? "Passport" : docType === "business_cert" ? "Business Certificate" : docType === "cr12" ? "CR12 Form" : "document"}`}
+              {`Take a clear photo of your ${docType === "national_id" ? "National ID" : docType === "passport" ? "Passport" : docType === "business_cert" ? "Business Certificate" : docType === "cr12" ? "CR12 Form" : "document"}`}
             </p>
 
-            {/* KRA PIN text input for business */}
-            {verificationCategory === "business" && docType === "kra_pin" ? (
-              <div>
-                <label className="text-xs font-semibold text-foreground mb-1.5 block">
-                  Business KRA PIN Number
-                </label>
-                <input
-                  value={kraPinNumber}
-                  onChange={(e) => setKraPinNumber(e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase())}
-                  inputMode="text"
-                  placeholder="P001234567X"
-                  maxLength={11}
-                  className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium tracking-wide outline-none focus:border-primary"
-                />
-                <p className="text-[10px] text-muted-foreground mt-1.5">
-                  Your 11-character business KRA PIN as printed on your registration certificate.
-                </p>
-                <button
-                  onClick={() => setStep("selfie")}
-                  disabled={kraPinNumber.trim().length < 5}
-                  className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40 mt-4"
-                >
-                  Continue to Selfie
-                </button>
-                <button onClick={() => setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
-                  ← Back
-                </button>
-              </div>
-            ) : (
-              <>
+            <>
             {/* Front */}
             <div
               onClick={() => openCamera((f) => { haptic("success"); setIdFrontFile(f); setIdFrontUploaded(true); })}
@@ -503,11 +399,10 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               Continue to Selfie
             </button>
 
-            <button onClick={() => verificationCategory === "individual" ? setStep("kra_enter") : setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
+            <button onClick={() => setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
               ← Back
             </button>
             </>
-            )}
           </div>
         )}
 
