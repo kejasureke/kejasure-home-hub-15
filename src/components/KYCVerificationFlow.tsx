@@ -122,20 +122,16 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
 
 
-  const getProgressSteps = () => {
-    if (verificationCategory === "business") return ["Type", "Document", "Upload", "Selfie", "Verify"];
-    return ["Type", "Document", "KRA", "Upload", "Selfie", "Verify"];
-  };
+  const getProgressSteps = () => ["Type", "Document", "Upload", "Selfie", "Verify"];
 
   const getCurrentProgress = () => {
     const stepMap: Record<Step, number> = {
       type_select: 0,
       doc_select: 1,
-      kra_enter: 2,
-      id_upload: verificationCategory === "individual" ? 3 : 2,
-      selfie: verificationCategory === "individual" ? 4 : 3,
-      processing: verificationCategory === "individual" ? 5 : 4,
-      result: verificationCategory === "individual" ? 5 : 4,
+      id_upload: 2,
+      selfie: 3,
+      processing: 4,
+      result: 4,
     };
     return stepMap[step] || 0;
   };
@@ -143,9 +139,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
   const progressSteps = getProgressSteps();
   const currentProgress = getCurrentProgress();
-
-  // Determine if individual service provider (KRA mandatory)
-  const isIndividualServiceProvider = verificationCategory === "individual" && activeRole === "serviceprovider";
 
   return (
     <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
