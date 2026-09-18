@@ -212,7 +212,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="space-y-1.5 ml-15">
-                {["National ID / Passport", "KRA PIN (optional)", "Selfie verification"].map((f) => (
+                {["National ID / Passport", "Selfie / liveness check", "Instant government-register match"].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
                     <span>{f}</span>
@@ -241,7 +241,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="space-y-1.5 ml-15">
-                {["Business Certificate", "KRA PIN (Business)", "CR12 / Directors form"].map((f) => (
+                {["Business Certificate", "CR12 / Directors form", "Director selfie check"].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <CheckCircle2 className="w-3 h-3 text-amber-600 shrink-0" />
                     <span>{f}</span>
@@ -281,11 +281,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 key={doc.type}
                 onClick={() => {
                   setDocType(doc.type);
-                  if (verificationCategory === "individual") {
-                    setStep("kra_enter");
-                  } else {
-                    setStep("id_upload");
-                  }
+                  setStep("id_upload");
                 }}
                 className="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
               >
