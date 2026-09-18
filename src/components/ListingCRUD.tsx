@@ -6,7 +6,8 @@ import {
 import ListingPhotoIntegrity from "./ListingPhotoIntegrity";
 import { kenyaCounties } from "@/data/kenyaCounties";
 import { validateCaption } from "@/utils/captionSafety";
-import { openCamera, haptic } from "@/lib/despia";
+import { openCamera, haptic, getCurrentLocation } from "@/lib/despia";
+import { Crosshair, CheckCircle2 } from "lucide-react";
 import { fileToDataUrl } from "@/lib/imageIntegrity";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
@@ -176,6 +177,24 @@ const steps = ["Details", "Location", "Amenities", "Photos", "Boost"];
 
 const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [step, setStep] = useState(0);
+  const [gpsPin, setGpsPin] = useState<{ lat: number; lng: number; accuracy?: number } | null>(null);
+  const [gpsState, setGpsState] = useState<"idle" | "locating" | "error">("idle");
+  const [gpsError, setGpsError] = useState("");
+
+  const capturePin = async () => {
+    setGpsState("locating");
+    setGpsError("");
+    try {
+      const fix = await getCurrentLocation();
+      setGpsPin({ lat: fix.latitude, lng: fix.longitude, accuracy: fix.accuracy });
+      setGpsState("idle");
+      haptic("success");
+    } catch (e) {
+      setGpsError((e as Error).message || "Could not get your location");
+      setGpsState("error");
+    }
+  };
+
   const [form, setForm] = useState<ListingFormData>({
     ...defaultForm,
     type: type === "service" ? "rental" : type,
