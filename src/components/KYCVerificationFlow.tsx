@@ -55,7 +55,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
   const businessDocs = [
     { type: "business_cert" as BusinessDocType, label: "Business Certificate", desc: "Certificate of incorporation", icon: Building2 },
-    { type: "kra_pin" as BusinessDocType, label: "KRA PIN (Business)", desc: "Business tax certificate", icon: FileText },
+    { type: "kra_pin" as BusinessDocType, label: "KRA PIN (Business)", desc: "Business tax registration number", icon: FileText },
     { type: "cr12" as BusinessDocType, label: "CR12 Form", desc: "Company directors form", icon: FileText },
   ];
 
@@ -89,7 +89,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
         selfie: selfieFile,
         idPhoto: idFrontFile,
         idPhotoBack: idBackFile,
-        businessDocs: verificationCategory === "business" ? [idFrontFile, kraFile] : undefined,
+        businessDocs: verificationCategory === "business" ? [idFrontFile] : undefined,
       });
 
       let verdict = status;
@@ -221,7 +221,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="space-y-1.5 ml-15">
-                {["National ID / Passport", "KRA PIN Certificate", "Selfie verification"].map((f) => (
+                {["National ID / Passport", "KRA PIN (optional)", "Selfie verification"].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
                     <span>{f}</span>
