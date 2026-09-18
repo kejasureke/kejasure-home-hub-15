@@ -507,6 +507,9 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               ← Back
             </button>
           </div>
+            </>
+            )}
+          </div>
         )}
 
         {/* Selfie Capture */}
