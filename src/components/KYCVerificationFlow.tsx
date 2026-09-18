@@ -315,38 +315,31 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
           </div>
         )}
 
-        {/* KRA PIN Upload (Individual — mandatory for service providers) */}
-        {step === "kra_upload" && (
+        {/* KRA PIN Entry (Individual — optional, text input) */}
+        {step === "kra_enter" && (
           <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-bold mb-1">KRA PIN Certificate</h2>
+            <h2 className="text-lg font-bold mb-1">KRA PIN</h2>
             <p className="text-sm text-muted-foreground mb-4">
               {isIndividualServiceProvider
-                ? "KRA PIN is required for service provider verification."
-                : "Upload your KRA PIN certificate for enhanced verification."}
+                ? "Enter your KRA PIN for service provider verification."
+                : "Enter your KRA PIN for enhanced verification (optional)."}
             </p>
 
-            <div
-              onClick={() => openCamera((f) => { haptic("success"); setKraFile(f); setKraUploaded(true); })}
-
-              className={`p-6 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all active:scale-[0.98] ${
-                kraUploaded ? "border-primary bg-primary/5" : "border-border bg-card"
-              }`}
-            >
-              {kraUploaded ? (
-                <div className="flex flex-col items-center gap-2">
-                  <CheckCircle2 className="w-10 h-10 text-primary" />
-                  <p className="text-sm font-semibold text-primary">KRA PIN uploaded</p>
-                  <p className="text-xs text-muted-foreground">Tap to re-upload</p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center">
-                    <FileText className="w-7 h-7 text-muted-foreground" />
-                  </div>
-                  <p className="text-sm font-semibold">KRA PIN Certificate</p>
-                  <p className="text-xs text-muted-foreground">Tap to upload</p>
-                </div>
-              )}
+            <div>
+              <label className="text-xs font-semibold text-foreground mb-1.5 block">
+                KRA PIN Number
+              </label>
+              <input
+                value={kraPinNumber}
+                onChange={(e) => setKraPinNumber(e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase())}
+                inputMode="text"
+                placeholder="A001234567X"
+                maxLength={11}
+                className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium tracking-wide outline-none focus:border-primary"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1.5">
+                Your 11-character KRA PIN as printed on your certificate. Leave blank to skip.
+              </p>
             </div>
 
             {isIndividualServiceProvider && (
@@ -362,13 +355,13 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
             <button
               onClick={() => setStep("id_upload")}
-              disabled={isIndividualServiceProvider && !kraUploaded}
+              disabled={isIndividualServiceProvider && kraPinNumber.trim().length < 5}
               className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40"
             >
-              {kraUploaded ? "Continue" : isIndividualServiceProvider ? "Upload KRA PIN to continue" : "Skip for now"}
+              {kraPinNumber.trim() ? "Continue" : isIndividualServiceProvider ? "Enter KRA PIN to continue" : "Skip for now"}
             </button>
 
-            {!isIndividualServiceProvider && !kraUploaded && (
+            {!isIndividualServiceProvider && !kraPinNumber.trim() && (
               <button onClick={() => setStep("id_upload")} className="w-full py-2 text-sm font-medium text-muted-foreground">
                 Skip →
               </button>
