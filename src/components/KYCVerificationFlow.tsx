@@ -55,7 +55,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
 
   const businessDocs = [
     { type: "business_cert" as BusinessDocType, label: "Business Certificate", desc: "Certificate of incorporation", icon: Building2 },
-    { type: "kra_pin" as BusinessDocType, label: "KRA PIN (Business)", desc: "Business tax registration number", icon: FileText },
     { type: "cr12" as BusinessDocType, label: "CR12 Form", desc: "Company directors form", icon: FileText },
   ];
 
