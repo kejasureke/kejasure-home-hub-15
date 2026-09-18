@@ -922,6 +922,36 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                 </div>
               </div>
             )}
+
+            {/* GPS pin — confirm you're at the property */}
+            <div className={`p-4 rounded-2xl border-2 ${gpsPin ? "border-trust/30 bg-trust/5" : "border-dashed border-border bg-card"}`}>
+              <div className="flex items-start gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${gpsPin ? "bg-trust/15" : "bg-secondary"}`}>
+                  {gpsPin ? <CheckCircle2 className="w-5 h-5 text-trust" /> : <Crosshair className="w-5 h-5 text-muted-foreground" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold">Drop a pin at the property</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {gpsPin
+                      ? `Pin saved${gpsPin.accuracy ? ` · accurate to about ${Math.round(gpsPin.accuracy)}m` : ""}. Listings with a pin get a location-confirmed badge.`
+                      : "Stand at the property and tap below. This confirms the place really exists where you say it does."}
+                  </p>
+                  {gpsPin && (
+                    <p className="text-[10px] text-muted-foreground mt-1 font-mono">
+                      {gpsPin.lat.toFixed(5)}, {gpsPin.lng.toFixed(5)}
+                    </p>
+                  )}
+                  {gpsState === "error" && <p className="text-[10px] text-destructive mt-1">{gpsError}</p>}
+                  <button
+                    onClick={capturePin}
+                    disabled={gpsState === "locating"}
+                    className="mt-2.5 px-3.5 py-2 rounded-xl bg-primary text-[11px] font-bold text-primary-foreground disabled:opacity-50 active:scale-95 transition-transform"
+                  >
+                    {gpsState === "locating" ? "Locating…" : gpsPin ? "Update pin" : "Use my current location"}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
