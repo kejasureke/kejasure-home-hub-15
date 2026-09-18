@@ -415,8 +415,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             <button onClick={() => setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
               ← Back
             </button>
-            </>
-            )}
+            />
           </div>
         )}
 
