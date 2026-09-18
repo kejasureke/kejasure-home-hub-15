@@ -75,7 +75,12 @@ export interface BehaviourSignal {
 }
 
 const PATTERNS: { kind: BehaviourSignal["kind"]; label: string; re: RegExp }[] = [
-  { kind: "payment_request", label: "Asking for money before a viewing", re: /\b(deposit|booking fee|send\s*(me)?\s*(cash|money)|paybill|till\s*(no|number)?|mpesa|m-pesa|pesa\s*kwanza|lipa)\b/i },
+  {
+    kind: "payment_request",
+    label: "Asking for money before a viewing",
+    // Only flag an actual demand for money, not ordinary talk about a deposit.
+    re: /\b(pay(ment)?\s*(the\s*)?(deposit|booking fee|reservation fee)|(deposit|booking fee|reservation fee)\s*(first|kwanza|before|to\s*(confirm|secure|book|reserve))|send\s*(me\s*)?(the\s*)?(cash|money|ksh|kes|\d{3,})|paybill\s*\d|till\s*(no\.?|number)?\s*\d|lipa\s*na\s*m-?pesa|pesa\s*kwanza|m-?pesa\s*(me|the|\d))\b/i,
+  },
   { kind: "contact_share", label: "Sharing a phone number in chat", re: /(\+?254|\b0)\s?7\d{2}\s?\d{3}\s?\d{3}\b/ },
   { kind: "off_platform", label: "Moving the chat off KejaSure", re: /\b(whats\s?app|whtsapp|telegram|facebook|instagram|dm me|inbox me|call me on)\b/i },
   { kind: "spam", label: "Repeated promotional text", re: /(.)\1{9,}|(http|www\.)\S{6,}/i },
