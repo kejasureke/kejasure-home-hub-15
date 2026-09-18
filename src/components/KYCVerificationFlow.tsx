@@ -12,9 +12,9 @@ interface KYCVerificationFlowProps {
 }
 
 type VerificationCategory = "tenant" | "individual" | "business";
-type DocType = "national_id" | "passport" | "kra_pin";
-type BusinessDocType = "business_cert" | "kra_pin" | "cr12";
-type Step = "type_select" | "doc_select" | "kra_enter" | "id_upload" | "selfie" | "processing" | "result";
+type DocType = "national_id" | "passport";
+type BusinessDocType = "business_cert" | "cr12";
+type Step = "type_select" | "doc_select" | "id_upload" | "selfie" | "processing" | "result";
 type VerificationResult = "success" | "failed" | "pending";
 
 const categoryBadgeConfig: Record<VerificationCategory, { label: string; color: string; bgColor: string; borderColor: string }> = {
