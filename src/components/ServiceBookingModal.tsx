@@ -443,6 +443,9 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                       Chat
                     </button>
                   </div>
+                  <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
+                    Keep the job in KejaSure — only in-app bookings count towards reviews and the provider's trust level. Never pay before the work is agreed in person.
+                  </p>
                 </div>
               </div>
 

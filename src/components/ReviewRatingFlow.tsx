@@ -195,6 +195,13 @@ const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "la
                   <p className="text-xs text-muted-foreground">{listingTitle}</p>
                 </div>
 
+                <div className="p-3 rounded-2xl bg-primary/5 border border-primary/15 flex items-start gap-2">
+                  <ShieldCheck className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Only bookings made inside KejaSure count towards ratings and verified badges. Deals done off-app stay unverified.
+                  </p>
+                </div>
+
                 {/* Star Rating */}
                 <div className="flex flex-col items-center gap-2">
                   <div className="flex gap-2">
