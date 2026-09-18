@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { scanMessage } from "@/lib/trust";
 import { ShieldAlert } from "lucide-react";
+import { haptic } from "@/lib/despia";
 
 interface ChatScreenProps {
   onBack: () => void;
