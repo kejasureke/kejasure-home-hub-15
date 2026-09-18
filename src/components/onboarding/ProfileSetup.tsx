@@ -545,9 +545,7 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
     },
   ];
 
-  const steps = isIndividual
-    ? [...baseSteps, kraStep, ...remainingSteps]
-    : [...baseSteps, ...remainingSteps];
+  const steps = [...baseSteps, ...remainingSteps];
 
   const handleComplete = async () => {
     try {
