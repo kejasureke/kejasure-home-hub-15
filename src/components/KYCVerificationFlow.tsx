@@ -323,8 +323,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               {`Take a clear photo of your ${docType === "national_id" ? "National ID" : docType === "passport" ? "Passport" : docType === "business_cert" ? "Business Certificate" : docType === "cr12" ? "CR12 Form" : "document"}`}
             </p>
 
-            {false ? null : (
-              <>
+            <>
             {/* Front */}
             <div
               onClick={() => openCamera((f) => { haptic("success"); setIdFrontFile(f); setIdFrontUploaded(true); })}
