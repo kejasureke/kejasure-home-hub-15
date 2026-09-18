@@ -62,6 +62,27 @@ export function getScamRiskScore(property: Property): ScamRiskResult {
     }
   }
 
+  // Behaviour signals — how the listing was written and posted
+  const text = `${property.title} ${property.description ?? ""}`;
+
+  if (/\b(whats\s?app|telegram|call me on|inbox me|dm me)\b/i.test(text)) {
+    score += 20;
+    flags.push("Pushes you to chat outside KejaSure");
+  }
+  if (/\b(deposit|booking fee|paybill|till number|send\s*(cash|money)|mpesa|m-pesa)\b/i.test(text)) {
+    score += 25;
+    flags.push("Asks for money before a viewing");
+  }
+  if (/(\+?254|\b0)\s?7\d{2}\s?\d{3}\s?\d{3}\b/.test(text)) {
+    score += 10;
+    flags.push("Phone number hidden inside the listing text");
+  }
+  if (/[A-Z]{12,}|!{3,}/.test(text)) {
+    score += 5;
+    flags.push("Spam-style wording");
+  }
+
+
   // Cap at 100
   score = Math.min(score, 100);
 
