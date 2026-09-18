@@ -376,11 +376,45 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
         {/* ID Upload */}
         {step === "id_upload" && (
           <div className="space-y-4 animate-fade-in">
-            <h2 className="text-lg font-bold mb-1">Upload Your Document</h2>
+            <h2 className="text-lg font-bold mb-1">
+              {verificationCategory === "business" && docType === "kra_pin" ? "KRA PIN (Business)" : "Upload Your Document"}
+            </h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Take a clear photo of your {docType === "national_id" ? "National ID" : docType === "passport" ? "Passport" : docType === "business_cert" ? "Business Certificate" : docType === "cr12" ? "CR12 Form" : "KRA PIN Certificate"}
+              {verificationCategory === "business" && docType === "kra_pin"
+                ? "Enter your business KRA PIN registration number."
+                : `Take a clear photo of your ${docType === "national_id" ? "National ID" : docType === "passport" ? "Passport" : docType === "business_cert" ? "Business Certificate" : docType === "cr12" ? "CR12 Form" : "document"}`}
             </p>
 
+            {/* KRA PIN text input for business */}
+            {verificationCategory === "business" && docType === "kra_pin" ? (
+              <div>
+                <label className="text-xs font-semibold text-foreground mb-1.5 block">
+                  Business KRA PIN Number
+                </label>
+                <input
+                  value={kraPinNumber}
+                  onChange={(e) => setKraPinNumber(e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase())}
+                  inputMode="text"
+                  placeholder="P001234567X"
+                  maxLength={11}
+                  className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm font-medium tracking-wide outline-none focus:border-primary"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1.5">
+                  Your 11-character business KRA PIN as printed on your registration certificate.
+                </p>
+                <button
+                  onClick={() => setStep("selfie")}
+                  disabled={kraPinNumber.trim().length < 5}
+                  className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-all disabled:opacity-40 mt-4"
+                >
+                  Continue to Selfie
+                </button>
+                <button onClick={() => setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
+                  ← Back
+                </button>
+              </div>
+            ) : (
+              <>
             {/* Front */}
             <div
               onClick={() => openCamera((f) => { haptic("success"); setIdFrontFile(f); setIdFrontUploaded(true); })}
@@ -469,7 +503,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               Continue to Selfie
             </button>
 
-            <button onClick={() => verificationCategory === "individual" ? setStep("kra_upload") : setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
+            <button onClick={() => verificationCategory === "individual" ? setStep("kra_enter") : setStep("doc_select")} className="w-full py-2 text-sm font-medium text-muted-foreground">
               ← Back
             </button>
           </div>
