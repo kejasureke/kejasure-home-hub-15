@@ -30,7 +30,6 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
   const [docType, setDocType] = useState<DocType | BusinessDocType | null>(null);
   const [idFrontUploaded, setIdFrontUploaded] = useState(false);
   const [idBackUploaded, setIdBackUploaded] = useState(false);
-  const [kraPinNumber, setKraPinNumber] = useState("");
   const [selfieCapture, setSelfieCapture] = useState<"none" | "capturing" | "done">("none");
   const [result, setResult] = useState<VerificationResult>("pending");
   const [failReason, setFailReason] = useState<string | null>(null);
