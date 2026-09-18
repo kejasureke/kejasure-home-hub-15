@@ -19,6 +19,8 @@ import ReviewRatingFlow from "./ReviewRatingFlow";
 import SubscriptionPlans from "./SubscriptionPlans";
 import NeighborhoodSafety from "./NeighborhoodSafety";
 import BoostListingFlow from "./BoostListingFlow";
+import TrustLadder from "./TrustLadder";
+import ReVerifyBanner from "./ReVerifyBanner";
 
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -199,7 +201,13 @@ const ProfileScreen = () => {
         </button>
       </div>
 
+      {/* Liveness re-check reminder */}
+      <ReVerifyBanner role={role} onVerify={() => setShowKYC(true)} />
 
+      {/* Trust ladder */}
+      <div className="mb-4">
+        <TrustLadder role={role} onVerify={() => setShowKYC(true)} />
+      </div>
 
       {/* Role Mode Switcher */}
       <div className="mb-4 p-4 rounded-2xl bg-card card-shadow">

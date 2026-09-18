@@ -4,6 +4,7 @@ import { useOverlayClose } from "@/hooks/useOverlayClose";
 import AIPhotoVerification from "./AIPhotoVerification";
 import { openCamera, haptic } from "@/lib/despia";
 import { submitSmileIdJob, waitForVerdict } from "@/lib/kyc/smileid";
+import { markLivenessChecked } from "@/lib/trust";
 
 
 interface KYCVerificationFlowProps {
@@ -62,6 +63,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
     localStorage.setItem(`kejasure_kyc_status_${activeRole}`, "verified");
     localStorage.setItem(`kejasure_kyc_category_${activeRole}`, verificationCategory);
     localStorage.setItem("kejasure_kyc_status", "verified");
+    markLivenessChecked(activeRole);
   };
 
   const handleProcessing = async () => {
