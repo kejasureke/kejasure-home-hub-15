@@ -235,12 +235,23 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
 
       {/* Phone revealed banner */}
       {phoneRevealed && (
-        <div className="px-4 py-2 bg-trust/10 border-b border-trust/20 flex items-center justify-between animate-fade-in">
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-trust" />
-            <span className="text-xs font-medium text-trust">+254 712 345 678</span>
+        <div className="bg-trust/10 border-b border-trust/20 animate-fade-in">
+          <div className="px-4 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-trust" />
+              <span className="text-xs font-medium text-trust">+254 712 345 678</span>
+            </div>
+            <a
+              href="tel:+254712345678"
+              onClick={() => haptic("light")}
+              className="px-3 py-1.5 rounded-full bg-trust text-[11px] font-bold text-primary-foreground active:scale-95 transition-transform"
+            >
+              Call
+            </a>
           </div>
-          <a href="tel:+254712345678" className="text-xs font-semibold text-trust">Call</a>
+          <p className="px-4 pb-2 text-[10px] text-muted-foreground">
+            Keep booking updates in KejaSure — only in-app connections count towards reviews and trust.
+          </p>
         </div>
       )}
 
@@ -446,9 +457,21 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
               <h3 className="text-lg font-bold">Reveal Phone Number</h3>
               <p className="text-xs text-muted-foreground mt-1">Contact {contactName} directly</p>
             </div>
-            <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20 mb-5">
+            <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20 mb-3">
               <p className="text-xs text-muted-foreground text-center">
                 Phone numbers are revealed after booking confirmation or premium unlock. This ensures trust and reduces spam for both parties.
+              </p>
+            </div>
+            <div className="p-4 rounded-2xl bg-destructive/5 border border-destructive/20 mb-5 space-y-1.5">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-destructive" />
+                <p className="text-xs font-bold text-foreground">Before you share your number</p>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Keep the conversation here. KejaSure never handles rent or deposits, and only in-app bookings count towards reviews, ratings and your trust level.
+              </p>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Never send money before viewing the place in person.
               </p>
             </div>
             <div className="space-y-2">
