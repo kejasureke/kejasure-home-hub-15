@@ -1,17 +1,37 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import BottomNav from "@/components/BottomNav";
 import HomeFeed from "@/components/HomeFeed";
-import ChatScreen from "@/components/ChatScreen";
 import ChatList from "@/components/ChatList";
 import type { ChatContact } from "@/components/ChatList";
-import ProfileScreen from "@/components/ProfileScreen";
 import NotificationToast from "@/components/NotificationToast";
-import DashboardScreen from "@/components/DashboardScreen";
-import StayHostDashboard from "@/components/StayHostDashboard";
-import AgencyDashboard from "@/components/AgencyDashboard";
-import ServiceProviderDashboard from "@/components/ServiceProviderDashboard";
-import ExploreScreen from "@/components/ExploreScreen";
-import ListingDetail from "@/components/ListingDetail";
+import { PropertyCardSkeleton } from "@/components/Skeleton";
+
+// Heavy screens load on demand, then get prefetched while the phone is idle.
+const loaders = {
+  chat: () => import("@/components/ChatScreen"),
+  profile: () => import("@/components/ProfileScreen"),
+  landlord: () => import("@/components/DashboardScreen"),
+  stayhost: () => import("@/components/StayHostDashboard"),
+  agency: () => import("@/components/AgencyDashboard"),
+  service: () => import("@/components/ServiceProviderDashboard"),
+  explore: () => import("@/components/ExploreScreen"),
+  detail: () => import("@/components/ListingDetail"),
+};
+const ChatScreen = lazy(loaders.chat);
+const ProfileScreen = lazy(loaders.profile);
+const DashboardScreen = lazy(loaders.landlord);
+const StayHostDashboard = lazy(loaders.stayhost);
+const AgencyDashboard = lazy(loaders.agency);
+const ServiceProviderDashboard = lazy(loaders.service);
+const ExploreScreen = lazy(loaders.explore);
+const ListingDetail = lazy(loaders.detail);
+
+const ScreenFallback = () => (
+  <div className="px-4 pt-6 pb-32 space-y-4">
+    <PropertyCardSkeleton />
+    <PropertyCardSkeleton />
+  </div>
+);
 import type { Property } from "@/data/mockData";
 import { Heart } from "lucide-react";
 import EmptyIllustration from "@/components/EmptyIllustration";
@@ -90,33 +110,67 @@ const Index = () => {
     setAppBadgeCount(chatBadge + profileBadge);
   }, [chatBadge, profileBadge]);
 
+  // Prefetch heavy screens once the phone is idle so taps feel instant.
+  useEffect(() => {
+    const run = () => Object.values(loaders).forEach((l) => l().catch(() => {}));
+    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(run);
+    else setTimeout(run, 1500);
+  }, []);
+
+  // Scroll restoration: remember where you were on each tab.
+  const scrollPos = useRef<Record<string, number>>({});
+  const changeTab = (tab: string) => {
+    scrollPos.current[activeTab] = window.scrollY;
+    setActiveTab(tab);
+  };
+  const overlayOpen = !!selectedProperty || showChat;
+  useEffect(() => {
+    if (overlayOpen) return;
+    const y = scrollPos.current[activeTab] ?? 0;
+    requestAnimationFrame(() => window.scrollTo(0, y));
+  }, [activeTab, overlayOpen]);
+  const openProperty = (p: Property) => {
+    if (!selectedProperty) scrollPos.current[activeTab] = window.scrollY;
+    setSelectedProperty(p);
+    window.scrollTo(0, 0);
+  };
+  const openChat = () => {
+    scrollPos.current[activeTab] = window.scrollY;
+    setShowChat(true);
+  };
+
   // Hardware back — pop screens in reverse order of depth.
   useHardwareBack(!!selectedProperty, () => setSelectedProperty(null));
   useHardwareBack(showChat, () => setShowChat(false));
-  useHardwareBack(!selectedProperty && !showChat && activeTab !== "home", () => setActiveTab("home"));
+  useHardwareBack(!selectedProperty && !showChat && activeTab !== "home", () => changeTab("home"));
 
   if (selectedProperty) {
     return (
-      <ListingDetail
-        property={selectedProperty}
-        onBack={() => setSelectedProperty(null)}
-        liked={isFavorite(selectedProperty.id)}
-        onToggleLike={() => toggleFavorite(selectedProperty.id)}
-        onSelectProperty={(p) => setSelectedProperty(p)}
-      />
+      <Suspense fallback={<ScreenFallback />}>
+        <ListingDetail
+          property={selectedProperty}
+          onBack={() => setSelectedProperty(null)}
+          liked={isFavorite(selectedProperty.id)}
+          onToggleLike={() => toggleFavorite(selectedProperty.id)}
+          onSelectProperty={openProperty}
+        />
+      </Suspense>
     );
   }
 
   if (showChat && chatContact) {
     return (
-      <ChatScreen
-        onBack={() => setShowChat(false)}
-        contactName={chatContact.name}
-        contactRole={chatContact.role}
-        contactOnline={chatContact.online}
-        contactVerified={chatContact.verified}
-        propertyContext={chatContact.property}
-      />
+      <Suspense fallback={<ScreenFallback />}>
+        <ChatScreen
+          onBack={() => setShowChat(false)}
+          contactName={chatContact.name}
+          contactRole={chatContact.role}
+          contactOnline={chatContact.online}
+          contactVerified={chatContact.verified}
+          propertyContext={chatContact.property}
+        />
+      </Suspense>
     );
   }
 
@@ -169,6 +223,7 @@ const Index = () => {
       )}
 
       <div key={activeTab} className="animate-fade-in">
+      <Suspense fallback={<ScreenFallback />}>
         {activeTab === "home" && <HomeFeed />}
 
         {activeTab === "dashboard" && renderDashboard()}
@@ -184,7 +239,7 @@ const Index = () => {
                 <SwipeablePropertyCard
                   key={p.id}
                   property={p}
-                  onPress={() => setSelectedProperty(p)}
+                  onPress={() => openProperty(p)}
                   onRemove={toggleFavorite}
                   onToggleLike={toggleFavorite}
                 />
@@ -206,17 +261,21 @@ const Index = () => {
         <ChatList
           onOpenChat={(contact) => {
             setChatContact(contact);
-            setShowChat(true);
+            openChat();
           }}
         />
       )}
 
       {activeTab === "profile" && <ProfileScreen />}
+      </Suspense>
       </div>
 
       <BottomNav
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        chatBadge={chatBadge}
+        profileBadge={profileBadge}
+        showDashboard={!isTenant}
+        onTabChange={changeTab}
         chatBadge={chatBadge}
         profileBadge={profileBadge}
         showDashboard={!isTenant}
