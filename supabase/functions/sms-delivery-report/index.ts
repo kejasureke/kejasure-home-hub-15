@@ -20,6 +20,15 @@ Deno.serve(async (req) => {
     return new Response("Method not allowed", { status: 405, headers: corsHeaders });
   }
 
+  // Shared-secret check: register the callback URL as
+  //   .../sms-delivery-report?token=<SMS_DLR_TOKEN>
+  const expected = Deno.env.get("SMS_DLR_TOKEN");
+  const provided = new URL(req.url).searchParams.get("token");
+  if (!expected || provided !== expected) {
+    return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+  }
+
+
   let payload: Record<string, string> = {};
   try {
     const contentType = req.headers.get("content-type") ?? "";
@@ -50,15 +59,16 @@ Deno.serve(async (req) => {
   });
   if (logErr) console.error("failed to log delivery report", logErr);
 
-  if (messageId && status) {
+  if (messageId && status && phone) {
     const { error: updErr } = await supabase
       .from("otp_codes")
       .update({
-        delivery_status: status,
-        delivery_failure_reason: failureReason,
+        delivery_status: String(status).slice(0, 40),
+        delivery_failure_reason: failureReason ? String(failureReason).slice(0, 200) : null,
         delivered_at: DELIVERED.has(status) ? new Date().toISOString() : null,
       })
-      .eq("message_id", messageId);
+      .eq("message_id", messageId)
+      .eq("phone", phone);
     if (updErr) console.error("failed to update otp code delivery", updErr);
   }
 
