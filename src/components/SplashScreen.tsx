@@ -7,13 +7,13 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),
-      setTimeout(() => setPhase(2), 1400),
-      setTimeout(() => setPhase(3), 2400),
-      setTimeout(() => setPhase(4), 3400),
-      setTimeout(() => setPhase(5), 4200),
-      setTimeout(() => setPhase(6), 5800),
-      setTimeout(() => onComplete(), 6500),
+      setTimeout(() => setPhase(1), 150),
+      setTimeout(() => setPhase(2), 600),
+      setTimeout(() => setPhase(3), 1100),
+      setTimeout(() => setPhase(4), 1500),
+      setTimeout(() => setPhase(5), 1900),
+      setTimeout(() => setPhase(6), 2700),
+      setTimeout(() => onComplete(), 3100),
     ];
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
