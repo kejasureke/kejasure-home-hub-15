@@ -276,9 +276,6 @@ const Index = () => {
         profileBadge={profileBadge}
         showDashboard={!isTenant}
         onTabChange={changeTab}
-        chatBadge={chatBadge}
-        profileBadge={profileBadge}
-        showDashboard={!isTenant}
       />
     </div>
   );
