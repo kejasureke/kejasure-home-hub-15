@@ -37,7 +37,13 @@ const json = (body: unknown, status = 200) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
-const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+const generateOtp = () => {
+  // Cryptographically secure, unbiased 6-digit code (rejection sampling).
+  const buf = new Uint32Array(1);
+  const limit = Math.floor(0xffffffff / 900000) * 900000;
+  do { crypto.getRandomValues(buf); } while (buf[0] >= limit);
+  return (100000 + (buf[0] % 900000)).toString();
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -104,7 +110,11 @@ Deno.serve(async (req) => {
     }
   }
 
-  const code = isAfricasTalkingConfigured() ? generateOtp() : "123456";
+  if (!isAfricasTalkingConfigured()) {
+    console.error("SMS provider not configured; refusing to issue OTP");
+    return json({ error: "Verification is temporarily unavailable. Please try again later." }, 503);
+  }
+  const code = generateOtp();
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_SECONDS * 1000).toISOString();
   const { data: codeRow, error: codeInsertErr } = await supabase
     .from("otp_codes")
