@@ -1,9 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Phone, CheckCircle2, XCircle, Clock, Receipt, RefreshCw, Zap,
   ShieldCheck, AlertTriangle, ArrowLeft, X
 } from "lucide-react";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { supabase } from "@/integrations/supabase/client";
+
+/** Parse durations like "3 days", "1 month", "monthly" into days. */
+function durationToDays(duration: string): number {
+  const d = duration.toLowerCase();
+  const n = parseInt(d, 10);
+  const num = isNaN(n) ? 1 : n;
+  if (d.includes("year")) return num * 365;
+  if (d.includes("month")) return num * 30;
+  if (d.includes("week")) return num * 7;
+  return num; // days
+}
 
 export interface MpesaPlan {
   name: string;
@@ -20,6 +32,9 @@ interface MpesaPaymentFlowProps {
   onClose: () => void;
   onSuccess?: (plan: MpesaPlan, transactionId: string) => void;
   accentColor?: string; // tailwind color class for the category
+  kind?: "subscription" | "boost";
+  role?: string;
+  listingId?: string;
 }
 
 type PaymentState = "select" | "confirm" | "processing" | "success" | "failed";
@@ -31,34 +46,49 @@ const MpesaPaymentFlow = ({
   onClose,
   onSuccess,
   accentColor = "primary",
+  kind = "subscription",
+  role,
+  listingId,
 }: MpesaPaymentFlowProps) => {
   const [selected, setSelected] = useState(selectedPlanIndex);
   const [phone, setPhone] = useState("");
   const [state, setState] = useState<PaymentState>("select");
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(90);
   const [transactionId, setTransactionId] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const paymentIdRef = useRef<string | null>(null);
 
   useHardwareBack(state !== "processing", onClose);
 
-
-
-  // Countdown timer during processing
+  // Poll the backend for Safaricom's confirmation while processing
   useEffect(() => {
     if (state !== "processing") return;
     if (countdown <= 0) {
-      // Simulate 85% success rate
-      if (Math.random() > 0.15) {
-        const txId = "KS" + Math.random().toString(36).substring(2, 10).toUpperCase();
-        setTransactionId(txId);
-        setState("success");
-        onSuccess?.(plans[selected], txId);
-      } else {
-        setState("failed");
-      }
+      setErrorMsg("We didn't get a confirmation from M-Pesa in time. If money was deducted, it will reflect shortly.");
+      setState("failed");
       return;
     }
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
-    return () => clearTimeout(t);
+    const poll = setInterval(async () => {
+      const pid = paymentIdRef.current;
+      if (!pid) return;
+      const { data } = await supabase
+        .from("mpesa_payments")
+        .select("status, mpesa_receipt, result_desc")
+        .eq("id", pid)
+        .single();
+      if (!data) return;
+      if (data.status === "success") {
+        const receipt = data.mpesa_receipt || "Confirmed";
+        setTransactionId(receipt);
+        setState("success");
+        onSuccess?.(plans[selected], receipt);
+      } else if (data.status === "failed") {
+        setErrorMsg(data.result_desc || "The M-Pesa transaction was not completed.");
+        setState("failed");
+      }
+    }, 3000);
+    return () => { clearTimeout(t); clearInterval(poll); };
   }, [state, countdown]);
 
   const plan = plans[selected];
@@ -68,14 +98,34 @@ const MpesaPaymentFlow = ({
     setState("confirm");
   };
 
-  const handleConfirmPay = () => {
-    setCountdown(4); // Simulate quick STK push
+  const sendStkPush = async () => {
+    setCountdown(90);
     setState("processing");
+    const { data, error } = await supabase.functions.invoke("mpesa-stk-push", {
+      body: {
+        kind,
+        planName: plan.name,
+        role,
+        price: plan.price,
+        durationDays: durationToDays(plan.duration),
+        listingId,
+        phone: `254${phone}`,
+      },
+    });
+    if (error || !data?.paymentId) {
+      setErrorMsg(data?.error || error?.message || "Could not reach M-Pesa. Try again.");
+      setState("failed");
+      return;
+    }
+    paymentIdRef.current = data.paymentId;
+  };
+
+  const handleConfirmPay = () => {
+    sendStkPush();
   };
 
   const handleRetry = () => {
-    setCountdown(4);
-    setState("processing");
+    sendStkPush();
   };
 
   // ====== SUCCESS STATE ======
@@ -144,7 +194,7 @@ const MpesaPaymentFlow = ({
             </div>
             <h2 className="text-xl font-extrabold text-foreground mb-1">Payment Failed</h2>
             <p className="text-sm text-muted-foreground text-center">
-              The M-Pesa transaction was not completed. This could be due to insufficient funds, timeout, or wrong PIN.
+              {errorMsg || "The M-Pesa transaction was not completed. This could be due to insufficient funds, timeout, or wrong PIN."}
             </p>
           </div>
 

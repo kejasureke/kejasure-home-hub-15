@@ -640,6 +640,71 @@ export type Database = {
           },
         ]
       }
+      mpesa_payments: {
+        Row: {
+          checkout_request_id: string | null
+          created_at: string
+          duration_days: number
+          id: string
+          kind: string
+          listing_id: string | null
+          merchant_request_id: string | null
+          mpesa_receipt: string | null
+          phone: string
+          plan_name: string
+          price_kes: number
+          result_desc: string | null
+          role: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checkout_request_id?: string | null
+          created_at?: string
+          duration_days: number
+          id?: string
+          kind: string
+          listing_id?: string | null
+          merchant_request_id?: string | null
+          mpesa_receipt?: string | null
+          phone: string
+          plan_name: string
+          price_kes: number
+          result_desc?: string | null
+          role?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checkout_request_id?: string | null
+          created_at?: string
+          duration_days?: number
+          id?: string
+          kind?: string
+          listing_id?: string | null
+          merchant_request_id?: string | null
+          mpesa_receipt?: string | null
+          phone?: string
+          plan_name?: string
+          price_kes?: number
+          result_desc?: string | null
+          role?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mpesa_payments_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       neighborhood_scores: {
         Row: {
           avg_rent_kes: number | null

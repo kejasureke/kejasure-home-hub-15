@@ -43,11 +43,14 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
   const [step, setStep] = useState<"select-listing" | "select-boost">("select-listing");
 
   if (showPayment) {
+    const isRealListing = selectedListing ? /^[0-9a-f-]{36}$/i.test(selectedListing) : false;
     return (
       <MpesaPaymentFlow
         plans={boostPlans.map(p => ({ name: p.name, price: p.price, duration: p.duration, features: p.features }))}
         selectedPlanIndex={selectedBoost}
         category="Listing Boost"
+        kind="boost"
+        listingId={isRealListing ? selectedListing! : undefined}
         onClose={() => setShowPayment(false)}
       />
     );
