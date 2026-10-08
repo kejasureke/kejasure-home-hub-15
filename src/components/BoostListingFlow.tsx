@@ -30,7 +30,6 @@ const boostPlans = [
   },
 ];
 
-const durationDays = [3, 7, 14];
 
 interface MyListing { id: string; title: string; views: number; status: string }
 
@@ -122,6 +121,10 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
             {/* Listing selection */}
             <h3 className="text-sm font-semibold mb-3">Select Listing</h3>
             <div className="space-y-2">
+              {loading && <p className="text-xs text-muted-foreground">Loading your listings…</p>}
+              {!loading && myListings.length === 0 && (
+                <p className="text-xs text-muted-foreground p-4 rounded-2xl bg-card text-center">You have no active listings to boost yet. Publish a listing first.</p>
+              )}
               {myListings.map((listing) => (
                 <button
                   key={listing.id}
