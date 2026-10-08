@@ -62,13 +62,8 @@ Deno.serve(async (req) => {
     }
     const { kind, planName, role, price, durationDays, listingId, phone } = parsed.data
 
-    // For boosts, verify the caller owns the listing
-    if (kind === 'boost') {
-      if (!listingId) {
-        return new Response(JSON.stringify({ error: 'listingId required for boosts' }), {
-          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
+    // For boosts with a listing attached, verify the caller owns it
+    if (kind === 'boost' && listingId) {
       const { data: listing } = await admin.from('listings').select('owner_id').eq('id', listingId).single()
       if (!listing || listing.owner_id !== user.id) {
         return new Response(JSON.stringify({ error: 'You can only boost your own listings' }), {

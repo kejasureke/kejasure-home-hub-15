@@ -98,8 +98,10 @@ Deno.serve(async (req) => {
       if (plan) {
         planId = plan.id
       } else {
+        const VALID_ROLES = ['tenant', 'landlord', 'agency', 'host', 'service_provider']
+        const planRole = VALID_ROLES.includes(payment.role) ? payment.role : 'tenant'
         const { data: newPlan } = await admin.from('subscription_plans').insert({
-          role: payment.role ?? 'tenant',
+          role: planRole,
           tier: payment.plan_name,
           price_kes: payment.price_kes,
         }).select('id').single()
