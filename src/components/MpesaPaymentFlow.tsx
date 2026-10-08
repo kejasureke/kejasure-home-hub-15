@@ -60,35 +60,67 @@ const MpesaPaymentFlow = ({
 
   useHardwareBack(state !== "processing", onClose);
 
-  // Poll the backend for Safaricom's confirmation while processing
+  // Countdown tick
+  useEffect(() => {
+    if (state !== "processing" || countdown <= 0) return;
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [state, countdown]);
+
+  // Poll the backend for Safaricom's confirmation (independent of the countdown)
   useEffect(() => {
     if (state !== "processing") return;
-    if (countdown <= 0) {
-      setErrorMsg("We didn't get a confirmation from M-Pesa in time. If money was deducted, it will reflect shortly.");
-      setState("failed");
-      return;
-    }
-    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
-    const poll = setInterval(async () => {
+    let done = false;
+    const check = async () => {
       const pid = paymentIdRef.current;
-      if (!pid) return;
+      if (!pid || done) return null;
       const { data } = await supabase
         .from("mpesa_payments")
         .select("status, mpesa_receipt, result_desc")
         .eq("id", pid)
         .single();
-      if (!data) return;
+      if (!data || done) return null;
       if (data.status === "success") {
+        done = true;
         const receipt = data.mpesa_receipt || "Confirmed";
         setTransactionId(receipt);
         setState("success");
         onSuccess?.(plans[selected], receipt);
       } else if (data.status === "failed") {
+        done = true;
         setErrorMsg(data.result_desc || "The M-Pesa transaction was not completed.");
         setState("failed");
       }
-    }, 3000);
-    return () => { clearTimeout(t); clearInterval(poll); };
+      return data.status;
+    };
+    const poll = setInterval(check, 3000);
+    return () => { done = true; clearInterval(poll); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
+
+  // Timeout: one final check before giving up
+  useEffect(() => {
+    if (state !== "processing" || countdown > 0) return;
+    (async () => {
+      const pid = paymentIdRef.current;
+      if (pid) {
+        const { data } = await supabase
+          .from("mpesa_payments")
+          .select("status, mpesa_receipt, result_desc")
+          .eq("id", pid)
+          .single();
+        if (data?.status === "success") {
+          const receipt = data.mpesa_receipt || "Confirmed";
+          setTransactionId(receipt);
+          setState("success");
+          onSuccess?.(plans[selected], receipt);
+          return;
+        }
+      }
+      setErrorMsg("We didn't get a confirmation from M-Pesa in time. If money was deducted, it will reflect shortly.");
+      setState("failed");
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, countdown]);
 
   const plan = plans[selected];
