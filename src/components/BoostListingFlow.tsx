@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Zap, TrendingUp, Eye, Clock, Check, Star, Crown, Sparkles } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
@@ -29,11 +30,9 @@ const boostPlans = [
   },
 ];
 
-const myListings = [
-  { id: "1", title: "3BR Apartment, Kilimani", views: 847, status: "active" },
-  { id: "2", title: "2BR Westlands Modern", views: 612, status: "active" },
-  { id: "3", title: "Studio Apartment, Westlands", views: 1203, status: "active" },
-];
+const durationDays = [3, 7, 14];
+
+interface MyListing { id: string; title: string; views: number; status: string }
 
 const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
   const { closing, triggerClose } = useOverlayClose(onBack);
@@ -41,16 +40,32 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
   const [selectedBoost, setSelectedBoost] = useState(1);
   const [showPayment, setShowPayment] = useState(false);
   const [step, setStep] = useState<"select-listing" | "select-boost">("select-listing");
+  const [myListings, setMyListings] = useState<MyListing[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (showPayment) {
-    const isRealListing = selectedListing ? /^[0-9a-f-]{36}$/i.test(selectedListing) : false;
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
+      const { data } = await supabase
+        .from("listings")
+        .select("id, title, view_count, status")
+        .eq("owner_id", user.id)
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+      setMyListings((data ?? []).map((l) => ({ id: l.id, title: l.title, views: l.view_count, status: l.status })));
+      setLoading(false);
+    })();
+  }, []);
+
+  if (showPayment && selectedListing) {
     return (
       <MpesaPaymentFlow
         plans={boostPlans.map(p => ({ name: p.name, price: p.price, duration: p.duration, features: p.features }))}
         selectedPlanIndex={selectedBoost}
         category="Listing Boost"
         kind="boost"
-        listingId={isRealListing ? selectedListing! : undefined}
+        listingId={selectedListing}
         onClose={() => setShowPayment(false)}
       />
     );
