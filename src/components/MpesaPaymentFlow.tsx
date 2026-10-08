@@ -32,6 +32,9 @@ interface MpesaPaymentFlowProps {
   onClose: () => void;
   onSuccess?: (plan: MpesaPlan, transactionId: string) => void;
   accentColor?: string; // tailwind color class for the category
+  kind?: "subscription" | "boost";
+  role?: string;
+  listingId?: string;
 }
 
 type PaymentState = "select" | "confirm" | "processing" | "success" | "failed";
