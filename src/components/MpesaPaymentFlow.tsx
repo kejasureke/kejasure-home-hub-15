@@ -194,7 +194,7 @@ const MpesaPaymentFlow = ({
             </div>
             <h2 className="text-xl font-extrabold text-foreground mb-1">Payment Failed</h2>
             <p className="text-sm text-muted-foreground text-center">
-              The M-Pesa transaction was not completed. This could be due to insufficient funds, timeout, or wrong PIN.
+              {errorMsg || "The M-Pesa transaction was not completed. This could be due to insufficient funds, timeout, or wrong PIN."}
             </p>
           </div>
 
