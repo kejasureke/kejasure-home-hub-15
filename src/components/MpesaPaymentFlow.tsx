@@ -1,9 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Phone, CheckCircle2, XCircle, Clock, Receipt, RefreshCw, Zap,
   ShieldCheck, AlertTriangle, ArrowLeft, X
 } from "lucide-react";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { supabase } from "@/integrations/supabase/client";
+
+/** Parse durations like "3 days", "1 month", "monthly" into days. */
+function durationToDays(duration: string): number {
+  const d = duration.toLowerCase();
+  const n = parseInt(d, 10);
+  const num = isNaN(n) ? 1 : n;
+  if (d.includes("year")) return num * 365;
+  if (d.includes("month")) return num * 30;
+  if (d.includes("week")) return num * 7;
+  return num; // days
+}
 
 export interface MpesaPlan {
   name: string;
