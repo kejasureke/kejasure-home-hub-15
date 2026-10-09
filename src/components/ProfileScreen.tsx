@@ -200,7 +200,7 @@ const ProfileScreen = () => {
                 />
               </svg>
               <div className="absolute inset-1.5 rounded-2xl gradient-trust flex items-center justify-center">
-                <span className="text-xl font-bold text-primary-foreground">JK</span>
+                 <span className="text-xl font-bold text-primary-foreground">{initials}</span>
               </div>
               {isVerified && (
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center border-2 border-background">
@@ -215,10 +215,10 @@ const ProfileScreen = () => {
         })()}
         <div className="flex-1">
           <div className="flex items-center gap-1.5">
-            <h2 className="text-lg font-bold">John Kamau</h2>
+            <h2 className="text-lg font-bold">{displayName}</h2>
             <VerificationBadge isVerified={isVerified} variant="dark" />
           </div>
-          <p className="text-sm text-muted-foreground">+254 712 345 678</p>
+          {displayPhone && <p className="text-sm text-muted-foreground">{displayPhone}</p>}
           <div className="tier-badge-premium mt-1 inline-block">Premium Member</div>
         </div>
         <button
