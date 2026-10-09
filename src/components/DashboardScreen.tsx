@@ -1,3 +1,4 @@
+import { useMyProfile } from "@/hooks/useMyProfile";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import KYCPromptBanner from "./KYCPromptBanner";
@@ -49,6 +50,7 @@ const initialBookingRequests: BookingRequest[] = [
 ];
 
 const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenProps) => {
+  const me = useMyProfile();
   const [showPayment, setShowPayment] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
   const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
@@ -171,11 +173,11 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
         </div>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-            <span className="text-lg font-bold text-primary-foreground">JK</span>
+            <span className="text-lg font-bold text-primary-foreground">{me.initials || "?"}</span>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold text-primary-foreground">John Kamau</h2>
+              <h2 className="text-base font-semibold text-primary-foreground">{me.name || "Your dashboard"}</h2>
               <VerificationBadge isVerified={isVerified} variant="light" />
             </div>
             <p className="text-xs text-primary-foreground/70">Landlord · 4 listings</p>
