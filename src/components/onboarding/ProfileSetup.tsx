@@ -24,7 +24,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
   const [preference, setPreference] = useState("");
 
   const countyOptions = ALL_COUNTIES;
-  const budgetOptions = ["Under 15K", "15K–30K", "30K–50K", "50K–100K", "100K+"];
+  const budgetOptions = ["Under 15K", "15K–30K", "30K–50K", "50K–100K", "100K+", "Not decided yet"];
   const bedroomOptions = ["Studio", "1 BR", "2 BR", "3 BR", "4+ BR"];
 
   const steps = [
@@ -90,23 +90,26 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
       subtitle: "Monthly rent range — we'll only show homes within it",
       content: (
         <div className="space-y-2.5">
-          {budgetOptions.map((b) => (
-            <button
-              key={b}
-              onClick={() => setBudget(b)}
-              className={`w-full p-4 rounded-2xl text-left text-sm font-semibold transition-all ${
-                budget === b ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
-              }`}
-            >
-              KES {b}
-            </button>
-          ))}
+          {budgetOptions.map((b) => {
+            const isOpen = b === "Not decided yet";
+            return (
+              <button
+                key={b}
+                onClick={() => setBudget(budget === b ? "" : b)}
+                className={`w-full p-4 rounded-2xl text-left text-sm font-semibold transition-all ${
+                  budget === b ? "bg-primary/10 border-2 border-primary" : "bg-card border-2 border-transparent"
+                }`}
+              >
+                {isOpen ? "Not decided yet — show me everything" : `KES ${b}`}
+              </button>
+            );
+          })}
           <p className="text-[11px] text-muted-foreground pt-1">
             You can change this anytime from the price filter on the home screen.
           </p>
         </div>
       ),
-      valid: !!budget,
+      valid: true,
     },
     {
       icon: Bed,
