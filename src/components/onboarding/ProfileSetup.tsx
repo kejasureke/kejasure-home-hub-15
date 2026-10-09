@@ -3,6 +3,9 @@ import { ArrowLeft, MapPin, Wallet, Bed, ChevronRight, Home, Sparkles, User, Fil
 import type { UserRole } from "./RoleSelection";
 import { toast } from "@/hooks/use-toast";
 import { upsertProfile } from "@/integrations/supabase/actions";
+import { kenyaCounties } from "@/data/kenyaCounties";
+
+const ALL_COUNTIES = kenyaCounties.map((c) => c.name);
 
 interface ProfileSetupProps {
   role: UserRole;
@@ -20,7 +23,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
   const [bedrooms, setBedrooms] = useState("");
   const [preference, setPreference] = useState("");
 
-  const countyOptions = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu", "Uasin Gishu", "Machakos", "Kajiado"];
+  const countyOptions = ALL_COUNTIES;
   const budgetOptions = ["Under 15K", "15K–30K", "30K–50K", "50K–100K", "100K+", "Not decided yet"];
   const bedroomOptions = ["Studio", "1 BR", "2 BR", "3 BR", "4+ BR"];
 
@@ -399,7 +402,7 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
   const [plan, setPlan] = useState("");
 
   const categories = ["Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers", "Security", "Painters", "Fumigators"];
-  const countyOpts = ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Kiambu", "Uasin Gishu", "Machakos", "Kajiado"];
+  const countyOpts = ALL_COUNTIES;
 
   const baseSteps = [
     {
