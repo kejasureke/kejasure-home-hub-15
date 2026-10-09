@@ -147,7 +147,7 @@ const ProfileScreen = () => {
     ...(!isTenant ? [{ icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action }] : []),
     { icon: Crown, label: "Subscription Plans", subtitle: "Manage your plan", action: () => setShowSubscription(true) },
     ...(!isTenant ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
-    { icon: ShieldCheck, label: "Verification", subtitle: isVerified ? "✓ Verified" : "Verify your identity", action: () => setShowKYC(true) },
+    { icon: ShieldCheck, label: "Verification", subtitle: isVerified ? "✓ ID verified" : isTenant ? "✓ Phone verified · ID optional" : "Verify your identity", action: () => setShowKYC(true) },
     { icon: MapPin, label: "Neighborhood Safety", subtitle: "Area scores & insights", action: () => setShowNeighborhood(true) },
     { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
     { icon: Search, label: "Saved Searches", subtitle: "Manage alerts & filters", action: () => setShowSavedSearches(true) },

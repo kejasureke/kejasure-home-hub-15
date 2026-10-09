@@ -1,3 +1,4 @@
+import { useMyProfile } from "@/hooks/useMyProfile";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import KYCPromptBanner from "./KYCPromptBanner";
@@ -155,7 +156,7 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold text-accent-foreground">John Kamau</h2>
+              <h2 className="text-base font-semibold text-accent-foreground">{me.name || "Your dashboard"}</h2>
               <VerificationBadge isVerified={isVerified} variant="light" />
             </div>
             <p className="text-xs text-accent-foreground/70">Pro Host · 3 stays</p>
