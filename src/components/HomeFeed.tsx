@@ -23,6 +23,24 @@ import { useHardwareBack } from "@/hooks/useHardwareBack";
 const segments = ["Rentals", "Short Stays", "Business Spaces", "Corporate Stay", "Services"] as const;
 
 const SEGMENT_KEY = "kejasure_home_segment";
+const BUDGET_KEY = "kejasure_budget";
+
+// Map onboarding budget choice to a price range
+const BUDGET_RANGES: Record<string, { min: number; max: number }> = {
+  "Under 15K": { min: 0, max: 15000 },
+  "15K–30K": { min: 15000, max: 30000 },
+  "30K–50K": { min: 30000, max: 50000 },
+  "50K–100K": { min: 50000, max: 100000 },
+  "100K+": { min: 100000, max: 500000 },
+};
+
+const savedBudgetRange = () => {
+  try {
+    const b = localStorage.getItem(BUDGET_KEY);
+    return b && BUDGET_RANGES[b] ? BUDGET_RANGES[b] : null;
+  } catch { return null; }
+};
+
 const HomeFeed = () => {
   const [segment, setSegmentState] = useState<(typeof segments)[number]>(() => {
     try {

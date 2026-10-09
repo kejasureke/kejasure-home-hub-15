@@ -149,6 +149,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
 
   const handleComplete = async () => {
     try {
+      try { localStorage.setItem("kejasure_budget", budget); } catch {}
       await upsertProfile({
         role: "tenant",
         first_name: firstName || null,
