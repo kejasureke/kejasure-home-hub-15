@@ -59,6 +59,36 @@ const ProfileScreen = () => {
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();
   const { counts: bookingCounts } = useBookings();
+  const { user } = useAuth();
+  const [profileName, setProfileName] = useState<string>(() => {
+    try { return localStorage.getItem("kejasure_display_name") || ""; } catch { return ""; }
+  });
+  const [profilePhone, setProfilePhone] = useState<string>(() => {
+    try { return localStorage.getItem("kejasure_phone") || ""; } catch { return ""; }
+  });
+
+  // Load the signed-in user's real profile (name + phone) from the backend.
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("full_name, phone")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.full_name) setProfileName(data.full_name);
+        if (data?.phone) setProfilePhone(data.phone);
+      });
+  }, [user]);
+
+  const displayName = profileName || "KejaSure User";
+  const displayPhone = profilePhone || "";
+  const initials = displayName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase())
+    .join("") || "K";
 
   const { isVerified } = useKYCStatus(role);
 
