@@ -69,20 +69,29 @@ const HomeFeed = () => {
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
   const [showNeighborhood, setShowNeighborhood] = useState(false);
-  const [filters, setFilters] = useState({
-    minPrice: 0,
-    maxPrice: 500000,
-    bedrooms: [] as number[],
-    amenities: [] as string[],
-    verified: false,
-    smileIdVerified: false,
-    furnished: false,
-    petFriendly: false,
-    sortBy: "featured",
-    commercialTypes: [] as string[],
-    minSqft: 0,
-    maxSqft: 100000,
+  const [filters, setFilters] = useState(() => {
+    const budget = savedBudgetRange();
+    return {
+      minPrice: budget?.min ?? 0,
+      maxPrice: budget?.max ?? 500000,
+      bedrooms: [] as number[],
+      amenities: [] as string[],
+      verified: false,
+      smileIdVerified: false,
+      furnished: false,
+      petFriendly: false,
+      sortBy: "featured",
+      commercialTypes: [] as string[],
+      minSqft: 0,
+      maxSqft: 100000,
+    };
   });
+
+  // When the user changes filters themselves, their choice wins over the onboarding budget
+  const applyUserFilters = (f: typeof filters) => {
+    try { localStorage.removeItem(BUDGET_KEY); } catch {}
+    setFilters(f);
+  };
 
   const { recentIds, recentMap, addRecent } = useRecentlyViewed();
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
