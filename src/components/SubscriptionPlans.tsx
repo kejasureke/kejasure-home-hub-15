@@ -220,7 +220,8 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
   const mpesaPlans = plans.filter(p => p.price > 0).map(p => ({
     name: p.name,
     price: p.price,
-    duration: p.duration || "/month",
+    // Tenant passes are named by their length ("24 Hours", "3 Days", "7 Days")
+    duration: p.duration || (/hour|day|week/i.test(p.name) ? p.name : "/month"),
     features: p.features.slice(0, 4),
     current: p.current,
   }));
