@@ -898,7 +898,7 @@ const HomeFeed = () => {
                     onClick={() => {
                       setCounty(""); setSubcounty(""); setWard(""); setEstate("");
                       setSearchQuery("");
-                      setFilters({
+                      applyUserFilters({
                         minPrice: 0, maxPrice: 500000, bedrooms: [], amenities: [],
                         verified: false, smileIdVerified: false, furnished: false, petFriendly: false,
                         sortBy: "featured", commercialTypes: [], minSqft: 0, maxSqft: 100000,
@@ -929,7 +929,7 @@ const HomeFeed = () => {
         isOpen={showFilters}
         onClose={() => setShowFilters(false)}
         filters={filters}
-        onApply={setFilters}
+        onApply={applyUserFilters}
         county={county}
         subcounty={subcounty}
         ward={ward}
