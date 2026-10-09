@@ -23,6 +23,24 @@ import { useHardwareBack } from "@/hooks/useHardwareBack";
 const segments = ["Rentals", "Short Stays", "Business Spaces", "Corporate Stay", "Services"] as const;
 
 const SEGMENT_KEY = "kejasure_home_segment";
+const BUDGET_KEY = "kejasure_budget";
+
+// Map onboarding budget choice to a price range
+const BUDGET_RANGES: Record<string, { min: number; max: number }> = {
+  "Under 15K": { min: 0, max: 15000 },
+  "15K–30K": { min: 15000, max: 30000 },
+  "30K–50K": { min: 30000, max: 50000 },
+  "50K–100K": { min: 50000, max: 100000 },
+  "100K+": { min: 100000, max: 500000 },
+};
+
+const savedBudgetRange = () => {
+  try {
+    const b = localStorage.getItem(BUDGET_KEY);
+    return b && BUDGET_RANGES[b] ? BUDGET_RANGES[b] : null;
+  } catch { return null; }
+};
+
 const HomeFeed = () => {
   const [segment, setSegmentState] = useState<(typeof segments)[number]>(() => {
     try {
@@ -51,20 +69,29 @@ const HomeFeed = () => {
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
   const [showNeighborhood, setShowNeighborhood] = useState(false);
-  const [filters, setFilters] = useState({
-    minPrice: 0,
-    maxPrice: 500000,
-    bedrooms: [] as number[],
-    amenities: [] as string[],
-    verified: false,
-    smileIdVerified: false,
-    furnished: false,
-    petFriendly: false,
-    sortBy: "featured",
-    commercialTypes: [] as string[],
-    minSqft: 0,
-    maxSqft: 100000,
+  const [filters, setFilters] = useState(() => {
+    const budget = savedBudgetRange();
+    return {
+      minPrice: budget?.min ?? 0,
+      maxPrice: budget?.max ?? 500000,
+      bedrooms: [] as number[],
+      amenities: [] as string[],
+      verified: false,
+      smileIdVerified: false,
+      furnished: false,
+      petFriendly: false,
+      sortBy: "featured",
+      commercialTypes: [] as string[],
+      minSqft: 0,
+      maxSqft: 100000,
+    };
   });
+
+  // When the user changes filters themselves, their choice wins over the onboarding budget
+  const applyUserFilters = (f: typeof filters) => {
+    try { localStorage.removeItem(BUDGET_KEY); } catch {}
+    setFilters(f);
+  };
 
   const { recentIds, recentMap, addRecent } = useRecentlyViewed();
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
@@ -871,7 +898,7 @@ const HomeFeed = () => {
                     onClick={() => {
                       setCounty(""); setSubcounty(""); setWard(""); setEstate("");
                       setSearchQuery("");
-                      setFilters({
+                      applyUserFilters({
                         minPrice: 0, maxPrice: 500000, bedrooms: [], amenities: [],
                         verified: false, smileIdVerified: false, furnished: false, petFriendly: false,
                         sortBy: "featured", commercialTypes: [], minSqft: 0, maxSqft: 100000,
@@ -902,7 +929,7 @@ const HomeFeed = () => {
         isOpen={showFilters}
         onClose={() => setShowFilters(false)}
         filters={filters}
-        onApply={setFilters}
+        onApply={applyUserFilters}
         county={county}
         subcounty={subcounty}
         ward={ward}
