@@ -163,20 +163,22 @@ const ProfileScreen = () => {
       {/* Profile header */}
       <div className="flex items-center gap-4 mb-6">
         {(() => {
-          // KYC tiers: phone, id, biz — verified status per tier stored in localStorage.
-          const tiers = [
-            { key: "phone", label: "Phone", done: true }, // always true post-OTP
-            { key: "id", label: "ID", done: isVerified },
-            { key: "biz", label: "Biz", done: !isTenant && localStorage.getItem(`kejasure_kyc_verified_biz_${role}`) === "true" },
-          ];
+          // Tenants only need phone verification; other roles climb phone → ID → business.
+          const tiers = isTenant
+            ? [{ key: "phone", label: "Phone", done: me.phoneVerified }]
+            : [
+                { key: "phone", label: "Phone", done: me.phoneVerified },
+                { key: "id", label: "ID", done: isVerified },
+                { key: "biz", label: "Biz", done: localStorage.getItem(`kejasure_kyc_verified_biz_${role}`) === "true" },
+              ];
           const completed = tiers.filter(t => t.done).length;
           const pct = completed / tiers.length;
           const dash = 2 * Math.PI * 30; // radius 30
           return (
             <button
-              onClick={() => !isVerified && setShowKYC(true)}
+              onClick={() => !isTenant && !isVerified && setShowKYC(true)}
               className="relative w-16 h-16 shrink-0"
-              aria-label={`KYC verification: ${completed} of ${tiers.length} complete`}
+              aria-label={`Verification: ${completed} of ${tiers.length} complete`}
             >
               <svg className="absolute inset-0 -rotate-90" viewBox="0 0 64 64">
                 <circle cx="32" cy="32" r="30" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" />
@@ -188,26 +190,71 @@ const ProfileScreen = () => {
                 />
               </svg>
               <div className="absolute inset-1.5 rounded-2xl gradient-trust flex items-center justify-center">
-                 <span className="text-xl font-bold text-primary-foreground">{initials}</span>
+                 {hasName
+                   ? <span className="text-xl font-bold text-primary-foreground">{initials}</span>
+                   : <User className="w-6 h-6 text-primary-foreground" />}
               </div>
-              {isVerified && (
+              {(isTenant ? me.phoneVerified : isVerified) && (
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center border-2 border-background">
                   <ShieldCheck className="w-3.5 h-3.5 text-primary-foreground" />
                 </div>
               )}
-              <div className="absolute -top-1 -left-1 px-1.5 py-0.5 rounded-full bg-card text-[9px] font-bold text-primary shadow-sm border border-border">
-                {completed}/{tiers.length}
-              </div>
+              {!isTenant && (
+                <div className="absolute -top-1 -left-1 px-1.5 py-0.5 rounded-full bg-card text-[9px] font-bold text-primary shadow-sm border border-border">
+                  {completed}/{tiers.length}
+                </div>
+              )}
             </button>
           );
         })()}
-        <div className="flex-1">
-          <div className="flex items-center gap-1.5">
-            <h2 className="text-lg font-bold">{displayName}</h2>
-            <VerificationBadge isVerified={isVerified} variant="dark" />
-          </div>
+        <div className="flex-1 min-w-0">
+          {editingName ? (
+            <div className="flex items-center gap-2">
+              <input
+                autoFocus
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submitName()}
+                placeholder="Your full name"
+                maxLength={60}
+                className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-secondary text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button
+                onClick={submitName}
+                disabled={savingName || !nameDraft.trim()}
+                className="px-3 py-2 rounded-xl gradient-trust text-primary-foreground text-xs font-bold disabled:opacity-50"
+              >
+                {savingName ? "…" : "Save"}
+              </button>
+            </div>
+          ) : hasName ? (
+            <button onClick={openNameEdit} className="flex items-center gap-1.5 text-left max-w-full">
+              <h2 className="text-lg font-bold truncate">{displayName}</h2>
+              {!isTenant && <VerificationBadge isVerified={isVerified} variant="dark" />}
+            </button>
+          ) : (
+            <button onClick={openNameEdit} className="text-lg font-bold text-primary underline underline-offset-4">
+              Add your name
+            </button>
+          )}
           {displayPhone && <p className="text-sm text-muted-foreground">{displayPhone}</p>}
-          <div className="tier-badge-premium mt-1 inline-block">Premium Member</div>
+          <div className="flex flex-wrap items-center gap-1.5 mt-1">
+            {me.phoneVerified && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
+                <ShieldCheck className="w-3 h-3" /> Phone verified
+              </span>
+            )}
+            {me.activePlan ? (
+              <span className="tier-badge-premium inline-block capitalize">{me.activePlan} plan</span>
+            ) : (
+              <button
+                onClick={() => setShowSubscription(true)}
+                className="px-2 py-0.5 rounded-full bg-secondary text-muted-foreground text-[10px] font-semibold"
+              >
+                Free plan
+              </button>
+            )}
+          </div>
         </div>
         <button
           onClick={() => setShowNotifications(true)}
@@ -222,13 +269,15 @@ const ProfileScreen = () => {
         </button>
       </div>
 
-      {/* Liveness re-check reminder */}
-      <ReVerifyBanner role={role} onVerify={() => setShowKYC(true)} />
-
-      {/* Trust ladder */}
-      <div className="mb-4">
-        <TrustLadder role={role} onVerify={() => setShowKYC(true)} />
-      </div>
+      {/* Liveness re-check + trust ladder only matter for people who list or offer services */}
+      {!isTenant && (
+        <>
+          <ReVerifyBanner role={role} onVerify={() => setShowKYC(true)} />
+          <div className="mb-4">
+            <TrustLadder role={role} onVerify={() => setShowKYC(true)} />
+          </div>
+        </>
+      )}
 
       {/* Role Mode Switcher */}
       <div className="mb-4 p-4 rounded-2xl bg-card card-shadow">
