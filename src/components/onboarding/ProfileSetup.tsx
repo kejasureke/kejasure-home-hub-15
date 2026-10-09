@@ -153,6 +153,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
   const handleComplete = async () => {
     try {
       try { localStorage.setItem("kejasure_budget", budget); } catch {}
+      try { localStorage.setItem("kejasure_display_name", `${firstName} ${lastName}`.trim()); } catch {}
       await upsertProfile({
         role: "tenant",
         first_name: firstName || null,
@@ -229,6 +230,7 @@ const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
 
   const handleComplete = async () => {
     try {
+      try { localStorage.setItem("kejasure_display_name", `${firstName} ${lastName}`.trim()); } catch {}
       await upsertProfile({
         role: "landlord",
         first_name: firstName || null,
@@ -297,6 +299,7 @@ const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
 
   const handleComplete = async () => {
     try {
+      try { localStorage.setItem("kejasure_display_name", `${firstName} ${lastName}`.trim()); } catch {}
       await upsertProfile({
         role: "agency",
         first_name: firstName || null,
@@ -370,6 +373,7 @@ const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
 
   const handleComplete = async () => {
     try {
+      try { localStorage.setItem("kejasure_display_name", `${firstName} ${lastName}`.trim()); } catch {}
       await upsertProfile({
         role: "stayhost",
         first_name: firstName || null,
@@ -507,6 +511,7 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
 
   const handleComplete = async () => {
     try {
+      try { localStorage.setItem("kejasure_display_name", `${firstName} ${lastName}`.trim()); } catch {}
       await upsertProfile({
         role: "serviceprovider",
         service_category: type || null,
