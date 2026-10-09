@@ -27,6 +27,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useMyProfile } from "@/hooks/useMyProfile";
 import { useEffect } from "react";
 import type { UserRole } from "@/components/onboarding/RoleSelection";
 
