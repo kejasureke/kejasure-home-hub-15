@@ -94,7 +94,16 @@ const MpesaPaymentFlow = ({
       return data.status;
     };
     const poll = setInterval(check, 3000);
-    return () => { done = true; clearInterval(poll); };
+    // Check right away when the user returns from the M-Pesa PIN prompt
+    const onVisible = () => { if (document.visibilityState === "visible") check(); };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    return () => {
+      done = true;
+      clearInterval(poll);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
@@ -145,6 +154,20 @@ const MpesaPaymentFlow = ({
       },
     });
     if (error || !data?.paymentId) {
+      // The PIN prompt often backgrounds the app and drops the reply even though
+      // the push went through — look for the payment we just started before failing.
+      const since = new Date(Date.now() - 3 * 60 * 1000).toISOString();
+      const { data: recent } = await supabase
+        .from("mpesa_payments")
+        .select("id")
+        .eq("plan_name", plan.name)
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (recent?.[0]?.id) {
+        paymentIdRef.current = recent[0].id;
+        return;
+      }
       setErrorMsg(data?.error || error?.message || "Could not reach M-Pesa. Try again.");
       setState("failed");
       return;
