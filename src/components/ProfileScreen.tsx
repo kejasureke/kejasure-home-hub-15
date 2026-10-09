@@ -59,38 +59,26 @@ const ProfileScreen = () => {
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();
   const { counts: bookingCounts } = useBookings();
-  const { user } = useAuth();
-  const [profileName, setProfileName] = useState<string>(() => {
-    try { return localStorage.getItem("kejasure_display_name") || ""; } catch { return ""; }
-  });
-  const [profilePhone, setProfilePhone] = useState<string>(() => {
-    try { return localStorage.getItem("kejasure_phone") || ""; } catch { return ""; }
-  });
+  const me = useMyProfile();
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState("");
+  const [savingName, setSavingName] = useState(false);
 
-  // Load the signed-in user's real profile (name + phone) from the backend.
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("profiles")
-      .select("full_name, phone")
-      .eq("id", user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.full_name) setProfileName(data.full_name);
-        if (data?.phone) setProfilePhone(data.phone);
-      });
-  }, [user]);
+  const hasName = !!me.name;
+  const displayName = me.name;
+  const displayPhone = me.phone;
+  const initials = me.initials || "?";
 
-  const displayName = profileName || "KejaSure User";
-  const displayPhone = profilePhone || "";
-  const initials = displayName
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase())
-    .join("") || "K";
+  const { isVerified: kycLocal } = useKYCStatus(role);
+  const isVerified = kycLocal || me.idVerified;
 
-  const { isVerified } = useKYCStatus(role);
+  const openNameEdit = () => { setNameDraft(me.name); setEditingName(true); };
+  const submitName = async () => {
+    setSavingName(true);
+    const ok = await me.saveName(nameDraft);
+    setSavingName(false);
+    if (ok) setEditingName(false);
+  };
 
   if (showMyBookings) return <MyBookingsScreen onBack={() => setShowMyBookings(false)} />;
 
