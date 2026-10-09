@@ -282,6 +282,16 @@ Deno.serve(async (req) => {
       .from("otp_codes")
       .update({ used_at: new Date().toISOString() })
       .eq("id", codeData.id);
+    // The code proved phone ownership — record it on the profile.
+    const userId = session?.user?.id;
+    if (userId) {
+      const { data: prof } = await supabase
+        .from("profiles").select("kyc_tier").eq("id", userId).maybeSingle();
+      const update: Record<string, unknown> = { phone_verified: true };
+      if (!prof || prof.kyc_tier === "none") update.kyc_tier = "phone";
+      const { error: pErr } = await supabase.from("profiles").update(update).eq("id", userId);
+      if (pErr) console.error("failed to mark phone verified", pErr);
+    }
     return json({ ok: true, demo: false, session });
 
   } catch (error) {
