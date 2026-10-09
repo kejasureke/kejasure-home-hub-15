@@ -62,6 +62,7 @@ const countyOccupancy = [
 type Tab = "overview" | "calendar" | "guests" | "billing";
 
 const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboardProps) => {
+  const me = useMyProfile();
   const [tab, setTab] = useState<Tab>("overview");
   const [showPayment, setShowPayment] = useState(false);
   const [showBoost, setShowBoost] = useState(false);

@@ -50,6 +50,7 @@ const initialBookingRequests: BookingRequest[] = [
 ];
 
 const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenProps) => {
+  const me = useMyProfile();
   const [showPayment, setShowPayment] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
   const [boostProcessing, setBoostProcessing] = useState<string | null>(null);
