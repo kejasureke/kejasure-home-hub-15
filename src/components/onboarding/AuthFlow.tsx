@@ -339,6 +339,7 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
           refresh_token: session.refresh_token,
         });
       }
+      try { localStorage.setItem("kejasure_phone", toE164(phone)); } catch {}
 
       setStep("pin");
     } finally {
