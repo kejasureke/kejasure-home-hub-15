@@ -511,7 +511,6 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
 
   const handleComplete = async () => {
     try {
-      try { localStorage.setItem("kejasure_display_name", `${firstName} ${lastName}`.trim()); } catch {}
       await upsertProfile({
         role: "serviceprovider",
         service_category: type || null,
