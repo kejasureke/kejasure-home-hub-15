@@ -56,12 +56,12 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
             <p className="text-[11px] text-muted-foreground">
-              Your SMS code verifies that you control the phone number. Your name is verified separately during identity verification.
+              Use your real first and last name, exactly as on your ID. It cannot be changed after signup.
             </p>
           </div>
         </div>
       ),
-      valid: firstName.trim().length > 0 && lastName.trim().length > 0,
+      valid: firstName.trim().length >= 2 && lastName.trim().length >= 2,
     },
     {
       icon: MapPin,
@@ -203,11 +203,11 @@ const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">Your SMS code verifies that you control the phone number. Your name is verified separately during identity verification.</p>
+            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your ID. It cannot be changed after signup.</p>
           </div>
         </div>
       ),
-      valid: firstName.trim().length > 0 && lastName.trim().length > 0,
+      valid: firstName.trim().length >= 2 && lastName.trim().length >= 2,
     },
     {
       icon: Home,
@@ -277,11 +277,11 @@ const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">Your SMS code verifies that you control the phone number. Your name is verified separately during identity verification.</p>
+            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your ID. It cannot be changed after signup.</p>
           </div>
         </div>
       ),
-      valid: firstName.trim().length > 0 && lastName.trim().length > 0,
+      valid: firstName.trim().length >= 2 && lastName.trim().length >= 2,
     },
     {
       icon: Home,
@@ -346,11 +346,11 @@ const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">Your SMS code verifies that you control the phone number. Your name is verified separately during identity verification.</p>
+            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your ID. It cannot be changed after signup.</p>
           </div>
         </div>
       ),
-      valid: firstName.trim().length > 0 && lastName.trim().length > 0,
+      valid: firstName.trim().length >= 2 && lastName.trim().length >= 2,
     },
     {
       icon: Home,

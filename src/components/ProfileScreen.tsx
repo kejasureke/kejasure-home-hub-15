@@ -209,34 +209,37 @@ const ProfileScreen = () => {
           );
         })()}
         <div className="flex-1 min-w-0">
-          {editingName ? (
+          {editingName && !hasName ? (
             <div className="flex items-center gap-2">
               <input
                 autoFocus
                 value={nameDraft}
                 onChange={(e) => setNameDraft(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && submitName()}
-                placeholder="Your full name"
+                placeholder="First and last name"
                 maxLength={60}
                 className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-secondary text-sm font-semibold outline-none focus:ring-2 focus:ring-primary/30"
               />
               <button
                 onClick={submitName}
-                disabled={savingName || !nameDraft.trim()}
+                disabled={savingName || !nameDraft.trim() || nameDraft.trim().split(/\s+/).length < 2}
                 className="px-3 py-2 rounded-xl gradient-trust text-primary-foreground text-xs font-bold disabled:opacity-50"
               >
                 {savingName ? "…" : "Save"}
               </button>
             </div>
           ) : hasName ? (
-            <button onClick={openNameEdit} className="flex items-center gap-1.5 text-left max-w-full">
+            <div className="flex items-center gap-1.5 max-w-full">
               <h2 className="text-lg font-bold truncate">{displayName}</h2>
               {!isTenant && <VerificationBadge isVerified={isVerified} variant="dark" />}
-            </button>
+            </div>
           ) : (
-            <button onClick={openNameEdit} className="text-lg font-bold text-primary underline underline-offset-4">
-              Add your name
-            </button>
+            <div>
+              <button onClick={openNameEdit} className="text-lg font-bold text-primary underline underline-offset-4">
+                Add your name
+              </button>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Use your real first and last name — it can't be changed later.</p>
+            </div>
           )}
           {displayPhone && <p className="text-sm text-muted-foreground">{displayPhone}</p>}
           <div className="flex flex-wrap items-center gap-1.5 mt-1">
