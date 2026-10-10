@@ -37,12 +37,8 @@ export default defineConfig(({ mode }) => ({
           },
           {
             // Same-origin hashed build assets are immutable — cache-first is safe.
-            urlPattern: ({ url, request }) =>
-              url.origin === self.location.origin &&
-              (request.destination === "script" ||
-                request.destination === "style" ||
-                request.destination === "font" ||
-                request.destination === "image"),
+            // Vite emits hashed, immutable files under /assets/.
+            urlPattern: /\/assets\/.*\.(js|css|woff2?|ttf|otf|png|jpe?g|webp|svg|gif)$/,
             handler: "CacheFirst",
             options: {
               cacheName: "kejasure-assets",
