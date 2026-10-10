@@ -69,6 +69,10 @@ const HomeFeed = () => {
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
   const [showNeighborhood, setShowNeighborhood] = useState(false);
+  // True while the price range comes from the onboarding budget (monthly rent).
+  // Budget prices are monthly, so they only make sense on the Rentals tab —
+  // Short Stays are priced per night and would all be filtered out.
+  const [budgetSeeded, setBudgetSeeded] = useState(() => !!savedBudgetRange());
   const [filters, setFilters] = useState(() => {
     const budget = savedBudgetRange();
     return {
@@ -90,6 +94,7 @@ const HomeFeed = () => {
   // When the user changes filters themselves, their choice wins over the onboarding budget
   const applyUserFilters = (f: typeof filters) => {
     try { localStorage.removeItem(BUDGET_KEY); } catch {}
+    setBudgetSeeded(false);
     setFilters(f);
   };
 
@@ -139,7 +144,9 @@ const HomeFeed = () => {
         p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.estate.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.nearbyLandmarks.some((l) => l.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchPrice = p.price >= filters.minPrice && p.price <= filters.maxPrice;
+      // Onboarding budget is a monthly rent figure — only apply it to Rentals.
+      const priceFilterApplies = !(budgetSeeded && segment !== "Rentals");
+      const matchPrice = !priceFilterApplies || (p.price >= filters.minPrice && p.price <= filters.maxPrice);
       const matchBedrooms = filters.bedrooms.length === 0 || filters.bedrooms.includes(p.bedrooms);
       const matchAmenities = filters.amenities.length === 0 || filters.amenities.every((a) => p.amenities.includes(a));
       const matchVerified = !filters.verified || p.verified;
@@ -163,7 +170,7 @@ const HomeFeed = () => {
     }
 
     return result;
-  }, [segment, county, estate, searchQuery, filters]);
+  }, [segment, county, estate, searchQuery, filters, budgetSeeded]);
 
   const recentProperties = properties.filter((p) => recentIds.includes(p.id));
   const compareProperties = properties.filter((p) => compareIds.includes(p.id));
