@@ -170,7 +170,7 @@ const HomeFeed = () => {
     }
 
     return result;
-  }, [segment, county, estate, searchQuery, filters]);
+  }, [segment, county, estate, searchQuery, filters, budgetSeeded]);
 
   const recentProperties = properties.filter((p) => recentIds.includes(p.id));
   const compareProperties = properties.filter((p) => compareIds.includes(p.id));
