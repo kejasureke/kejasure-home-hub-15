@@ -144,7 +144,9 @@ const HomeFeed = () => {
         p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.estate.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.nearbyLandmarks.some((l) => l.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchPrice = p.price >= filters.minPrice && p.price <= filters.maxPrice;
+      // Onboarding budget is a monthly rent figure — only apply it to Rentals.
+      const priceFilterApplies = !(budgetSeeded && segment !== "Rentals");
+      const matchPrice = !priceFilterApplies || (p.price >= filters.minPrice && p.price <= filters.maxPrice);
       const matchBedrooms = filters.bedrooms.length === 0 || filters.bedrooms.includes(p.bedrooms);
       const matchAmenities = filters.amenities.length === 0 || filters.amenities.every((a) => p.amenities.includes(a));
       const matchVerified = !filters.verified || p.verified;
