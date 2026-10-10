@@ -69,6 +69,10 @@ const HomeFeed = () => {
   const [showMap, setShowMap] = useState(false);
   const [showAIMatch, setShowAIMatch] = useState(false);
   const [showNeighborhood, setShowNeighborhood] = useState(false);
+  // True while the price range comes from the onboarding budget (monthly rent).
+  // Budget prices are monthly, so they only make sense on the Rentals tab —
+  // Short Stays are priced per night and would all be filtered out.
+  const [budgetSeeded, setBudgetSeeded] = useState(() => !!savedBudgetRange());
   const [filters, setFilters] = useState(() => {
     const budget = savedBudgetRange();
     return {
