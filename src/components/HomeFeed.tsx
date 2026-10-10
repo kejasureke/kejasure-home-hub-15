@@ -94,6 +94,7 @@ const HomeFeed = () => {
   // When the user changes filters themselves, their choice wins over the onboarding budget
   const applyUserFilters = (f: typeof filters) => {
     try { localStorage.removeItem(BUDGET_KEY); } catch {}
+    setBudgetSeeded(false);
     setFilters(f);
   };
 
