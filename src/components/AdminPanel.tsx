@@ -102,7 +102,7 @@ const AdminPanel = ({ onBack }: AdminPanelProps) => {
   return (
     <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
       {/* Header */}
-      <div className="px-4 pt-5 pb-8 bg-foreground">
+      <div className="px-4 pt-safe pb-8 bg-foreground">
         <div className="flex items-center gap-3 mb-5">
           <button onClick={onBack} className="p-1"><ArrowLeft className="w-5 h-5 text-background" /></button>
           <h1 className="text-lg font-bold text-background">Admin Panel</h1>

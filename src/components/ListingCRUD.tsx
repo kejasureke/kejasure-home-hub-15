@@ -597,7 +597,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   return (
     <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3">
+      <div className="sticky top-0 z-10 bg-background border-b border-border px-4 pb-3 pt-safe-compact">
         <div className="flex items-center justify-between mb-3">
           <button onClick={onClose} className="p-1">
             <ArrowLeft className="w-5 h-5 text-foreground" />

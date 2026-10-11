@@ -50,7 +50,7 @@ const CompareSelectionModal = ({ onClose, onCompare, segment, preSelectedId }: C
   return (
     <div className="fixed inset-0 z-[60] bg-background flex flex-col animate-slide-up">
       {/* Header */}
-      <div className="px-4 pt-4 pb-3 border-b border-border">
+      <div className="px-4 pt-safe pb-3 border-b border-border">
         <div className="flex items-center justify-between mb-3">
           <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
             <X className="w-4 h-4 text-foreground" />

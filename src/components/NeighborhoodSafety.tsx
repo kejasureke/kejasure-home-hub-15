@@ -129,7 +129,7 @@ const NeighborhoodSafety = ({ onBack, estate, county }: NeighborhoodSafetyProps)
   if (selectedArea) {
     return (
       <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
-        <div className="px-4 pt-5 pb-8">
+        <div className="px-4 pt-safe pb-8">
           <div className="flex items-center gap-3 mb-5">
             <button onClick={() => setSelectedArea(null)} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
               <ArrowLeft className="w-4 h-4 text-foreground" />
@@ -212,7 +212,7 @@ const NeighborhoodSafety = ({ onBack, estate, county }: NeighborhoodSafetyProps)
 
   return (
     <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
-      <div className="px-4 pt-5 pb-8">
+      <div className="px-4 pt-safe pb-8">
         <div className="flex items-center gap-3 mb-5">
           <button onClick={triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
             <ArrowLeft className="w-4 h-4 text-foreground" />

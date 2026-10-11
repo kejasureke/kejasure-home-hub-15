@@ -561,7 +561,7 @@ const StepRenderer = ({
 
   return (
     <div className="fixed inset-0 z-[90] bg-background flex flex-col">
-      <div className="px-5 pt-5 flex items-center gap-3">
+      <div className="px-5 pt-safe flex items-center gap-3">
         <button
           onClick={() => (step === 0 ? onBack() : setStep(step - 1))}
           className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center"

@@ -241,7 +241,7 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
   return (
     <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       {/* Header */}
-      <div className="gradient-premium px-4 pt-5 pb-8">
+      <div className="gradient-premium px-4 pt-safe pb-8">
         <div className="flex items-center gap-3 mb-5">
           <button onClick={triggerClose} className="p-1">
             <ArrowLeft className="w-5 h-5 text-accent-foreground" />

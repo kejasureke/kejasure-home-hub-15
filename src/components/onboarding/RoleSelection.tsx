@@ -20,7 +20,7 @@ const RoleSelection = ({ onSelect }: RoleSelectionProps) => {
 
   return (
     <div className="fixed inset-0 z-[90] bg-background flex flex-col">
-      <div className="px-6 pt-8 pb-4">
+      <div className="px-6 pt-safe pb-4">
         <h1 className="text-2xl font-extrabold text-foreground">I am a...</h1>
         <p className="text-sm text-muted-foreground mt-1">Choose how you'll use KejaSure</p>
       </div>

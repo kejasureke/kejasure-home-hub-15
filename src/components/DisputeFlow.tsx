@@ -38,7 +38,7 @@ const DisputeFlow = ({ onClose }: DisputeFlowProps) => {
   if (step === "submitted") {
     return (
       <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
-        <div className="px-4 pt-6 pb-8 flex flex-col items-center text-center min-h-screen justify-center">
+        <div className="px-4 pt-safe pb-8 flex flex-col items-center text-center min-h-screen justify-center">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-[pulse_1s_ease-in-out_2]">
             <CheckCircle2 className="w-10 h-10 text-primary" />
           </div>
@@ -98,7 +98,7 @@ const DisputeFlow = ({ onClose }: DisputeFlowProps) => {
   if (step === "track") {
     return (
       <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
-        <div className="px-4 pt-5 pb-8">
+        <div className="px-4 pt-safe pb-8">
           <div className="flex items-center gap-3 mb-5">
             <button onClick={triggerClose} className="p-1"><ArrowLeft className="w-5 h-5 text-foreground" /></button>
             <h1 className="text-lg font-bold">My Disputes</h1>
@@ -163,7 +163,7 @@ const DisputeFlow = ({ onClose }: DisputeFlowProps) => {
   // Main flow: select + details
   return (
     <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
-      <div className="px-4 pt-5 pb-8">
+      <div className="px-4 pt-safe pb-8">
         <div className="flex items-center gap-3 mb-5">
           <button onClick={step === "details" ? () => setStep("select") : onClose} className="p-1">
             <ArrowLeft className="w-5 h-5 text-foreground" />

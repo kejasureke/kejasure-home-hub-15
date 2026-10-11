@@ -89,13 +89,13 @@ const FullscreenImageViewer = ({ images, alt, initialIndex = 0, onClose }: Fulls
     <div className={`fixed inset-0 z-[80] bg-black ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       <button
         onClick={triggerClose}
-        className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center"
+        className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center" style={{ top: "calc(1rem + var(--safe-area-top, env(safe-area-inset-top, 0px)))" }}
         aria-label="Close fullscreen"
       >
         <X className="w-5 h-5 text-white" />
       </button>
 
-      <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md flex items-center gap-1.5">
+      <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md flex items-center gap-1.5" style={{ top: "calc(1rem + var(--safe-area-top, env(safe-area-inset-top, 0px)))" }}>
         <span className="text-xs font-semibold text-white">
           {index + 1} / {images.length}
         </span>
