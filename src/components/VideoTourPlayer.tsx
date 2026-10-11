@@ -90,7 +90,7 @@ const VideoTourPlayer = ({ videoUrl, title, onBack, rooms }: VideoTourPlayerProp
   return (
     <div className="fixed inset-0 z-[70] bg-foreground flex flex-col">
       {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center gap-3 p-4 bg-gradient-to-b from-foreground/80 to-transparent">
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center gap-3 p-4 pt-safe-compact bg-gradient-to-b from-foreground/80 to-transparent">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-card/20 flex items-center justify-center">
           <ArrowLeft className="w-4 h-4 text-background" />
         </button>

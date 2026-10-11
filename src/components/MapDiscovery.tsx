@@ -235,7 +235,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   return (
     <div className="fixed inset-0 z-[60] bg-background flex flex-col animate-slide-up pb-20">
       {/* Header */}
-      <div className="px-4 pt-4 pb-3 flex items-center gap-3">
+      <div className="px-4 pt-safe pb-3 flex items-center gap-3">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
           <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>

@@ -232,7 +232,7 @@ const NotificationsScreen = ({
   return (
     <div className="pb-32">
       {/* Header */}
-      <div className="gradient-trust px-4 pt-5 pb-4">
+      <div className="gradient-trust px-4 pt-safe pb-4">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}

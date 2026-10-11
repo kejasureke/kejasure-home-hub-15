@@ -56,7 +56,7 @@ const MoveInChecklist = ({ property, onBack }: MoveInChecklistProps) => {
   return (
     <div className="fixed inset-0 z-40 bg-background overflow-y-auto animate-slide-up">
       {/* Header */}
-      <div className="gradient-trust px-4 pt-6 pb-5">
+      <div className="gradient-trust px-4 pt-safe pb-5">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={onBack} className="w-10 h-10 rounded-full bg-card/20 backdrop-blur-sm flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-primary-foreground" />
