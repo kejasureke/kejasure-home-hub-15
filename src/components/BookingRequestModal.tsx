@@ -117,7 +117,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
     <Confetti active={step === "accepted"} />
     <div className="fixed inset-0 z-50 flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-h-[90vh] bg-card rounded-t-3xl overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
-        <div className="sticky top-0 bg-card z-10 px-6 pt-6 pb-3">
+        <div className="sticky top-0 bg-card z-10 px-6 pt-safe pb-3">
           <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold">{title}</h3>

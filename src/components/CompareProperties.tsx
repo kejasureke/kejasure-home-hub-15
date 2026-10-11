@@ -95,7 +95,7 @@ const CompareProperties = ({ properties, onClose, onRemove }: ComparePropertiesP
 
   return (
     <div className="fixed inset-0 z-[70] bg-background animate-slide-up overflow-y-auto pb-8">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border sticky top-0 bg-background z-10">
+      <div className="flex items-center justify-between px-4 pb-3 pt-safe-compact border-b border-border sticky top-0 bg-background z-10">
         <button onClick={onClose}>
           <X className="w-5 h-5 text-muted-foreground" />
         </button>
