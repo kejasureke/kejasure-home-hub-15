@@ -198,11 +198,22 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
     refs: React.MutableRefObject<(HTMLInputElement | null)[]>,
     length: number
   ) => {
-    if (!/^\d*$/.test(value)) return;
+    const digits = value.replace(/\D/g, "");
+    if (value && !digits) return;
     const next = [...arr];
-    next[index] = value.slice(-1);
+    // Autofill / paste delivers the whole code into one box — spread it out.
+    if (digits.length > 1) {
+      const fill = digits.slice(-length).length === length ? digits.slice(-length) : digits;
+      const start = fill.length === length ? 0 : index;
+      for (let k = 0; k < fill.length && start + k < length; k++) next[start + k] = fill[k];
+      setArr(next);
+      const last = Math.min(start + fill.length, length) - 1;
+      refs.current[last]?.focus();
+      return;
+    }
+    next[index] = digits;
     setArr(next);
-    if (value && index < length - 1) refs.current[index + 1]?.focus();
+    if (digits && index < length - 1) refs.current[index + 1]?.focus();
   };
 
   const handleKeyDown = (
@@ -623,9 +634,16 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
                 <input
                   key={i}
                   ref={(el) => (otpRefs.current[i] = el)}
-                  type="tel"
+                  type="text"
                   inputMode="numeric"
-                  maxLength={1}
+                  pattern="[0-9]*"
+                  autoComplete={i === 0 ? "one-time-code" : "off"}
+                  name={i === 0 ? "otp" : undefined}
+                  maxLength={i === 0 ? 6 : 1}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    handleCodeInput(e.clipboardData.getData("text"), i, otp, setOtp, otpRefs, 6);
+                  }}
                   value={digit}
                   onChange={(e) => handleCodeInput(e.target.value, i, otp, setOtp, otpRefs, 6)}
                   onKeyDown={(e) => handleKeyDown(e, i, otp, setOtp, otpRefs)}
