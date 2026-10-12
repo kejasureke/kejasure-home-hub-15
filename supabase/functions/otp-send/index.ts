@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
   if (isAfricasTalkingConfigured()) {
     const sendResult = await sendSms(
       phone,
-      `${code} is your KejaSure verification code. It expires in 5 minutes. Do not share it with anyone.`,
+      `${code} is your KejaSure verification code. It expires in 5 minutes. Do not share it with anyone.\n\n@kejasureapp.lovable.app #${code}`,
     );
     smsSent = sendResult.ok;
     smsError = sendResult.ok ? null : sendResult.error;
