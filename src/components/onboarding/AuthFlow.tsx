@@ -358,6 +358,59 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
     }
   };
 
+  // Auto-verify once all 6 digits are in (typed, pasted or autofilled).
+  const lastAutoSubmitted = useRef<string>("");
+  useEffect(() => {
+    if (step !== "otp" || !isOtpFilled || verifying) return;
+    const code = otp.join("");
+    if (lastAutoSubmitted.current === code) return;
+    lastAutoSubmitted.current = code;
+    haptic("light");
+    void handleOtpSubmit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otp, step, isOtpFilled, verifying]);
+
+  const applyDetectedCode = (code: string) => {
+    if (!/^\d{6}$/.test(code)) return;
+    if (otp.join("") === code) return;
+    setOtp(code.split(""));
+    otpRefs.current[5]?.focus();
+  };
+
+  // Android: read the code straight from the SMS where supported (WebOTP).
+  useEffect(() => {
+    if (step !== "otp" || typeof window === "undefined" || !("OTPCredential" in window)) return;
+    const ac = new AbortController();
+    (navigator.credentials as any)
+      .get({ otp: { transport: ["sms"] }, signal: ac.signal })
+      .then((cred: any) => cred?.code && applyDetectedCode(String(cred.code).replace(/\D/g, "").slice(0, 6)))
+      .catch(() => {});
+    return () => ac.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  // Fallback: user copied the code from the SMS and came back to the app.
+  useEffect(() => {
+    if (step !== "otp") return;
+    const check = async () => {
+      if (document.visibilityState !== "visible" || otp.every((d) => d !== "")) return;
+      try {
+        const text = await navigator.clipboard?.readText?.();
+        const m = text?.match(/\b(\d{6})\b/);
+        if (m) applyDetectedCode(m[1]);
+      } catch {
+        // clipboard permission denied — user can still type or paste
+      }
+    };
+    document.addEventListener("visibilitychange", check);
+    window.addEventListener("focus", check);
+    return () => {
+      document.removeEventListener("visibilitychange", check);
+      window.removeEventListener("focus", check);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, otp]);
+
   const handlePinSubmit = () => {
     setPinError("");
     setStep("confirm-pin");
