@@ -198,11 +198,22 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
     refs: React.MutableRefObject<(HTMLInputElement | null)[]>,
     length: number
   ) => {
-    if (!/^\d*$/.test(value)) return;
+    const digits = value.replace(/\D/g, "");
+    if (value && !digits) return;
     const next = [...arr];
-    next[index] = value.slice(-1);
+    // Autofill / paste delivers the whole code into one box — spread it out.
+    if (digits.length > 1) {
+      const fill = digits.slice(-length).length === length ? digits.slice(-length) : digits;
+      const start = fill.length === length ? 0 : index;
+      for (let k = 0; k < fill.length && start + k < length; k++) next[start + k] = fill[k];
+      setArr(next);
+      const last = Math.min(start + fill.length, length) - 1;
+      refs.current[last]?.focus();
+      return;
+    }
+    next[index] = digits;
     setArr(next);
-    if (value && index < length - 1) refs.current[index + 1]?.focus();
+    if (digits && index < length - 1) refs.current[index + 1]?.focus();
   };
 
   const handleKeyDown = (
@@ -346,6 +357,59 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
       setVerifying(false);
     }
   };
+
+  // Auto-verify once all 6 digits are in (typed, pasted or autofilled).
+  const lastAutoSubmitted = useRef<string>("");
+  useEffect(() => {
+    if (step !== "otp" || !isOtpFilled || verifying) return;
+    const code = otp.join("");
+    if (lastAutoSubmitted.current === code) return;
+    lastAutoSubmitted.current = code;
+    haptic("light");
+    void handleOtpSubmit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otp, step, isOtpFilled, verifying]);
+
+  const applyDetectedCode = (code: string) => {
+    if (!/^\d{6}$/.test(code)) return;
+    if (otp.join("") === code) return;
+    setOtp(code.split(""));
+    otpRefs.current[5]?.focus();
+  };
+
+  // Android: read the code straight from the SMS where supported (WebOTP).
+  useEffect(() => {
+    if (step !== "otp" || typeof window === "undefined" || !("OTPCredential" in window)) return;
+    const ac = new AbortController();
+    (navigator.credentials as any)
+      .get({ otp: { transport: ["sms"] }, signal: ac.signal })
+      .then((cred: any) => cred?.code && applyDetectedCode(String(cred.code).replace(/\D/g, "").slice(0, 6)))
+      .catch(() => {});
+    return () => ac.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  // Fallback: user copied the code from the SMS and came back to the app.
+  useEffect(() => {
+    if (step !== "otp") return;
+    const check = async () => {
+      if (document.visibilityState !== "visible" || otp.every((d) => d !== "")) return;
+      try {
+        const text = await navigator.clipboard?.readText?.();
+        const m = text?.match(/\b(\d{6})\b/);
+        if (m) applyDetectedCode(m[1]);
+      } catch {
+        // clipboard permission denied — user can still type or paste
+      }
+    };
+    document.addEventListener("visibilitychange", check);
+    window.addEventListener("focus", check);
+    return () => {
+      document.removeEventListener("visibilitychange", check);
+      window.removeEventListener("focus", check);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, otp]);
 
   const handlePinSubmit = () => {
     setPinError("");
@@ -623,9 +687,16 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
                 <input
                   key={i}
                   ref={(el) => (otpRefs.current[i] = el)}
-                  type="tel"
+                  type="text"
                   inputMode="numeric"
-                  maxLength={1}
+                  pattern="[0-9]*"
+                  autoComplete={i === 0 ? "one-time-code" : "off"}
+                  name={i === 0 ? "otp" : undefined}
+                  maxLength={i === 0 ? 6 : 1}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    handleCodeInput(e.clipboardData.getData("text"), i, otp, setOtp, otpRefs, 6);
+                  }}
                   value={digit}
                   onChange={(e) => handleCodeInput(e.target.value, i, otp, setOtp, otpRefs, 6)}
                   onKeyDown={(e) => handleKeyDown(e, i, otp, setOtp, otpRefs)}
