@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Phone, ShieldCheck, Lock, Fingerprint, ChevronRight, Smartphone, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { haptic, requestBiometric } from "@/lib/despia";
+import { haptic, requestBiometric, isDespia } from "@/lib/despia";
 import { hasStoredPin, getStoredPhone, storePin, verifyPin } from "@/lib/pinAuth";
 
 type AuthStep = "unlock" | "phone" | "otp" | "pin" | "confirm-pin" | "biometric";
@@ -472,6 +472,29 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
       return () => clearTimeout(t);
     }
   }, [step, unlockPin]);
+
+  // Returning users who enabled biometrics: prompt fingerprint/Face ID
+  // automatically on open. PIN stays as the fallback if they cancel.
+  const autoBioTried = useRef(false);
+  useEffect(() => {
+    if (step !== "unlock" || autoBioTried.current) return;
+    let enabled = false;
+    try { enabled = localStorage.getItem("kejasure_biometric_enabled") === "true"; } catch {}
+    if (!enabled || !isDespia()) return;
+    const t = setTimeout(async () => {
+      autoBioTried.current = true;
+      const result = await requestBiometric();
+      if (result.success) {
+        haptic("success");
+        try { localStorage.removeItem(AUTH_STATE_KEY); } catch {}
+        onComplete();
+      } else {
+        unlockRefs.current[0]?.focus();
+      }
+    }, 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   const stepIndex = ["phone", "otp", "pin", "confirm-pin", "biometric"].indexOf(step);
   const progress = step === "unlock" ? 100 : ((stepIndex + 1) / 5) * 100;
