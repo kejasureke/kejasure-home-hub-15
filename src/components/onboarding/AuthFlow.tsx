@@ -481,8 +481,8 @@ const AuthFlow = ({ onComplete, onBack, mode = "signup" }: AuthFlowProps) => {
     let enabled = false;
     try { enabled = localStorage.getItem("kejasure_biometric_enabled") === "true"; } catch {}
     if (!enabled || !isDespia()) return;
-    autoBioTried.current = true;
     const t = setTimeout(async () => {
+      autoBioTried.current = true;
       const result = await requestBiometric();
       if (result.success) {
         haptic("success");
