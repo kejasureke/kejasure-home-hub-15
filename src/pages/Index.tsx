@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import BottomNav from "@/components/BottomNav";
 import HomeFeed from "@/components/HomeFeed";
-import ChatList from "@/components/ChatList";
+import ChatList, { contacts as chatContacts } from "@/components/ChatList";
+import { useParams } from "react-router-dom";
 import type { ChatContact } from "@/components/ChatList";
 import NotificationToast from "@/components/NotificationToast";
 import { PropertyCardSkeleton } from "@/components/Skeleton";
@@ -88,6 +89,38 @@ const Index = () => {
     window.addEventListener("open-service-chat", handler);
     return () => window.removeEventListener("open-service-chat", handler);
   }, []);
+
+  // Deep links (kejasure://listing/ID, https://…/listing/ID, ?open=chat&id=…)
+  // and notification taps all land here and open the exact screen.
+  const { id: routeListingId } = useParams();
+  useEffect(() => {
+    const open = (type?: string | null, id?: string | null) => {
+      if (type === "listing") {
+        const p = id ? properties.find((x) => x.id === id) : null;
+        if (p) { setShowChat(false); setSelectedProperty(p); window.scrollTo(0, 0); }
+        else setActiveTab("search");
+      } else if (type === "chat") {
+        const c = id ? chatContacts.find((x) => x.id === id) : null;
+        setSelectedProperty(null);
+        if (c) { setChatContact(c); setShowChat(true); }
+        else setActiveTab("chats");
+      } else if (type === "booking") {
+        setSelectedProperty(null);
+        setShowChat(false);
+        sessionStorage.setItem("kejasure_open_bookings", "1");
+        setActiveTab("profile");
+        setTimeout(() => window.dispatchEvent(new Event("open-my-bookings")), 50);
+      }
+    };
+    const q = new URLSearchParams(window.location.search);
+    if (routeListingId) open("listing", routeListingId);
+    else if (q.get("open")) open(q.get("open"), q.get("id"));
+    else if (q.get("listing")) open("listing", q.get("listing"));
+    if (routeListingId || q.get("open") || q.get("listing")) window.history.replaceState(null, "", "/");
+    const h = (e: Event) => { const d = (e as CustomEvent).detail || {}; open(d.type, d.id); };
+    window.addEventListener("kejasure-open", h);
+    return () => window.removeEventListener("kejasure-open", h);
+  }, [routeListingId]);
 
   // Listen for saved search navigation
   useEffect(() => {

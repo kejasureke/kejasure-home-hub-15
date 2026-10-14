@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import SplashScreen from "@/components/SplashScreen";
 import DesktopBlocker from "@/components/DesktopBlocker";
 import OfflineBanner from "@/components/OfflineBanner";
+import NativeGestures from "@/components/NativeGestures";
 import OnboardingFlow, { isOnboarded } from "@/components/onboarding/OnboardingFlow";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -42,6 +43,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <OfflineBanner />
+        <NativeGestures />
         {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
         {!showSplash && !onboarded && (
           <OnboardingFlow onComplete={() => setOnboarded(true)} />
@@ -50,6 +52,7 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/listing/:id" element={<Index />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

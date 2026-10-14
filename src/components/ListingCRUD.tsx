@@ -336,7 +336,8 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const addFakePhoto = () => {
     if (form.photos.length >= 10) return;
     // Native camera on device, file picker on web — both hand back real bytes.
-    openCamera(() => haptic("light"));
+    // Webview opens the phone camera straight away (gallery still available).
+    haptic("light");
     fileInputRef.current?.click();
   };
 
@@ -354,7 +355,9 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
       return next;
     });
     update({ photos: [...form.photos, ...dataUrls] });
-    haptic("light");
+    haptic("success");
+    // Stamp the listing GPS pin automatically on first photo.
+    if (!gpsPin && gpsState !== "locating") void capturePin();
   };
 
   const removePhoto = (i: number) => {
@@ -1135,6 +1138,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
               ref={fileInputRef}
               type="file"
               accept="image/*"
+              capture="environment"
               multiple
               className="hidden"
               onChange={(e) => { void onPickFiles(e.target.files); e.target.value = ""; }}

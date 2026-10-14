@@ -445,7 +445,11 @@ const NotificationsScreen = ({
                     Close
                   </button>
                   <button
-                    onClick={closeDetail}
+                    onClick={() => {
+                      const t = detailItem.type;
+                      closeDetail();
+                      window.dispatchEvent(new CustomEvent("kejasure-open", { detail: { type: t === "message" ? "chat" : t === "booking" ? "booking" : t === "listing" || t === "price" ? "listing" : t } }));
+                    }}
                     className="flex-[1.4] py-3 rounded-xl gradient-trust text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
                   >
                     {detailActionLabel(detailItem.type)}
