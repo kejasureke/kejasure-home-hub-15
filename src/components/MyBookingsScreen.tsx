@@ -1,3 +1,4 @@
+import PullToRefresh from "@/components/PullToRefresh";
 import { useState, useMemo, useEffect } from "react";
 import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, ShieldAlert, Calendar, MoreVertical, CalendarClock, Star } from "lucide-react";
 import { useBookings, type BookingStatus, type Booking } from "@/hooks/useBookings";
@@ -287,6 +288,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
             })}
           </div>
         )}
+        </PullToRefresh>
       </div>
 
       {/* Action sheet */}
