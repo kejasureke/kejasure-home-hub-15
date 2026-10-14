@@ -34,7 +34,7 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 const ShareListingSheet = ({ property, onClose }: ShareListingSheetProps) => {
   const [copied, setCopied] = useState(false);
 
-  const shareUrl = `https://kejasure.co.ke/listing/${property.id}`;
+  const shareUrl = `https://kejasureapp.lovable.app/listing/${property.id}`;
   const shareText = `Check out this property on KejaSure: ${property.title} - KES ${new Intl.NumberFormat("en-KE").format(property.price)}${property.priceUnit} in ${property.estate}, ${property.county}`;
 
   const handleCopy = () => {

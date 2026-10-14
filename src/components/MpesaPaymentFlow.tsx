@@ -1,3 +1,4 @@
+import { haptic } from "@/lib/despia";
 import { useState, useEffect, useRef } from "react";
 import {
   Phone, CheckCircle2, XCircle, Clock, Receipt, RefreshCw, Zap,
@@ -85,12 +86,12 @@ const MpesaPaymentFlow = ({
         done = true;
         const receipt = data.mpesa_receipt || "Confirmed";
         setTransactionId(receipt);
-        setState("success");
+        { haptic("success"); setState("success"); }
         onSuccess?.(plans[selected], receipt);
       } else if (data.status === "failed") {
         done = true;
         setErrorMsg(data.result_desc || "The M-Pesa transaction was not completed.");
-        setState("failed");
+        { haptic("error"); setState("failed"); }
       }
       return data.status;
     };
@@ -122,13 +123,13 @@ const MpesaPaymentFlow = ({
         if (data?.status === "success") {
           const receipt = data.mpesa_receipt || "Confirmed";
           setTransactionId(receipt);
-          setState("success");
+          { haptic("success"); setState("success"); }
           onSuccess?.(plans[selected], receipt);
           return;
         }
       }
       setErrorMsg("We didn't get a confirmation from M-Pesa in time. If money was deducted, it will reflect shortly.");
-      setState("failed");
+      { haptic("error"); setState("failed"); }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, countdown]);
@@ -170,7 +171,7 @@ const MpesaPaymentFlow = ({
         return;
       }
       setErrorMsg(data?.error || error?.message || "Could not reach M-Pesa. Try again.");
-      setState("failed");
+      { haptic("error"); setState("failed"); }
       return;
     }
     paymentIdRef.current = data.paymentId;

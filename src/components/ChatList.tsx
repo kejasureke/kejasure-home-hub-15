@@ -26,7 +26,7 @@ interface ChatListProps {
   onOpenChat: (contact: ChatContact) => void;
 }
 
-const contacts: ChatContact[] = [
+export const contacts: ChatContact[] = [
   { id: "1", name: "John Kamau", avatar: "JK", lastMessage: "Saturday at 10 AM works perfectly. I'll send you the exact location pin.", time: "10:35 AM", unread: 1, online: true, verified: true, role: "landlord", pinned: true, property: "3BR Kilimani" },
   { id: "2", name: "Mary Wanjiku", avatar: "MW", lastMessage: "The apartment is ready for viewing. Please bring your ID.", time: "Yesterday", unread: 0, online: false, verified: true, role: "landlord", property: "2BR Westlands" },
   { id: "3", name: "SwiftMovers KE", avatar: "🚛", lastMessage: "We can move you on Friday morning. Confirmed!", time: "Mon", unread: 3, online: true, verified: true, role: "service" },

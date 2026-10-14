@@ -2,7 +2,6 @@ import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Ph
 import { useState, useEffect, useRef } from "react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
-import { useSwipeBack } from "@/hooks/useSwipeBack";
 import type { Property } from "@/data/mockData";
 import HostCard from "./listing/HostCard";
 import SimilarListingsRail from "./listing/SimilarListingsRail";
@@ -61,10 +60,8 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
   // Edge-swipe from left to close, and hardware back on Android
   useHardwareBack(true, triggerClose);
-  const swipeRef = useSwipeBack(true, triggerClose);
   const setRefs = (el: HTMLDivElement | null) => {
     scrollRef.current = el;
-    (swipeRef as { current: HTMLElement | null }).current = el;
   };
 
   const formatPrice = (price: number) => new Intl.NumberFormat("en-KE").format(price);
