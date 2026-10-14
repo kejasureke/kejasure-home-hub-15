@@ -55,7 +55,18 @@ const ProfileScreen = () => {
   const [showSubscription, setShowSubscription] = useState(false);
   const [showNeighborhood, setShowNeighborhood] = useState(false);
   const [showBoost, setShowBoost] = useState(false);
-  const [showMyBookings, setShowMyBookings] = useState(false);
+  const [showMyBookings, setShowMyBookings] = useState(() => {
+    if (sessionStorage.getItem("kejasure_open_bookings")) {
+      sessionStorage.removeItem("kejasure_open_bookings");
+      return true;
+    }
+    return false;
+  });
+  useEffect(() => {
+    const h = () => { sessionStorage.removeItem("kejasure_open_bookings"); setShowNotifications(false); setShowMyBookings(true); };
+    window.addEventListener("open-my-bookings", h);
+    return () => window.removeEventListener("open-my-bookings", h);
+  }, []);
   const { alerts, unreadCount: liveUnread, soundEnabled, markAlertRead, markAllAlertsRead, toggleSound, dismissAlert, restoreAlert } = useInAppNotifications();
   const { unreadCount: storedUnread } = useNotifications();
   const { role, setRole, isTenant } = useUserRole();

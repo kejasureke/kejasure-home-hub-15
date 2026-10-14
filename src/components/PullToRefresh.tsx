@@ -28,12 +28,22 @@ const PullToRefresh = ({
   const [pull, setPull] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
-  const atTop = () =>
-    (window.scrollY || document.documentElement.scrollTop || 0) <= 0;
+  const atTop = (target?: EventTarget | null) => {
+    if ((window.scrollY || document.documentElement.scrollTop || 0) > 0) return false;
+    // Also respect inner scroll areas (full-screen overlays scroll inside a div).
+    let el = target as HTMLElement | null;
+    while (el && el !== document.body) {
+      if (el.scrollHeight > el.clientHeight && /auto|scroll/.test(getComputedStyle(el).overflowY)) {
+        return el.scrollTop <= 0;
+      }
+      el = el.parentElement;
+    }
+    return true;
+  };
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     if (refreshing) return;
-    if (!atTop()) return;
+    if (!atTop(e.target)) return;
     startY.current = e.touches[0].clientY;
     armed.current = true;
     crossedThreshold.current = false;

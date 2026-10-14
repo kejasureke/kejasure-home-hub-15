@@ -108,6 +108,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
 
       {/* List */}
       <div className="flex-1 overflow-y-auto px-4 pt-2 pb-32 scrollbar-none">
+        <PullToRefresh onRefresh={async () => { window.dispatchEvent(new Event("bookings-updated")); await new Promise((r) => setTimeout(r, 700)); }}>
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-20 px-6 animate-fade-in">
             <EmptyIllustration variant="bookings" className="w-32 h-32 mb-3" />
