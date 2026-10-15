@@ -8,6 +8,13 @@
       "when": 1791440085569,
       "tag": "0000_create_mpesa_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792035397431,
+      "tag": "0001_referrals",
+      "breakpoints": true
     }
   ]
 }
