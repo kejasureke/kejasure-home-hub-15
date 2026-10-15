@@ -122,6 +122,45 @@ Deno.serve(async (req) => {
           mpesa_receipt: receipt,
         })
       }
+
+      // Referral reward: the inviter gets a free 24h pass once their friend has paid for a plan
+      try {
+        const { data: ref } = await admin.from('referrals')
+          .select('id, referrer_id').eq('referred_id', payment.user_id).eq('status', 'pending').maybeSingle()
+        if (ref) {
+          const { data: claimed } = await admin.from('referrals')
+            .update({ status: 'rewarded', rewarded_at: new Date().toISOString() })
+            .eq('id', ref.id).eq('status', 'pending').select('id').maybeSingle()
+          if (claimed) {
+            const DAY = 24 * 60 * 60 * 1000
+            const { data: active } = await admin.from('subscriptions')
+              .select('id, ends_at').eq('user_id', ref.referrer_id).eq('status', 'active')
+              .order('ends_at', { ascending: false }).limit(1).maybeSingle()
+            if (active?.ends_at && new Date(active.ends_at) > new Date()) {
+              await admin.from('subscriptions')
+                .update({ ends_at: new Date(new Date(active.ends_at).getTime() + DAY).toISOString() })
+                .eq('id', active.id)
+            } else {
+              let { data: rp } = await admin.from('subscription_plans').select('id').eq('tier', 'Referral 24h Pass').maybeSingle()
+              if (!rp) {
+                const { data: np } = await admin.from('subscription_plans')
+                  .insert({ role: 'tenant', tier: 'Referral 24h Pass', price_kes: 0, active: false }).select('id').single()
+                rp = np
+              }
+              if (rp) {
+                await admin.from('subscriptions').insert({
+                  user_id: ref.referrer_id, plan_id: rp.id, status: 'active',
+                  starts_at: new Date().toISOString(), ends_at: new Date(Date.now() + DAY).toISOString(),
+                })
+              }
+            }
+            await admin.from('notifications').insert({
+              user_id: ref.referrer_id, type: 'system', title: 'You earned a free 24h pass',
+              body: 'A friend you invited just subscribed. Asante for spreading KejaSure!', deep_link: '/settings/subscription',
+            })
+          }
+        }
+      } catch (_) { /* never block the payment ack */ }
     }
 
     // Notify the user
