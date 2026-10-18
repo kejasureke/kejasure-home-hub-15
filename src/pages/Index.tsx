@@ -35,6 +35,7 @@ const ScreenFallback = () => (
 );
 import type { Property } from "@/data/mockData";
 import { Heart } from "lucide-react";
+import { cacheImages } from "@/lib/offlineSaved";
 import EmptyIllustration from "@/components/EmptyIllustration";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -68,6 +69,10 @@ const Index = () => {
   } = useInAppNotifications();
 
   const favoriteProperties = properties.filter((p) => favoriteIds.includes(p.id));
+  useEffect(() => {
+    cacheImages(favoriteProperties.flatMap((p) => p.images));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [favoriteIds.join(",")]);
 
   // Listen for service chat open events
   useEffect(() => {
@@ -265,7 +270,12 @@ const Index = () => {
 
       {activeTab === "favorites" && (
         <div className="px-4 pt-6 pb-32">
-          <h1 className="text-xl font-bold mb-4">Saved Properties</h1>
+          <h1 className="text-xl font-bold mb-1">Saved Properties</h1>
+          {favoriteProperties.length > 0 && (
+            <p className="text-[11px] text-muted-foreground mb-4">
+              {navigator.onLine ? "Saved on your phone — opens even without data." : "You're offline. Showing your saved homes."}
+            </p>
+          )}
           {favoriteProperties.length > 0 ? (
             <div className="space-y-4">
               {favoriteProperties.map((p) => (

@@ -4,6 +4,7 @@ import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
 import type { Property } from "@/data/mockData";
 import HostCard from "./listing/HostCard";
+import CaretakerCard from "./listing/CaretakerCard";
 import SimilarListingsRail from "./listing/SimilarListingsRail";
 import FullscreenImageViewer from "./listing/FullscreenImageViewer";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
@@ -380,6 +381,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
         {/* Host / Landlord Card */}
         <HostCard property={property} />
+        <CaretakerCard property={property} />
 
         {/* smile.id Verified Badge */}
         {property.verified && (
