@@ -49,7 +49,7 @@ const ScamCheckScreen = ({ onBack }: { onBack: () => void }) => {
         setResult({ kind: "phone", flagged: !!hit, reports: hit?.reports, reason: hit?.reason, phone });
       } else setResult({ kind: "unknown" });
     }
-    haptic("medium");
+    haptic("light");
   };
 
   const paste = async () => {
