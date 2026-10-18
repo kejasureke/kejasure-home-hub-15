@@ -38,7 +38,7 @@ const CaretakerCard = ({ property }: { property: Property }) => {
         </p>
       </div>
       {unlocked ? (
-        <a href={`tel:${c.phone.replace(/\s/g, "")}`} onClick={() => haptic("medium")} className="px-3 py-2 rounded-xl gradient-trust text-[11px] font-semibold text-primary-foreground flex items-center gap-1">
+        <a href={`tel:${c.phone.replace(/\s/g, "")}`} onClick={() => haptic("light")} className="px-3 py-2 rounded-xl gradient-trust text-[11px] font-semibold text-primary-foreground flex items-center gap-1">
           <Phone className="w-3 h-3" /> Call
         </a>
       ) : (

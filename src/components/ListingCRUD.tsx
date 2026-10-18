@@ -8,6 +8,7 @@ import { kenyaCounties } from "@/data/kenyaCounties";
 import { validateCaption } from "@/utils/captionSafety";
 import { openCamera, haptic, getCurrentLocation } from "@/lib/despia";
 import { Crosshair, CheckCircle2 } from "lucide-react";
+import { notifyNewListing } from "@/lib/listingAlerts";
 import { fileToDataUrl } from "@/lib/imageIntegrity";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
@@ -177,6 +178,8 @@ const steps = ["Details", "Location", "Amenities", "Photos", "Boost"];
 
 const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [step, setStep] = useState(0);
+  const [caretakerName, setCaretakerName] = useState("");
+  const [caretakerPhone, setCaretakerPhone] = useState("");
   const [gpsPin, setGpsPin] = useState<{ lat: number; lng: number; accuracy?: number } | null>(null);
   const [gpsState, setGpsState] = useState<"idle" | "locating" | "error">("idle");
   const [gpsError, setGpsError] = useState("");
@@ -572,6 +575,24 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const captionedCount = Object.values(photoCaptions).filter((c) => c && c.trim()).length;
 
   const handleSubmit = () => {
+    const listingId = (editData as any)?.id ?? `new_${Date.now()}`;
+    if (caretakerPhone.replace(/\D/g, "").length >= 9) {
+      try {
+        const all = JSON.parse(localStorage.getItem("kejasure_caretakers") || "{}");
+        all[listingId] = { name: caretakerName.trim() || "Caretaker", phone: caretakerPhone.trim() };
+        localStorage.setItem("kejasure_caretakers", JSON.stringify(all));
+      } catch {}
+    }
+    if (!editData && type !== "service") {
+      notifyNewListing({
+        title: form.title || "New listing",
+        type: form.type,
+        county: form.county,
+        estate: form.estate,
+        bedrooms: form.bedrooms,
+        price: Number(form.price) || 0,
+      });
+    }
     setShowSuccess(true);
     setTimeout(() => {
       setShowSuccess(false);
@@ -923,6 +944,28 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                   <MapPin className="w-4 h-4 text-trust" />
                   <span className="text-sm font-semibold text-trust">{form.estate}, {form.county}</span>
                 </div>
+              </div>
+            )}
+
+            {type !== "service" && (
+              <div className="p-4 rounded-2xl border border-border bg-card space-y-2.5">
+                <div>
+                  <p className="text-sm font-semibold">Caretaker contact <span className="text-[11px] font-normal text-muted-foreground">(optional)</span></p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Tenants only see this number after you accept their viewing.</p>
+                </div>
+                <input
+                  value={caretakerName}
+                  onChange={(e) => setCaretakerName(e.target.value)}
+                  placeholder="Caretaker name"
+                  className="w-full h-11 px-3 rounded-xl bg-secondary text-sm"
+                />
+                <input
+                  value={caretakerPhone}
+                  onChange={(e) => setCaretakerPhone(e.target.value.replace(/[^\d+\s]/g, ""))}
+                  inputMode="tel"
+                  placeholder="07XX XXX XXX"
+                  className="w-full h-11 px-3 rounded-xl bg-secondary text-sm"
+                />
               </div>
             )}
 
