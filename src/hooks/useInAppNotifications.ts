@@ -73,22 +73,6 @@ export const useInAppNotifications = () => {
     return () => { listeners.delete(createAndShow); };
   }, [createAndShow]);
 
-  // Simulate receiving notifications periodically
-  useEffect(() => {
-    const scheduleNext = () => {
-      const delay = 15000 + Math.random() * 30000;
-      timerRef.current = setTimeout(() => {
-        const template = SIMULATED_ALERTS[indexRef.current % SIMULATED_ALERTS.length];
-        indexRef.current++;
-        createAndShow(template);
-        scheduleNext();
-      }, delay);
-    };
-    scheduleNext();
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [createAndShow]);
 
   const unreadCount = alerts.filter((a) => !a.read).length;
 
