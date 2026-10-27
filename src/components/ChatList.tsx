@@ -6,8 +6,9 @@ import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { useLongPress } from "@/hooks/useLongPress";
 import { haptic } from "@/lib/despia";
 import EmptyIllustration from "./EmptyIllustration";
+import { supabase } from "@/integrations/supabase/client";
 
-interface ChatContact {
+export interface ChatContact {
   id: string;
   name: string;
   avatar: string;
@@ -26,16 +27,36 @@ interface ChatListProps {
   onOpenChat: (contact: ChatContact) => void;
 }
 
-export const contacts: ChatContact[] = [
-  { id: "1", name: "John Kamau", avatar: "JK", lastMessage: "Saturday at 10 AM works perfectly. I'll send you the exact location pin.", time: "10:35 AM", unread: 1, online: true, verified: true, role: "landlord", pinned: true, property: "3BR Kilimani" },
-  { id: "2", name: "Mary Wanjiku", avatar: "MW", lastMessage: "The apartment is ready for viewing. Please bring your ID.", time: "Yesterday", unread: 0, online: false, verified: true, role: "landlord", property: "2BR Westlands" },
-  { id: "3", name: "SwiftMovers KE", avatar: "🚛", lastMessage: "We can move you on Friday morning. Confirmed!", time: "Mon", unread: 3, online: true, verified: true, role: "service" },
-  { id: "4", name: "Grace Njeri", avatar: "GN", lastMessage: "Is the deposit negotiable?", time: "Sun", unread: 0, online: false, verified: false, role: "tenant", property: "Studio Westlands" },
-  { id: "5", name: "KejaPrime Agency", avatar: "KP", lastMessage: "We have 3 new listings in Kilimani matching your budget.", time: "Sat", unread: 2, online: true, verified: true, role: "agent" },
-  { id: "6", name: "David Ochieng", avatar: "DO", lastMessage: "Check-in is at 2 PM. I'll leave the keys with the guard.", time: "Fri", unread: 0, online: false, verified: true, role: "host", property: "Beach View Nyali" },
-  { id: "7", name: "CleanPro Solutions", avatar: "🧹", lastMessage: "Deep cleaning done! Photos attached.", time: "Thu", unread: 0, online: false, verified: true, role: "service", muted: true },
-  { id: "8", name: "Peter Mutua", avatar: "PM", lastMessage: "I'll take the apartment. When can we sign?", time: "Wed", unread: 0, online: false, verified: false, role: "tenant", property: "1BR South B" },
-];
+const roleMap: Record<string, ChatContact["role"]> = {
+  landlord: "landlord", agency: "agent", host: "host", service_provider: "service", tenant: "tenant",
+};
+
+function chatTime(iso: string) {
+  const d = new Date(iso);
+  const now = new Date();
+  if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true });
+  const diff = (now.getTime() - d.getTime()) / 86400000;
+  if (diff < 2) return "Yesterday";
+  if (diff < 7) return d.toLocaleDateString("en-KE", { weekday: "short" });
+  return d.toLocaleDateString("en-KE", { day: "numeric", month: "short" });
+}
+
+export async function fetchConversations(): Promise<ChatContact[]> {
+  const { data, error } = await supabase.rpc("my_conversations");
+  if (error || !data) return [];
+  return (data as any[]).map((r) => ({
+    id: r.id,
+    name: r.other_name,
+    avatar: String(r.other_name).split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
+    lastMessage: r.last_body ?? "Say hello 👋",
+    time: chatTime(r.last_at),
+    unread: r.unread ?? 0,
+    online: false,
+    verified: !!r.other_verified,
+    role: roleMap[r.other_role] ?? "tenant",
+    property: r.listing_title ?? undefined,
+  }));
+}
 
 type FilterType = "all" | "unread" | "landlords" | "services";
 
@@ -118,6 +139,18 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   const [markedUnread, setMarkedUnread] = useState<Set<string>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem("kejasure_marked_unread") || "[]")); } catch { return new Set(); }
   });
+  const [contacts, setContacts] = useState<ChatContact[]>([]);
+  const [loading, setLoading] = useState(true);
+  const load = async () => { setContacts(await fetchConversations()); setLoading(false); };
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel(`chatlist-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
   const [, tick] = useState(0);
   // Auto-tick every 30s so "just now / Xm ago" style timestamps stay fresh.
   useEffect(() => {
@@ -225,8 +258,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
   };
 
   const handleRefresh = async () => {
-    await new Promise((r) => setTimeout(r, 700));
-    toast("Chats refreshed");
+    await load();
   };
 
   useHardwareBack(showNewChat, () => { setShowNewChat(false); setNewChatSearch(""); });
@@ -286,7 +318,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
 
       {/* Chat List */}
       <div className="px-4 space-y-1.5">
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12">
             <EmptyIllustration variant="chats" className="w-28 h-28 mb-3" />
             <p className="text-sm font-semibold text-foreground mb-1">No conversations yet</p>
