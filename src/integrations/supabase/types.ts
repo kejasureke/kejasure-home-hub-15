@@ -1349,7 +1349,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      chat_contact_phone: {
+        Args: { _conversation_id: string }
+        Returns: string
+      }
       claim_referral: { Args: { _code: string }; Returns: string }
+      my_conversations: {
+        Args: never
+        Returns: {
+          id: string
+          last_at: string
+          last_body: string
+          listing_title: string
+          other_id: string
+          other_name: string
+          other_role: string
+          other_verified: boolean
+          unread: number
+        }[]
+      }
       my_referral_code: { Args: never; Returns: string }
       purge_old_otp_attempts: { Args: never; Returns: undefined }
       purge_old_otp_codes: { Args: never; Returns: undefined }
