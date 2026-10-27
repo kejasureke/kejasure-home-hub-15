@@ -541,4 +541,3 @@ const SwipeableChatRow = ({ children, onArchive }: { children: React.ReactNode; 
 };
 
 export default ChatList;
-export type { ChatContact };
