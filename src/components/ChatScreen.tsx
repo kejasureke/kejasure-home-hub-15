@@ -4,6 +4,7 @@ import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { scanMessage } from "@/lib/trust";
 import { ShieldAlert } from "lucide-react";
 import { haptic } from "@/lib/despia";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ChatScreenProps {
   onBack: () => void;
@@ -12,10 +13,11 @@ interface ChatScreenProps {
   contactOnline?: boolean;
   contactVerified?: boolean;
   propertyContext?: string;
+  conversationId?: string;
 }
 
 interface Message {
-  id: number;
+  id: string;
   text?: string;
   image?: string;
   sender: "me" | "other";
@@ -24,60 +26,68 @@ interface Message {
   replyTo?: string;
 }
 
-const conversationsByContact: Record<string, Message[]> = {
-  "John Kamau": [
-    { id: 1, text: "Hi! I'm interested in the 3BR apartment in Kilimani. Is it still available?", sender: "me", time: "10:30 AM", status: "seen" },
-    { id: 2, text: "Hello! Yes, it's still available. Would you like to schedule a viewing?", sender: "other", time: "10:32 AM" },
-    { id: 3, text: "That would be great! Is Saturday morning okay?", sender: "me", time: "10:33 AM", status: "seen" },
-    { id: 4, text: "Saturday at 10 AM works perfectly. I'll send you the exact location pin.", sender: "other", time: "10:35 AM" },
-  ],
-  "Mary Wanjiku": [
-    { id: 1, text: "Hello, I saw your 2BR listing in Westlands. What floor is it on?", sender: "me", time: "2:15 PM", status: "seen" },
-    { id: 2, text: "Hi! It's on the 5th floor with a great view of Karura Forest.", sender: "other", time: "2:20 PM" },
-    { id: 3, text: "The apartment is ready for viewing. Please bring your ID.", sender: "other", time: "3:00 PM" },
-  ],
-  "SwiftMovers KE": [
-    { id: 1, text: "Hi, I need moving services from Kilimani to Karen. 2BR apartment.", sender: "me", time: "9:00 AM", status: "seen" },
-    { id: 2, text: "Hello! We can help with that. When do you need to move?", sender: "other", time: "9:05 AM" },
-    { id: 3, text: "This Friday morning if possible.", sender: "me", time: "9:07 AM", status: "seen" },
-    { id: 4, text: "We can move you on Friday morning. Confirmed! 🚛", sender: "other", time: "9:10 AM" },
-  ],
-  "Grace Njeri": [
-    { id: 1, text: "Hi, I'm Grace. Is the Studio in Westlands still available?", sender: "other", time: "11:00 AM" },
-    { id: 2, text: "Yes it is! Would you like to view it?", sender: "me", time: "11:15 AM", status: "delivered" },
-    { id: 3, text: "Is the deposit negotiable?", sender: "other", time: "11:30 AM" },
-  ],
-  "KejaPrime Agency": [
-    { id: 1, text: "We have 3 new listings in Kilimani matching your budget.", sender: "other", time: "10:00 AM" },
-  ],
-  "David Ochieng": [
-    { id: 1, text: "I'd like to book your Beach View stay for next weekend.", sender: "me", time: "4:00 PM", status: "seen" },
-    { id: 2, text: "It's available! Booking confirmed for Fri-Sun.", sender: "other", time: "4:10 PM" },
-    { id: 3, text: "Check-in is at 2 PM. I'll leave the keys with the guard.", sender: "other", time: "4:12 PM" },
-  ],
-};
+const isUuid = (v?: string) => !!v && /^[0-9a-f-]{36}$/i.test(v);
+const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true });
 
-const autoReplies: Record<string, string[]> = {
-  "John Kamau": ["Great, see you then!", "I'll prepare the documents for viewing.", "Let me know if you have any other questions."],
-  "Mary Wanjiku": ["The rent includes water and garbage collection.", "Parking is available at KES 3,000/month extra.", "Happy to help!"],
-  "SwiftMovers KE": ["We'll send 2 trucks and 4 movers.", "Packing materials are included in the price.", "We also offer storage services."],
-  default: ["Thanks for your message! I'll get back to you shortly.", "Sure, let me check and confirm.", "Sounds good! 👍"],
-};
-
-const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOnline, contactVerified = true, propertyContext }: ChatScreenProps) => {
+const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, contactOnline, contactVerified = false, propertyContext, conversationId }: ChatScreenProps) => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>(conversationsByContact[contactName] || conversationsByContact["John Kamau"]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [myId, setMyId] = useState<string | null>(null);
+  const [phone, setPhone] = useState<string | null>(null);
+  const canChat = isUuid(conversationId);
   const [isTyping, setIsTyping] = useState(false);
   const [safetyDismissed, setSafetyDismissed] = useState(false);
   const [showPhoneReveal, setShowPhoneReveal] = useState(false);
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
-  const [lastSeen] = useState(contactOnline ? "Online" : "Last seen today, 2:45 PM");
+  const [lastSeen] = useState(propertyContext ? "In-app chat" : "In-app chat");
   const [showJumpPill, setShowJumpPill] = useState(false);
   const [newIncoming, setNewIncoming] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const replyIdx = useRef(0);
+
+  // Load real messages + live updates
+  useEffect(() => {
+    if (!canChat) return;
+    let cancelled = false;
+    let ch: ReturnType<typeof supabase.channel> | null = null;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || cancelled) return;
+      setMyId(user.id);
+      const toMsg = (r: any): Message => ({
+        id: r.id,
+        text: r.body ?? undefined,
+        image: r.attachment_url ?? undefined,
+        sender: r.sender_id === user.id ? "me" : "other",
+        time: fmtTime(r.created_at),
+        status: r.sender_id === user.id ? (r.read_at ? "seen" : "sent") : undefined,
+      });
+      const { data } = await supabase.from("messages").select("*").eq("conversation_id", conversationId!).order("created_at").limit(500);
+      if (!cancelled && data) setMessages(data.map(toMsg));
+      await supabase.from("messages").update({ read_at: new Date().toISOString() })
+        .eq("conversation_id", conversationId!).neq("sender_id", user.id).is("read_at", null);
+      ch = supabase
+        .channel(`chat-${conversationId}-${Math.random().toString(36).slice(2)}`)
+        .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` }, (p) => {
+          const r: any = p.new;
+          if (!r?.id) return;
+          if (p.eventType === "INSERT") {
+            setMessages((prev) => prev.some((m) => m.id === r.id) ? prev : [...prev, toMsg(r)]);
+            if (r.sender_id !== user.id) {
+              haptic("light");
+              supabase.from("messages").update({ read_at: new Date().toISOString() }).eq("id", r.id).then(() => {});
+            }
+          } else if (p.eventType === "UPDATE") {
+            setMessages((prev) => prev.map((m) => (m.id === r.id ? toMsg(r) : m)));
+          }
+        })
+        .subscribe();
+      const { data: ph } = await supabase.rpc("chat_contact_phone", { _conversation_id: conversationId! });
+      if (!cancelled && ph) setPhone(ph as string);
+    })();
+    return () => { cancelled = true; if (ch) supabase.removeChannel(ch); };
+  }, [conversationId, canChat]);
 
   const initials = contactName.split(" ").map((n) => n[0]).join("");
 
@@ -109,77 +119,34 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
     }
   };
 
-  const sendMessage = () => {
-    if (!message.trim()) return;
-    const now = new Date().toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true });
-
-    const newMsg: Message = {
-      id: Date.now(),
-      text: message,
-      sender: "me",
-      time: now,
-      status: "sending",
-    };
-    setMessages((prev) => [...prev, newMsg]);
+  const sendMessage = async () => {
+    if (!message.trim() || !canChat || !myId) return;
+    const text = message.trim();
+    const tempId = `tmp-${Date.now()}`;
+    setMessages((prev) => [...prev, { id: tempId, text, sender: "me", time: fmtTime(new Date().toISOString()), status: "sending" }]);
     setMessage("");
-
-    // Simulate status progression
-    setTimeout(() => {
-      setMessages((prev) => prev.map((m) => m.id === newMsg.id ? { ...m, status: "sent" as const } : m));
-    }, 500);
-    setTimeout(() => {
-      setMessages((prev) => prev.map((m) => m.id === newMsg.id ? { ...m, status: "delivered" as const } : m));
-    }, 1200);
-
-    // Simulate typing then reply
-    setTimeout(() => setIsTyping(true), 1500);
-    const delay = 2500 + Math.random() * 2000;
-    setTimeout(() => {
-      setIsTyping(false);
-      const replies = autoReplies[contactName] || autoReplies["default"];
-      const replyText = replies[replyIdx.current % replies.length];
-      replyIdx.current++;
-
-      setMessages((prev) => {
-        const updated = prev.map((m) => m.id === newMsg.id ? { ...m, status: "seen" as const } : m);
-        return [
-          ...updated,
-          {
-            id: Date.now() + 1,
-            text: replyText,
-            sender: "other" as const,
-            time: new Date().toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true }),
-          },
-        ];
-      });
-
-      // Fire a global alert for the incoming host/agent message when the user
-      // is not actively viewing this chat (backgrounded tab / minimized app).
-      if (typeof document !== "undefined" && document.hidden) {
-        const roleLabel = contactRole === "host" ? "host" : contactRole === "service" ? "provider" : "landlord";
-        pushGlobalAlert({
-          type: "message",
-          title: `New message from ${contactName || "your " + roleLabel}`,
-          body: replyText,
-          action: "open-chats",
-        });
-      }
-    }, delay);
+    const { data, error } = await supabase.from("messages")
+      .insert({ conversation_id: conversationId!, sender_id: myId, body: text }).select().single();
+    if (error || !data) {
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
+      setMessage(text);
+      haptic("error");
+      return;
+    }
+    haptic("light");
+    setMessages((prev) => {
+      const withoutTemp = prev.filter((m) => m.id !== tempId);
+      return withoutTemp.some((m) => m.id === data.id) ? withoutTemp
+        : [...withoutTemp, { id: data.id, text, sender: "me", time: fmtTime(data.created_at), status: "sent" }];
+    });
   };
 
   const handleImageSelect = () => {
-    const newMsg: Message = {
-      id: Date.now(),
-      image: "/placeholder.svg",
-      sender: "me",
-      time: new Date().toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true }),
-      status: "sent",
-    };
-    setMessages((prev) => [...prev, newMsg]);
     setShowAttachMenu(false);
   };
 
   const handlePhoneReveal = () => {
+    if (!phone) return;
     setPhoneRevealed(true);
     setShowPhoneReveal(false);
   };
@@ -235,15 +202,15 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
       </div>
 
       {/* Phone revealed banner */}
-      {phoneRevealed && (
+      {phoneRevealed && phone && (
         <div className="bg-trust/10 border-b border-trust/20 animate-fade-in">
           <div className="px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-trust" />
-              <span className="text-xs font-medium text-trust">+254 712 345 678</span>
+              <span className="text-xs font-medium text-trust">{phone}</span>
             </div>
             <a
-              href="tel:+254712345678"
+              href={`tel:${phone}`}
               onClick={() => haptic("light")}
               className="px-3 py-1.5 rounded-full bg-trust text-[11px] font-bold text-primary-foreground active:scale-95 transition-transform"
             >
@@ -286,12 +253,6 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
           </div>
         </div>
       )}
-
-      {/* Priority alert banner */}
-      <div className="px-4 py-2 bg-gold/10 border-b border-gold/20 flex items-center gap-2">
-        <span className="text-xs">⚡</span>
-        <span className="text-xs font-medium text-gold-foreground">Priority tenant – your messages are highlighted</span>
-      </div>
 
       {/* Messages */}
       <div ref={scrollRef} onScroll={onMessagesScroll} className="flex-1 overflow-y-auto px-4 py-4 space-y-3 relative">
@@ -476,8 +437,8 @@ const ChatScreen = ({ onBack, contactName = "John Kamau", contactRole, contactOn
               </p>
             </div>
             <div className="space-y-2">
-              <button onClick={handlePhoneReveal} className="w-full py-3.5 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
-                ✓ Reveal Number (Booking Accepted)
+              <button onClick={handlePhoneReveal} disabled={!phone} className="disabled:opacity-50 w-full py-3.5 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
+                {phone ? "✓ Reveal Number (Booking Accepted)" : "Unlocks once a booking is accepted"}
               </button>
               <button onClick={() => setShowPhoneReveal(false)} className="w-full py-3 rounded-xl bg-secondary text-sm font-medium text-secondary-foreground">
                 Cancel
