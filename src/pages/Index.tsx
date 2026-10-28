@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import BottomNav from "@/components/BottomNav";
 import HomeFeed from "@/components/HomeFeed";
-import ChatList, { contacts as chatContacts } from "@/components/ChatList";
+import ChatList, { fetchConversations } from "@/components/ChatList";
 import { useParams } from "react-router-dom";
 import type { ChatContact } from "@/components/ChatList";
 import NotificationToast from "@/components/NotificationToast";
@@ -105,10 +105,12 @@ const Index = () => {
         if (p) { setShowChat(false); setSelectedProperty(p); window.scrollTo(0, 0); }
         else setActiveTab("search");
       } else if (type === "chat") {
-        const c = id ? chatContacts.find((x) => x.id === id) : null;
         setSelectedProperty(null);
-        if (c) { setChatContact(c); setShowChat(true); }
-        else setActiveTab("chats");
+        setActiveTab("chats");
+        if (id) fetchConversations().then((list) => {
+          const c = list.find((x) => x.id === id);
+          if (c) { setChatContact(c); setShowChat(true); }
+        });
       } else if (type === "booking") {
         setSelectedProperty(null);
         setShowChat(false);
@@ -207,6 +209,7 @@ const Index = () => {
           contactOnline={chatContact.online}
           contactVerified={chatContact.verified}
           propertyContext={chatContact.property}
+          conversationId={chatContact.id}
         />
       </Suspense>
     );

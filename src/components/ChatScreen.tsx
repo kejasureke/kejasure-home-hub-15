@@ -382,6 +382,11 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
         </div>
       )}
 
+      {!canChat && (
+        <p className="px-4 py-2 text-[11px] text-center text-muted-foreground border-t border-border">
+          Chat opens once you send a booking request to this provider.
+        </p>
+      )}
       {/* Input */}
       <div className="p-4 border-t border-border glass-surface safe-bottom">
         <div className="flex items-center gap-2 bg-secondary rounded-2xl px-3 py-1">
@@ -391,6 +396,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
           <input
             type="text"
             placeholder="Type a message..."
+            disabled={!canChat}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
