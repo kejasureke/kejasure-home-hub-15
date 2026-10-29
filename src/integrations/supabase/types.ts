@@ -333,6 +333,39 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_alerts: {
+        Row: {
+          bedrooms: number
+          county: string
+          created_at: string
+          estate: string
+          id: string
+          max_price: number
+          segment: string
+          user_id: string
+        }
+        Insert: {
+          bedrooms?: number
+          county?: string
+          created_at?: string
+          estate?: string
+          id?: string
+          max_price?: number
+          segment?: string
+          user_id: string
+        }
+        Update: {
+          bedrooms?: number
+          county?: string
+          created_at?: string
+          estate?: string
+          id?: string
+          max_price?: number
+          segment?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       listing_image_checks: {
         Row: {
           ai_verdict: Json | null
