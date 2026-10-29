@@ -8,6 +8,8 @@ import SplashScreen from "@/components/SplashScreen";
 import DesktopBlocker from "@/components/DesktopBlocker";
 import OfflineBanner from "@/components/OfflineBanner";
 import NativeGestures from "@/components/NativeGestures";
+import LegalPage from "@/pages/LegalPage";
+import type { LegalDocument } from "@/components/LegalContent";
 import OnboardingFlow, { isOnboarded } from "@/components/onboarding/OnboardingFlow";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -32,6 +34,13 @@ const App = () => {
   const [onboarded, setOnboarded] = useState(() => isOnboarded());
   const handleSplashComplete = useCallback(() => setShowSplash(false), []);
   const isMobile = useIsMobile();
+
+  // Policies must be accessible without signup, splash or a phone-sized browser.
+  const publicDocuments: Record<string, LegalDocument> = {
+    "/privacy": "privacy", "/terms": "terms", "/delete-account": "delete-account",
+  };
+  const publicDocument = publicDocuments[window.location.pathname.replace(/\/$/, "")];
+  if (publicDocument) return <LegalPage document={publicDocument} />;
 
   if (!isMobile) {
     return <DesktopBlocker />;

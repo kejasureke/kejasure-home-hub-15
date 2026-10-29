@@ -18,7 +18,7 @@ const faqs = [
   // Account & contact
   { q: "How do I get a landlord's or host's contact?", a: "Subscribe to a plan, then send a booking request on the listing. Once the landlord, host or service provider accepts, their phone and chat are unlocked automatically inside the app." },
   { q: "Is KejaSure free to use?", a: "Browsing all listings is completely free. A subscription is required to send booking requests. Landlord and provider contacts only unlock after your booking is accepted." },
-  { q: "What subscription plans are available?", a: "Tenants can choose KES 50 (24 hours), KES 100 (3 days) or KES 250 (7 days). Landlords, agencies, stay hosts and service providers have their own monthly plans with listing limits and boost credits." },
+  { q: "What subscription plans are available?", a: "Tenants can choose KES 30 (24 hours), KES 50 (3 days) or KES 100 (7 days). Landlords, agencies, stay hosts and service providers have their own monthly plans with listing limits and boost credits." },
 
   // Verification & trust
   { q: "How does identity verification (KYC) work?", a: "Go to Profile → Verification. Tier 1 is phone (OTP), Tier 2 is National ID + selfie via smile.id, and Tier 3 is Business verification (certificate of registration + CR12) for agencies and companies. Most checks complete in under a minute." },
@@ -31,11 +31,11 @@ const faqs = [
   { q: "Can I edit or pause a listing?", a: "Yes — open your dashboard, tap the listing, then choose Edit, Pause or Delete. Paused listings stop receiving booking requests but stay saved for later." },
 
   // Payments & safety
-  { q: "How do M-Pesa payments work?", a: "We send an STK push to your phone. Enter your M-Pesa PIN to confirm — payments process instantly and you get a digital receipt in the app. KejaSure only handles platform fees, subscriptions and service bookings." },
+  { q: "How do M-Pesa payments work?", a: "We send an STK push to your phone. Enter your M-Pesa PIN to confirm — payments process instantly and you get a digital receipt in the app. KejaSure charges only for platform subscriptions. We do not collect or hold rent, deposits, viewing fees or service payments." },
   { q: "Can I pay rent or deposit through KejaSure?", a: "No. To protect both sides, KejaSure does not handle rent or deposit transfers between tenants and landlords. Always pay these directly to the landlord after viewing and signing the lease." },
-  { q: "How do I report a fake listing or bad host?", a: "Tap the flag icon on any listing or chat. Pick a reason, add details and submit — our trust team reviews all reports within 24 hours and may suspend the account." },
+  { q: "How do I report a fake listing or bad host?", a: "Contact Help & Support with the listing link or the person’s name and details of your concern. Never send your PIN or SMS code. Our team can review suspicious activity." },
   { q: "What happens if I'm scammed?", a: "Open Profile → Disputes & Safety, file a dispute and upload evidence (screenshots, receipts). Our team investigates within 48 hours and works with authorities for confirmed fraud cases." },
-  { q: "Can I get a refund?", a: "Subscription and platform fees are refundable for verified scam or service-failure cases. File a dispute through the app and the team will review within 48 hours." },
+  { q: "Can I get a refund?", a: "Contact Help & Support about subscription payment or refund issues. Include your payment reference, but never your M-Pesa PIN. Applicable consumer rights still apply." },
 
   // App features
   { q: "How do price drop alerts work?", a: "Save any listing as a favourite or tap the bell icon to track its price. You'll get an in-app notification (and SMS) the moment the host lowers the rent or nightly rate." },
