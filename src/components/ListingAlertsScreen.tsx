@@ -4,7 +4,7 @@ import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { haptic } from "@/lib/despia";
 import { kenyaCounties } from "@/data/kenyaCounties";
-import { ALERTS_EVENT, addAlert, describeAlert, readAlerts, removeAlert, type ListingAlert } from "@/lib/listingAlerts";
+import { ALERTS_EVENT, addAlert, describeAlert, readAlerts, removeAlert, syncAlerts, type ListingAlert } from "@/lib/listingAlerts";
 
 const BUDGETS = [0, 10000, 15000, 20000, 30000, 50000, 80000, 120000];
 const SEGMENTS: { v: ListingAlert["segment"]; l: string }[] = [
@@ -25,6 +25,7 @@ const ListingAlertsScreen = ({ onBack }: { onBack: () => void }) => {
   useEffect(() => {
     const s = () => setAlerts(readAlerts());
     window.addEventListener(ALERTS_EVENT, s);
+    syncAlerts();
     return () => window.removeEventListener(ALERTS_EVENT, s);
   }, []);
 

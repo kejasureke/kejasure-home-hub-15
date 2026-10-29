@@ -1,5 +1,6 @@
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { haptic } from "@/lib/despia";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface ListingAlert {
   id: string;
@@ -30,9 +31,42 @@ const write = (a: ListingAlert[]) => {
   localStorage.setItem(KEY, JSON.stringify(a));
   window.dispatchEvent(new Event(ALERTS_EVENT));
 };
-export const addAlert = (a: Omit<ListingAlert, "id" | "createdAt">) =>
-  write([{ ...a, id: `al_${Date.now()}`, createdAt: Date.now() }, ...readAlerts()].slice(0, 20));
-export const removeAlert = (id: string) => write(readAlerts().filter((a) => a.id !== id));
+export const addAlert = async (a: Omit<ListingAlert, "id" | "createdAt">) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  let id = `al_${Date.now()}`;
+  if (user) {
+    const { data } = await supabase.from("listing_alerts").insert({
+      user_id: user.id, segment: a.segment, county: a.county, estate: a.estate,
+      bedrooms: a.bedrooms, max_price: a.maxPrice,
+    }).select("id").single();
+    if (data) id = data.id;
+  }
+  write([{ ...a, id, createdAt: Date.now() }, ...readAlerts()].slice(0, 20));
+};
+export const removeAlert = async (id: string) => {
+  write(readAlerts().filter((a) => a.id !== id));
+  if (!id.startsWith("al_")) await supabase.from("listing_alerts").delete().eq("id", id);
+};
+
+/** Pull the signed-in user's alerts from the server (source of truth). */
+export async function syncAlerts() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  // Upload any alerts saved on this phone before syncing existed
+  const local = readAlerts().filter((a) => a.id.startsWith("al_"));
+  if (local.length) {
+    await supabase.from("listing_alerts").insert(local.map((a) => ({
+      user_id: user.id, segment: a.segment, county: a.county, estate: a.estate,
+      bedrooms: a.bedrooms, max_price: a.maxPrice,
+    })));
+  }
+  const { data } = await supabase.from("listing_alerts").select("*").order("created_at", { ascending: false });
+  if (!data) return;
+  write(data.map((r) => ({
+    id: r.id, segment: r.segment as ListingAlert["segment"], county: r.county, estate: r.estate,
+    bedrooms: r.bedrooms, maxPrice: r.max_price, createdAt: new Date(r.created_at).getTime(),
+  })));
+}
 
 const fmtK = (n: number) => (n >= 1000 ? `${Math.round(n / 1000)}K` : String(n));
 
