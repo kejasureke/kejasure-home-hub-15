@@ -7,3 +7,8 @@
 
 ## Despia wrapper
 - Web app changes need only a publish (app loads from `https://kejasureapp.lovable.app`); wrapper-level changes (icon, splash, URL scheme, status bar settings, permissions) need a new Despia build.
+
+## Legal content
+- Use shared LegalContent for signup, Settings and public policy pages to prevent conflicting disclosures.
+- Public /privacy, /terms and /delete-account pages bypass onboarding and the desktop blocker so store reviewers and former users can access them without an account.
+- Deletion requests currently use the existing support email; do not present email initiation as completed account deletion or store-compliant automated deletion.

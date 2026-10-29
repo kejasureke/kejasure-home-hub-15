@@ -4,6 +4,8 @@ import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useTheme } from "@/hooks/useTheme";
 import { toast } from "@/hooks/use-toast";
 import { isDespia, requestBiometric, getCurrentLocation, openNativeSettings } from "@/lib/despia";
+import LegalContent, { legalTitles, type LegalDocument } from "@/components/LegalContent";
+import { Button } from "@/components/ui/button";
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -26,6 +28,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
     try { return localStorage.getItem(BIOMETRIC_KEY) === "true"; } catch { return false; }
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [legalDocument, setLegalDocument] = useState<LegalDocument | null>(null);
   const [language, setLanguage] = useState("en");
   const [showVisibility, setShowVisibility] = useState(false);
   const [visibility, setVisibility] = useState<"everyone" | "verified" | "private">("everyone");
@@ -280,9 +283,18 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-semibold">Delete Account</p>
-              <p className="text-[11px] text-destructive/70">Permanently delete your account & data</p>
+              <p className="text-[11px] text-destructive/70">Request account & personal-data deletion</p>
             </div>
           </button>
+        </Section>
+
+        <Section title="Legal & Data">
+          {(["privacy", "terms"] as const).map((document) => (
+            <Button key={document} variant="ghost" onClick={() => setLegalDocument(document)} className="w-full h-auto p-4 justify-between rounded-none">
+              <span className="flex items-center gap-3"><Shield className="w-4 h-4 text-primary" />{legalTitles[document]}</span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </Button>
+          ))}
         </Section>
 
         <p className="text-center text-[10px] text-muted-foreground mt-4">KejaSure v1.0.0 · Made in Kenya 🇰🇪</p>
@@ -296,18 +308,28 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-3">
                 <Trash2 className="w-7 h-7 text-destructive" />
               </div>
-              <h3 className="text-lg font-bold">Delete Account?</h3>
+              <h3 className="text-lg font-bold">Delete Account</h3>
               <p className="text-sm text-muted-foreground text-center mt-1">
-                This will permanently delete your profile, listings, chats, and all data. This action cannot be undone.
+                Request permanent deletion of your account and associated personal data. Read the verification steps and information about retained records before sending your request.
               </p>
             </div>
-            <button className="w-full py-3.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-bold mb-2 active:scale-[0.98] transition-transform">
-              Yes, Delete My Account
-            </button>
-            <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-3 rounded-xl text-sm font-semibold text-muted-foreground">
+            <Button variant="destructive" onClick={() => { setShowDeleteConfirm(false); setLegalDocument("delete-account"); }} className="w-full mb-2">
+              Continue to deletion request
+            </Button>
+            <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)} className="w-full">
               Cancel
-            </button>
+            </Button>
           </div>
+        </div>
+      )}
+
+      {legalDocument && (
+        <div className="fixed inset-0 z-[80] bg-background overflow-y-auto">
+          <header className="sticky top-0 z-10 bg-background border-b border-border pt-safe-compact pb-3 px-4 flex items-center gap-3">
+            <Button variant="secondary" size="icon" aria-label="Back to Settings" onClick={() => setLegalDocument(null)}><ArrowLeft /></Button>
+            <h2 className="text-base font-bold">{legalTitles[legalDocument]}</h2>
+          </header>
+          <div className="px-5 py-6 pb-32"><LegalContent document={legalDocument} /></div>
         </div>
       )}
 
