@@ -48,7 +48,7 @@ export async function fetchConversations(): Promise<ChatContact[]> {
     id: r.id,
     name: r.other_name,
     avatar: String(r.other_name).split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
-    lastMessage: r.last_body ?? "Say hello 👋",
+    lastMessage: r.last_body ?? "Say hello 👋🏿",
     time: chatTime(r.last_at),
     unread: r.unread ?? 0,
     online: false,
