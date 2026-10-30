@@ -322,7 +322,7 @@ const HomeFeed = () => {
             <div className="mb-3 animate-fade-in">
               <p className="text-base font-bold text-white">
                 {greeting}, <GreetingName />!{" "}
-                <span className="inline-block animate-[wave_1.5s_ease-in-out_infinite] origin-[70%_70%]">👋</span>
+                <span className="inline-block animate-[wave_1.5s_ease-in-out_infinite] origin-[70%_70%]">👋🏿</span>
               </p>
               <p className="text-xs text-white/70 mt-0.5">{tagline}</p>
             </div>

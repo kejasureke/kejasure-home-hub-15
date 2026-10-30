@@ -562,7 +562,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 <CheckCircle2 className="w-10 h-10 text-trust" />
               </div>
               <div>
-                <h4 className="text-lg font-bold mb-1 text-trust">Thanks for your review! 🙏</h4>
+                <h4 className="text-lg font-bold mb-1 text-trust">Thanks for your review! 🙏🏿</h4>
                 <p className="text-sm text-muted-foreground">
                   Your feedback helps other users find great service providers
                 </p>
