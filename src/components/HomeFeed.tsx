@@ -41,6 +41,28 @@ const savedBudgetRange = () => {
   } catch { return null; }
 };
 
+// The signed-in user's first name, taken from the full name saved at signup ("Donald Kamau" -> "Donald").
+const greetingFirstName = () => {
+  try {
+    const full = localStorage.getItem("kejasure_display_name") || localStorage.getItem("kejasure_first_name") || "";
+    return full.trim().split(/\s+/)[0] || "there";
+  } catch { return "there"; }
+};
+
+const GreetingName = () => {
+  const [name, setName] = useState(greetingFirstName);
+  useEffect(() => {
+    const h = () => setName(greetingFirstName());
+    window.addEventListener("profile-updated", h);
+    window.addEventListener("profile-name-synced", h);
+    return () => {
+      window.removeEventListener("profile-updated", h);
+      window.removeEventListener("profile-name-synced", h);
+    };
+  }, []);
+  return <>{name}</>;
+};
+
 const HomeFeed = () => {
   const [segment, setSegmentState] = useState<(typeof segments)[number]>(() => {
     try {
@@ -296,11 +318,10 @@ const HomeFeed = () => {
             : hour < 21
             ? pick(["Wind down with great listings 🌙", "Evening browsing, smart choices 🌆", "Relax and explore new spaces 🛋️"])
             : pick(["Browse listings before bed 🛏️", "Late-night deals are the best 🌜", "Can't sleep? Find your next keja 🏘️"]);
-          const name = (() => { try { const n = localStorage.getItem("kejasure_first_name"); return n || "there"; } catch { return "there"; } })();
           return (
             <div className="mb-3 animate-fade-in">
               <p className="text-base font-bold text-white">
-                {greeting}, {name}!{" "}
+                {greeting}, <GreetingName />!{" "}
                 <span className="inline-block animate-[wave_1.5s_ease-in-out_infinite] origin-[70%_70%]">👋</span>
               </p>
               <p className="text-xs text-white/70 mt-0.5">{tagline}</p>

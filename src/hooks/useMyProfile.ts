@@ -46,7 +46,16 @@ export const useMyProfile = (): MyProfile => {
         .order("created_at", { ascending: false })
         .limit(1),
     ]);
-    if (prof?.full_name) setName(prof.full_name);
+    if (prof?.full_name) {
+      setName(prof.full_name);
+      // Keep the phone's copy in step with the account so the greeting works on a new device.
+      try {
+        if (localStorage.getItem("kejasure_display_name") !== prof.full_name) {
+          localStorage.setItem("kejasure_display_name", prof.full_name);
+          window.dispatchEvent(new CustomEvent("profile-name-synced"));
+        }
+      } catch {}
+    }
     if (prof?.phone) setPhone(prof.phone);
     else if (user.phone) setPhone(user.phone);
     // Anyone signed in got here through an SMS code.
