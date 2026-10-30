@@ -11,6 +11,9 @@ const InviteFriendsScreen = ({ onBack }: { onBack: () => void }) => {
   useHardwareBack(true, triggerClose);
   const [code, setCode] = useState("");
   const [stats, setStats] = useState({ joined: 0, rewarded: 0 });
+  const [isBusiness, setIsBusiness] = useState(false);
+  const base = isBusiness ? "a free month" : "a free 24h pass";
+  const double = isBusiness ? "2 free months" : "a free 48h pass";
 
   useEffect(() => {
     (async () => {
@@ -18,6 +21,8 @@ const InviteFriendsScreen = ({ onBack }: { onBack: () => void }) => {
       if (c) setCode(String(c));
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", u.user.id);
+      setIsBusiness((roles ?? []).some((r) => ["landlord", "agency", "host", "service_provider"].includes(r.role as string)));
       const { data } = await supabase.from("referrals").select("status").eq("referrer_id", u.user.id);
       setStats({ joined: data?.length ?? 0, rewarded: data?.filter((r) => r.status === "rewarded").length ?? 0 });
     })();
@@ -46,8 +51,15 @@ const InviteFriendsScreen = ({ onBack }: { onBack: () => void }) => {
       <div className="px-4 py-6 pb-32 space-y-5">
         <div className="p-5 rounded-3xl gradient-trust text-primary-foreground text-center">
           <Gift className="w-10 h-10 mx-auto mb-2" />
-          <p className="text-lg font-bold">Get a free 24h pass</p>
-          <p className="text-xs opacity-90 mt-1">For every friend who joins with your link and buys any plan.</p>
+          <p className="text-lg font-bold">Get {base}</p>
+          <p className="text-xs opacity-90 mt-1">For every friend who joins with your link and buys any plan. No limit.</p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
+          <p className="text-xs font-bold">What you earn</p>
+          <div className="flex justify-between text-xs"><span className="text-muted-foreground">Friend buys a tenant pass</span><span className="font-semibold">{base}</span></div>
+          <div className="flex justify-between text-xs"><span className="text-muted-foreground">Landlord, agency, host or provider subscribes</span><span className="font-semibold text-accent">{double}</span></div>
+          <p className="text-[10px] text-muted-foreground pt-1">Anyone can invite anyone. Your friend signs up with their phone number as usual, picks their role, and the reward lands on your plan the moment they pay.</p>
         </div>
 
         <div className="p-4 rounded-2xl bg-card border border-border">
@@ -78,7 +90,7 @@ const InviteFriendsScreen = ({ onBack }: { onBack: () => void }) => {
           <div className="p-4 rounded-2xl bg-card border border-border text-center">
             <Gift className="w-5 h-5 mx-auto text-accent mb-1" />
             <p className="text-xl font-bold">{stats.rewarded}</p>
-            <p className="text-[10px] text-muted-foreground">Passes earned</p>
+            <p className="text-[10px] text-muted-foreground">Rewards earned</p>
           </div>
         </div>
 

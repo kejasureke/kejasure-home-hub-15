@@ -133,30 +133,49 @@ Deno.serve(async (req) => {
             .eq('id', ref.id).eq('status', 'pending').select('id').maybeSingle()
           if (claimed) {
             const DAY = 24 * 60 * 60 * 1000
+            const BUSINESS = ['landlord', 'agency', 'host', 'service_provider']
+            // Inviter's role decides the reward: tenants get a 24h pass, business roles a free month
+            const { data: roles } = await admin.from('user_roles').select('role').eq('user_id', ref.referrer_id)
+            const inviterRole = (roles ?? []).map((r: any) => r.role).find((r: string) => BUSINESS.includes(r)) ?? 'tenant'
+            const inviterIsBusiness = inviterRole !== 'tenant'
+            // Friend who paid for a business plan doubles the reward
+            const friendIsBusiness = BUSINESS.includes(payment.role)
+            const baseDays = inviterIsBusiness ? 30 : 1
+            const days = baseDays * (friendIsBusiness ? 2 : 1)
+            const rewardMs = days * DAY
+            const label = inviterIsBusiness
+              ? (days === 60 ? '2 free months' : 'a free month')
+              : (days === 2 ? 'a free 48h pass' : 'a free 24h pass')
+
             const { data: active } = await admin.from('subscriptions')
               .select('id, ends_at').eq('user_id', ref.referrer_id).eq('status', 'active')
               .order('ends_at', { ascending: false }).limit(1).maybeSingle()
             if (active?.ends_at && new Date(active.ends_at) > new Date()) {
               await admin.from('subscriptions')
-                .update({ ends_at: new Date(new Date(active.ends_at).getTime() + DAY).toISOString() })
+                .update({ ends_at: new Date(new Date(active.ends_at).getTime() + rewardMs).toISOString() })
                 .eq('id', active.id)
             } else {
-              let { data: rp } = await admin.from('subscription_plans').select('id').eq('tier', 'Referral 24h Pass').maybeSingle()
+              const tier = inviterIsBusiness ? 'Referral Free Month' : 'Referral 24h Pass'
+              let { data: rp } = await admin.from('subscription_plans').select('id')
+                .eq('tier', tier).eq('role', inviterRole).maybeSingle()
               if (!rp) {
                 const { data: np } = await admin.from('subscription_plans')
-                  .insert({ role: 'tenant', tier: 'Referral 24h Pass', price_kes: 0, active: false }).select('id').single()
+                  .insert({ role: inviterRole, tier, price_kes: 0, active: false }).select('id').single()
                 rp = np
               }
               if (rp) {
                 await admin.from('subscriptions').insert({
                   user_id: ref.referrer_id, plan_id: rp.id, status: 'active',
-                  starts_at: new Date().toISOString(), ends_at: new Date(Date.now() + DAY).toISOString(),
+                  starts_at: new Date().toISOString(), ends_at: new Date(Date.now() + rewardMs).toISOString(),
                 })
               }
             }
             await admin.from('notifications').insert({
-              user_id: ref.referrer_id, type: 'system', title: 'You earned a free 24h pass',
-              body: 'A friend you invited just subscribed. Asante for spreading KejaSure!', deep_link: '/settings/subscription',
+              user_id: ref.referrer_id, type: 'system', title: `You earned ${label}`,
+              body: friendIsBusiness
+                ? 'A business you invited just subscribed — double reward! Asante for spreading KejaSure!'
+                : 'A friend you invited just subscribed. Asante for spreading KejaSure!',
+              deep_link: '/settings/subscription',
             })
           }
         }
