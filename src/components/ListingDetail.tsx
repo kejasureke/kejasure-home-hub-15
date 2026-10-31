@@ -530,6 +530,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
       {showBooking && (
         <BookingRequestModal
           property={property}
+          initialNote={bookingNote}
           onClose={() => setShowBooking(false)}
         />
       )}

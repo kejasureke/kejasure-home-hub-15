@@ -20,6 +20,10 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { freshAvailability, homeDetails, useHouseHunting, useLowData } from "@/lib/houseHunting";
+import ViewingNotebook from "./listing/ViewingNotebook";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 const segments = ["Rentals", "Short Stays", "Business Spaces", "Corporate Stay", "Services"] as const;
 
@@ -66,6 +70,12 @@ const GreetingName = () => {
 
 const HomeFeed = () => {
   useLanguage();
+  const detailsVersion = useHouseHunting();
+  const lowData = useLowData();
+  const [freshOnly, setFreshOnly] = useState(false);
+  const [stepFreeOnly, setStepFreeOnly] = useState(false);
+  const [petsOnly, setPetsOnly] = useState(false);
+  const [showNotebook, setShowNotebook] = useState(false);
   const [segment, setSegmentState] = useState<(typeof segments)[number]>(() => {
     try {
       const saved = localStorage.getItem(SEGMENT_KEY) as (typeof segments)[number] | null;
@@ -157,6 +167,10 @@ const HomeFeed = () => {
 
   const filteredProperties = useMemo(() => {
     let result = properties.filter((p) => {
+      const details = homeDetails(p);
+      if (freshOnly && !freshAvailability(details)) return false;
+      if (stepFreeOnly && details.accessible !== "yes") return false;
+      if (petsOnly && details.pets !== "yes") return false;
       const matchType = segment === "Rentals" ? (p.type === "rental" && !p.corporate) :
                         segment === "Short Stays" ? (p.type === "shortstay" && !p.corporate) :
                         segment === "Business Spaces" ? p.type === "commercial" :
@@ -194,7 +208,7 @@ const HomeFeed = () => {
     }
 
     return result;
-  }, [segment, county, estate, searchQuery, filters, budgetSeeded]);
+  }, [segment, county, estate, searchQuery, filters, budgetSeeded, commCategory, freshOnly, stepFreeOnly, petsOnly, detailsVersion]);
 
   const recentProperties = properties.filter((p) => recentIds.includes(p.id));
   const compareProperties = properties.filter((p) => compareIds.includes(p.id));
@@ -284,6 +298,8 @@ const HomeFeed = () => {
       />
     );
   }
+
+  if (showNotebook) return <ViewingNotebook onClose={() => setShowNotebook(false)} />;
 
   if (showNeighborhood) {
     return (
@@ -647,6 +663,16 @@ const HomeFeed = () => {
 
       {/* Content */}
       <div className="px-4">
+        <div className="border-y border-border py-3 mb-4 space-y-3">
+          <div className="flex items-center justify-between gap-3"><label htmlFor="feed-low-data" className="text-xs font-medium">{translate("Low-data browsing")}</label><Switch id="feed-low-data" checked={lowData.enabled} onCheckedChange={lowData.setEnabled} /></div>
+          {segment !== "Services" && <div className="flex gap-2 overflow-x-auto pb-1">
+            <Button size="sm" variant={freshOnly ? "default" : "outline"} aria-pressed={freshOnly} onClick={() => setFreshOnly(!freshOnly)}>{translate("Confirmed this week")}</Button>
+            <Button size="sm" variant={petsOnly ? "default" : "outline"} aria-pressed={petsOnly} onClick={() => setPetsOnly(!petsOnly)}>{translate("Pets allowed")}</Button>
+            <Button size="sm" variant={stepFreeOnly ? "default" : "outline"} aria-pressed={stepFreeOnly} onClick={() => setStepFreeOnly(!stepFreeOnly)}>{translate("Step-free access")}</Button>
+          </div>}
+          <Button variant="ghost" size="sm" className="text-primary px-0" onClick={() => setShowNotebook(true)}><BookmarkCheck />{translate("Viewing notebook")}</Button>
+          {(freshOnly || petsOnly || stepFreeOnly) && <Button variant="ghost" size="sm" onClick={() => { setFreshOnly(false); setPetsOnly(false); setStepFreeOnly(false); }}>{translate("Clear house filters")}</Button>}
+        </div>
         {segment === "Services" ? (
           <div className="space-y-3">
             <h2 className="text-base font-semibold">{translate("Popular Services")}</h2>

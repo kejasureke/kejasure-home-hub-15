@@ -10,6 +10,7 @@ import SwipeableImageGallery from "./SwipeableImageGallery";
 import PropertyQuickActions from "./PropertyQuickActions";
 import { useLongPress } from "@/hooks/useLongPress";
 import { toast } from "sonner";
+import { homeDetails, freshAvailability, useHouseHunting } from "@/lib/houseHunting";
 interface PropertyCardProps {
   property: Property;
   onPress: (id: string) => void;
@@ -22,6 +23,8 @@ interface PropertyCardProps {
 
 const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareMode, isComparing, onToggleCompare }: PropertyCardProps) => {
   useLanguage();
+  useHouseHunting();
+  const details = homeDetails(property);
   const scamRisk = getScamRiskScore(property);
   const oldPrice = property.priceHistory?.[0]?.price;
   const [quickOpen, setQuickOpen] = useState(false);
@@ -68,9 +71,9 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
 
         {/* Ribbons */}
         {property.featured && <div className="premium-ribbon">{translate("⭐ Featured")}</div>}
-        {property.available && !property.featured && (
+        {freshAvailability(details) && !property.featured && (
           <div className="absolute top-3 left-0 px-3 py-1 text-xs font-semibold rounded-r-full bg-trust text-trust-foreground">
-            {translate("Available Now")} </div>
+            {translate("Confirmed this week")} </div>
         )}
 
         {/* Top right actions */}
@@ -116,6 +119,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
       {/* Content */}
       {/* Content */}
       <div className="p-4 space-y-2.5">
+        <p className="text-[11px] text-muted-foreground">{translate(details.availability === "taken" ? "Taken" : details.availability === "viewing" ? "Viewing arranged" : freshAvailability(details) ? "Confirmed this week" : "Availability not confirmed")}</p>
         {/* Title + Badge row */}
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-sm font-bold text-foreground leading-snug line-clamp-2 flex-1">{property.title}</h3>
