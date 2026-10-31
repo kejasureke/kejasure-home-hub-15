@@ -274,7 +274,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
           <div>
             <h1 className="text-xl font-bold text-foreground">{translate("Messages")}</h1>
             {totalUnread > 0 && (
-              <p className="text-xs text-muted-foreground">{totalUnread} {translate("unread message")}{totalUnread > 1 ? "s" : ""}</p>
+              <p className="text-xs text-muted-foreground">{totalUnread} {translate(totalUnread === 1 ? "unread message" : "Unread messages")}</p>
             )}
           </div>
           <button

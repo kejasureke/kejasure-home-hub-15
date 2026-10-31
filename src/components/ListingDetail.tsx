@@ -533,7 +533,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
       {showShare && <ShareListingSheet property={property} onClose={() => setShowShare(false)} />}
       {showReport && <ReportListingModal listingTitle={property.title} listingId={property.id} onClose={() => setShowReport(false)} />}
-      {showReviews && <ReviewRatingFlow onClose={() => setShowReviews(false)} targetName=translate("Landlord") targetType="landlord" listingTitle={property.title} />}
+      {showReviews && <ReviewRatingFlow onClose={() => setShowReviews(false)} targetName={translate("Landlord")} targetType="landlord" listingTitle={property.title} />}
       {showMoveIn && <MoveInChecklist property={property} onBack={() => setShowMoveIn(false)} />}
       {showVideoTour && property.videoTour && (
         <VideoTourPlayer

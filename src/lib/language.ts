@@ -15,7 +15,7 @@ let currentLanguage = readLanguage();
 export function setAppLanguage(language: AppLanguage) {
   currentLanguage = language;
   try { localStorage.setItem(LANGUAGE_KEY, language); } catch { /* Keep this session usable. */ }
-  document.documentElement.lang = language;
+  if (typeof document !== "undefined") document.documentElement.lang = language;
   listeners.forEach((listener) => listener());
 }
 
@@ -37,7 +37,7 @@ export function useLanguage() {
 if (typeof window !== "undefined") {
   document.documentElement.lang = currentLanguage;
   window.addEventListener("storage", (event) => {
-    if (event.key !== LANGUAGE_KEY) return;
+    if (event.key !== LANGUAGE_KEY && event.key !== null) return;
     currentLanguage = readLanguage();
     document.documentElement.lang = currentLanguage;
     listeners.forEach((listener) => listener());

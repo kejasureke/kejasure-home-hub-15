@@ -9,6 +9,7 @@
 - Web app changes need only a publish (app loads from `https://kejasureapp.lovable.app`); wrapper-level changes (icon, splash, URL scheme, status bar settings, permissions) need a new Despia build.
 
 ## Legal content
+- Translate app-owned display copy through the shared language store and catalog at render time; preserve canonical stored values and user-authored content so switching languages never changes account or listing data.
 - Use shared LegalContent for signup, Settings and public policy pages to prevent conflicting disclosures.
 - Public /privacy, /terms and /delete-account pages bypass onboarding and the desktop blocker so store reviewers and former users can access them without an account.
 - Deletion requests currently use the existing support email; do not present email initiation as completed account deletion or store-compliant automated deletion.
