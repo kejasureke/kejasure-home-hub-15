@@ -502,7 +502,7 @@ const HomeFeed = () => {
             className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-card/20 backdrop-blur-sm active:scale-95 transition-transform"
           >
             <Sparkles className="w-4 h-4 text-primary-foreground" />
-            <span className="text-xs font-semibold text-primary-foreground">{translate("Keja AI Match")}</span>
+            <span className="text-xs font-semibold text-primary-foreground">{translate("KejaSure AI Match")}</span>
           </button>
           <button
             onClick={() => setShowNeighborhood(true)}

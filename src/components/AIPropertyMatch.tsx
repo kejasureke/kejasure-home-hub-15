@@ -198,7 +198,7 @@ const AIPropertyMatch = ({ onBack, onSelectProperty }: Props) => {
           <div>
             <h1 className="text-lg font-bold flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
-              Keja AI Match
+              KejaSure AI Match
             </h1>
             <p className="text-xs text-muted-foreground">Describe your dream home in plain language</p>
           </div>
@@ -247,7 +247,7 @@ const AIPropertyMatch = ({ onBack, onSelectProperty }: Props) => {
             <div className="w-12 h-12 rounded-full gradient-trust flex items-center justify-center mb-4 animate-pulse">
               <Sparkles className="w-6 h-6 text-primary-foreground" />
             </div>
-            <p className="text-sm font-semibold">Keja AI is matching...</p>
+            <p className="text-sm font-semibold">KejaSure AI is matching...</p>
             <p className="text-xs text-muted-foreground mt-1">Analyzing listings, location, and amenities</p>
           </div>
         )}
