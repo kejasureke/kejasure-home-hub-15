@@ -4,7 +4,7 @@ import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Sun, Eye, Shield, ChevronRi
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useTheme } from "@/hooks/useTheme";
 import { toast } from "@/hooks/use-toast";
-import { isDespia, requestBiometric, getCurrentLocation, openNativeSettings } from "@/lib/despia";
+import { isDespia, requestBiometric, getCurrentLocation, openNativeSettings, haptic } from "@/lib/despia";
 import LegalContent, { legalTitles, type LegalDocument } from "@/components/LegalContent";
 import ShareKejaSureSheet from "@/components/ShareKejaSureSheet";
 import { Button } from "@/components/ui/button";
@@ -295,6 +295,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
 
         <p className="text-center text-[10px] text-muted-foreground mt-4">{translate("KejaSure v1.0.0 · Made in Kenya 🇰🇪")}</p>
       </div>
+
+      {showShareSheet && <ShareKejaSureSheet onClose={() => setShowShareSheet(false)} />}
 
       {/* Delete Confirmation */}
       {showDeleteConfirm && (
