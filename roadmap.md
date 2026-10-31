@@ -1,3 +1,7 @@
+# App language
+- [ ] Make the English/Kiswahili preference persistent and translate app-owned screens and controls.
+- [ ] Verify switching languages, navigation and reopening the app.
+
 # Store readiness
 - [x] Add Settings privacy/data disclosures and public policy URLs accessible without signup.
 - [x] Replace the inactive deletion button with honest deletion-request instructions and email action.
