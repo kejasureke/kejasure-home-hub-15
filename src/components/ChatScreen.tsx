@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { ArrowLeft, Send, Paperclip, Phone, MoreVertical, Check, CheckCheck, ShieldCheck, Image, Camera, X, Smile, Mic } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
@@ -30,6 +31,7 @@ const isUuid = (v?: string) => !!v && /^[0-9a-f-]{36}$/i.test(v);
 const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true });
 
 const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, contactOnline, contactVerified = false, propertyContext, conversationId }: ChatScreenProps) => {
+  useLanguage();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [myId, setMyId] = useState<string | null>(null);
@@ -191,7 +193,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
             <h3 className="text-sm font-semibold">{contactName}</h3>
             {contactVerified && <ShieldCheck className="w-3.5 h-3.5 text-trust" />}
           </div>
-          <p className={`text-xs ${contactOnline ? "text-trust" : "text-muted-foreground"}`}>{lastSeen}</p>
+          <p className={`text-xs ${contactOnline ? "text-trust" : "text-muted-foreground"}`}>{translate(lastSeen)}</p>
         </div>
         <button onClick={() => setShowPhoneReveal(true)} className="p-2">
           <Phone className={`w-4.5 h-4.5 ${phoneRevealed ? "text-trust" : "text-muted-foreground"}`} />
@@ -214,12 +216,10 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
               onClick={() => haptic("light")}
               className="px-3 py-1.5 rounded-full bg-trust text-[11px] font-bold text-primary-foreground active:scale-95 transition-transform"
             >
-              Call
-            </a>
+              {translate("Call")} </a>
           </div>
           <p className="px-4 pb-2 text-[10px] text-muted-foreground">
-            Keep booking updates in KejaSure — only in-app connections count towards reviews and trust.
-          </p>
+            {translate("Keep booking updates in KejaSure — only in-app connections count towards reviews and trust.")} </p>
         </div>
       )}
 
@@ -237,15 +237,14 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
           <div className="flex items-start gap-2">
             <ShieldAlert className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-[11px] font-bold text-destructive">Careful with this chat</p>
+              <p className="text-[11px] font-bold text-destructive">{translate("Careful with this chat")}</p>
               <ul className="mt-0.5 space-y-0.5">
                 {safetySignals.map((s) => (
-                  <li key={s.kind} className="text-[10px] text-muted-foreground">• {s.label}</li>
+                  <li key={s.kind} className="text-[10px] text-muted-foreground">• {translate(s.label)}</li>
                 ))}
               </ul>
               <p className="text-[10px] text-muted-foreground mt-1">
-                KejaSure never handles rent or deposits. Keep chatting here and view the place before you agree to anything.
-              </p>
+                {translate("KejaSure never handles rent or deposits. Keep chatting here and view the place before you agree to anything.")} </p>
             </div>
             <button onClick={() => setSafetyDismissed(true)} className="p-1 text-muted-foreground shrink-0">
               <X className="w-3.5 h-3.5" />
@@ -272,11 +271,11 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {quickChips.map((chip) => (
             <button
-              key={chip}
+              key={translate(chip)}
               onClick={() => setMessage(chip.replace(/^[^\s]+\s/, ""))}
               className="shrink-0 px-3 py-1.5 rounded-full bg-primary/5 text-xs font-medium text-primary border border-primary/15 active:scale-95 transition-transform"
             >
-              {chip}
+              {translate(chip)}
             </button>
           ))}
         </div>
@@ -284,7 +283,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
         {/* Date separator */}
         <div className="flex items-center gap-3 py-2">
           <div className="flex-1 h-px bg-border" />
-          <span className="text-[10px] text-muted-foreground font-medium">Today</span>
+          <span className="text-[10px] text-muted-foreground font-medium">{translate("Today")}</span>
           <div className="flex-1 h-px bg-border" />
         </div>
 
@@ -297,7 +296,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
               {i === firstUnreadIdx && firstUnreadIdx > 0 && (
                 <div className="flex items-center gap-3 py-1 animate-fade-in">
                   <div className="flex-1 h-px bg-accent/30" />
-                  <span className="text-[10px] font-bold text-accent uppercase tracking-wider">Unread messages</span>
+                  <span className="text-[10px] font-bold text-accent uppercase tracking-wider">{translate("Unread messages")}</span>
                   <div className="flex-1 h-px bg-accent/30" />
                 </div>
               )}
@@ -370,13 +369,13 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                 <Image className="w-5 h-5 text-primary" />
               </div>
-              <span className="text-[10px] text-muted-foreground">Gallery</span>
+              <span className="text-[10px] text-muted-foreground">{translate("Gallery")}</span>
             </button>
             <button onClick={handleImageSelect} className="flex flex-col items-center gap-1">
               <div className="w-12 h-12 rounded-full bg-trust/10 flex items-center justify-center">
                 <Camera className="w-5 h-5 text-trust" />
               </div>
-              <span className="text-[10px] text-muted-foreground">Camera</span>
+              <span className="text-[10px] text-muted-foreground">{translate("Camera")}</span>
             </button>
           </div>
         </div>
@@ -384,8 +383,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
 
       {!canChat && (
         <p className="px-4 py-2 text-[11px] text-center text-muted-foreground border-t border-border">
-          Chat opens once you send a booking request to this provider.
-        </p>
+          {translate("Chat opens once you send a booking request to this provider.")} </p>
       )}
       {/* Input */}
       <div className="p-4 border-t border-border glass-surface safe-bottom">
@@ -395,7 +393,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
           </button>
           <input
             type="text"
-            placeholder="Type a message..."
+            placeholder={translate("Type a message...")}
             disabled={!canChat}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -422,33 +420,29 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
               <div className="w-16 h-16 rounded-full gradient-trust mx-auto mb-3 flex items-center justify-center">
                 <Phone className="w-7 h-7 text-primary-foreground" />
               </div>
-              <h3 className="text-lg font-bold">Reveal Phone Number</h3>
+              <h3 className="text-lg font-bold">{translate("Reveal Phone Number")}</h3>
               <p className="text-xs text-muted-foreground mt-1">Contact {contactName} directly</p>
             </div>
             <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20 mb-3">
               <p className="text-xs text-muted-foreground text-center">
-                Phone numbers are revealed after booking confirmation or premium unlock. This ensures trust and reduces spam for both parties.
-              </p>
+                {translate("Phone numbers are revealed after booking confirmation or premium unlock. This ensures trust and reduces spam for both parties.")} </p>
             </div>
             <div className="p-4 rounded-2xl bg-destructive/5 border border-destructive/20 mb-5 space-y-1.5">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-destructive" />
-                <p className="text-xs font-bold text-foreground">Before you share your number</p>
+                <p className="text-xs font-bold text-foreground">{translate("Before you share your number")}</p>
               </div>
               <p className="text-[11px] text-muted-foreground leading-relaxed">
-                Keep the conversation here. KejaSure never handles rent or deposits, and only in-app bookings count towards reviews, ratings and your trust level.
-              </p>
+                {translate("Keep the conversation here. KejaSure never handles rent or deposits, and only in-app bookings count towards reviews, ratings and your trust level.")} </p>
               <p className="text-[11px] text-muted-foreground leading-relaxed">
-                Never send money before viewing the place in person.
-              </p>
+                {translate("Never send money before viewing the place in person.")} </p>
             </div>
             <div className="space-y-2">
               <button onClick={handlePhoneReveal} disabled={!phone} className="disabled:opacity-50 w-full py-3.5 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
-                {phone ? "✓ Reveal Number (Booking Accepted)" : "Unlocks once a booking is accepted"}
+                {phone ? translate("✓ Reveal Number (Booking Accepted)") : translate("Unlocks once a booking is accepted")}
               </button>
               <button onClick={() => setShowPhoneReveal(false)} className="w-full py-3 rounded-xl bg-secondary text-sm font-medium text-secondary-foreground">
-                Cancel
-              </button>
+                {translate("Cancel")} </button>
             </div>
           </div>
         </div>

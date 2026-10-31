@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import PullToRefresh from "@/components/PullToRefresh";
 import { useState, useMemo, useEffect } from "react";
 import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, ShieldAlert, Calendar, MoreVertical, CalendarClock, Star } from "lucide-react";
@@ -36,6 +37,7 @@ const statusBadge = (s: BookingStatus) => {
 };
 
 const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
+  useLanguage();
   const { bookings, counts, cancelBooking, updateBooking } = useBookings();
   const [tab, setTab] = useState<BookingStatus | "all">("pending");
   const [actionFor, setActionFor] = useState<Booking | null>(null);
@@ -74,8 +76,8 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
           <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>
         <div className="flex-1">
-          <h1 className="text-lg font-extrabold text-foreground">My Bookings</h1>
-          <p className="text-[11px] text-muted-foreground">Track viewings and stays</p>
+          <h1 className="text-lg font-extrabold text-foreground">{translate("My Bookings")}</h1>
+          <p className="text-[11px] text-muted-foreground">{translate("Track viewings and stays")}</p>
         </div>
       </div>
 
@@ -96,7 +98,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                 isActive ? "gradient-trust text-primary-foreground" : "bg-secondary text-secondary-foreground"
               }`}
             >
-              {t.label}
+              {translate(t.label)}
               {count > 0 && (
                 <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] ${
                   isActive ? "bg-primary-foreground/20" : "bg-card text-foreground"
@@ -114,7 +116,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
           <div className="flex flex-col items-center justify-center text-center py-20 px-6 animate-fade-in">
             <EmptyIllustration variant="bookings" className="w-32 h-32 mb-3" />
             <h3 className="text-base font-bold text-foreground mb-1">
-              {tab === "pending" ? "No pending requests" : tab === "accepted" ? "No accepted bookings yet" : tab === "completed" ? "No past bookings" : "No bookings yet"}
+              {tab === "pending" ? translate("No pending requests") : tab === "accepted" ? translate("No accepted bookings yet") : tab === "completed" ? translate("No past bookings") : translate("No bookings yet")}
             </h3>
             <p className="text-xs text-muted-foreground max-w-xs mb-5">
               Browse listings and tap "Book a Viewing" or "Book Stay" to send a request. Hosts respond within 2 hours.
@@ -123,8 +125,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
               onClick={onBack}
               className="px-5 py-2.5 rounded-xl gradient-trust text-xs font-bold text-primary-foreground active:scale-95 transition-transform"
             >
-              Browse Rentals
-            </button>
+              {translate("Browse Rentals")} </button>
           </div>
         ) : (
 
@@ -140,7 +141,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <h4 className="text-sm font-bold text-foreground line-clamp-1">{b.propertyTitle}</h4>
-                        <button onClick={() => setActionFor(b)} className="-mt-1 -mr-1 p-1 active:opacity-60" aria-label="Booking actions">
+                        <button onClick={() => setActionFor(b)} className="-mt-1 -mr-1 p-1 active:opacity-60" aria-label={translate("Booking actions")}>
                           <MoreVertical className="w-4 h-4 text-muted-foreground" />
                         </button>
                       </div>
@@ -149,7 +150,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                       </p>
                       <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border mt-2 ${badge.cls}`}>
                         <Icon className={`w-3 h-3 ${badge.spin ? "animate-spin" : ""}`} />
-                        {badge.label}
+                        {translate(badge.label)}
                       </div>
                       {/* Timeline stepper */}
                       {b.status !== "declined" && b.status !== "cancelled" && (() => {
@@ -165,7 +166,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                             {steps.map((s, idx) => (
                               <div key={s.key} className="flex items-center gap-1 flex-1">
                                 <div className={`w-2.5 h-2.5 rounded-full transition-colors ${s.done ? "bg-trust" : "bg-border"} ${s.done && idx === steps.findIndex((x) => !x.done) - 1 ? "ring-2 ring-trust/30" : ""}`} />
-                                <span className={`text-[9px] font-semibold ${s.done ? "text-foreground" : "text-muted-foreground"}`}>{s.label}</span>
+                                <span className={`text-[9px] font-semibold ${s.done ? "text-foreground" : "text-muted-foreground"}`}>{translate(s.label)}</span>
                                 {idx < steps.length - 1 && (
                                   <div className={`flex-1 h-0.5 rounded-full ${steps[idx + 1].done ? "bg-trust" : "bg-border"}`} />
                                 )}
@@ -181,7 +182,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                     {isStay ? (
                       <>
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Stay</span>
+                          <span className="text-muted-foreground">{translate("Stay")}</span>
                           <span className="font-medium text-foreground">{formatDate(b.date)} → {formatDate(b.checkOut || "")}</span>
                         </div>
                         <div className="flex justify-between">
@@ -191,7 +192,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                       </>
                     ) : (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Viewing</span>
+                        <span className="text-muted-foreground">{translate("Viewing")}</span>
                         <span className="font-medium text-foreground">{formatDate(b.date)} · {b.time}</span>
                       </div>
                     )}
@@ -206,7 +207,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                         <div className={`flex items-center gap-1.5 text-[10px] pt-1 font-semibold ${overdue ? "text-destructive" : "text-accent-foreground"}`}>
                           <Clock className={`w-3 h-3 ${overdue ? "" : "animate-pulse"}`} />
                           {overdue
-                            ? "Response overdue — try nudging or messaging"
+                            ? translate("Response overdue — try nudging or messaging")
                             : `Response expected in ${hrs > 0 ? `${hrs}h ` : ""}${mins}m`}
                         </div>
                       );
@@ -223,7 +224,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                         `${isStay ? "Check-in" : "Viewing"} in ${days} days`;
                       return (
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold text-trust pt-1">
-                          <CalendarClock className="w-3 h-3" /> {label}
+                          <CalendarClock className="w-3 h-3" /> {translate(label)}
                         </div>
                       );
                     })()}
@@ -237,21 +238,18 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                           href={`tel:${b.landlordPhone.replace(/\s/g, "")}`}
                           className="flex-1 py-2.5 rounded-xl bg-trust/10 text-xs font-semibold text-trust active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
                         >
-                          <Phone className="w-3.5 h-3.5" /> Call
-                        </a>
+                          <Phone className="w-3.5 h-3.5" /> {translate("Call")} </a>
                       )}
                       <button
                         onClick={() => onOpenChat?.(b.propertyId)}
                         className="flex-1 py-2.5 rounded-xl bg-primary/10 text-xs font-semibold text-primary active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
                       >
-                        <MessageCircle className="w-3.5 h-3.5" /> Chat
-                      </button>
+                        <MessageCircle className="w-3.5 h-3.5" /> {translate("Chat")} </button>
                       <button
                         onClick={() => setRescheduleFor(b)}
                         className="flex-1 py-2.5 rounded-xl bg-secondary text-xs font-semibold text-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
                       >
-                        <CalendarClock className="w-3.5 h-3.5" /> Reschedule
-                      </button>
+                        <CalendarClock className="w-3.5 h-3.5" /> {translate("Reschedule")} </button>
                     </div>
                   )}
 
@@ -260,8 +258,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                     <div className="mx-3 mb-3 flex items-start gap-2 p-2.5 rounded-xl bg-accent/5 border border-accent/20">
                       <ShieldAlert className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
                       <p className="text-[10px] text-muted-foreground leading-relaxed">
-                        <span className="font-semibold text-accent-foreground">Safety:</span> Arrange payment directly with the host on arrival. KejaSure does not handle rent or deposits — never send money before viewing.
-                      </p>
+                        <span className="font-semibold text-accent-foreground">{translate("Safety:")}</span> {translate("Arrange payment directly with the host on arrival. KejaSure does not handle rent or deposits — never send money before viewing.")} </p>
                     </div>
                   )}
 
@@ -272,15 +269,14 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                         <Star className="w-4 h-4 text-gold-foreground fill-gold-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-foreground">How was your experience?</p>
-                        <p className="text-[10px] text-muted-foreground">Help others by leaving a quick review.</p>
+                        <p className="text-xs font-bold text-foreground">{translate("How was your experience?")}</p>
+                        <p className="text-[10px] text-muted-foreground">{translate("Help others by leaving a quick review.")}</p>
                       </div>
                       <button
                         onClick={() => markReviewed(b.id)}
                         className="shrink-0 px-3 py-1.5 rounded-lg gradient-trust text-[10px] font-bold text-primary-foreground active:scale-95"
                       >
-                        Rate
-                      </button>
+                        {translate("Rate")} </button>
                     </div>
                   )}
                 </div>
@@ -305,31 +301,27 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                   onClick={() => { setRescheduleFor(actionFor); setActionFor(null); }}
                   className="w-full py-3 rounded-xl bg-secondary text-sm font-semibold text-foreground active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  <CalendarClock className="w-4 h-4" /> Reschedule
-                </button>
+                  <CalendarClock className="w-4 h-4" /> {translate("Reschedule")} </button>
               )}
               {(actionFor.status === "pending" || actionFor.status === "accepted") && (
                 <button
                   onClick={() => { cancelBooking(actionFor.id); setActionFor(null); }}
                   className="w-full py-3 rounded-xl bg-destructive/10 text-sm font-semibold text-destructive active:scale-[0.98]"
                 >
-                  Cancel booking
-                </button>
+                  {translate("Cancel booking")} </button>
               )}
               {actionFor.status === "accepted" && (
                 <button
                   onClick={() => { updateBooking(actionFor.id, { status: "completed" }); setActionFor(null); }}
                   className="w-full py-3 rounded-xl bg-secondary text-sm font-semibold text-foreground active:scale-[0.98]"
                 >
-                  Mark as completed
-                </button>
+                  {translate("Mark as completed")} </button>
               )}
               <button
                 onClick={() => setActionFor(null)}
                 className="w-full py-3 rounded-xl bg-muted text-sm font-medium text-muted-foreground"
               >
-                Close
-              </button>
+                {translate("Close")} </button>
             </div>
           </div>
         </div>
