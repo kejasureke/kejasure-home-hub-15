@@ -103,7 +103,7 @@ const InviteFriendsScreen = ({ onBack }: { onBack: () => void }) => {
         </div>
 
         <p className="text-[11px] text-muted-foreground text-center">
-          A pass only counts once your friend pays for a plan. Signing up alone doesn't earn one.
+          A reward only counts once your friend pays for a plan — and you both need an active plan. Signing up alone doesn't earn one.
         </p>
       </div>
     </div>
