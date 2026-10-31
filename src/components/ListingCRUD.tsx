@@ -1408,7 +1408,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-                      Keja AI
+                      KejaSure AI
                       <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[9px] font-semibold uppercase tracking-wide">Beta</span>
                     </h3>
                     <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
@@ -1471,7 +1471,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                     className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform"
                   >
                     <Sparkles className="w-4 h-4" />
-                    {form.description ? "Rewrite description with Keja AI" : "Write description with Keja AI"}
+                    {form.description ? "Rewrite description with KejaSure AI" : "Write description with KejaSure AI"}
                   </button>
                 )}
 
