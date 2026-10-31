@@ -138,14 +138,41 @@ Deno.serve(async (req) => {
             const { data: roles } = await admin.from('user_roles').select('role').eq('user_id', ref.referrer_id)
             const inviterRole = (roles ?? []).map((r: any) => r.role).find((r: string) => BUSINESS.includes(r)) ?? 'tenant'
             const inviterIsBusiness = inviterRole !== 'tenant'
-            // Friend who paid for a business plan doubles the reward
             const friendIsBusiness = BUSINESS.includes(payment.role)
-            const baseDays = inviterIsBusiness ? 30 : 1
-            const days = baseDays * (friendIsBusiness ? 2 : 1)
+
+            if (inviterIsBusiness && !friendIsBusiness) {
+              // Business invites a tenant → free listing boost sized to the tenant's pass
+              const BOOST_HOURS: Record<string, number> = { '24 Hours': 6, '3 Days': 12, '7 Days': 24 }
+              const hours = BOOST_HOURS[payment.plan_name] ?? 6
+              const { data: lst } = await admin.from('listings').select('id, boost_expires_at, title')
+                .eq('owner_id', ref.referrer_id).eq('status', 'active')
+                .order('created_at', { ascending: false }).limit(1).maybeSingle()
+              if (lst) {
+                const from = lst.boost_expires_at && new Date(lst.boost_expires_at) > new Date()
+                  ? new Date(lst.boost_expires_at) : new Date()
+                const ends = new Date(from.getTime() + hours * 60 * 60 * 1000)
+                await admin.from('boost_purchases').insert({
+                  listing_id: lst.id, user_id: ref.referrer_id, package: `Referral ${hours}h Boost`,
+                  price_kes: 0, starts_at: from.toISOString(), expires_at: ends.toISOString(),
+                })
+                await admin.from('listings').update({ boost_expires_at: ends.toISOString() }).eq('id', lst.id)
+                await admin.from('notifications').insert({
+                  user_id: ref.referrer_id, type: 'system', title: `You earned a free ${hours}h boost`,
+                  body: `A tenant you invited just subscribed. "${lst.title}" is now boosted. Asante!`,
+                  deep_link: `/listing/${lst.id}`,
+                })
+              } else {
+                await admin.from('notifications').insert({
+                  user_id: ref.referrer_id, type: 'system', title: `You earned a free ${hours}h boost`,
+                  body: 'A tenant you invited just subscribed, but you have no live listing to boost yet.',
+                  deep_link: '/settings/subscription',
+                })
+              }
+            } else {
+            // Tenant inviter → 24h pass; business inviting business → free month
+            const days = inviterIsBusiness ? 30 : 1
             const rewardMs = days * DAY
-            const label = inviterIsBusiness
-              ? (days === 60 ? '2 free months' : 'a free month')
-              : (days === 2 ? 'a free 48h pass' : 'a free 24h pass')
+            const label = inviterIsBusiness ? 'a free month' : 'a free 24h pass'
 
             const { data: active } = await admin.from('subscriptions')
               .select('id, ends_at').eq('user_id', ref.referrer_id).eq('status', 'active')
@@ -172,11 +199,10 @@ Deno.serve(async (req) => {
             }
             await admin.from('notifications').insert({
               user_id: ref.referrer_id, type: 'system', title: `You earned ${label}`,
-              body: friendIsBusiness
-                ? 'A business you invited just subscribed — double reward! Asante for spreading KejaSure!'
-                : 'A friend you invited just subscribed. Asante for spreading KejaSure!',
+              body: 'A friend you invited just subscribed. Asante for spreading KejaSure!',
               deep_link: '/settings/subscription',
             })
+            }
           }
         }
       } catch (_) { /* never block the payment ack */ }
