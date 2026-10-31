@@ -40,7 +40,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   const [mapSnap, setMapSnap] = useState<"peek" | "expanded">("expanded");
   const [, forceTick] = useState(0);
   const [locationEnabled, setLocationEnabled] = useState(() => {
-    try { return localStorage.getItem(LOCATION_KEY) === "true"; } catch { return false; }
+    try { return localStorage.getItem(LOCATION_KEY) !== "false"; } catch { return true; }
   });
   const [autoRecenter, setAutoRecenter] = useState(() => {
     try { return localStorage.getItem(AUTO_RECENTER_KEY) === "true"; } catch { return false; }
@@ -185,7 +185,7 @@ const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
   // Sync location toggle if changed elsewhere (Settings).
   useEffect(() => {
     const onStorage = () => {
-      try { setLocationEnabled(localStorage.getItem(LOCATION_KEY) === "true"); } catch {}
+      try { setLocationEnabled(localStorage.getItem(LOCATION_KEY) !== "false"); } catch {}
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
