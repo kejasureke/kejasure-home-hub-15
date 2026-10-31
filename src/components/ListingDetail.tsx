@@ -22,6 +22,8 @@ import SwipeableImageGallery from "./SwipeableImageGallery";
 import BookingRequestModal from "./BookingRequestModal";
 import { getScamRiskScore } from "@/utils/scamDetection";
 import HouseHuntingDetails from "./listing/HouseHuntingDetails";
+import { usePaidAccess } from "@/hooks/usePaidAccess";
+import PaidAccessNotice from "./PaidAccessNotice";
 
 interface ListingDetailProps {
   property: Property;
@@ -34,6 +36,7 @@ interface ListingDetailProps {
 
 const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith, onSelectProperty }: ListingDetailProps) => {
   useLanguage();
+  const { hasActivePlan, loading: planLoading } = usePaidAccess();
   const { closing, triggerClose } = useOverlayClose(onBack);
   const [currentImage, setCurrentImage] = useState(0);
   const [showBooking, setShowBooking] = useState(false);
@@ -501,7 +504,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
       {/* Bottom CTA — Book first, contacts after acceptance */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
-
+        {!hasActivePlan ? <div className="max-w-lg mx-auto"><PaidAccessNotice loading={planLoading} /></div> : <>
         <div className="flex gap-3 max-w-lg mx-auto">
           <button
             onClick={() => setShowBooking(true)}
@@ -523,7 +526,8 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             {translate("Chat")} </button>
         </div>
         <p className="text-[10px] text-muted-foreground text-center mt-2">
-          {translate("📋 Contacts are shared once your booking is accepted")} </p>
+          {translate("Phone numbers require an active subscription and an accepted booking. Payment alone does not unlock contacts.")} </p>
+        </>}
       </div>
 
       {/* Booking Request Modal */}

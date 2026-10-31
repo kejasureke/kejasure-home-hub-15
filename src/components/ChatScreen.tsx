@@ -53,7 +53,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
 
   // Load real messages + live updates
   useEffect(() => {
-    if (!canChat) return;
+    if (!canChat || !conversationId) return;
     let cancelled = false;
     let ch: ReturnType<typeof supabase.channel> | null = null;
     (async () => {
@@ -68,10 +68,10 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
         time: fmtTime(r.created_at),
         status: r.sender_id === user.id ? (r.read_at ? "seen" : "sent") : undefined,
       });
-      const { data } = await supabase.from("messages").select("*").eq("conversation_id", conversationId!).order("created_at").limit(500);
+      const { data } = await supabase.from("messages").select("*").eq("conversation_id", conversationId).order("created_at").limit(500);
       if (!cancelled && data) setMessages(data.map(toMsg));
       await supabase.from("messages").update({ read_at: new Date().toISOString() })
-        .eq("conversation_id", conversationId!).neq("sender_id", user.id).is("read_at", null);
+        .eq("conversation_id", conversationId).neq("sender_id", user.id).is("read_at", null);
       ch = supabase
         .channel(`chat-${conversationId}-${Math.random().toString(36).slice(2)}`)
         .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` }, (p) => {
@@ -135,13 +135,13 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
   };
 
   const sendMessage = async () => {
-    if (!message.trim() || !canChat || !myId || !hasActivePlan) return;
+    if (!message.trim() || !canChat || !conversationId || !myId || !hasActivePlan) return;
     const text = message.trim();
     const tempId = `tmp-${Date.now()}`;
     setMessages((prev) => [...prev, { id: tempId, text, sender: "me", time: fmtTime(new Date().toISOString()), status: "sending" }]);
     setMessage("");
     const { data, error } = await supabase.from("messages")
-      .insert({ conversation_id: conversationId!, sender_id: myId, body: text }).select().single();
+      .insert({ conversation_id: conversationId, sender_id: myId, body: text }).select().single();
     if (error || !data) {
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
       setMessage(text);
@@ -179,7 +179,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
           messages
             .slice(-8)
             .filter((m) => m.sender === "other" && m.text)
-            .flatMap((m) => scanMessage(m.text!))
+            .flatMap((m) => m.text ? scanMessage(m.text) : [])
             .map((s) => [s.kind, s]),
         ).values(),
       );
