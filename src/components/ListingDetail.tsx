@@ -21,6 +21,7 @@ import SmileIDBadge from "./SmileIDBadge";
 import SwipeableImageGallery from "./SwipeableImageGallery";
 import BookingRequestModal from "./BookingRequestModal";
 import { getScamRiskScore } from "@/utils/scamDetection";
+import HouseHuntingDetails from "./listing/HouseHuntingDetails";
 
 interface ListingDetailProps {
   property: Property;
@@ -36,6 +37,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
   const { closing, triggerClose } = useOverlayClose(onBack);
   const [currentImage, setCurrentImage] = useState(0);
   const [showBooking, setShowBooking] = useState(false);
+  const [bookingNote, setBookingNote] = useState("");
   const [showShare, setShowShare] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
@@ -209,6 +211,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
         {/* Scam Risk Warning */}
         <ScamWarningBadge risk={scamRisk} />
+        <HouseHuntingDetails property={property} onRequestUpdate={() => { setBookingNote(translate("Please confirm this home is still available and the advertised price before I travel.")); setShowBooking(true); }} />
 
         {/* Price Drop + Alert */}
         <div className="flex items-center gap-3 mb-4">

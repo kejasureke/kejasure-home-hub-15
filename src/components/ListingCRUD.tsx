@@ -10,6 +10,8 @@ import { openCamera, haptic, getCurrentLocation } from "@/lib/despia";
 import { Crosshair, CheckCircle2 } from "lucide-react";
 import { notifyNewListing } from "@/lib/listingAlerts";
 import { fileToDataUrl } from "@/lib/imageIntegrity";
+import { homeDetails, saveHomeDetails, type HomeDetails } from "@/lib/houseHunting";
+import HomeDetailsEditor from "./listing/HomeDetailsEditor";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
 
@@ -177,6 +179,10 @@ const boostOptions = [
 const steps = ["Details", "Location", "Amenities", "Photos", "Boost"];
 
 const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
+  const [extraDetails, setExtraDetails] = useState<HomeDetails>(() => {
+    const id = (editData as { id?: string } | undefined)?.id;
+    return id ? homeDetails({ id } as import("@/data/mockData").Property) : {};
+  });
   const [step, setStep] = useState(0);
   const [caretakerName, setCaretakerName] = useState("");
   const [caretakerPhone, setCaretakerPhone] = useState("");
@@ -576,6 +582,9 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   const handleSubmit = () => {
     const listingId = (editData as any)?.id ?? `new_${Date.now()}`;
+    try {
+      saveHomeDetails(listingId, { ...extraDetails, deposit: form.deposit === "" ? undefined : Math.max(0, Number(form.deposit)), moveInDate: extraDetails.moveInDate || form.moveInDate });
+    } catch { return; }
     if (caretakerPhone.replace(/\D/g, "").length >= 9) {
       try {
         const all = JSON.parse(localStorage.getItem("kejasure_caretakers") || "{}");
@@ -651,6 +660,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
         {step === 0 && (
           <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold">Basic Details</h2>
+            {type !== "service" && <HomeDetailsEditor value={extraDetails} onChange={setExtraDetails} />}
 
             {type === "service" && (
               <div>
