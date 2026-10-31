@@ -4,8 +4,9 @@ import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Sun, Eye, Shield, ChevronRi
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useTheme } from "@/hooks/useTheme";
 import { toast } from "@/hooks/use-toast";
-import { isDespia, requestBiometric, getCurrentLocation, openNativeSettings } from "@/lib/despia";
+import { isDespia, requestBiometric, getCurrentLocation, openNativeSettings, haptic } from "@/lib/despia";
 import LegalContent, { legalTitles, type LegalDocument } from "@/components/LegalContent";
+import ShareKejaSureSheet from "@/components/ShareKejaSureSheet";
 import { Button } from "@/components/ui/button";
 
 interface SettingsScreenProps {
@@ -34,6 +35,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const [showVisibility, setShowVisibility] = useState(false);
   const [visibility, setVisibility] = useState<"everyone" | "verified" | "private">("everyone");
   const [showPinFlow, setShowPinFlow] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
   const [pinStep, setPinStep] = useState<"current" | "new" | "confirm" | "otp" | "done">("current");
   const [currentPin, setCurrentPin] = useState("");
   const [newPin, setNewPin] = useState("");
@@ -250,16 +252,9 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
 
         <Section title={translate("Share KejaSure")}>
           <button
-            onClick={async () => {
-              const shareText = "Pata Keja, Be Sure 🇰🇪 — I'm using KejaSure to find verified rentals across Kenya. Try it: https://kejasure.co.ke";
-              try {
-                if (navigator.share) {
-                  await navigator.share({ title: "KejaSure", text: shareText });
-                } else {
-                  await navigator.clipboard.writeText(shareText);
-                  toast({ title: translate("Link copied"), description: translate("Share it with a friend on WhatsApp") });
-                }
-              } catch {}
+            onClick={() => {
+              haptic("light");
+              setShowShareSheet(true);
             }}
             className="w-full flex items-center gap-3 p-4"
           >
@@ -268,7 +263,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-semibold">{translate("Share with a friend")}</p>
-              <p className="text-[11px] text-muted-foreground">{translate("Send them a WhatsApp invite")}</p>
+              <p className="text-[11px] text-muted-foreground">{translate("WhatsApp, SMS, email or copy link")}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>
@@ -300,6 +295,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
 
         <p className="text-center text-[10px] text-muted-foreground mt-4">{translate("KejaSure v1.0.0 · Made in Kenya 🇰🇪")}</p>
       </div>
+
+      {showShareSheet && <ShareKejaSureSheet onClose={() => setShowShareSheet(false)} />}
 
       {/* Delete Confirmation */}
       {showDeleteConfirm && (
