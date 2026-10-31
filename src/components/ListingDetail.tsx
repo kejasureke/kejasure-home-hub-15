@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { ArrowLeft, Heart, Share2, ShieldCheck, MapPin, Clock, MessageCircle, Phone, ChevronRight, Star, Bed, Bath, X, Calendar, AlertTriangle, Flag, ShieldAlert, CheckCircle2, ClipboardList, Video, Building2, Lock, GitCompare } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
@@ -31,6 +32,7 @@ interface ListingDetailProps {
 }
 
 const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompareWith, onSelectProperty }: ListingDetailProps) => {
+  useLanguage();
   const { closing, triggerClose } = useOverlayClose(onBack);
   const [currentImage, setCurrentImage] = useState(0);
   const [showBooking, setShowBooking] = useState(false);
@@ -86,7 +88,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate">{property.title}</p>
             <p className="text-[11px] text-muted-foreground truncate">
-              KES {new Intl.NumberFormat("en-KE").format(property.price)} {property.priceUnit}
+              KES {new Intl.NumberFormat("en-KE").format(property.price)} {translate(property.priceUnit)}
             </p>
           </div>
           <button onClick={onToggleLike} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
@@ -131,8 +133,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
               className="px-3 py-1 rounded-full bg-primary/90 text-[10px] font-bold text-primary-foreground flex items-center gap-1"
             >
               <Video className="w-3 h-3" />
-              Video Tour
-            </button>
+              {translate("Video Tour")} </button>
           </div>
         )}
       </div>
@@ -143,7 +144,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-2xl font-bold text-foreground">KES {formatPrice(property.price)}</span>
-            <span className="text-sm text-muted-foreground">{property.priceUnit}</span>
+            <span className="text-sm text-muted-foreground">{translate(property.priceUnit)}</span>
             {property.rating && (
               <button onClick={() => setShowReviews(true)} className="flex items-center gap-1 ml-auto px-2 py-1 rounded-lg bg-secondary active:scale-95 transition-transform">
                 <Star className="w-3.5 h-3.5 fill-gold text-gold" />
@@ -157,7 +158,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             {property.verified && (
               <div className="verified-badge">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Verified Listing</span>
+                <span>{translate("Verified Listing")}</span>
               </div>
             )}
             <div className="location-chip">
@@ -166,8 +167,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             </div>
             {property.hostTrustBadge && (
               <div className="px-2 py-0.5 rounded-full bg-gold/15 text-xs font-medium text-gold-foreground">
-                🏆 Trusted Host
-              </div>
+                {translate("🏆 Trusted Host")} </div>
             )}
           </div>
 
@@ -189,9 +189,9 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             return (
               <div className="flex items-center gap-1.5 mt-2 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
                 {chips.map((c) => (
-                  <div key={c.label} className={`shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold border ${chipCls(c.value)}`}>
+                  <div key={translate(c.label)} className={`shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold border ${chipCls(c.value)}`}>
                     <span>{c.icon}</span>
-                    <span>{c.label}</span>
+                    <span>{translate(c.label)}</span>
                     <span className="opacity-70">{c.value}/10</span>
                   </div>
                 ))}
@@ -226,10 +226,10 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             { icon: Clock, value: property.landlordResponseTime, label: "Response" },
             { icon: MapPin, value: property.size || "–", label: "Size" },
           ].map((spec) => (
-            <div key={spec.label} className="text-center p-3 rounded-2xl bg-secondary">
+            <div key={translate(spec.label)} className="text-center p-3 rounded-2xl bg-secondary">
               <spec.icon className="w-4 h-4 mx-auto mb-1 text-primary" />
               <p className="text-xs font-semibold">{spec.value}</p>
-              <p className="text-[10px] text-muted-foreground">{spec.label}</p>
+              <p className="text-[10px] text-muted-foreground">{translate(spec.label)}</p>
             </div>
           ))}
         </div>
@@ -245,9 +245,9 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
               { label: "Floor", value: property.floor || "–" },
               { label: "Year Built", value: property.yearBuilt?.toString() || "–" },
             ].map((d) => (
-              <div key={d.label} className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{d.label}</span>
-                <span className="font-medium">{d.value}</span>
+              <div key={translate(d.label)} className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">{translate(d.label)}</span>
+                <span className="font-medium">{translate(d.value)}</span>
               </div>
             ))}
           </div>
@@ -255,16 +255,16 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
         {/* Description */}
         <div className="mb-5">
-          <h2 className="text-base font-semibold mb-2">About this property</h2>
+          <h2 className="text-base font-semibold mb-2">{translate("About this property")}</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">{property.description}</p>
         </div>
 
         {/* Amenities */}
         <div className="mb-5">
-          <h2 className="text-base font-semibold mb-2">Amenities</h2>
+          <h2 className="text-base font-semibold mb-2">{translate("Amenities")}</h2>
           <div className="flex flex-wrap gap-2">
             {property.amenities.map((a) => (
-              <span key={a} className="px-3 py-1.5 rounded-xl bg-secondary text-xs font-medium text-secondary-foreground">{a}</span>
+              <span key={translate(a)} className="px-3 py-1.5 rounded-xl bg-secondary text-xs font-medium text-secondary-foreground">{translate(a)}</span>
             ))}
           </div>
         </div>
@@ -272,7 +272,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
         {/* Stay Rules */}
         {property.stayRules && (
           <div className="mb-5">
-            <h2 className="text-base font-semibold mb-2">Stay Rules</h2>
+            <h2 className="text-base font-semibold mb-2">{translate("Stay Rules")}</h2>
             <div className="flex flex-wrap gap-2">
               {property.stayRules.map((r) => (
                 <span key={r} className="px-3 py-1.5 rounded-xl bg-destructive/5 text-xs font-medium text-destructive">{r}</span>
@@ -283,7 +283,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
         {/* Nearby */}
         <div className="mb-5">
-          <h2 className="text-base font-semibold mb-2">Nearby Landmarks</h2>
+          <h2 className="text-base font-semibold mb-2">{translate("Nearby Landmarks")}</h2>
           <div className="space-y-2">
             {property.nearbyLandmarks.map((l) => (
               <div key={l} className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -305,9 +305,8 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             <div className="mb-5 p-4 rounded-2xl bg-card card-shadow border border-border">
               <h2 className="text-base font-semibold mb-1 flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-primary" />
-                {hood.estate} Area Intelligence
-              </h2>
-              <p className="text-[10px] text-muted-foreground mb-3">Should I live here?</p>
+                {hood.estate} {translate("Area Intelligence")} </h2>
+              <p className="text-[10px] text-muted-foreground mb-3">{translate("Should I live here?")}</p>
 
               {/* Scores row */}
               <div className="grid grid-cols-4 gap-2 mb-3">
@@ -317,7 +316,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
                   { label: "Power", score: hood.electricityReliability },
                   { label: "Walk", score: hood.walkabilityScore },
                 ].map(s => (
-                  <div key={s.label} className="text-center">
+                  <div key={translate(s.label)} className="text-center">
                     <div className="relative w-10 h-10 mx-auto mb-1">
                       <svg className="w-10 h-10 -rotate-90" viewBox="0 0 36 36">
                         <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-secondary" />
@@ -325,7 +324,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
                       </svg>
                       <span className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${scoreColor(s.score)}`}>{s.score.toFixed(0)}</span>
                     </div>
-                    <p className="text-[9px] text-muted-foreground">{s.label}</p>
+                    <p className="text-[9px] text-muted-foreground">{translate(s.label)}</p>
                   </div>
                 ))}
               </div>
@@ -333,26 +332,26 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
               {/* Quick facts */}
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <div className="px-2.5 py-2 rounded-xl bg-secondary">
-                  <p className="text-[9px] text-muted-foreground">Noise</p>
+                  <p className="text-[9px] text-muted-foreground">{translate("Noise")}</p>
                   <p className="text-[11px] font-semibold">{hood.noiseLevel}</p>
                 </div>
                 <div className="px-2.5 py-2 rounded-xl bg-secondary">
-                  <p className="text-[9px] text-muted-foreground">Nightlife</p>
+                  <p className="text-[9px] text-muted-foreground">{translate("Nightlife")}</p>
                   <p className="text-[11px] font-semibold">{hood.nightlife}</p>
                 </div>
                 <div className="px-2.5 py-2 rounded-xl bg-secondary">
-                  <p className="text-[9px] text-muted-foreground">Avg Rent (2BR)</p>
-                  <p className="text-[11px] font-semibold">{formatP(hood.avgRent2BR)}/mo</p>
+                  <p className="text-[9px] text-muted-foreground">{translate("Avg Rent (2BR)")}</p>
+                  <p className="text-[11px] font-semibold">{formatP(hood.avgRent2BR)}{translate("/mo")}</p>
                 </div>
                 <div className="px-2.5 py-2 rounded-xl bg-secondary">
-                  <p className="text-[9px] text-muted-foreground">Nearest Mall</p>
+                  <p className="text-[9px] text-muted-foreground">{translate("Nearest Mall")}</p>
                   <p className="text-[11px] font-semibold truncate">{hood.nearestMall}</p>
                 </div>
               </div>
 
               {/* Internet & Transport */}
               <div className="mb-2">
-                <p className="text-[10px] font-semibold text-muted-foreground mb-1">📡 Internet</p>
+                <p className="text-[10px] font-semibold text-muted-foreground mb-1">{translate("📡 Internet")}</p>
                 <div className="flex flex-wrap gap-1">
                   {hood.internetProviders.map(p => (
                     <span key={p} className="px-2 py-0.5 rounded-full bg-primary/5 text-[9px] font-medium text-primary">{p}</span>
@@ -360,7 +359,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
                 </div>
               </div>
               <div>
-                <p className="text-[10px] font-semibold text-muted-foreground mb-1">🚌 Transport</p>
+                <p className="text-[10px] font-semibold text-muted-foreground mb-1">{translate("🚌 Transport")}</p>
                 <div className="flex flex-wrap gap-1">
                   {hood.transportOptions.map(t => (
                     <span key={t} className="px-2 py-0.5 rounded-full bg-accent/5 text-[9px] font-medium text-accent-foreground">{t}</span>
@@ -375,7 +374,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
         <div className="mb-5 rounded-2xl bg-secondary h-40 flex items-center justify-center">
           <div className="text-center">
             <MapPin className="w-8 h-8 mx-auto mb-2 text-primary" />
-            <p className="text-xs text-muted-foreground">Map preview — {property.estate}, {property.county}</p>
+            <p className="text-xs text-muted-foreground">{translate("Map preview —")} {property.estate}, {property.county}</p>
           </div>
         </div>
 
@@ -394,7 +393,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
         <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20 mb-4">
           <div className="flex items-center gap-2 mb-2">
             <ShieldCheck className="w-5 h-5 text-trust" />
-            <h3 className="text-sm font-semibold text-trust">Trust & Safety</h3>
+            <h3 className="text-sm font-semibold text-trust">{translate("Trust & Safety")}</h3>
           </div>
           <ul className="space-y-1.5 text-xs text-muted-foreground">
             <li>✓ Landlord identity verified via smile.id</li>
@@ -410,10 +409,9 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           <div className="flex items-start gap-2">
             <ShieldAlert className="w-4 h-4 text-accent shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs font-bold text-accent-foreground mb-0.5">Stay Safe with KejaSure</p>
+              <p className="text-xs font-bold text-accent-foreground mb-0.5">{translate("Stay Safe with KejaSure")}</p>
               <p className="text-[10px] text-muted-foreground leading-relaxed">
-                KejaSure connects you with verified landlords and service providers. Always visit the property in person before making any payment or commitment. Report suspicious profiles immediately.
-              </p>
+                {translate("KejaSure connects you with verified landlords and service providers. Always visit the property in person before making any payment or commitment. Report suspicious profiles immediately.")} </p>
             </div>
           </div>
         </div>
@@ -424,10 +422,9 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-destructive mb-0.5">Unverified Listing</p>
+                <p className="text-xs font-bold text-destructive mb-0.5">{translate("Unverified Listing")}</p>
                 <p className="text-[10px] text-muted-foreground leading-relaxed">
-                  This listing has not been verified by our team. Exercise extra caution and verify the property in person before making any commitments.
-                </p>
+                  {translate("This listing has not been verified by our team. Exercise extra caution and verify the property in person before making any commitments.")} </p>
               </div>
             </div>
           </div>
@@ -441,8 +438,8 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           >
             <ClipboardList className="w-6 h-6 text-accent" />
             <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">Move-In Checklist</p>
-              <p className="text-[10px] text-muted-foreground">Movers, cleaners, internet & more — all in one place</p>
+              <p className="text-sm font-semibold">{translate("Move-In Checklist")}</p>
+              <p className="text-[10px] text-muted-foreground">{translate("Movers, cleaners, internet & more — all in one place")}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>
@@ -456,8 +453,8 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           >
             <GitCompare className="w-6 h-6 text-primary" />
             <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">Compare with...</p>
-              <p className="text-[10px] text-muted-foreground">Pick another listing to compare side by side</p>
+              <p className="text-sm font-semibold">{translate("Compare with...")}</p>
+              <p className="text-[10px] text-muted-foreground">{translate("Pick another listing to compare side by side")}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>
@@ -474,8 +471,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
           className="flex items-center gap-2 text-xs text-destructive/70 py-2 hover:text-destructive transition-colors"
         >
           <Flag className="w-3.5 h-3.5" />
-          Report this listing
-        </button>
+          {translate("Report this listing")} </button>
       </div>
 
       {/* Report nudge (unverified listings) */}
@@ -483,17 +479,16 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
         <div className="fixed left-0 right-0 z-30 flex justify-center px-4 animate-fade-in pointer-events-none" style={{ bottom: "calc(6rem + env(safe-area-inset-bottom, 0px))" }}>
           <div className="pointer-events-auto flex items-center gap-2 px-3 py-2 rounded-full bg-destructive/95 text-destructive-foreground shadow-2xl max-w-sm">
             <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-            <span className="text-[11px] font-semibold flex-1">Something feel off? Report this listing</span>
+            <span className="text-[11px] font-semibold flex-1">{translate("Something feel off? Report this listing")}</span>
             <button
               onClick={() => { setShowReportNudge(false); setShowReport(true); }}
               className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-destructive-foreground text-destructive active:scale-95"
             >
-              Report
-            </button>
+              {translate("Report")} </button>
             <button
               onClick={() => setShowReportNudge(false)}
               className="text-[10px] font-medium opacity-80 active:opacity-100"
-              aria-label="Dismiss"
+              aria-label={translate("Dismiss")}
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -509,26 +504,23 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
             onClick={() => setShowBooking(true)}
             className="flex-1 py-3.5 rounded-xl gradient-trust text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98]"
           >
-            {property.type === "shortstay" ? "Book Stay" : "Request Viewing"}
+            {property.type === "shortstay" ? translate("Book Stay") : translate("Request Viewing")}
           </button>
           <button
             className="py-3.5 px-5 rounded-xl bg-muted text-sm font-semibold text-muted-foreground flex items-center gap-1.5 cursor-not-allowed"
-            title="Contact available after booking is accepted"
+            title={translate("Contact available after booking is accepted")}
           >
             <Lock className="w-3.5 h-3.5" />
-            Call
-          </button>
+            {translate("Call")} </button>
           <button
             className="py-3.5 px-5 rounded-xl bg-muted text-sm font-semibold text-muted-foreground flex items-center gap-1.5 cursor-not-allowed"
-            title="Contact available after booking is accepted"
+            title={translate("Contact available after booking is accepted")}
           >
             <Lock className="w-3.5 h-3.5" />
-            Chat
-          </button>
+            {translate("Chat")} </button>
         </div>
         <p className="text-[10px] text-muted-foreground text-center mt-2">
-          📋 Contacts are shared once your booking is accepted
-        </p>
+          {translate("📋 Contacts are shared once your booking is accepted")} </p>
       </div>
 
       {/* Booking Request Modal */}
@@ -541,7 +533,7 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
       {showShare && <ShareListingSheet property={property} onClose={() => setShowShare(false)} />}
       {showReport && <ReportListingModal listingTitle={property.title} listingId={property.id} onClose={() => setShowReport(false)} />}
-      {showReviews && <ReviewRatingFlow onClose={() => setShowReviews(false)} targetName="Landlord" targetType="landlord" listingTitle={property.title} />}
+      {showReviews && <ReviewRatingFlow onClose={() => setShowReviews(false)} targetName={translate("Landlord")} targetType="landlord" listingTitle={property.title} />}
       {showMoveIn && <MoveInChecklist property={property} onBack={() => setShowMoveIn(false)} />}
       {showVideoTour && property.videoTour && (
         <VideoTourPlayer

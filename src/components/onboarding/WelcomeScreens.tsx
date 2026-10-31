@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { useState, useRef, useEffect } from "react";
 import { ChevronRight, ChevronLeft, ShieldCheck } from "lucide-react";
 import logoIcon from "@/assets/logo-icon-green.png";
@@ -44,6 +45,7 @@ const slides = [
 const SWIPE_THRESHOLD = 50;
 
 const WelcomeScreens = ({ onComplete, onSkip, onLogin }: WelcomeScreensProps) => {
+  useLanguage();
   const [current, setCurrent] = useState(0);
   const [swiped, setSwiped] = useState(false);
   const [hintTimedOut, setHintTimedOut] = useState(false);
@@ -104,16 +106,14 @@ const WelcomeScreens = ({ onComplete, onSkip, onLogin }: WelcomeScreensProps) =>
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/15">
           <ShieldCheck className="w-3 h-3 text-primary" />
           <span className="text-[10px] font-semibold text-primary tracking-wide">
-            Safe & Verified
-          </span>
+            {translate("Safe & Verified")} </span>
         </div>
         {onSkip && !isLast && (
           <button
             onClick={onSkip}
             className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground active:text-foreground px-2 py-1"
           >
-            Skip
-          </button>
+            {translate("Skip")} </button>
         )}
       </div>
 
@@ -126,12 +126,12 @@ const WelcomeScreens = ({ onComplete, onSkip, onLogin }: WelcomeScreensProps) =>
           <img src={logoIcon} alt="KejaSure" className="w-16 h-16 object-contain" draggable={false} />
         </div>
         <h1 className="text-2xl font-extrabold text-foreground leading-tight whitespace-pre-line mb-3 animate-fade-in">
-          {slide.title}
+          {translate(slide.title)}
         </h1>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-[280px] mb-4 animate-fade-in">
-          {slide.description}
+          {translate(slide.description)}
         </p>
-        <p className="text-sm font-semibold text-primary animate-fade-in">{slide.accent}</p>
+        <p className="text-sm font-semibold text-primary animate-fade-in">{translate(slide.accent)}</p>
       </div>
 
       {/* Bottom section */}
@@ -145,8 +145,7 @@ const WelcomeScreens = ({ onComplete, onSkip, onLogin }: WelcomeScreensProps) =>
         >
           <ChevronLeft className="w-3.5 h-3.5 text-muted-foreground/60" />
           <span className="text-[11px] font-medium text-muted-foreground">
-            Swipe or tap to navigate
-          </span>
+            {translate("Swipe or tap to navigate")} </span>
           <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
         </div>
 
@@ -173,8 +172,7 @@ const WelcomeScreens = ({ onComplete, onSkip, onLogin }: WelcomeScreensProps) =>
             onClick={onComplete}
             className="w-full py-4 rounded-2xl gradient-trust text-primary-foreground font-semibold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform animate-fade-in"
           >
-            Find Your Next Keja
-            <ChevronRight className="w-5 h-5" />
+            {translate("Find Your Next Keja")} <ChevronRight className="w-5 h-5" />
           </button>
         ) : (
           <div className="flex items-center gap-3">
@@ -186,14 +184,12 @@ const WelcomeScreens = ({ onComplete, onSkip, onLogin }: WelcomeScreensProps) =>
               }`}
             >
               <ChevronLeft className="w-4 h-4" />
-              Back
-            </button>
+              {translate("Back")} </button>
             <button
               onClick={goNext}
               className="flex-1 h-12 rounded-2xl gradient-trust text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
             >
-              Next
-              <ChevronRight className="w-4 h-4" />
+              {translate("Next")} <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         )}
@@ -204,8 +200,8 @@ const WelcomeScreens = ({ onComplete, onSkip, onLogin }: WelcomeScreensProps) =>
             onClick={onLogin}
             className="w-full mt-4 text-center text-sm text-muted-foreground active:text-foreground"
           >
-            Already have an account?{" "}
-            <span className="font-semibold text-primary">Log in</span>
+            {translate("Already have an account?")}{" "}
+            <span className="font-semibold text-primary">{translate("Log in")}</span>
           </button>
         )}
       </div>

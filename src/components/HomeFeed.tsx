@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { Search, SlidersHorizontal, GitCompare, BookmarkCheck, ChevronRight, Clock, MapPin, Navigation, Wrench, Sparkles, Building2, X, BookmarkPlus, Bookmark, SearchX, TrendingUp } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -60,10 +61,11 @@ const GreetingName = () => {
       window.removeEventListener("profile-name-synced", h);
     };
   }, []);
-  return <>{name}</>;
+  return <>{name === "there" ? "" : `, ${name}`}</>;
 };
 
 const HomeFeed = () => {
+  useLanguage();
   const [segment, setSegmentState] = useState<(typeof segments)[number]>(() => {
     try {
       const saved = localStorage.getItem(SEGMENT_KEY) as (typeof segments)[number] | null;
@@ -221,7 +223,7 @@ const HomeFeed = () => {
 
   const handleRefresh = async () => {
     await new Promise((r) => setTimeout(r, 700));
-    toast("Feed refreshed");
+    toast(translate("Feed refreshed"));
   };
 
   // Android hardware back — close overlays before allowing app exit.
@@ -321,10 +323,10 @@ const HomeFeed = () => {
           return (
             <div className="mb-3 animate-fade-in">
               <p className="text-base font-bold text-white">
-                {greeting}, <GreetingName />!{" "}
+                {translate(greeting)}<GreetingName />!{" "}
                 <span className="inline-block animate-[wave_1.5s_ease-in-out_infinite] origin-[70%_70%]">👋🏿</span>
               </p>
-              <p className="text-xs text-white/70 mt-0.5">{tagline}</p>
+              <p className="text-xs text-white/70 mt-0.5">{translate(tagline)}</p>
             </div>
           );
         })()}
@@ -333,7 +335,7 @@ const HomeFeed = () => {
             <Search className="absolute left-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
             <input
               type="text"
-              placeholder="Search properties, estates, landmarks..."
+              placeholder={translate("Search properties, estates, landmarks...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setSearchFocused(true)}
@@ -371,7 +373,7 @@ const HomeFeed = () => {
             <div className="absolute top-full left-0 right-0 mt-2 z-30 bg-card rounded-xl card-shadow border border-border overflow-hidden animate-fade-in">
               {recentQueries.length > 0 && (
                 <div className="p-2">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 pt-1 pb-1.5">Recent searches</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 pt-1 pb-1.5">{translate("Recent searches")}</p>
                   {recentQueries.map((q) => (
                     <button
                       key={q}
@@ -395,8 +397,7 @@ const HomeFeed = () => {
               )}
               <div className="p-2 border-t border-border">
                 <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-2 pt-1 pb-1.5 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" /> Trending
-                </p>
+                  <TrendingUp className="w-3 h-3" /> {translate("Trending")} </p>
                 {["Kilimani 2BR", "Westlands furnished", "Diani short stay", "Karen villa", "CBD office"].map((q) => (
                   <button
                     key={q}
@@ -435,8 +436,7 @@ const HomeFeed = () => {
                   onClick={clearAll}
                   className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-destructive/15 text-destructive text-[11px] font-semibold animate-scale-in"
                 >
-                  Clear all
-                  <X className="w-3 h-3" />
+                  {translate("Clear all")} <X className="w-3 h-3" />
                 </button>
               )}
               {commCategory !== "All" && (
@@ -472,8 +472,7 @@ const HomeFeed = () => {
                   onClick={() => setFilters(f => ({ ...f, bedrooms: [] }))}
                   className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold animate-scale-in"
                 >
-                  {filters.bedrooms.join(",")} Bed
-                  <X className="w-3 h-3" />
+                  {filters.bedrooms.join(",")} {translate("Bed")} <X className="w-3 h-3" />
                 </button>
               )}
               {filters.verified && (
@@ -481,8 +480,7 @@ const HomeFeed = () => {
                   onClick={() => setFilters(f => ({ ...f, verified: false }))}
                   className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold animate-scale-in"
                 >
-                  Verified
-                  <X className="w-3 h-3" />
+                  {translate("Verified")} <X className="w-3 h-3" />
                 </button>
               )}
               {filters.furnished && (
@@ -490,8 +488,7 @@ const HomeFeed = () => {
                   onClick={() => setFilters(f => ({ ...f, furnished: false }))}
                   className="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-[11px] font-semibold animate-scale-in"
                 >
-                  Furnished
-                  <X className="w-3 h-3" />
+                  {translate("Furnished")} <X className="w-3 h-3" />
                 </button>
               )}
             </div>
@@ -505,14 +502,14 @@ const HomeFeed = () => {
             className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-card/20 backdrop-blur-sm active:scale-95 transition-transform"
           >
             <Sparkles className="w-4 h-4 text-primary-foreground" />
-            <span className="text-xs font-semibold text-primary-foreground">Keja AI Match</span>
+            <span className="text-xs font-semibold text-primary-foreground">{translate("Keja AI Match")}</span>
           </button>
           <button
             onClick={() => setShowNeighborhood(true)}
             className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-card/20 backdrop-blur-sm active:scale-95 transition-transform"
           >
             <Building2 className="w-4 h-4 text-primary-foreground" />
-            <span className="text-xs font-semibold text-primary-foreground">Area Intel</span>
+            <span className="text-xs font-semibold text-primary-foreground">{translate("Area Intel")}</span>
           </button>
         </div>
       </div>
@@ -523,7 +520,7 @@ const HomeFeed = () => {
         <div className="flex gap-1 p-1 rounded-xl bg-secondary">
           {segments.map((seg) => (
             <button
-              key={seg}
+              key={translate(seg)}
               onClick={() => { setSegment(seg); if (seg !== "Business Spaces") setCommCategory("All"); }}
               className={`flex-1 py-2 rounded-lg text-[10px] leading-tight font-semibold transition-all duration-200 text-center ${
                 segment === seg
@@ -531,13 +528,13 @@ const HomeFeed = () => {
                   : "text-muted-foreground"
               }`}
             >
-              {seg.includes(" ") ? (
+              {translate(seg).includes(" ") ? (
                 <>
-                  {seg.split(" ")[0]}
+                  {translate(seg).split(" ")[0]}
                   <br />
-                  {seg.split(" ").slice(1).join(" ")}
+                  {translate(seg).split(" ").slice(1).join(" ")}
                 </>
-              ) : seg}
+              ) : translate(seg)}
             </button>
           ))}
         </div>
@@ -559,7 +556,7 @@ const HomeFeed = () => {
           <div className="px-4 pb-2">
             <div className="flex items-center gap-2 mb-2">
               <Bookmark className="w-3.5 h-3.5 text-muted-foreground" />
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">My Searches</h3>
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{translate("My Searches")}</h3>
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
               {hasActiveLocationOrSearch && !alreadySaved && (county || estate) && (
@@ -641,7 +638,7 @@ const HomeFeed = () => {
                 <span className="text-lg">{cat.icon}</span>
                 <span className={`text-[10px] font-semibold leading-none ${
                   commCategory === cat.value ? "text-primary" : "text-muted-foreground"
-                }`}>{cat.label}</span>
+                }`}>{translate(cat.label)}</span>
               </button>
             ))}
           </div>
@@ -652,7 +649,7 @@ const HomeFeed = () => {
       <div className="px-4">
         {segment === "Services" ? (
           <div className="space-y-3">
-            <h2 className="text-base font-semibold">Popular Services</h2>
+            <h2 className="text-base font-semibold">{translate("Popular Services")}</h2>
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
               {[
                 { value: "All", icon: "🔧", label: "All" },
@@ -683,14 +680,14 @@ const HomeFeed = () => {
                   <span className="text-lg">{cat.icon}</span>
                   <span className={`text-[10px] font-semibold leading-none ${
                     serviceCategory === cat.value ? "text-primary" : "text-muted-foreground"
-                  }`}>{cat.label}</span>
+                  }`}>{translate(cat.label)}</span>
                 </button>
               ))}
             </div>
 
             {/* Sort controls */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground font-medium">Sort:</span>
+              <span className="text-[10px] text-muted-foreground font-medium">{translate("Sort:")}</span>
               {([
                 { value: "featured", label: "Featured" },
                 { value: "rating", label: "Top Rated" },
@@ -705,7 +702,7 @@ const HomeFeed = () => {
                       : "bg-secondary text-secondary-foreground"
                   }`}
                 >
-                  {opt.label}
+                  {translate(opt.label)}
                 </button>
               ))}
             </div>
@@ -719,23 +716,20 @@ const HomeFeed = () => {
             {/* Compare toolbar */}
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">
-                {filteredProperties.length} {segment === "Short Stays" ? "stays" : "properties"} found
-              </p>
+                {filteredProperties.length} {translate(segment === "Short Stays" ? "stays" : "properties")} {translate("found")} </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowMap(true)}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
                 >
                   <MapPin className="w-3 h-3" />
-                  Map
-                </button>
+                  {translate("Map")} </button>
                 <button
                   onClick={() => setShowCompareSelector(true)}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
                 >
                   <GitCompare className="w-3 h-3" />
-                  Compare
-                </button>
+                  {translate("Compare")} </button>
               </div>
             </div>
 
@@ -744,8 +738,7 @@ const HomeFeed = () => {
               <div>
                 <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  Recently Viewed
-                </h2>
+                  {translate("Recently Viewed")} </h2>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
                   {recentProperties.slice(0, 5).map((p) => (
                     <button
@@ -777,7 +770,7 @@ const HomeFeed = () => {
             {/* Smart recommendations */}
             {!searchQuery && !county && (
               <div>
-                <h2 className="text-base font-semibold mb-3">✨ Recommended for You</h2>
+                <h2 className="text-base font-semibold mb-3">{translate("✨ Recommended for You")}</h2>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
                   {properties
                     .filter((p) => p.verified && p.rating && p.rating >= 4.5)
@@ -798,7 +791,7 @@ const HomeFeed = () => {
                           <p className="text-xs font-semibold line-clamp-1">{p.title}</p>
                           <p className="text-[10px] text-muted-foreground">{p.estate}, {p.county}</p>
                           <p className="text-xs font-bold text-primary mt-1">
-                            KES {new Intl.NumberFormat("en-KE").format(p.price)}<span className="font-normal text-muted-foreground">{p.priceUnit}</span>
+                            KES {new Intl.NumberFormat("en-KE").format(p.price)}<span className="font-normal text-muted-foreground">{translate(p.priceUnit)}</span>
                           </p>
                         </div>
                       </button>
@@ -813,11 +806,9 @@ const HomeFeed = () => {
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-base font-semibold flex items-center gap-2">
                     <Navigation className="w-4 h-4 text-primary" />
-                    Nearby Rentals
-                  </h2>
+                    {translate("Nearby Rentals")} </h2>
                   <button onClick={() => setShowMap(true)} className="text-xs font-medium text-primary">
-                    View Map →
-                  </button>
+                    {translate("View Map →")} </button>
                 </div>
                 <div className="flex gap-3 overflow-x-auto pb-2">
                   {properties
@@ -838,7 +829,7 @@ const HomeFeed = () => {
                         <div className="p-2.5">
                           <p className="text-xs font-semibold line-clamp-1">{p.title}</p>
                           <p className="text-xs font-bold text-primary mt-0.5">
-                            KES {(p.price / 1000).toFixed(0)}K<span className="font-normal text-muted-foreground">{p.priceUnit}</span>
+                            KES {(p.price / 1000).toFixed(0)}K<span className="font-normal text-muted-foreground">{translate(p.priceUnit)}</span>
                           </p>
                         </div>
                       </button>
@@ -852,8 +843,7 @@ const HomeFeed = () => {
               <div>
                 <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
                   <Wrench className="w-4 h-4 text-accent" />
-                  Nearby Services
-                </h2>
+                  {translate("Nearby Services")} </h2>
                 <div className="flex gap-3 overflow-x-auto pb-2">
                   {serviceProviders.slice(0, 4).map((sp) => (
                     <div
@@ -862,7 +852,7 @@ const HomeFeed = () => {
                     >
                       <div className="text-2xl mb-2">{sp.avatar}</div>
                       <p className="text-xs font-semibold line-clamp-1">{sp.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{sp.category}</p>
+                      <p className="text-[10px] text-muted-foreground">{translate(sp.category)}</p>
                       <div className="flex items-center justify-center gap-1 mt-1">
                         <span className="text-[10px] font-bold text-accent">⭐ {sp.rating}</span>
                       </div>
@@ -876,7 +866,7 @@ const HomeFeed = () => {
             {filteredProperties.some((p) => p.featured) && (
               <div>
                 <h2 className="text-base font-semibold mb-3">
-                  {segment === "Short Stays" ? "⭐ Top-Rated Stays" : "⭐ Featured Properties"}
+                  {segment === "Short Stays" ? translate("⭐ Top-Rated Stays") : translate("⭐ Featured Properties")}
                 </h2>
                 {filteredProperties
                   .filter((p) => p.featured)
@@ -893,7 +883,7 @@ const HomeFeed = () => {
             )}
 
             <h2 className="text-base font-semibold">
-              {segment === "Short Stays" ? "All Short Stays" : segment === "Corporate Stay" ? "All Corporate & Expat Listings" : segment === "Business Spaces" ? "All Business Spaces" : "All Rentals"}
+              {segment === "Short Stays" ? translate("All Short Stays") : segment === "Corporate Stay" ? translate("All Corporate & Expat Listings") : segment === "Business Spaces" ? translate("All Business Spaces") : translate("All Rentals")}
             </h2>
             <div className="space-y-4">
               {loadingSegment ? (
@@ -919,8 +909,8 @@ const HomeFeed = () => {
                 <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-secondary flex items-center justify-center">
                   <SearchX className="w-7 h-7 text-muted-foreground" />
                 </div>
-                <p className="text-sm font-semibold text-foreground">No matches found</p>
-                <p className="text-xs text-muted-foreground mt-1 mb-4">Try broadening your search or clearing filters</p>
+                <p className="text-sm font-semibold text-foreground">{translate("No matches found")}</p>
+                <p className="text-xs text-muted-foreground mt-1 mb-4">{translate("Try broadening your search or clearing filters")}</p>
                 <div className="flex flex-col gap-2 max-w-[240px] mx-auto">
                   <button
                     onClick={() => {
@@ -935,16 +925,14 @@ const HomeFeed = () => {
                     }}
                     className="w-full py-2.5 rounded-xl gradient-trust text-xs font-semibold text-primary-foreground"
                   >
-                    Clear all filters
-                  </button>
+                    {translate("Clear all filters")} </button>
                   {(county || estate || searchQuery) && (
                     <button
                       onClick={handleSaveSearch}
                       className="w-full py-2.5 rounded-xl bg-secondary text-xs font-semibold text-secondary-foreground flex items-center justify-center gap-1.5"
                     >
                       <BookmarkPlus className="w-3.5 h-3.5" />
-                      Notify me when available
-                    </button>
+                      {translate("Notify me when available")} </button>
                   )}
                 </div>
               </div>
@@ -972,21 +960,19 @@ const HomeFeed = () => {
           <div className="pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-full gradient-trust text-primary-foreground shadow-2xl animate-fade-in max-w-md w-full">
             <GitCompare className="w-4 h-4 shrink-0" />
             <span className="text-xs font-bold flex-1 truncate">
-              {compareIds.length} selected {compareIds.length < 2 && "· pick 1 more"}
+              {compareIds.length} {translate("selected")} {compareIds.length < 2 && "· pick 1 more"}
             </span>
             <button
               onClick={() => setCompareIds([])}
               className="text-[11px] font-semibold px-2 py-1 rounded-full bg-primary-foreground/15 active:scale-95"
             >
-              Clear
-            </button>
+              {translate("Clear")} </button>
             <button
               disabled={compareIds.length < 2}
               onClick={() => setShowCompare(true)}
               className="text-[11px] font-bold px-3 py-1.5 rounded-full bg-primary-foreground text-primary disabled:opacity-50 active:scale-95"
             >
-              Compare
-            </button>
+              {translate("Compare")} </button>
           </div>
         </div>
       )}

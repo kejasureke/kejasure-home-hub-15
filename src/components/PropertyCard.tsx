@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { Heart, Bed, Bath, MapPin, ShieldCheck, Star, GitCompare, AlertTriangle, Ruler, Store, Building2, Factory, Hotel, UtensilsCrossed, Scissors, Pill, Dumbbell, GraduationCap, Church, Fuel, Music, ShoppingCart, Wrench, Palette, Laptop } from "lucide-react";
 import { useState } from "react";
 import type { Property } from "@/data/mockData";
@@ -20,6 +21,7 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareMode, isComparing, onToggleCompare }: PropertyCardProps) => {
+  useLanguage();
   const scamRisk = getScamRiskScore(property);
   const oldPrice = property.priceHistory?.[0]?.price;
   const [quickOpen, setQuickOpen] = useState(false);
@@ -65,11 +67,10 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         />
 
         {/* Ribbons */}
-        {property.featured && <div className="premium-ribbon">⭐ Featured</div>}
+        {property.featured && <div className="premium-ribbon">{translate("⭐ Featured")}</div>}
         {property.available && !property.featured && (
           <div className="absolute top-3 left-0 px-3 py-1 text-xs font-semibold rounded-r-full bg-trust text-trust-foreground">
-            Available Now
-          </div>
+            {translate("Available Now")} </div>
         )}
 
         {/* Top right actions */}
@@ -96,7 +97,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
           <div className="px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-sm shadow-lg">
             <span className="text-lg font-bold text-gray-900">{formatPrice(property.price)}</span>
-            <span className="text-sm text-gray-600">{property.priceUnit}</span>
+            <span className="text-sm text-gray-600">{translate(property.priceUnit)}</span>
           </div>
           {oldPrice && oldPrice > property.price && (
             <PriceDropBadge oldPrice={oldPrice} newPrice={property.price} compact />
@@ -122,12 +123,12 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
             {property.verified ? (
               <div className="verified-badge">
                 <ShieldCheck className="w-3 h-3" />
-                <span>Verified</span>
+                <span>{translate("Verified")}</span>
               </div>
             ) : (
               <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-destructive/10 text-[10px] font-medium text-destructive">
                 <AlertTriangle className="w-3 h-3" />
-                <span>Unverified</span>
+                <span>{translate("Unverified")}</span>
               </div>
             )}
             <ScamWarningBadge risk={scamRisk} compact />
@@ -137,8 +138,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         {/* Corporate badge */}
         {property.corporate && (
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-[11px] font-semibold text-primary w-fit">
-            💼 Corporate Stay
-          </div>
+            {translate("💼 Corporate Stay")} </div>
         )}
 
         {/* Commercial type + sqft badges */}
@@ -199,11 +199,11 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
             <>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Bed className="w-3.5 h-3.5" />
-                <span>{property.bedrooms} Bed{property.bedrooms > 1 ? "s" : ""}</span>
+                <span>{property.bedrooms} {translate(property.bedrooms === 1 ? "Bed" : "Beds")}</span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Bath className="w-3.5 h-3.5" />
-                <span>{property.bathrooms} Bath{property.bathrooms > 1 ? "s" : ""}</span>
+                <span>{property.bathrooms} {translate(property.bathrooms === 1 ? "Bath" : "Baths")}</span>
               </div>
             </>
           )}
@@ -214,7 +214,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
             </div>
           )}
           {property.landlordResponseSpeed === "fast" && (
-            <span className="text-[10px] font-medium text-trust">⚡ Fast reply</span>
+            <span className="text-[10px] font-medium text-trust">{translate("⚡ Fast reply")}</span>
           )}
         </div>
 
@@ -226,10 +226,10 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         {/* Amenities */}
         <div className="flex flex-wrap gap-1.5 pt-0.5">
           {property.amenities.slice(0, 3).map((a) => (
-            <span key={a} className="px-2 py-0.5 rounded-md bg-secondary text-[10px] font-medium text-secondary-foreground">{a}</span>
+            <span key={translate(a)} className="px-2 py-0.5 rounded-md bg-secondary text-[10px] font-medium text-secondary-foreground">{translate(a)}</span>
           ))}
           {property.amenities.length > 3 && (
-            <span className="px-2 py-0.5 rounded-md bg-primary/5 text-[10px] font-medium text-primary">+{property.amenities.length - 3} more</span>
+            <span className="px-2 py-0.5 rounded-md bg-primary/5 text-[10px] font-medium text-primary">+{property.amenities.length - 3} {translate("more")}</span>
           )}
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { Home, Search, MessageCircle, User, Heart, LayoutDashboard } from "lucide-react";
 import { haptic } from "@/lib/despia";
 import { useHideOnScroll } from "@/hooks/useHideOnScroll";
@@ -11,6 +12,7 @@ interface BottomNavProps {
 }
 
 const BottomNav = ({ activeTab, onTabChange, chatBadge = 0, profileBadge = 0, showDashboard = false }: BottomNavProps) => {
+  useLanguage();
   const tabs = [
     { id: "home", icon: Home, label: "Home" },
     ...(showDashboard ? [{ id: "dashboard", icon: LayoutDashboard, label: "Dashboard" }] : []),
@@ -75,7 +77,7 @@ const BottomNav = ({ activeTab, onTabChange, chatBadge = 0, profileBadge = 0, sh
                   isActive ? "text-primary" : "text-muted-foreground"
                 }`}
               >
-                {tab.label}
+                {translate(tab.label)}
               </span>
             </button>
           );
