@@ -10,6 +10,7 @@ import Confetti from "./Confetti";
 interface BookingRequestModalProps {
   property: Property;
   onClose: () => void;
+  initialNote?: string;
 }
 
 type BookingStep = "select" | "confirm" | "pending" | "accepted" | "declined";
@@ -28,14 +29,14 @@ const deriveHost = (propertyId: string) => {
 
 const fmtKES = (n: number) => `KES ${n.toLocaleString("en-KE")}`;
 
-const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) => {
+const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingRequestModalProps) => {
   const { addBooking } = useBookings();
   const [step, setStep] = useState<BookingStep>("select");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(initialNote);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
   useHardwareBack(true, onClose);
@@ -115,7 +116,7 @@ const BookingRequestModal = ({ property, onClose }: BookingRequestModalProps) =>
   return (
     <>
     <Confetti active={step === "accepted"} />
-    <div className="fixed inset-0 z-50 flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[90] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-h-[90vh] bg-card rounded-t-3xl overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
         <div className="sticky top-0 bg-card z-10 px-6 pt-safe pb-3">
           <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-4" />

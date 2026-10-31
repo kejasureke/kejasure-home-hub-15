@@ -1,6 +1,9 @@
 import { useRef, useState, useEffect } from "react";
 import { Image as ImageIcon } from "lucide-react";
 import BlurImage from "./BlurImage";
+import { useLowData } from "@/lib/houseHunting";
+import { translate, useLanguage } from "@/lib/language";
+import { Button } from "@/components/ui/button";
 
 interface SwipeableImageGalleryProps {
   images: string[];
@@ -38,6 +41,9 @@ const SwipeableImageGallery = ({
   bottomOffsetClass = "bottom-3",
   lazy = true,
 }: SwipeableImageGalleryProps) => {
+  useLanguage();
+  const { enabled: lowData } = useLowData();
+  const [loadedImages, setLoadedImages] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [internalIndex, setInternalIndex] = useState(0);
   const activeIndex = controlledIndex ?? internalIndex;
@@ -83,7 +89,7 @@ const SwipeableImageGallery = ({
       >
         {images.map((src, i) => (
           <div key={i} className="w-full h-full shrink-0 snap-center">
-            <BlurImage
+            {lowData && !loadedImages.includes(src) ? <div className="w-full h-full bg-secondary flex flex-col justify-center items-center gap-3"><ImageIcon className="size-8 text-muted-foreground" /><Button size="sm" variant="outline" onClick={e => { e.stopPropagation(); setLoadedImages(s => [...s, src]); }}>{translate("Load photo")}</Button></div> : <BlurImage
               src={src}
               alt={`${alt} ${i + 1}`}
               wrapperClassName="w-full h-full"
@@ -94,7 +100,7 @@ const SwipeableImageGallery = ({
                 }
               }}
               className={`w-full h-full ${imageClassName} ${onImageClick ? "cursor-pointer" : ""}`}
-            />
+            />}
           </div>
         ))}
       </div>

@@ -8,6 +8,8 @@ import { isDespia, requestBiometric, getCurrentLocation, openNativeSettings, hap
 import LegalContent, { legalTitles, type LegalDocument } from "@/components/LegalContent";
 import ShareKejaSureSheet from "@/components/ShareKejaSureSheet";
 import { Button } from "@/components/ui/button";
+import { useLowData } from "@/lib/houseHunting";
+import { Switch } from "@/components/ui/switch";
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -17,6 +19,7 @@ const BIOMETRIC_KEY = "kejasure_biometric_enabled";
 const LOCATION_KEY = "kejasure_location_enabled";
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
+  const lowData = useLowData();
   const { language, setLanguage } = useLanguage();
   const { closing, triggerClose } = useOverlayClose(onBack);
   const { theme, setTheme } = useTheme();
@@ -206,6 +209,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         </Section>
 
         <Section title={translate("Preferences")}>
+          <SettingRow icon={Smartphone} label={translate("Low-data browsing")} subtitle={translate("Photos load only when you choose")} right={<Switch aria-label={translate("Low-data browsing")} checked={lowData.enabled} onCheckedChange={lowData.setEnabled} />} />
           <SettingRow
             icon={theme === "dark" ? Moon : Sun}
             label={translate("Appearance")}

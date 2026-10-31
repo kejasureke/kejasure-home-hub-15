@@ -8,6 +8,10 @@
 ## Despia wrapper
 - Web app changes need only a publish (app loads from `https://kejasureapp.lovable.app`); wrapper-level changes (icon, splash, URL scheme, status bar settings, permissions) need a new Despia build.
 
+## House-hunting extensions
+- Keep supplemental listing disclosures and private viewing notes in the shared house-hunting module; local-only observations must never imply a provider notification or a shared listing update.
+- Low-data galleries must not mount property images until explicitly requested; commute displays use supplied provider estimates, never invented routes or fares.
+
 ## Legal content
 - Translate app-owned display copy through the shared language store and catalog at render time; preserve canonical stored values and user-authored content so switching languages never changes account or listing data.
 - Use shared LegalContent for signup, Settings and public policy pages to prevent conflicting disclosures.

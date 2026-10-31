@@ -6,6 +6,8 @@ import { useBookings, type BookingStatus, type Booking } from "@/hooks/useBookin
 import BookingRescheduleModal from "./BookingRescheduleModal";
 import { toast } from "sonner";
 import EmptyIllustration from "./EmptyIllustration";
+import ViewingNotebook from "./listing/ViewingNotebook";
+import { Button } from "./ui/button";
 
 interface MyBookingsScreenProps {
   onBack: () => void;
@@ -38,6 +40,7 @@ const statusBadge = (s: BookingStatus) => {
 
 const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
   useLanguage();
+  const [showNotebook, setShowNotebook] = useState(false);
   const { bookings, counts, cancelBooking, updateBooking } = useBookings();
   const [tab, setTab] = useState<BookingStatus | "all">("pending");
   const [actionFor, setActionFor] = useState<Booking | null>(null);
@@ -82,6 +85,8 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
       </div>
 
       {/* Tabs */}
+      {showNotebook && <ViewingNotebook onClose={() => setShowNotebook(false)} />}
+      <div className="px-4 pt-3"><Button variant="outline" size="sm" onClick={() => setShowNotebook(true)}>{translate("Viewing notebook")}</Button></div>
       <div className="px-4 pt-3 pb-2 flex gap-2 overflow-x-auto scrollbar-none">
         {TABS.map((t) => {
           const isActive = tab === t.id;

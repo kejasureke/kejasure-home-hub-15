@@ -10,6 +10,10 @@ import { openCamera, haptic, getCurrentLocation } from "@/lib/despia";
 import { Crosshair, CheckCircle2 } from "lucide-react";
 import { notifyNewListing } from "@/lib/listingAlerts";
 import { fileToDataUrl } from "@/lib/imageIntegrity";
+import { homeDetails, saveHomeDetails, saveLocalHome, type HomeDetails } from "@/lib/houseHunting";
+import HomeDetailsEditor from "./listing/HomeDetailsEditor";
+import { translate as t, useLanguage } from "@/lib/language";
+import { toast } from "sonner";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
 
@@ -20,6 +24,7 @@ interface ListingCRUDProps {
 }
 
 interface ListingFormData {
+  id?: string;
   title: string;
   description: string;
   type: "rental" | "shortstay" | "commercial" | "service" | "corporate";
@@ -177,6 +182,11 @@ const boostOptions = [
 const steps = ["Details", "Location", "Amenities", "Photos", "Boost"];
 
 const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
+  useLanguage();
+  const [extraDetails, setExtraDetails] = useState<HomeDetails>(() => {
+    const id = (editData as { id?: string } | undefined)?.id;
+    return id ? homeDetails({ id } as import("@/data/mockData").Property) : {};
+  });
   const [step, setStep] = useState(0);
   const [caretakerName, setCaretakerName] = useState("");
   const [caretakerPhone, setCaretakerPhone] = useState("");
@@ -576,6 +586,20 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   const handleSubmit = () => {
     const listingId = (editData as any)?.id ?? `new_${Date.now()}`;
+    try {
+      saveHomeDetails(listingId, { ...extraDetails, deposit: form.deposit === "" ? undefined : Math.max(0, Number(form.deposit)), moveInDate: extraDetails.moveInDate || form.moveInDate });
+      if (type !== "service") saveLocalHome({
+        id: listingId, title: form.title, description: form.description,
+        type: form.type === "shortstay" ? "shortstay" : form.type === "commercial" ? "commercial" : "rental", corporate: form.type === "corporate",
+        county: form.county, subcounty: form.subcounty, ward: "", estate: form.estate,
+        price: Number(form.price) || 0, priceUnit: form.priceUnit, bedrooms: form.bedrooms, bathrooms: form.bathrooms,
+        image: form.photos[0] || "", images: form.photos, amenities: form.amenities,
+        verified: false, featured: false, available: extraDetails.availability === "available",
+        landlordResponseTime: "—", landlordResponseSpeed: "slow", lastActive: "—", nearbyLandmarks: [],
+        lat: gpsPin?.lat || 0, lng: gpsPin?.lng || 0, petFriendly: extraDetails.pets === "yes", furnished: form.furnished,
+        homeDetails: extraDetails,
+      });
+    } catch { toast.error(t("Phone storage is full. Remove a photo and try again.")); return; }
     if (caretakerPhone.replace(/\D/g, "").length >= 9) {
       try {
         const all = JSON.parse(localStorage.getItem("kejasure_caretakers") || "{}");
@@ -602,24 +626,22 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   if (showSuccess) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-6 animate-scale-in">
+      <div className="fixed inset-0 z-[95] bg-background flex flex-col items-center justify-center p-6 pt-safe animate-scale-in">
         <div className="w-20 h-20 rounded-full bg-trust/10 flex items-center justify-center mb-4">
           <Check className="w-10 h-10 text-trust" />
         </div>
         <h2 className="text-xl font-bold text-foreground mb-2">
-          {editData ? "Listing Updated!" : "Listing Published!"}
+          {t("Listing saved on this phone")}
         </h2>
         <p className="text-sm text-muted-foreground text-center">
-          {form.featured
-            ? "Your listing is live and boosted for extra visibility."
-            : "Your listing is now live and visible to tenants."}
+          {t("These details are not published to other users yet.")}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+    <div className="fixed inset-0 z-[95] bg-background overflow-y-auto">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background border-b border-border px-4 pb-3 pt-safe-compact">
         <div className="flex items-center justify-between mb-3">
@@ -651,6 +673,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
         {step === 0 && (
           <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold">Basic Details</h2>
+            {type !== "service" && <HomeDetailsEditor value={extraDetails} onChange={setExtraDetails} />}
 
             {type === "service" && (
               <div>
@@ -1663,7 +1686,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
             onClick={handleSubmit}
             className="flex-1 py-3 rounded-xl bg-trust text-white text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           >
-            <Check className="w-4 h-4" /> {editData ? "Update Listing" : "Publish Listing"}
+            <Check className="w-4 h-4" /> {t("Save on this phone")}
           </button>
         )}
       </div>
