@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Bell, Lock, Globe, Trash2, Moon, Sun, Eye, Shield, ChevronRight, ToggleLeft, ToggleRight, Smartphone, MapPin, Volume2, Share2 } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
@@ -15,6 +16,7 @@ const BIOMETRIC_KEY = "kejasure_biometric_enabled";
 const LOCATION_KEY = "kejasure_location_enabled";
 
 const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
+  const { language, setLanguage } = useLanguage();
   const { closing, triggerClose } = useOverlayClose(onBack);
   const { theme, setTheme } = useTheme();
   const [pushEnabled, setPushEnabled] = useState(true);
@@ -29,7 +31,6 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [legalDocument, setLegalDocument] = useState<LegalDocument | null>(null);
-  const [language, setLanguage] = useState("en");
   const [showVisibility, setShowVisibility] = useState(false);
   const [visibility, setVisibility] = useState<"everyone" | "verified" | "private">("everyone");
   const [showPinFlow, setShowPinFlow] = useState(false);
@@ -184,29 +185,29 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
         <button onClick={triggerClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
           <ArrowLeft className="w-4 h-4" />
         </button>
-        <h1 className="text-base font-bold">Settings</h1>
+        <h1 className="text-base font-bold">{translate("Settings")}</h1>
       </div>
 
       <div className="px-4 py-5 pb-20">
-        <Section title="Notifications">
-          <SettingRow icon={Bell} label="Push Notifications" subtitle="Listing alerts & messages" right={<Toggle enabled={pushEnabled} onToggle={() => setPushEnabled(!pushEnabled)} />} />
-          <SettingRow icon={Smartphone} label="SMS Alerts" subtitle="Important updates via SMS" right={<Toggle enabled={smsEnabled} onToggle={() => setSmsEnabled(!smsEnabled)} />} />
-          <SettingRow icon={Bell} label="Price Drop Alerts" subtitle="Get notified on price changes" right={<Toggle enabled={priceAlerts} onToggle={() => setPriceAlerts(!priceAlerts)} />} />
-          <SettingRow icon={Volume2} label="Notification Sound" subtitle="Play sound for alerts" right={<Toggle enabled={soundEnabled} onToggle={() => setSoundEnabled(!soundEnabled)} />} />
+        <Section title={translate("Notifications")}>
+          <SettingRow icon={Bell} label={translate("Push Notifications")} subtitle={translate("Listing alerts & messages")} right={<Toggle enabled={pushEnabled} onToggle={() => setPushEnabled(!pushEnabled)} />} />
+          <SettingRow icon={Smartphone} label={translate("SMS Alerts")} subtitle={translate("Important updates via SMS")} right={<Toggle enabled={smsEnabled} onToggle={() => setSmsEnabled(!smsEnabled)} />} />
+          <SettingRow icon={Bell} label={translate("Price Drop Alerts")} subtitle={translate("Get notified on price changes")} right={<Toggle enabled={priceAlerts} onToggle={() => setPriceAlerts(!priceAlerts)} />} />
+          <SettingRow icon={Volume2} label={translate("Notification Sound")} subtitle={translate("Play sound for alerts")} right={<Toggle enabled={soundEnabled} onToggle={() => setSoundEnabled(!soundEnabled)} />} />
         </Section>
 
-        <Section title="Privacy & Security">
-          <SettingRow icon={Lock} label="Biometric Login" subtitle="Use fingerprint or face unlock" right={<Toggle enabled={biometricEnabled} onToggle={toggleBiometric} />} />
-          <SettingRow icon={MapPin} label="Location Services" subtitle="Nearby listings & map features" right={<Toggle enabled={locationEnabled} onToggle={toggleLocation} />} />
-          <SettingRow icon={Eye} label="Profile Visibility" subtitle={visibilityLabel} right={<ChevronRight className="w-4 h-4 text-muted-foreground" />} onClick={() => setShowVisibility(true)} />
-          <SettingRow icon={Shield} label="Change PIN" subtitle="Update your 4-digit PIN" right={<ChevronRight className="w-4 h-4 text-muted-foreground" />} onClick={() => setShowPinFlow(true)} />
+        <Section title={translate("Privacy & Security")}>
+          <SettingRow icon={Lock} label={translate("Biometric Login")} subtitle={translate("Use fingerprint or face unlock")} right={<Toggle enabled={biometricEnabled} onToggle={toggleBiometric} />} />
+          <SettingRow icon={MapPin} label={translate("Location Services")} subtitle={translate("Nearby listings & map features")} right={<Toggle enabled={locationEnabled} onToggle={toggleLocation} />} />
+          <SettingRow icon={Eye} label={translate("Profile Visibility")} subtitle={translate(visibilityLabel)} right={<ChevronRight className="w-4 h-4 text-muted-foreground" />} onClick={() => setShowVisibility(true)} />
+          <SettingRow icon={Shield} label={translate("Change PIN")} subtitle={translate("Update your 4-digit PIN")} right={<ChevronRight className="w-4 h-4 text-muted-foreground" />} onClick={() => setShowPinFlow(true)} />
         </Section>
 
-        <Section title="Preferences">
+        <Section title={translate("Preferences")}>
           <SettingRow
             icon={theme === "dark" ? Moon : Sun}
-            label="Appearance"
-            subtitle={theme === "dark" ? "Dark mode" : "Light mode"}
+            label={translate("Appearance")}
+            subtitle={theme === "dark" ? translate("Dark mode") : translate("Light mode")}
             right={
               <div className="p-1 rounded-lg bg-secondary flex gap-1">
                 <button
@@ -214,7 +215,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   className={`flex items-center justify-center w-8 h-7 rounded-md transition-all ${
                     theme === "light" ? "bg-card card-shadow text-foreground" : "text-muted-foreground"
                   }`}
-                  aria-label="Light mode"
+                  aria-label={translate("Light mode")}
                 >
                   <Sun className="w-3.5 h-3.5" />
                 </button>
@@ -223,7 +224,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   className={`flex items-center justify-center w-8 h-7 rounded-md transition-all ${
                     theme === "dark" ? "bg-card card-shadow text-foreground" : "text-muted-foreground"
                   }`}
-                  aria-label="Dark mode"
+                  aria-label={translate("Dark mode")}
                 >
                   <Moon className="w-3.5 h-3.5" />
                 </button>
@@ -232,12 +233,12 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           />
           <SettingRow
             icon={Globe}
-            label="Language"
-            subtitle={language === "en" ? "English" : "Kiswahili"}
+            label={translate("Language")}
+            subtitle={language === "en" ? translate("English") : translate("Kiswahili")}
             right={
               <select
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={(e) => setLanguage(e.target.value === "sw" ? "sw" : "en")}
                 className="text-xs font-semibold bg-secondary rounded-lg px-3 py-1.5 text-foreground border-none focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
                 <option value="en">English</option>
@@ -247,7 +248,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
           />
         </Section>
 
-        <Section title="Share KejaSure">
+        <Section title={translate("Share KejaSure")}>
           <button
             onClick={async () => {
               const shareText = "Pata Keja, Be Sure 🇰🇪 — I'm using KejaSure to find verified rentals across Kenya. Try it: https://kejasure.co.ke";
@@ -256,7 +257,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   await navigator.share({ title: "KejaSure", text: shareText });
                 } else {
                   await navigator.clipboard.writeText(shareText);
-                  toast({ title: "Link copied", description: "Share it with a friend on WhatsApp" });
+                  toast({ title: translate("Link copied"), description: translate("Share it with a friend on WhatsApp") });
                 }
               } catch {}
             }}
@@ -266,14 +267,14 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               <Share2 className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">Share with a friend</p>
-              <p className="text-[11px] text-muted-foreground">Send them a WhatsApp invite</p>
+              <p className="text-sm font-semibold">{translate("Share with a friend")}</p>
+              <p className="text-[11px] text-muted-foreground">{translate("Send them a WhatsApp invite")}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>
         </Section>
 
-        <Section title="Account">
+        <Section title={translate("Account")}>
           <button
             onClick={() => setShowDeleteConfirm(true)}
             className="w-full flex items-center gap-3 p-4 text-destructive"
@@ -282,22 +283,22 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               <Trash2 className="w-4 h-4 text-destructive" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">Delete Account</p>
-              <p className="text-[11px] text-destructive/70">Request account & personal-data deletion</p>
+              <p className="text-sm font-semibold">{translate("Delete Account")}</p>
+              <p className="text-[11px] text-destructive/70">{translate("Request account & personal-data deletion")}</p>
             </div>
           </button>
         </Section>
 
-        <Section title="Legal & Data">
+        <Section title={translate("Legal & Data")}>
           {(["privacy", "terms"] as const).map((document) => (
             <Button key={document} variant="ghost" onClick={() => setLegalDocument(document)} className="w-full h-auto p-4 justify-between rounded-none">
-              <span className="flex items-center gap-3"><Shield className="w-4 h-4 text-primary" />{legalTitles[document]}</span>
+              <span className="flex items-center gap-3"><Shield className="w-4 h-4 text-primary" />{translate(legalTitles[document])}</span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </Button>
           ))}
         </Section>
 
-        <p className="text-center text-[10px] text-muted-foreground mt-4">KejaSure v1.0.0 · Made in Kenya 🇰🇪</p>
+        <p className="text-center text-[10px] text-muted-foreground mt-4">{translate("KejaSure v1.0.0 · Made in Kenya 🇰🇪")}</p>
       </div>
 
       {/* Delete Confirmation */}
@@ -308,7 +309,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-3">
                 <Trash2 className="w-7 h-7 text-destructive" />
               </div>
-              <h3 className="text-lg font-bold">Delete Account</h3>
+              <h3 className="text-lg font-bold">{translate("Delete Account")}</h3>
               <p className="text-sm text-muted-foreground text-center mt-1">
                 Request permanent deletion of your account and associated personal data. Read the verification steps and information about retained records before sending your request.
               </p>
@@ -317,8 +318,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               Continue to deletion request
             </Button>
             <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)} className="w-full">
-              Cancel
-            </Button>
+              {translate("Cancel")} </Button>
           </div>
         </div>
       )}
@@ -326,8 +326,8 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
       {legalDocument && (
         <div className="fixed inset-0 z-[80] bg-background overflow-y-auto">
           <header className="sticky top-0 z-10 bg-background border-b border-border pt-safe-compact pb-3 px-4 flex items-center gap-3">
-            <Button variant="secondary" size="icon" aria-label="Back to Settings" onClick={() => setLegalDocument(null)}><ArrowLeft /></Button>
-            <h2 className="text-base font-bold">{legalTitles[legalDocument]}</h2>
+            <Button variant="secondary" size="icon" aria-label={translate("Back to Settings")} onClick={() => setLegalDocument(null)}><ArrowLeft /></Button>
+            <h2 className="text-base font-bold">{translate(legalTitles[legalDocument])}</h2>
           </header>
           <div className="px-5 py-6 pb-32"><LegalContent document={legalDocument} /></div>
         </div>
@@ -341,7 +341,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
                 <Eye className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-lg font-bold">Profile Visibility</h3>
+              <h3 className="text-lg font-bold">{translate("Profile Visibility")}</h3>
               <p className="text-xs text-muted-foreground text-center mt-1">Choose who can see your profile and contact details</p>
             </div>
             <div className="space-y-2 mb-4">
@@ -358,16 +358,15 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold">{opt.label}</p>
+                    <p className="text-sm font-semibold">{translate(opt.label)}</p>
                     <div className={`w-4 h-4 rounded-full border-2 ${visibility === opt.id ? "border-primary bg-primary" : "border-muted-foreground"}`} />
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{opt.desc}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{translate(opt.desc)}</p>
                 </button>
               ))}
             </div>
             <button onClick={() => setShowVisibility(false)} className="w-full py-3.5 rounded-xl gradient-trust text-primary-foreground text-sm font-bold active:scale-[0.98] transition-transform">
-              Save
-            </button>
+              {translate("Save")} </button>
           </div>
         </div>
       )}
@@ -381,11 +380,10 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                   <Shield className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="text-lg font-bold">PIN Updated</h3>
+                <h3 className="text-lg font-bold">{translate("PIN Updated")}</h3>
                 <p className="text-sm text-muted-foreground text-center mt-1 mb-5">Your 4-digit PIN has been changed successfully.</p>
                 <button onClick={closePinFlow} className="w-full py-3.5 rounded-xl gradient-trust text-primary-foreground text-sm font-bold active:scale-[0.98] transition-transform">
-                  Done
-                </button>
+                  {translate("Done")} </button>
               </div>
             ) : pinStep === "otp" ? (
               <>
@@ -393,7 +391,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
                     <Smartphone className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="text-lg font-bold">Verify it's you</h3>
+                  <h3 className="text-lg font-bold">{translate("Verify it's you")}</h3>
                   <p className="text-xs text-muted-foreground text-center mt-1">
                     Enter the 6-digit code sent to <span className="font-semibold text-foreground">{maskedPhone}</span>
                   </p>
@@ -415,20 +413,18 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   className="w-full text-center text-2xl tracking-[0.4em] font-bold bg-secondary rounded-xl py-4 mb-2 border-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                   placeholder="••••••"
                 />
-                {pinError && <p className="text-xs text-destructive text-center mb-2">{pinError}</p>}
+                {pinError && <p className="text-xs text-destructive text-center mb-2">{translate(pinError)}</p>}
                 <div className="text-center mb-2">
                   {otpResendIn > 0 ? (
-                    <p className="text-[11px] text-muted-foreground">Resend in <span className="font-semibold text-primary">{otpResendIn}s</span></p>
+                    <p className="text-[11px] text-muted-foreground">{translate("Resend in")} <span className="font-semibold text-primary">{otpResendIn}s</span></p>
                   ) : (
-                    <button onClick={generateOtp} className="text-[11px] font-semibold text-primary">Resend code</button>
+                    <button onClick={generateOtp} className="text-[11px] font-semibold text-primary">{translate("Resend code")}</button>
                   )}
                 </div>
                 <button onClick={handlePinSubmit} className="w-full py-3.5 rounded-xl gradient-trust text-primary-foreground text-sm font-bold mt-2 active:scale-[0.98] transition-transform">
-                  Verify & Update PIN
-                </button>
+                  {translate("Verify & Update PIN")} </button>
                 <button onClick={closePinFlow} className="w-full py-3 rounded-xl text-sm font-semibold text-muted-foreground">
-                  Cancel
-                </button>
+                  {translate("Cancel")} </button>
               </>
             ) : (
               <>
@@ -459,13 +455,12 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
                   className="w-full text-center text-3xl tracking-[0.6em] font-bold bg-secondary rounded-xl py-4 mb-2 border-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                   placeholder="••••"
                 />
-                {pinError && <p className="text-xs text-destructive text-center mb-2">{pinError}</p>}
+                {pinError && <p className="text-xs text-destructive text-center mb-2">{translate(pinError)}</p>}
                 <button onClick={handlePinSubmit} className="w-full py-3.5 rounded-xl gradient-trust text-primary-foreground text-sm font-bold mt-2 active:scale-[0.98] transition-transform">
                   {pinStep === "confirm" ? "Send SMS Code" : "Continue"}
                 </button>
                 <button onClick={closePinFlow} className="w-full py-3 rounded-xl text-sm font-semibold text-muted-foreground">
-                  Cancel
-                </button>
+                  {translate("Cancel")} </button>
               </>
             )}
           </div>

@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import BottomNav from "@/components/BottomNav";
 import HomeFeed from "@/components/HomeFeed";
@@ -48,6 +49,7 @@ import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { setAppBadgeCount } from "@/lib/despia";
 
 const Index = () => {
+  useLanguage();
   const [activeTab, setActiveTab] = useState("home");
   const [showChat, setShowChat] = useState(false);
   const [chatContact, setChatContact] = useState<ChatContact | null>(null);
@@ -273,10 +275,10 @@ const Index = () => {
 
       {activeTab === "favorites" && (
         <div className="px-4 pt-6 pb-32">
-          <h1 className="text-xl font-bold mb-1">Saved Properties</h1>
+          <h1 className="text-xl font-bold mb-1">{translate("Saved Properties")}</h1>
           {favoriteProperties.length > 0 && (
             <p className="text-[11px] text-muted-foreground mb-4">
-              {navigator.onLine ? "Saved on your phone — opens even without data." : "You're offline. Showing your saved homes."}
+              {navigator.onLine ? translate("Saved on your phone — opens even without data.") : translate("You're offline. Showing your saved homes.")}
             </p>
           )}
           {favoriteProperties.length > 0 ? (
@@ -296,8 +298,7 @@ const Index = () => {
               <EmptyIllustration variant="favorites" className="w-28 h-28 mb-3" />
               <p className="text-sm font-semibold text-foreground mb-1">Keja Safi, Keja Sure.</p>
               <p className="text-xs text-muted-foreground text-center px-8">
-                Tap the heart on any listing to save it here for later.
-              </p>
+                {translate("Tap the heart on any listing to save it here for later.")} </p>
             </div>
           )}
         </div>

@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Search, MessageCircle, ShieldCheck, Filter, Plus, Pin, BellOff, X, Users, Archive, Bell, EyeOff, Ban, Trash2 } from "lucide-react";
@@ -128,6 +129,7 @@ const ChatRowButton = ({
 };
 
 const ChatList = ({ onOpenChat }: ChatListProps) => {
+  useLanguage();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const [showNewChat, setShowNewChat] = useState(false);
@@ -172,7 +174,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
       if (wasMuted) next.delete(id); else next.add(id);
       persistSet("kejasure_muted_chats", next);
       haptic("success");
-      toast(wasMuted ? "Chat unmuted" : "Chat muted", { description: wasMuted ? "You'll get notifications again" : "Notifications silenced" });
+      toast(wasMuted ? translate("Chat unmuted") : translate("Chat muted"), { description: wasMuted ? translate("You'll get notifications again") : translate("Notifications silenced") });
       return next;
     });
   };
@@ -184,7 +186,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
       if (was) next.delete(id); else next.add(id);
       persistSet("kejasure_marked_unread", next);
       haptic("light");
-      toast(was ? "Marked as read" : "Marked as unread");
+      toast(was ? translate("Marked as read") : translate("Marked as unread"));
       return next;
     });
   };
@@ -197,7 +199,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
       persistSet("kejasure_archived_chats", next);
       return next;
     });
-    toast("User blocked", { description: "You won't receive messages from them" });
+    toast(translate("User blocked"), { description: translate("You won't receive messages from them") });
   };
 
   const archiveChat = (id: string) => {
@@ -208,9 +210,9 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
       return next;
     });
     haptic("success");
-    toast("Chat archived", {
+    toast(translate("Chat archived"), {
       action: {
-        label: "Undo",
+        label: translate("Undo"),
         onClick: () => setArchived((p) => {
           const n = new Set(p); n.delete(id);
           try { localStorage.setItem("kejasure_archived_chats", JSON.stringify([...n])); } catch {}
@@ -270,9 +272,9 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
       <div className="px-4 pt-safe mb-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-xl font-bold text-foreground">Messages</h1>
+            <h1 className="text-xl font-bold text-foreground">{translate("Messages")}</h1>
             {totalUnread > 0 && (
-              <p className="text-xs text-muted-foreground">{totalUnread} unread message{totalUnread > 1 ? "s" : ""}</p>
+              <p className="text-xs text-muted-foreground">{totalUnread} {translate("unread message")}{totalUnread > 1 ? "s" : ""}</p>
             )}
           </div>
           <button
@@ -288,7 +290,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search chats, people, properties..."
+            placeholder={translate("Search chats, people, properties...")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-3 rounded-xl bg-card card-shadow text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -307,7 +309,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
                   : "bg-card card-shadow text-muted-foreground"
               }`}
             >
-              {f.label}
+              {translate(f.label)}
               {f.key === "unread" && totalUnread > 0 && (
                 <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary-foreground/20 text-[9px]">{totalUnread}</span>
               )}
@@ -321,10 +323,9 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
         {!loading && filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12">
             <EmptyIllustration variant="chats" className="w-28 h-28 mb-3" />
-            <p className="text-sm font-semibold text-foreground mb-1">No conversations yet</p>
+            <p className="text-sm font-semibold text-foreground mb-1">{translate("No conversations yet")}</p>
             <p className="text-xs text-muted-foreground text-center px-6">
-              Chats with landlords, hosts and service pros will appear here.
-            </p>
+              {translate("Chats with landlords, hosts and service pros will appear here.")} </p>
           </div>
         )}
 
@@ -388,12 +389,12 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
                 const Icon = a.icon;
                 return (
                   <button
-                    key={a.label}
+                    key={translate(a.label)}
                     onClick={a.onClick}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl active:bg-secondary/60 ${a.destructive ? "text-destructive" : "text-foreground"}`}
                   >
                     <Icon className="w-4 h-4" />
-                    <span className="text-sm font-medium">{a.label}</span>
+                    <span className="text-sm font-medium">{translate(a.label)}</span>
                   </button>
                 );
               })}
@@ -402,8 +403,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
               onClick={() => setLongPressed(null)}
               className="mx-4 mt-1 mb-1 py-3 rounded-xl bg-secondary text-sm font-semibold text-foreground"
             >
-              Cancel
-            </button>
+              {translate("Cancel")} </button>
           </div>
         </div>
       )}
@@ -414,7 +414,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
           <div className="w-full max-w-lg bg-card rounded-t-3xl card-shadow max-h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-300">
             {/* Modal Header */}
             <div className="flex items-center justify-between px-4 pt-5 pb-3">
-              <h2 className="text-lg font-bold text-foreground">New Message</h2>
+              <h2 className="text-lg font-bold text-foreground">{translate("New Message")}</h2>
               <button
                 onClick={() => { setShowNewChat(false); setNewChatSearch(""); }}
                 className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center"
@@ -429,7 +429,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Search contacts..."
+                  placeholder={translate("Search contacts...")}
                   value={newChatSearch}
                   onChange={(e) => setNewChatSearch(e.target.value)}
                   autoFocus
@@ -488,7 +488,7 @@ const ChatList = ({ onOpenChat }: ChatListProps) => {
               }).length === 0 && (
                 <div className="flex flex-col items-center py-10">
                   <Users className="w-8 h-8 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">No contacts found</p>
+                  <p className="text-sm text-muted-foreground">{translate("No contacts found")}</p>
                 </div>
               )}
             </div>
@@ -525,7 +525,7 @@ const SwipeableChatRow = ({ children, onArchive }: { children: React.ReactNode; 
       <div className="absolute inset-0 flex items-center justify-end pr-5 bg-accent/90 rounded-2xl">
         <div className="flex items-center gap-1.5 text-accent-foreground">
           <Archive className="w-4 h-4" />
-          <span className="text-xs font-bold">Archive</span>
+          <span className="text-xs font-bold">{translate("Archive")}</span>
         </div>
       </div>
       <div
