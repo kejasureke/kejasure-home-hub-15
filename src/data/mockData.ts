@@ -5,6 +5,7 @@ import property3 from "@/assets/property3.jpg";
 import property4 from "@/assets/property4.jpg";
 
 export interface Property {
+  homeDetails?: import("@/lib/houseHunting").HomeDetails;
   id: string;
   title: string;
   type: "rental" | "shortstay" | "commercial";
