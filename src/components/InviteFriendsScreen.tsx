@@ -12,8 +12,6 @@ const InviteFriendsScreen = ({ onBack }: { onBack: () => void }) => {
   const [code, setCode] = useState("");
   const [stats, setStats] = useState({ joined: 0, rewarded: 0 });
   const [isBusiness, setIsBusiness] = useState(false);
-  const base = isBusiness ? "a free month" : "a free 24h pass";
-  const double = isBusiness ? "2 free months" : "a free 48h pass";
 
   useEffect(() => {
     (async () => {
@@ -51,15 +49,25 @@ const InviteFriendsScreen = ({ onBack }: { onBack: () => void }) => {
       <div className="px-4 py-6 pb-32 space-y-5">
         <div className="p-5 rounded-3xl gradient-trust text-primary-foreground text-center">
           <Gift className="w-10 h-10 mx-auto mb-2" />
-          <p className="text-lg font-bold">Get {base}</p>
+          <p className="text-lg font-bold">{isBusiness ? "Free boosts & free months" : "Get a free 24h pass"}</p>
           <p className="text-xs opacity-90 mt-1">For every friend who joins with your link and buys any plan. No limit.</p>
         </div>
 
         <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
           <p className="text-xs font-bold">What you earn</p>
-          <div className="flex justify-between text-xs"><span className="text-muted-foreground">Friend buys a tenant pass</span><span className="font-semibold">{base}</span></div>
-          <div className="flex justify-between text-xs"><span className="text-muted-foreground">Landlord, agency, host or provider subscribes</span><span className="font-semibold text-accent">{double}</span></div>
-          <p className="text-[10px] text-muted-foreground pt-1">Anyone can invite anyone. Your friend signs up with their phone number as usual, picks their role, and the reward lands on your plan the moment they pay.</p>
+          {isBusiness ? (
+            <>
+              <div className="flex justify-between text-xs"><span className="text-muted-foreground">Tenant buys 24 Hours</span><span className="font-semibold">6h free boost</span></div>
+              <div className="flex justify-between text-xs"><span className="text-muted-foreground">Tenant buys 3 Days</span><span className="font-semibold">12h free boost</span></div>
+              <div className="flex justify-between text-xs"><span className="text-muted-foreground">Tenant buys 7 Days</span><span className="font-semibold">24h free boost</span></div>
+              <div className="flex justify-between text-xs"><span className="text-muted-foreground">Landlord, agency, host or provider subscribes</span><span className="font-semibold text-accent">1 free month</span></div>
+            </>
+          ) : (
+            <div className="flex justify-between text-xs"><span className="text-muted-foreground">Any friend buys a plan</span><span className="font-semibold">Free 24h pass</span></div>
+          )}
+          <p className="text-[10px] text-muted-foreground pt-1">
+            {isBusiness ? "Boosts go to your newest live listing. " : ""}Anyone can invite anyone. Your friend signs up with their phone number as usual, picks their role, and the reward lands the moment they pay.
+          </p>
         </div>
 
         <div className="p-4 rounded-2xl bg-card border border-border">
