@@ -1,4 +1,5 @@
 # Kenyan house-hunting improvements
+- [ ] Close unpaid tenant contact leaks across caretaker cards, bookings and chats; verify paid/acceptance checks.
 - [x] Add availability timestamps, status controls and freshness filtering.
 - [x] Add disclosed upfront/recurring costs and missing-cost labels.
 - [x] Add destination-based commute notes with explicitly labelled estimates.
