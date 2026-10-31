@@ -22,7 +22,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const [priceAlerts, setPriceAlerts] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [locationEnabled, setLocationEnabled] = useState(() => {
-    try { return localStorage.getItem(LOCATION_KEY) === "true"; } catch { return false; }
+    try { return localStorage.getItem(LOCATION_KEY) !== "false"; } catch { return true; }
   });
   const [biometricEnabled, setBiometricEnabled] = useState(() => {
     try { return localStorage.getItem(BIOMETRIC_KEY) === "true"; } catch { return false; }
