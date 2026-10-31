@@ -28,9 +28,9 @@ export default function LegalContent({ document }: { document: LegalDocument }) 
         <p>Ask support to explain any records that must be retained, the reason and the retention period before processing your request. Payment, fraud or legal records may need separate handling. A deletion request does not itself cancel or refund a paid subscription.</p>
       </Section>
       <Button asChild className="w-full h-auto min-h-11 whitespace-normal">
-        <a href="mailto:support@kejasure.co.ke?subject=KejaSure%20account%20deletion%20request&body=Please%20delete%20my%20KejaSure%20account%20and%20associated%20personal%20data.%0ARegistered%20phone%20number%3A%20%0APlease%20confirm%20identity%20verification%20steps%2C%20processing%20time%20and%20any%20records%20you%20must%20retain.">Email deletion request</a>
+        <a href="mailto:support@kejasure.ke?subject=KejaSure%20account%20deletion%20request&body=Please%20delete%20my%20KejaSure%20account%20and%20associated%20personal%20data.%0ARegistered%20phone%20number%3A%20%0APlease%20confirm%20identity%20verification%20steps%2C%20processing%20time%20and%20any%20records%20you%20must%20retain.">Email deletion request</a>
       </Button>
-      <p className="text-xs text-muted-foreground break-words">support@kejasure.co.ke · Opening an email does not submit your request; send it from your email app.</p>
+      <p className="text-xs text-muted-foreground break-words">support@kejasure.ke · Opening an email does not submit your request; send it from your email app.</p>
     </div>
   );
   if (document === "terms") return (
@@ -42,12 +42,12 @@ export default function LegalContent({ document }: { document: LegalDocument }) 
       <Section title="5. Subscriptions"><p>Paid plans unlock platform features and listing slots. Subscription fees are the only payments KejaSure charges. Review the price and access period before paying. Contact Help &amp; Support about payment or refund issues; any applicable consumer rights still apply.</p></Section>
       <Section title="6. Conduct"><p>No harassment, discrimination, spam, scams, scraping or attempts to break the app’s security. Do not publish personal information without permission.</p></Section>
       <Section title="7. Reports and disputes"><p>Report suspicious users or listings in the app. Accounts may be suspended during investigation. Identity records may be shared with authorities where legally required. Verification is not a guarantee of a property or person’s conduct.</p></Section>
-      <Section title="Contact"><p>Use Help &amp; Support in the app or email support@kejasure.co.ke.</p></Section>
+      <Section title="Contact"><p>Use Help &amp; Support in the app or email support@kejasure.ke.</p></Section>
     </div>
   );
   return (
     <div className="space-y-6">
-      <Section title="KejaSure and your information"><p>This notice covers the KejaSure app and its web experience. For privacy questions, access, correction or deletion requests, contact support@kejasure.co.ke.</p></Section>
+      <Section title="KejaSure and your information"><p>This notice covers the KejaSure app and its web experience. For privacy questions, access, correction or deletion requests, contact support@kejasure.ke.</p></Section>
       <Section title="Account and activity"><p>Information used by KejaSure includes your real name, phone number, role, profile preferences, listings, photos, messages, booking requests, saved homes, alerts and reports. Device and security information helps protect account access and investigate misuse.</p></Section>
       <Section title="Identity checks"><p>Verification can involve an ID or passport, selfie or liveness check, and business documents, depending on your role. Smile ID processes verification information. Verification submissions, uploaded documents, results and references can be stored; they are not ordinary public profile content.</p></Section>
       <Section title="Location, camera and photos"><p>With your permission, location helps with nearby discovery, maps and confirming a listing’s GPS pin. Camera and photo access lets you upload listing, profile or verification images. Listing photos may contain location metadata used for integrity checks. You can decline a permission and use features that do not need it, or change permissions in your phone’s settings.</p></Section>
