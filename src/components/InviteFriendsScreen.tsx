@@ -66,7 +66,7 @@ const InviteFriendsScreen = ({ onBack }: { onBack: () => void }) => {
             <div className="flex justify-between text-xs"><span className="text-muted-foreground">Any friend buys a plan</span><span className="font-semibold">Free 24h pass</span></div>
           )}
           <p className="text-[10px] text-muted-foreground pt-1">
-            {isBusiness ? "Boosts go to your newest live listing. " : ""}Anyone can invite anyone. Your friend signs up with their phone number as usual, picks their role, and the reward lands the moment they pay.
+            {isBusiness ? "Boosts go to your newest live listing — or are saved for your next one. " : ""}Anyone can invite anyone. Your friend signs up with their phone number as usual, picks their role, and the reward lands the moment they pay.
           </p>
         </div>
 
