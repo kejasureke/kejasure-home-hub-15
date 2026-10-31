@@ -8,6 +8,9 @@ import { toast } from "sonner";
 import EmptyIllustration from "./EmptyIllustration";
 import ViewingNotebook from "./listing/ViewingNotebook";
 import { Button } from "./ui/button";
+import { usePaidAccess } from "@/hooks/usePaidAccess";
+import { canRevealContact } from "@/lib/paidAccess";
+import PaidAccessNotice from "./PaidAccessNotice";
 
 interface MyBookingsScreenProps {
   onBack: () => void;
@@ -40,6 +43,7 @@ const statusBadge = (s: BookingStatus) => {
 
 const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
   useLanguage();
+  const { hasActivePlan, loading: planLoading } = usePaidAccess();
   const [showNotebook, setShowNotebook] = useState(false);
   const { bookings, counts, cancelBooking, updateBooking } = useBookings();
   const [tab, setTab] = useState<BookingStatus | "all">("pending");
@@ -236,7 +240,8 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                   </div>
 
                   {/* Actions */}
-                  {b.status === "accepted" && (
+                  {b.status === "accepted" && !hasActivePlan && <div className="px-3 pb-3"><PaidAccessNotice loading={planLoading} /></div>}
+                  {canRevealContact(hasActivePlan, b.status) && b.status === "accepted" && (
                     <div className="px-3 pb-3 flex gap-2">
                       {b.landlordPhone && (
                         <a

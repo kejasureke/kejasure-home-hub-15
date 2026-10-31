@@ -761,5 +761,13 @@
   "These details are not published to other users yet.": "Maelezo haya bado hayajachapishwa kwa watumiaji wengine.",
   "Listings saved on this phone": "Matangazo yaliyohifadhiwa kwenye simu hii",
   "Edit": "Hariri",
-  "Save on this phone": "Hifadhi kwenye simu hii"
+  "Save on this phone": "Hifadhi kwenye simu hii",
+  "Checking your plan…": "Tunakagua mpango wako…",
+  "Subscribe to request viewings, chat and access contacts. Phone numbers also require an accepted booking.": "Jisajili kwa mpango ili kuomba kutazama, kuzungumza na kupata mawasiliano. Nambari za simu pia zinahitaji ombi lililokubaliwa.",
+  "View plans": "Tazama mipango",
+  "Caretaker contact": "Mawasiliano ya msimamizi",
+  "Caretaker on site": "Msimamizi kwenye jengo",
+  "Number shows after your viewing is accepted": "Nambari itaonekana ombi lako la kutazama likikubaliwa",
+  "Phone numbers require an active subscription and an accepted booking. Payment alone does not unlock contacts.": "Nambari za simu zinahitaji mpango unaotumika na ombi lililokubaliwa. Kulipa pekee hakufungui mawasiliano.",
+  "Active subscription required": "Mpango unaotumika unahitajika"
 }

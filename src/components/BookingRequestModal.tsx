@@ -6,6 +6,8 @@ import { useBookings, _bookingsApi } from "@/hooks/useBookings";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { haptic } from "@/lib/despia";
 import Confetti from "./Confetti";
+import { usePaidAccess } from "@/hooks/usePaidAccess";
+import PaidAccessNotice from "./PaidAccessNotice";
 
 interface BookingRequestModalProps {
   property: Property;
@@ -30,6 +32,7 @@ const deriveHost = (propertyId: string) => {
 const fmtKES = (n: number) => `KES ${n.toLocaleString("en-KE")}`;
 
 const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingRequestModalProps) => {
+  const { hasActivePlan, loading: planLoading } = usePaidAccess();
   const { addBooking } = useBookings();
   const [step, setStep] = useState<BookingStep>("select");
   const [selectedDate, setSelectedDate] = useState("");
@@ -89,6 +92,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
   }, [step, submittedId, isShortStay, property.title]);
 
   const handleSubmit = () => {
+    if (!hasActivePlan) return;
     const booking = addBooking({
       propertyId: property.id,
       propertyTitle: property.title,
@@ -129,6 +133,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
         </div>
 
         <div className="px-6 pb-6">
+          {!hasActivePlan ? <PaidAccessNotice loading={planLoading} /> : <>
           {/* Step 1: Select date(s) & time/guests */}
           {step === "select" && (
             <div className="space-y-5">
@@ -479,6 +484,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
               </button>
             </div>
           )}
+          </>}
         </div>
       </div>
     </div>

@@ -6,6 +6,8 @@ import { scanMessage } from "@/lib/trust";
 import { ShieldAlert } from "lucide-react";
 import { haptic } from "@/lib/despia";
 import { supabase } from "@/integrations/supabase/client";
+import { usePaidAccess } from "@/hooks/usePaidAccess";
+import PaidAccessNotice from "./PaidAccessNotice";
 
 interface ChatScreenProps {
   onBack: () => void;
@@ -32,6 +34,7 @@ const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString("en-KE", { hou
 
 const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, contactOnline, contactVerified = false, propertyContext, conversationId }: ChatScreenProps) => {
   useLanguage();
+  const { hasActivePlan, loading: planLoading } = usePaidAccess();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [myId, setMyId] = useState<string | null>(null);
@@ -50,7 +53,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
 
   // Load real messages + live updates
   useEffect(() => {
-    if (!canChat) return;
+    if (!canChat || !conversationId) return;
     let cancelled = false;
     let ch: ReturnType<typeof supabase.channel> | null = null;
     (async () => {
@@ -65,10 +68,10 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
         time: fmtTime(r.created_at),
         status: r.sender_id === user.id ? (r.read_at ? "seen" : "sent") : undefined,
       });
-      const { data } = await supabase.from("messages").select("*").eq("conversation_id", conversationId!).order("created_at").limit(500);
+      const { data } = await supabase.from("messages").select("*").eq("conversation_id", conversationId).order("created_at").limit(500);
       if (!cancelled && data) setMessages(data.map(toMsg));
       await supabase.from("messages").update({ read_at: new Date().toISOString() })
-        .eq("conversation_id", conversationId!).neq("sender_id", user.id).is("read_at", null);
+        .eq("conversation_id", conversationId).neq("sender_id", user.id).is("read_at", null);
       ch = supabase
         .channel(`chat-${conversationId}-${Math.random().toString(36).slice(2)}`)
         .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` }, (p) => {
@@ -85,11 +88,21 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
           }
         })
         .subscribe();
-      const { data: ph } = await supabase.rpc("chat_contact_phone", { _conversation_id: conversationId! });
-      if (!cancelled && ph) setPhone(ph as string);
     })();
     return () => { cancelled = true; if (ch) supabase.removeChannel(ch); };
   }, [conversationId, canChat]);
+
+  useEffect(() => {
+    setPhone(null);
+    setPhoneRevealed(false);
+    setShowPhoneReveal(false);
+    if (!hasActivePlan || !conversationId || !canChat) return;
+    let cancelled = false;
+    supabase.rpc("chat_contact_phone", { _conversation_id: conversationId }).then(({ data }) => {
+      if (!cancelled && typeof data === "string") setPhone(data);
+    });
+    return () => { cancelled = true; };
+  }, [hasActivePlan, conversationId, canChat]);
 
   const initials = contactName.split(" ").map((n) => n[0]).join("");
 
@@ -122,13 +135,13 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
   };
 
   const sendMessage = async () => {
-    if (!message.trim() || !canChat || !myId) return;
+    if (!message.trim() || !canChat || !conversationId || !myId || !hasActivePlan) return;
     const text = message.trim();
     const tempId = `tmp-${Date.now()}`;
     setMessages((prev) => [...prev, { id: tempId, text, sender: "me", time: fmtTime(new Date().toISOString()), status: "sending" }]);
     setMessage("");
     const { data, error } = await supabase.from("messages")
-      .insert({ conversation_id: conversationId!, sender_id: myId, body: text }).select().single();
+      .insert({ conversation_id: conversationId, sender_id: myId, body: text }).select().single();
     if (error || !data) {
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
       setMessage(text);
@@ -148,7 +161,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
   };
 
   const handlePhoneReveal = () => {
-    if (!phone) return;
+    if (!phone || !hasActivePlan) return;
     setPhoneRevealed(true);
     setShowPhoneReveal(false);
   };
@@ -166,7 +179,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
           messages
             .slice(-8)
             .filter((m) => m.sender === "other" && m.text)
-            .flatMap((m) => scanMessage(m.text!))
+            .flatMap((m) => m.text ? scanMessage(m.text) : [])
             .map((s) => [s.kind, s]),
         ).values(),
       );
@@ -204,7 +217,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
       </div>
 
       {/* Phone revealed banner */}
-      {phoneRevealed && phone && (
+      {hasActivePlan && phoneRevealed && phone && (
         <div className="bg-trust/10 border-b border-trust/20 animate-fade-in">
           <div className="px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -386,15 +399,16 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
           {translate("Chat opens once you send a booking request to this provider.")} </p>
       )}
       {/* Input */}
+      {!hasActivePlan && <PaidAccessNotice loading={planLoading} />}
       <div className="p-4 border-t border-border glass-surface safe-bottom">
         <div className="flex items-center gap-2 bg-secondary rounded-2xl px-3 py-1">
-          <button className="p-2" onClick={() => setShowAttachMenu(!showAttachMenu)}>
+          <button disabled={!hasActivePlan} className="p-2" onClick={() => setShowAttachMenu(!showAttachMenu)}>
             <Paperclip className="w-5 h-5 text-muted-foreground" />
           </button>
           <input
             type="text"
             placeholder={translate("Type a message...")}
-            disabled={!canChat}
+            disabled={!canChat || !hasActivePlan}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
@@ -425,7 +439,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
             </div>
             <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20 mb-3">
               <p className="text-xs text-muted-foreground text-center">
-                {translate("Phone numbers are revealed after booking confirmation or premium unlock. This ensures trust and reduces spam for both parties.")} </p>
+                {translate("Phone numbers require an active subscription and an accepted booking. Payment alone does not unlock contacts.")} </p>
             </div>
             <div className="p-4 rounded-2xl bg-destructive/5 border border-destructive/20 mb-5 space-y-1.5">
               <div className="flex items-center gap-2">
@@ -438,8 +452,8 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
                 {translate("Never send money before viewing the place in person.")} </p>
             </div>
             <div className="space-y-2">
-              <button onClick={handlePhoneReveal} disabled={!phone} className="disabled:opacity-50 w-full py-3.5 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
-                {phone ? translate("✓ Reveal Number (Booking Accepted)") : translate("Unlocks once a booking is accepted")}
+              <button onClick={handlePhoneReveal} disabled={!phone || !hasActivePlan} className="disabled:opacity-50 w-full py-3.5 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
+                {!hasActivePlan ? translate("Active subscription required") : phone ? translate("✓ Reveal Number (Booking Accepted)") : translate("Unlocks once a booking is accepted")}
               </button>
               <button onClick={() => setShowPhoneReveal(false)} className="w-full py-3 rounded-xl bg-secondary text-sm font-medium text-secondary-foreground">
                 {translate("Cancel")} </button>
