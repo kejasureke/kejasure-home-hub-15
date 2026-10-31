@@ -199,11 +199,11 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
             <>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Bed className="w-3.5 h-3.5" />
-                <span>{property.bedrooms} {translate("Bed")}{property.bedrooms > 1 ? "s" : ""}</span>
+                <span>{property.bedrooms} {translate(property.bedrooms === 1 ? "Bed" : "Beds")}</span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Bath className="w-3.5 h-3.5" />
-                <span>{property.bathrooms} {translate("Bath")}{property.bathrooms > 1 ? "s" : ""}</span>
+                <span>{property.bathrooms} {translate(property.bathrooms === 1 ? "Bath" : "Baths")}</span>
               </div>
             </>
           )}

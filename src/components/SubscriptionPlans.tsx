@@ -346,7 +346,7 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
           className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2 mb-3"
         >
           <Zap className="w-4 h-4" />
-          {`Subscribe — KES ${plans[selectedPlan].price.toLocaleString()}${plans[selectedPlan].duration}`}
+          {`${translate("Subscribe")} — KES ${plans[selectedPlan].price.toLocaleString()}${translate(plans[selectedPlan].duration)}`}
         </button>
 
         <p className="text-center text-[10px] text-muted-foreground">

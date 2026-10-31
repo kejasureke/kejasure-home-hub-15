@@ -534,7 +534,7 @@ const HomeFeed = () => {
                   <br />
                   {translate(seg).split(" ").slice(1).join(" ")}
                 </>
-              ) : seg}
+              ) : translate(seg)}
             </button>
           ))}
         </div>
@@ -716,7 +716,7 @@ const HomeFeed = () => {
             {/* Compare toolbar */}
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">
-                {filteredProperties.length} {segment === "Short Stays" ? "stays" : "properties"} {translate("found")} </p>
+                {filteredProperties.length} {translate(segment === "Short Stays" ? "stays" : "properties")} {translate("found")} </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowMap(true)}
@@ -791,7 +791,7 @@ const HomeFeed = () => {
                           <p className="text-xs font-semibold line-clamp-1">{p.title}</p>
                           <p className="text-[10px] text-muted-foreground">{p.estate}, {p.county}</p>
                           <p className="text-xs font-bold text-primary mt-1">
-                            KES {new Intl.NumberFormat("en-KE").format(p.price)}<span className="font-normal text-muted-foreground">{p.priceUnit}</span>
+                            KES {new Intl.NumberFormat("en-KE").format(p.price)}<span className="font-normal text-muted-foreground">{translate(p.priceUnit)}</span>
                           </p>
                         </div>
                       </button>
@@ -829,7 +829,7 @@ const HomeFeed = () => {
                         <div className="p-2.5">
                           <p className="text-xs font-semibold line-clamp-1">{p.title}</p>
                           <p className="text-xs font-bold text-primary mt-0.5">
-                            KES {(p.price / 1000).toFixed(0)}K<span className="font-normal text-muted-foreground">{p.priceUnit}</span>
+                            KES {(p.price / 1000).toFixed(0)}K<span className="font-normal text-muted-foreground">{translate(p.priceUnit)}</span>
                           </p>
                         </div>
                       </button>
@@ -852,7 +852,7 @@ const HomeFeed = () => {
                     >
                       <div className="text-2xl mb-2">{sp.avatar}</div>
                       <p className="text-xs font-semibold line-clamp-1">{sp.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{sp.category}</p>
+                      <p className="text-[10px] text-muted-foreground">{translate(sp.category)}</p>
                       <div className="flex items-center justify-center gap-1 mt-1">
                         <span className="text-[10px] font-bold text-accent">⭐ {sp.rating}</span>
                       </div>
