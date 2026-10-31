@@ -13,6 +13,7 @@ import { fileToDataUrl } from "@/lib/imageIntegrity";
 import { homeDetails, saveHomeDetails, saveLocalHome, type HomeDetails } from "@/lib/houseHunting";
 import HomeDetailsEditor from "./listing/HomeDetailsEditor";
 import { translate as t, useLanguage } from "@/lib/language";
+import { toast } from "sonner";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
 
@@ -598,7 +599,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
         lat: gpsPin?.lat || 0, lng: gpsPin?.lng || 0, petFriendly: extraDetails.pets === "yes", furnished: form.furnished,
         homeDetails: extraDetails,
       });
-    } catch { return; }
+    } catch { toast.error(t("Phone storage is full. Remove a photo and try again.")); return; }
     if (caretakerPhone.replace(/\D/g, "").length >= 9) {
       try {
         const all = JSON.parse(localStorage.getItem("kejasure_caretakers") || "{}");
