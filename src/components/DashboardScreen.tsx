@@ -10,6 +10,7 @@ import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
+import LocalHomeManager from "./listing/LocalHomeManager";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 
 interface DashboardScreenProps {
@@ -112,6 +113,7 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
 
   return (
     <div className="fixed inset-0 z-[60] bg-background overflow-y-auto animate-slide-up">
+      <div className="pt-safe-compact"><LocalHomeManager /></div>
       {showKYCDirect && (
         <KYCVerificationFlow
           onClose={(completed?: boolean) => {

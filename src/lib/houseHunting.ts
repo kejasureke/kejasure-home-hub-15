@@ -51,6 +51,8 @@ export function homeDetails(property: Property): HomeDetails {
   const saved = read<Record<string, HomeDetails>>(DETAILS, {})[property.id];
   return { deposit: property.deposit, pets: property.petFriendly === undefined ? "ask" : property.petFriendly ? "yes" : "no", ...property.homeDetails, ...saved };
 }
+export function localHomes(): Property[] { return read("kejasure_local_homes", []); }
+export function saveLocalHome(property: Property) { writeLocal("kejasure_local_homes", [property, ...localHomes().filter(p => p.id !== property.id)]); }
 export function saveHomeDetails(id: string, details: HomeDetails) {
   writeLocal(DETAILS, { ...read<Record<string, HomeDetails>>(DETAILS, {}), [id]: details });
 }

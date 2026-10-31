@@ -10,8 +10,9 @@ import { openCamera, haptic, getCurrentLocation } from "@/lib/despia";
 import { Crosshair, CheckCircle2 } from "lucide-react";
 import { notifyNewListing } from "@/lib/listingAlerts";
 import { fileToDataUrl } from "@/lib/imageIntegrity";
-import { homeDetails, saveHomeDetails, type HomeDetails } from "@/lib/houseHunting";
+import { homeDetails, saveHomeDetails, saveLocalHome, type HomeDetails } from "@/lib/houseHunting";
 import HomeDetailsEditor from "./listing/HomeDetailsEditor";
+import { translate as t, useLanguage } from "@/lib/language";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
 
@@ -22,6 +23,7 @@ interface ListingCRUDProps {
 }
 
 interface ListingFormData {
+  id?: string;
   title: string;
   description: string;
   type: "rental" | "shortstay" | "commercial" | "service" | "corporate";
@@ -179,6 +181,7 @@ const boostOptions = [
 const steps = ["Details", "Location", "Amenities", "Photos", "Boost"];
 
 const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
+  useLanguage();
   const [extraDetails, setExtraDetails] = useState<HomeDetails>(() => {
     const id = (editData as { id?: string } | undefined)?.id;
     return id ? homeDetails({ id } as import("@/data/mockData").Property) : {};
@@ -584,6 +587,17 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     const listingId = (editData as any)?.id ?? `new_${Date.now()}`;
     try {
       saveHomeDetails(listingId, { ...extraDetails, deposit: form.deposit === "" ? undefined : Math.max(0, Number(form.deposit)), moveInDate: extraDetails.moveInDate || form.moveInDate });
+      if (type !== "service") saveLocalHome({
+        id: listingId, title: form.title, description: form.description,
+        type: form.type === "shortstay" ? "shortstay" : form.type === "commercial" ? "commercial" : "rental", corporate: form.type === "corporate",
+        county: form.county, subcounty: form.subcounty, ward: "", estate: form.estate,
+        price: Number(form.price) || 0, priceUnit: form.priceUnit, bedrooms: form.bedrooms, bathrooms: form.bathrooms,
+        image: form.photos[0] || "", images: form.photos, amenities: form.amenities,
+        verified: false, featured: false, available: extraDetails.availability === "available",
+        landlordResponseTime: "—", landlordResponseSpeed: "slow", lastActive: "—", nearbyLandmarks: [],
+        lat: gpsPin?.lat || 0, lng: gpsPin?.lng || 0, petFriendly: extraDetails.pets === "yes", furnished: form.furnished,
+        homeDetails: extraDetails,
+      });
     } catch { return; }
     if (caretakerPhone.replace(/\D/g, "").length >= 9) {
       try {
@@ -616,12 +630,10 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
           <Check className="w-10 h-10 text-trust" />
         </div>
         <h2 className="text-xl font-bold text-foreground mb-2">
-          {editData ? "Listing Updated!" : "Listing Published!"}
+          {t("Listing saved on this phone")}
         </h2>
         <p className="text-sm text-muted-foreground text-center">
-          {form.featured
-            ? "Your listing is live and boosted for extra visibility."
-            : "Your listing is now live and visible to tenants."}
+          {t("These details are not published to other users yet.")}
         </p>
       </div>
     );

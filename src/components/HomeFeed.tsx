@@ -14,13 +14,13 @@ import CompareSelectionModal from "./CompareSelectionModal";
 import AIPropertyMatch from "./AIPropertyMatch";
 import NeighborhoodIntelligence from "./NeighborhoodIntelligence";
 import PullToRefresh from "./PullToRefresh";
-import { properties, serviceProviders } from "@/data/mockData";
+import { properties as sampleProperties, serviceProviders } from "@/data/mockData";
 import MapDiscovery from "./MapDiscovery";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
-import { freshAvailability, homeDetails, useHouseHunting, useLowData } from "@/lib/houseHunting";
+import { freshAvailability, homeDetails, useHouseHunting, useLowData, localHomes } from "@/lib/houseHunting";
 import ViewingNotebook from "./listing/ViewingNotebook";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -71,6 +71,7 @@ const GreetingName = () => {
 const HomeFeed = () => {
   useLanguage();
   const detailsVersion = useHouseHunting();
+  const properties = useMemo(() => [...localHomes(), ...sampleProperties], [detailsVersion]);
   const lowData = useLowData();
   const [freshOnly, setFreshOnly] = useState(false);
   const [stepFreeOnly, setStepFreeOnly] = useState(false);
@@ -208,7 +209,7 @@ const HomeFeed = () => {
     }
 
     return result;
-  }, [segment, county, estate, searchQuery, filters, budgetSeeded, commCategory, freshOnly, stepFreeOnly, petsOnly, detailsVersion]);
+  }, [segment, county, estate, searchQuery, filters, budgetSeeded, commCategory, freshOnly, stepFreeOnly, petsOnly, properties]);
 
   const recentProperties = properties.filter((p) => recentIds.includes(p.id));
   const compareProperties = properties.filter((p) => compareIds.includes(p.id));
