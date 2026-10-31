@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { useState } from "react";
 import { Home, Building2, Briefcase, Palmtree, Wrench, ChevronRight } from "lucide-react";
 
@@ -16,13 +17,14 @@ const roles: { id: UserRole; icon: any; title: string; subtitle: string }[] = [
 ];
 
 const RoleSelection = ({ onSelect }: RoleSelectionProps) => {
+  useLanguage();
   const [selected, setSelected] = useState<UserRole | null>(null);
 
   return (
     <div className="fixed inset-0 z-[90] bg-background flex flex-col">
       <div className="px-6 pt-safe pb-4">
-        <h1 className="text-2xl font-extrabold text-foreground">I am a...</h1>
-        <p className="text-sm text-muted-foreground mt-1">Choose how you'll use KejaSure</p>
+        <h1 className="text-2xl font-extrabold text-foreground">{translate("I am a...")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{translate("Choose how you'll use KejaSure")}</p>
       </div>
 
       <div className="flex-1 px-6 space-y-3 overflow-y-auto">
@@ -45,8 +47,8 @@ const RoleSelection = ({ onSelect }: RoleSelectionProps) => {
                 <Icon className={`w-6 h-6 ${isSelected ? "text-primary-foreground" : "text-primary"}`} />
               </div>
               <div className="flex-1 text-left">
-                <p className="text-sm font-bold">{role.title}</p>
-                <p className="text-xs text-muted-foreground">{role.subtitle}</p>
+                <p className="text-sm font-bold">{translate(role.title)}</p>
+                <p className="text-xs text-muted-foreground">{translate(role.subtitle)}</p>
               </div>
               {isSelected && (
                 <div className="w-6 h-6 rounded-full gradient-trust flex items-center justify-center">
@@ -70,8 +72,7 @@ const RoleSelection = ({ onSelect }: RoleSelectionProps) => {
               : "bg-muted text-muted-foreground"
           }`}
         >
-          Continue
-          <ChevronRight className="w-5 h-5" />
+          {translate("Continue")} <ChevronRight className="w-5 h-5" />
         </button>
       </div>
     </div>

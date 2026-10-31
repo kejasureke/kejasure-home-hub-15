@@ -1,3 +1,4 @@
+import { translate, useLanguage } from "@/lib/language";
 import { useState } from "react";
 import { Home, Search, MessageCircle, User, ShieldCheck, Sparkles, ChevronRight, X } from "lucide-react";
 
@@ -52,6 +53,7 @@ interface AppTourProps {
 }
 
 const AppTour = ({ onFinish }: AppTourProps) => {
+  useLanguage();
   const [index, setIndex] = useState(0);
   const isLast = index === STEPS.length - 1;
   const step = STEPS[index];
@@ -71,10 +73,9 @@ const AppTour = ({ onFinish }: AppTourProps) => {
         <button
           onClick={onFinish}
           className="text-xs font-semibold text-muted-foreground active:opacity-70 flex items-center gap-1"
-          aria-label="Skip tour"
+          aria-label={translate("Skip tour")}
         >
-          Skip
-          <X className="w-3.5 h-3.5" />
+          {translate("Skip")} <X className="w-3.5 h-3.5" />
         </button>
       </div>
 
@@ -88,8 +89,8 @@ const AppTour = ({ onFinish }: AppTourProps) => {
         </div>
 
         <div key={`text-${index}`} className="animate-fade-in text-center">
-          <h1 className="text-2xl font-extrabold text-foreground mb-3">{step.title}</h1>
-          <p className="text-sm text-muted-foreground leading-relaxed px-2">{step.description}</p>
+          <h1 className="text-2xl font-extrabold text-foreground mb-3">{translate(step.title)}</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed px-2">{translate(step.description)}</p>
         </div>
 
         {/* Dots */}
@@ -112,7 +113,7 @@ const AppTour = ({ onFinish }: AppTourProps) => {
             onClick={() => (isLast ? onFinish() : setIndex(index + 1))}
             className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 gradient-trust text-primary-foreground active:scale-[0.98] transition-transform"
           >
-            {isLast ? "Get Started" : "Next"}
+            {isLast ? translate("Get Started") : translate("Next")}
             <ChevronRight className="w-5 h-5" />
           </button>
           {!isLast && (
@@ -120,8 +121,7 @@ const AppTour = ({ onFinish }: AppTourProps) => {
               onClick={onFinish}
               className="w-full py-3 rounded-2xl font-semibold text-sm text-muted-foreground active:opacity-70"
             >
-              Skip tour
-            </button>
+              {translate("Skip tour")} </button>
           )}
         </div>
       </div>
