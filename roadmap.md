@@ -1,3 +1,12 @@
+# Kenyan house-hunting improvements
+- [ ] Add availability timestamps, status controls and freshness filtering.
+- [ ] Add disclosed upfront/recurring costs and missing-cost labels.
+- [ ] Add destination-based commute notes with explicitly labelled estimates.
+- [ ] Add private viewing notes, photos and visited-home comparison.
+- [ ] Add persisted low-data browsing with manual photo loading.
+- [ ] Add structured house rules and renter filters.
+- [ ] Verify mobile flows and clearly distinguish phone-only information from shared listing data.
+
 # App language
 - [x] Persist language and translate Settings, navigation, Home, Explore, Profile, chats, bookings, plans, listing details, filters, welcome and tour screens.
 - [x] Verify switching to Kiswahili, navigating, reopening and returning to English in the mobile preview.
