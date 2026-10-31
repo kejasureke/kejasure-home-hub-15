@@ -625,7 +625,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   if (showSuccess) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-6 animate-scale-in">
+      <div className="fixed inset-0 z-[95] bg-background flex flex-col items-center justify-center p-6 pt-safe animate-scale-in">
         <div className="w-20 h-20 rounded-full bg-trust/10 flex items-center justify-center mb-4">
           <Check className="w-10 h-10 text-trust" />
         </div>
@@ -640,7 +640,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+    <div className="fixed inset-0 z-[95] bg-background overflow-y-auto">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background border-b border-border px-4 pb-3 pt-safe-compact">
         <div className="flex items-center justify-between mb-3">
@@ -1685,7 +1685,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
             onClick={handleSubmit}
             className="flex-1 py-3 rounded-xl bg-trust text-white text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           >
-            <Check className="w-4 h-4" /> {editData ? "Update Listing" : "Publish Listing"}
+            <Check className="w-4 h-4" /> {t("Save on this phone")}
           </button>
         )}
       </div>

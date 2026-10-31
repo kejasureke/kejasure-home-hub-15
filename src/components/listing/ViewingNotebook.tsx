@@ -11,7 +11,7 @@ import { toast } from "sonner";
 
 const checks = ["Water", "Noise", "Mobile signal", "Damp", "Security", "Access"];
 export default function ViewingNotebook({ property, onClose }: { property?: Property; onClose: () => void }) {
-  useLanguage(); useHouseHunting(); useHardwareBack(true, onClose);
+  useLanguage(); useHouseHunting();
   const existing = viewingNotes().find(n => n.id === property?.id);
   const [draft, setDraft] = useState<ViewingNote | null>(() => existing || (property ? { id: property.id, title: property.title, estate: property.estate, price: property.price, date: new Date().toISOString().slice(0, 10), checks: {}, notes: "", photos: [] } : null));
   const [compare, setCompare] = useState(false);
@@ -20,6 +20,7 @@ export default function ViewingNotebook({ property, onClose }: { property?: Prop
   const all = viewingNotes();
   const update = (v: Partial<ViewingNote>) => { if (draft) { setDraft({ ...draft, ...v }); setDirty(true); } };
   const leave = () => { if (!dirty || window.confirm(t("Discard unsaved notes?"))) onClose(); };
+  useHardwareBack(true, leave);
   const addPhotos = async (files: FileList | null) => {
     if (!files || !draft) return;
     try {
