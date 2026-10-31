@@ -6,6 +6,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { toast } from "@/hooks/use-toast";
 import { isDespia, requestBiometric, getCurrentLocation, openNativeSettings } from "@/lib/despia";
 import LegalContent, { legalTitles, type LegalDocument } from "@/components/LegalContent";
+import ShareKejaSureSheet from "@/components/ShareKejaSureSheet";
 import { Button } from "@/components/ui/button";
 
 interface SettingsScreenProps {
@@ -34,6 +35,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
   const [showVisibility, setShowVisibility] = useState(false);
   const [visibility, setVisibility] = useState<"everyone" | "verified" | "private">("everyone");
   const [showPinFlow, setShowPinFlow] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
   const [pinStep, setPinStep] = useState<"current" | "new" | "confirm" | "otp" | "done">("current");
   const [currentPin, setCurrentPin] = useState("");
   const [newPin, setNewPin] = useState("");
