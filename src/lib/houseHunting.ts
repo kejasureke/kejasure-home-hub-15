@@ -65,11 +65,15 @@ export function useHouseHunting() {
   return useSyncExternalStore(subscribe, () => version, () => 0);
 }
 let version = 0;
-function subscribe(listener: () => void) {
-  const update = () => { version += 1; listener(); };
+const listeners = new Set<() => void>();
+if (typeof window !== "undefined") {
+  const update = () => { version += 1; listeners.forEach(listener => listener()); };
   window.addEventListener(EVENT, update);
   window.addEventListener("storage", update);
-  return () => { window.removeEventListener(EVENT, update); window.removeEventListener("storage", update); };
+}
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => { listeners.delete(listener); };
 }
 export function useLowData() {
   useHouseHunting();

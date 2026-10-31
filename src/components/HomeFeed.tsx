@@ -761,7 +761,7 @@ const HomeFeed = () => {
             </div>
 
             {/* Recently viewed */}
-            {recentProperties.length > 0 && !searchQuery && !county && (
+            {recentProperties.length > 0 && !searchQuery && !county && !freshOnly && !petsOnly && !stepFreeOnly && (
               <div>
                 <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
@@ -774,7 +774,7 @@ const HomeFeed = () => {
                       className="shrink-0 w-[160px] bg-card rounded-2xl card-shadow overflow-hidden"
                     >
                       <div className="aspect-[4/3] overflow-hidden">
-                        <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                        {!lowData.enabled && <img src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover" />}
                       </div>
                       <div className="p-2.5">
                         <p className="text-xs font-semibold line-clamp-1">{p.title}</p>
@@ -795,7 +795,7 @@ const HomeFeed = () => {
             )}
 
             {/* Smart recommendations */}
-            {!searchQuery && !county && (
+            {!searchQuery && !county && !freshOnly && !petsOnly && !stepFreeOnly && (
               <div>
                 <h2 className="text-base font-semibold mb-3">{translate("✨ Recommended for You")}</h2>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
@@ -809,7 +809,7 @@ const HomeFeed = () => {
                         className="shrink-0 w-[200px] bg-card rounded-2xl card-shadow overflow-hidden"
                       >
                         <div className="aspect-[16/10] overflow-hidden relative">
-                          <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                          {!lowData.enabled && <img src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover" />}
                           <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-trust/90 text-[10px] font-semibold text-trust-foreground">
                             ⭐ {p.rating}
                           </div>
@@ -828,7 +828,7 @@ const HomeFeed = () => {
             )}
 
             {/* Nearby Rentals */}
-            {!searchQuery && !county && (
+            {!searchQuery && !county && !freshOnly && !petsOnly && !stepFreeOnly && (
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-base font-semibold flex items-center gap-2">
@@ -848,7 +848,7 @@ const HomeFeed = () => {
                         className="shrink-0 w-[160px] bg-card rounded-2xl card-shadow overflow-hidden"
                       >
                         <div className="aspect-[4/3] overflow-hidden relative">
-                          <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                          {!lowData.enabled && <img src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover" />}
                           <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-card/90 text-[10px] font-bold text-foreground">
                             {(Math.random() * 2 + 0.3).toFixed(1)} km
                           </div>
