@@ -1,6 +1,8 @@
 # App language
-- [ ] Make the English/Kiswahili preference persistent and translate app-owned screens and controls.
-- [ ] Verify switching languages, navigation and reopening the app.
+- [x] Persist language and translate Settings, navigation, Home, Explore, Profile, chats, bookings, plans, listing details, filters, welcome and tour screens.
+- [x] Verify switching to Kiswahili, navigating, reopening and returning to English in the mobile preview.
+- [ ] Finish remaining dashboard, authentication, support, legal and secondary-screen translations; current coverage is partial.
+- [ ] Verify account-specific translated flows — blocked by no available requesting-user preview session.
 
 # Store readiness
 - [x] Add Settings privacy/data disclosures and public policy URLs accessible without signup.
