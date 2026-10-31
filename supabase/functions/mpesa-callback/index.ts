@@ -140,7 +140,16 @@ Deno.serve(async (req) => {
             const inviterIsBusiness = inviterRole !== 'tenant'
             const friendIsBusiness = BUSINESS.includes(payment.role)
 
-            if (inviterIsBusiness && !friendIsBusiness) {
+            // Both parties must have an active plan — the friend just paid, so check the inviter
+            const { data: inviterSub } = await admin.from('subscriptions')
+              .select('id, ends_at').eq('user_id', ref.referrer_id).eq('status', 'active')
+              .gt('ends_at', new Date().toISOString())
+              .order('ends_at', { ascending: false }).limit(1).maybeSingle()
+
+            if (!inviterSub) {
+              // Inviter has no active plan — no reward
+              await admin.from('referrals').update({ status: 'skipped' }).eq('id', ref.id)
+            } else if (inviterIsBusiness && !friendIsBusiness) {
               // Business invites a tenant → free listing boost sized to the tenant's pass
               const BOOST_HOURS: Record<string, number> = { '24 Hours': 6, '3 Days': 12, '7 Days': 24 }
               const hours = BOOST_HOURS[payment.plan_name] ?? 6
@@ -162,46 +171,29 @@ Deno.serve(async (req) => {
                   deep_link: `/listing/${lst.id}`,
                 })
               } else {
+                // No live listing — bank the boost; it applies automatically to their next listing
+                await admin.from('referral_boosts').insert({
+                  user_id: ref.referrer_id, minutes: hours * 60, referral_id: ref.id,
+                })
                 await admin.from('notifications').insert({
                   user_id: ref.referrer_id, type: 'system', title: `You earned a free ${hours}h boost`,
-                  body: 'A tenant you invited just subscribed, but you have no live listing to boost yet.',
+                  body: 'A tenant you invited just subscribed. Your boost is saved and will apply to your next listing automatically.',
                   deep_link: '/settings/subscription',
                 })
               }
             } else {
-            // Tenant inviter → 24h pass; business inviting business → free month
-            const days = inviterIsBusiness ? 30 : 1
-            const rewardMs = days * DAY
-            const label = inviterIsBusiness ? 'a free month' : 'a free 24h pass'
-
-            const { data: active } = await admin.from('subscriptions')
-              .select('id, ends_at').eq('user_id', ref.referrer_id).eq('status', 'active')
-              .order('ends_at', { ascending: false }).limit(1).maybeSingle()
-            if (active?.ends_at && new Date(active.ends_at) > new Date()) {
+              // Tenant inviter → 24h pass; business inviting business → free month.
+              // Inviter has an active plan (checked above), so extend it.
+              const days = inviterIsBusiness ? 30 : 1
+              const label = inviterIsBusiness ? 'a free month' : 'a free 24h pass'
               await admin.from('subscriptions')
-                .update({ ends_at: new Date(new Date(active.ends_at).getTime() + rewardMs).toISOString() })
-                .eq('id', active.id)
-            } else {
-              const tier = inviterIsBusiness ? 'Referral Free Month' : 'Referral 24h Pass'
-              let { data: rp } = await admin.from('subscription_plans').select('id')
-                .eq('tier', tier).eq('role', inviterRole).maybeSingle()
-              if (!rp) {
-                const { data: np } = await admin.from('subscription_plans')
-                  .insert({ role: inviterRole, tier, price_kes: 0, active: false }).select('id').single()
-                rp = np
-              }
-              if (rp) {
-                await admin.from('subscriptions').insert({
-                  user_id: ref.referrer_id, plan_id: rp.id, status: 'active',
-                  starts_at: new Date().toISOString(), ends_at: new Date(Date.now() + rewardMs).toISOString(),
-                })
-              }
-            }
-            await admin.from('notifications').insert({
-              user_id: ref.referrer_id, type: 'system', title: `You earned ${label}`,
-              body: 'A friend you invited just subscribed. Asante for spreading KejaSure!',
-              deep_link: '/settings/subscription',
-            })
+                .update({ ends_at: new Date(new Date(inviterSub.ends_at).getTime() + days * DAY).toISOString() })
+                .eq('id', inviterSub.id)
+              await admin.from('notifications').insert({
+                user_id: ref.referrer_id, type: 'system', title: `You earned ${label}`,
+                body: 'A friend you invited just subscribed. Asante for spreading KejaSure!',
+                deep_link: '/settings/subscription',
+              })
             }
           }
         }
