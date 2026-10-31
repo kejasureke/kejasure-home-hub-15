@@ -1026,6 +1026,44 @@ export type Database = {
           },
         ]
       }
+      referral_boosts: {
+        Row: {
+          granted_at: string
+          id: string
+          listing_id: string | null
+          minutes: number
+          referral_id: string | null
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          id?: string
+          listing_id?: string | null
+          minutes: number
+          referral_id?: string | null
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          id?: string
+          listing_id?: string | null
+          minutes?: number
+          referral_id?: string | null
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_boosts_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referrals: {
         Row: {
           created_at: string
