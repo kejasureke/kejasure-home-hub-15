@@ -252,16 +252,9 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
 
         <Section title={translate("Share KejaSure")}>
           <button
-            onClick={async () => {
-              const shareText = "Pata Keja, Be Sure 🇰🇪 — I'm using KejaSure to find verified rentals across Kenya. Try it: https://kejasure.co.ke";
-              try {
-                if (navigator.share) {
-                  await navigator.share({ title: "KejaSure", text: shareText });
-                } else {
-                  await navigator.clipboard.writeText(shareText);
-                  toast({ title: translate("Link copied"), description: translate("Share it with a friend on WhatsApp") });
-                }
-              } catch {}
+            onClick={() => {
+              haptic("light");
+              setShowShareSheet(true);
             }}
             className="w-full flex items-center gap-3 p-4"
           >
@@ -270,7 +263,7 @@ const SettingsScreen = ({ onBack }: SettingsScreenProps) => {
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-semibold">{translate("Share with a friend")}</p>
-              <p className="text-[11px] text-muted-foreground">{translate("Send them a WhatsApp invite")}</p>
+              <p className="text-[11px] text-muted-foreground">{translate("WhatsApp, SMS, email or copy link")}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>
