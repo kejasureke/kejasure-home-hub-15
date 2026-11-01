@@ -769,5 +769,9 @@
   "Caretaker on site": "Msimamizi kwenye jengo",
   "Number shows after your viewing is accepted": "Nambari itaonekana ombi lako la kutazama likikubaliwa",
   "Phone numbers require an active subscription and an accepted booking. Payment alone does not unlock contacts.": "Nambari za simu zinahitaji mpango unaotumika na ombi lililokubaliwa. Kulipa pekee hakufungui mawasiliano.",
-  "Active subscription required": "Mpango unaotumika unahitajika"
+  "Active subscription required": "Mpango unaotumika unahitajika",
+  "3 viewings already pending": "Maombi 3 ya kutazama yanasubiri majibu",
+  "Wait for a reply or cancel a pending viewing in My Bookings before requesting another.": "Subiri jibu au ghairi ombi linalosubiri katika Nafasi Zangu kabla ya kuomba jingine.",
+  "Back to listing": "Rudi kwenye tangazo",
+  "Pending viewings": "Maombi ya kutazama yanayosubiri"
 }

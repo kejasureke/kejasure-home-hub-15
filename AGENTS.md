@@ -10,6 +10,7 @@
 - Web app changes need only a publish (app loads from `https://kejasureapp.lovable.app`); wrapper-level changes (icon, splash, URL scheme, status bar settings, permissions) need a new Despia build.
 
 ## House-hunting extensions
+- Use the shared viewing-limit helper for the mobile request-screen pending count; local booking state is not server-enforced account entitlement.
 - Use the shared paid-access hook for contact and booking UI; require both a current account subscription and booking acceptance for phone reveals, because cached booking status alone is not paid entitlement.
 - Profile plan labels and paid action gates use the same subscription window check; never reveal generated phone numbers or auto-accept bookings, because local simulations are not account entitlement or provider consent.
 - Keep supplemental listing disclosures and private viewing notes in the shared house-hunting module; local-only observations must never imply a provider notification or a shared listing update.
