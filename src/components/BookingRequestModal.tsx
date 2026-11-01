@@ -1,8 +1,7 @@
 import { X, Calendar, Clock, MapPin, CheckCircle2, Loader2, Phone, MessageCircle, ShieldCheck, Users, Minus, Plus } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import type { Property } from "@/data/mockData";
-import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
-import { useBookings, _bookingsApi } from "@/hooks/useBookings";
+import { useBookings } from "@/hooks/useBookings";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { haptic } from "@/lib/despia";
 import Confetti from "./Confetti";
@@ -74,25 +73,8 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
     ? !!selectedDate && !!checkOut && nights > 0 && guests > 0
     : !!selectedDate && !!selectedTime;
 
-  // Simulate landlord acceptance and patch the persisted booking
-  useEffect(() => {
-    if (step !== "pending" || !submittedId) return;
-    const timer = setTimeout(() => {
-      _bookingsApi.patch(submittedId, { status: "accepted" });
-      setStep("accepted");
-      haptic("success");
-      pushGlobalAlert({
-        type: "booking",
-        title: `${isShortStay ? "Booking" : "Viewing"} Accepted! 🎉`,
-        body: `Your ${isShortStay ? "booking" : "viewing"} for ${property.title} has been confirmed.`,
-        action: "open-chats",
-      });
-    }, 3500);
-    return () => clearTimeout(timer);
-  }, [step, submittedId, isShortStay, property.title]);
-
   const handleSubmit = () => {
-    if (!hasActivePlan) return;
+    if (planLoading || !hasActivePlan || !canProceed) return;
     const booking = addBooking({
       propertyId: property.id,
       propertyTitle: property.title,

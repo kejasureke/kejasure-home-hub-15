@@ -1,4 +1,5 @@
 # Kenyan house-hunting improvements
+- [ ] Align free-plan labels with contact locks and remove simulated booking acceptance.
 - [x] Close unpaid tenant contact leaks across caretaker cards, bookings and chats; paid/acceptance/expiry tests pass.
 - [ ] Verify contact locks using a real signed-in tenant — blocked by no requesting-user preview session.
 - [x] Add availability timestamps, status controls and freshness filtering.

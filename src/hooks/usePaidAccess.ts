@@ -6,7 +6,8 @@ import { isActiveSubscription, type SubscriptionWindow } from "@/lib/paidAccess"
 /** Fail closed until the current account's subscription has been confirmed. */
 export function usePaidAccess() {
   const { user, loading: authLoading } = useAuth();
-  const [snapshot, setSnapshot] = useState<{ userId: string; subscriptions: SubscriptionWindow[] } | null>(null);
+  type AccountSubscription = SubscriptionWindow & { subscription_plans: { tier: string } | null };
+  const [snapshot, setSnapshot] = useState<{ userId: string; subscriptions: AccountSubscription[] } | null>(null);
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -15,7 +16,8 @@ export function usePaidAccess() {
     let cancelled = false;
     const refresh = async () => {
       const { data, error } = await supabase.from("subscriptions")
-        .select("status, starts_at, ends_at").eq("user_id", user.id).eq("status", "active");
+        .select("status, starts_at, ends_at, subscription_plans(tier)").eq("user_id", user.id).eq("status", "active")
+        .order("created_at", { ascending: false });
       if (!cancelled) {
         setSnapshot({ userId: user.id, subscriptions: error ? [] : data ?? [] });
         setNow(Date.now());
@@ -47,6 +49,7 @@ export function usePaidAccess() {
 
   return {
     hasActivePlan: !!user && subscriptions.some((s) => isActiveSubscription(s, now)),
+    activePlan: subscriptions.find((s) => isActiveSubscription(s, now))?.subscription_plans?.tier ?? null,
     loading: authLoading || (!!user && snapshot?.userId !== user.id),
   };
 }
