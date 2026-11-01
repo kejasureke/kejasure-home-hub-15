@@ -2,6 +2,8 @@ import { translate, useLanguage } from "@/lib/language";
 import { useState } from "react";
 import { ArrowLeft, Crown, Check, ShieldCheck, Zap, Star, MapPin, Phone, MessageCircle, BarChart3, Bell, Heart, SlidersHorizontal, TrendingUp, Sparkles, Receipt, Clock } from "lucide-react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
+import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
@@ -185,6 +187,7 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
   const { plans, label } = getPlansForRole(role);
   const [selectedPlan, setSelectedPlan] = useState(() => plans.findIndex(p => p.popular) ?? 1);
   const [showPayment, setShowPayment] = useState(false);
+  useHardwareBack(!showPayment, triggerClose);
 
   const handleSubscriptionSuccess = async (plan: { name: string; price: number; duration: string }, transactionId: string) => {
     try {
@@ -241,15 +244,15 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
   }
 
   return (
-    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
+    <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto overscroll-contain ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
       {/* Header */}
-      <div className="gradient-premium px-4 pt-safe pb-8">
-        <div className="flex items-center gap-3 mb-5">
-          <button onClick={triggerClose} className="p-1">
+      <div className="sticky top-0 z-20 gradient-premium px-4 pt-safe-compact pb-3 flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={triggerClose} aria-label={translate("Back")} className="text-accent-foreground shrink-0">
             <ArrowLeft className="w-5 h-5 text-accent-foreground" />
-          </button>
+          </Button>
           <h1 className="text-lg font-bold text-accent-foreground">{translate("Subscription Plans")}</h1>
-        </div>
+      </div>
+      <div className="gradient-premium px-4 pt-4 pb-8">
         <div className="text-center">
           <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm mx-auto flex items-center justify-center mb-3">
             <Crown className="w-8 h-8 text-white" />
@@ -259,7 +262,7 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
         </div>
       </div>
 
-      <div className="px-4 -mt-4 pb-24">
+      <div className="px-4 -mt-4 pb-32 safe-bottom">
         {/* Trust banner */}
         <div className="flex items-center gap-2 p-3 rounded-xl bg-card card-shadow mb-4">
           <ShieldCheck className="w-4 h-4 text-primary shrink-0" />

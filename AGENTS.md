@@ -1,6 +1,7 @@
 # Project Notes
 
 ## Safe areas / status bar
+- Paid-access plan pickers must open in a body-level modal portal with their own scroll area and sticky back bar, so transformed listing containers cannot clip them or lose the reading position.
 - Every full-screen overlay, sticky top header, and back-button bar must include safe-area top padding: use `pt-safe` (1.5rem base) or `pt-safe-compact` (0.75rem base) from `src/index.css` — never bare `pt-4`/`py-3` on an element that sits at the viewport top, or it hides under the phone's status bar in the Despia webview.
 - `index.html` viewport meta must keep `viewport-fit=cover` (needed for `env(safe-area-inset-*)` to report real values).
 - Despia editor status bar settings: Fullscreen Mode ON + Auto-Inject Safe Area OFF. The app applies `var(--safe-area-top)` itself; Despia injects the variables in every webview (leaving Auto-Inject on with Fullscreen on causes double padding).
