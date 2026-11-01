@@ -7,6 +7,9 @@ import { haptic } from "@/lib/despia";
 import Confetti from "./Confetti";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
 import PaidAccessNotice from "./PaidAccessNotice";
+import { canRequestViewing, pendingViewingCount, MAX_PENDING_VIEWINGS } from "@/lib/viewingLimits";
+import { translate, useLanguage } from "@/lib/language";
+import { Button } from "@/components/ui/button";
 
 interface BookingRequestModalProps {
   property: Property;
@@ -31,8 +34,9 @@ const deriveHost = (propertyId: string) => {
 const fmtKES = (n: number) => `KES ${n.toLocaleString("en-KE")}`;
 
 const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingRequestModalProps) => {
+  useLanguage();
   const { hasActivePlan, loading: planLoading } = usePaidAccess();
-  const { addBooking } = useBookings();
+  const { bookings, addBooking } = useBookings();
   const [step, setStep] = useState<BookingStep>("select");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -46,6 +50,8 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
 
 
   const isShortStay = property.type === "shortstay";
+  const viewingLimitReached = !isShortStay && !canRequestViewing(bookings);
+  const pendingViewings = pendingViewingCount(bookings);
   const title = isShortStay ? "Book Your Stay" : "Request a Viewing";
   const host = useMemo(() => deriveHost(property.id), [property.id]);
 
@@ -74,7 +80,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
     : !!selectedDate && !!selectedTime;
 
   const handleSubmit = () => {
-    if (planLoading || !hasActivePlan || !canProceed) return;
+    if (planLoading || !hasActivePlan || !canProceed || viewingLimitReached) return;
     const booking = addBooking({
       propertyId: property.id,
       propertyTitle: property.title,
@@ -114,7 +120,16 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
         </div>
 
         <div className="px-6 pb-6">
-          {!hasActivePlan ? <PaidAccessNotice loading={planLoading} /> : <>
+          {!hasActivePlan ? <PaidAccessNotice loading={planLoading} /> : viewingLimitReached && (step === "select" || step === "confirm") ? (
+            <div className="py-6 space-y-4">
+              <h4 className="text-lg font-bold">{translate("3 viewings already pending")}</h4>
+              <p className="text-sm text-muted-foreground">{translate("Wait for a reply or cancel a pending viewing in My Bookings before requesting another.")}</p>
+              <Button className="w-full" onClick={onClose}>{translate("Back to listing")}</Button>
+            </div>
+          ) : <>
+          {!isShortStay && (step === "select" || step === "confirm") && (
+            <p className="text-xs text-muted-foreground mb-4">{translate("Pending viewings")}: {pendingViewings}/{MAX_PENDING_VIEWINGS}</p>
+          )}
           {/* Step 1: Select date(s) & time/guests */}
           {step === "select" && (
             <div className="space-y-5">

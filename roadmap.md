@@ -1,4 +1,7 @@
 # Kenyan house-hunting improvements
+- [x] Add the three-pending-viewing limit to the mobile request screen; limit and freed-slot checks pass.
+- [ ] Enforce the three-request limit across phones — current request screen saves only locally; blocked by frontend-only scope.
+- [ ] Preserve access for paid-origin, late-accepted viewings — requires account-verified entitlement changes outside frontend-only scope.
 - [x] Align free-plan labels with contact locks, gate service bookings and remove simulated booking acceptance; signed-out contact/booking checks passed even with cached acceptance.
 - [x] Close unpaid tenant contact leaks across caretaker cards, bookings and chats; paid/acceptance/expiry tests pass.
 - [ ] Verify contact locks using a real signed-in tenant — blocked by no requesting-user preview session.
