@@ -92,7 +92,6 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
       totalPrice: isShortStay ? total : undefined,
       note: note || undefined,
       landlordName: host.name,
-      landlordPhone: host.phone,
       responseTime: property.landlordResponseTime,
     });
     setSubmittedId(booking.id);
@@ -422,13 +421,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <a
-                    href={`tel:${host.phone.replace(/\s/g, "")}`}
-                    className="flex-1 py-3 rounded-xl bg-trust/10 text-xs font-semibold text-trust active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Call
-                  </a>
+                  <span className="text-xs text-muted-foreground">Contact available after booking is accepted</span>
                   <button className="flex-1 py-3 rounded-xl bg-primary/10 text-xs font-semibold text-primary active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
                     <MessageCircle className="w-4 h-4" />
                     Chat

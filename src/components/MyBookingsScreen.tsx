@@ -243,13 +243,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                   {b.status === "accepted" && !hasActivePlan && <div className="px-3 pb-3"><PaidAccessNotice loading={planLoading} /></div>}
                   {canRevealContact(hasActivePlan, b.status) && b.status === "accepted" && (
                     <div className="px-3 pb-3 flex gap-2">
-                      {b.landlordPhone && (
-                        <a
-                          href={`tel:${b.landlordPhone.replace(/\s/g, "")}`}
-                          className="flex-1 py-2.5 rounded-xl bg-trust/10 text-xs font-semibold text-trust active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
-                        >
-                          <Phone className="w-3.5 h-3.5" /> {translate("Call")} </a>
-                      )}
+                      {/* Phone-only booking records are not proof of provider acceptance. */}
                       <button
                         onClick={() => onOpenChat?.(b.propertyId)}
                         className="flex-1 py-2.5 rounded-xl bg-primary/10 text-xs font-semibold text-primary active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
