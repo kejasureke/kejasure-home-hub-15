@@ -1,5 +1,5 @@
 import { useState, ImgHTMLAttributes } from "react";
-import logoIconWhite from "@/assets/logo-icon-white.png";
+import logoIconGreen from "@/assets/logo-icon-green.png";
 
 interface BlurImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -74,10 +74,13 @@ const BlurImage = ({
           {/* Corner logo badge */}
           <div
             aria-hidden
-            className="pointer-events-none absolute bottom-1.5 right-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/35 backdrop-blur-[2px]"
+            className="pointer-events-none absolute bottom-1.5 right-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/85 backdrop-blur-[2px] shadow-sm"
           >
-            <img src={logoIconWhite} alt="" className="w-3 h-3 opacity-90" draggable={false} />
-            <span className="text-[8px] font-bold tracking-wide text-white/90">KejaSure</span>
+            <img src={logoIconGreen} alt="" className="w-3 h-3" draggable={false} />
+            <span className="text-[8px] font-bold tracking-wide">
+              <span className="text-[#1A6B3C]">Keja</span>
+              <span className="text-[#F5A623]">Sure</span>
+            </span>
           </div>
         </>
       )}
