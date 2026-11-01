@@ -1,6 +1,8 @@
 import { Lock, Phone, UserRound } from "lucide-react";
 import type { Property } from "@/data/mockData";
-import { useBookings } from "@/hooks/useBookings";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { haptic } from "@/lib/despia";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
 import { canRevealContact } from "@/lib/paidAccess";
@@ -19,10 +21,25 @@ export function getCaretaker(p: Property): { name: string; phone: string } | nul
 const CaretakerCard = ({ property }: { property: Property }) => {
   useLanguage();
   const { hasActivePlan, loading } = usePaidAccess();
-  const { bookings } = useBookings();
+  const { user } = useAuth();
+  const [acceptedFor, setAcceptedFor] = useState<string | null>(null);
+  const accountListing = user ? `${user.id}:${property.id}` : null;
+  useEffect(() => {
+    setAcceptedFor(null);
+    if (!user || !hasActivePlan || !/^[0-9a-f-]{36}$/i.test(property.id)) return;
+    let cancelled = false;
+    const refresh = async () => {
+      const { data, error } = await supabase.from("bookings").select("id")
+        .eq("guest_id", user.id).eq("listing_id", property.id).in("status", ["accepted", "completed"]).limit(1);
+      if (!cancelled) setAcceptedFor(!error && data?.length ? accountListing : null);
+    };
+    void refresh();
+    const timer = window.setInterval(refresh, 30000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [user?.id, property.id, hasActivePlan, accountListing]);
   const c = getCaretaker(property);
   if (!c) return null;
-  const unlocked = bookings.some((b) => b.propertyId === property.id && canRevealContact(hasActivePlan, b.status));
+  const unlocked = !!accountListing && acceptedFor === accountListing && canRevealContact(hasActivePlan, "accepted");
 
   if (!hasActivePlan) return <div className="mb-5"><p className="text-sm font-semibold mb-2">{translate("Caretaker contact")}</p><PaidAccessNotice loading={loading} /></div>;
 

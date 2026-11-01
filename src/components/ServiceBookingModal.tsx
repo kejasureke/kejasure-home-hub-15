@@ -6,6 +6,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import type { ServiceProvider } from "@/data/mockData";
+import { usePaidAccess } from "@/hooks/usePaidAccess";
+import PaidAccessNotice from "./PaidAccessNotice";
 
 interface ServiceBookingModalProps {
   provider: ServiceProvider;
@@ -18,6 +20,7 @@ type BookingStep = "details" | "confirm" | "submitting" | "pending" | "accepted"
 const timeSlots = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 
 const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalProps) => {
+  const { hasActivePlan, loading: planLoading } = usePaidAccess();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [description, setDescription] = useState("");
@@ -33,7 +36,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
 
   // Submitting animation
   useEffect(() => {
-    if (step !== "submitting") return;
+    if (step !== "submitting" || !hasActivePlan || planLoading) return;
     setSubmitProgress(0);
     setSubmitStep(0);
     const progressTimer = setInterval(() => setSubmitProgress((p) => Math.min(p + 5, 100)), 90);
@@ -47,28 +50,12 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
         body: `Your request to ${provider.name} for ${selectedDate ? format(selectedDate, "MMM d") : ""} at ${selectedTime} has been submitted.`,
         action: "open-dashboard",
       });
-      setTimeout(() => {
-        pushGlobalAlert({
-          type: "booking",
-          title: `Booking accepted by ${provider.name}`,
-          body: `${provider.name} accepted your ${provider.category} booking. Contact details unlocked!`,
-          action: "open-dashboard",
-        });
-      }, 3800);
     }, 2200);
     return () => { clearInterval(progressTimer); clearInterval(stepTimer); clearTimeout(completeTimer); };
-  }, [step]);
-
-  // Simulate provider acceptance
-  useEffect(() => {
-    if (step === "pending") {
-      const timer = setTimeout(() => setStep("accepted"), 3500);
-      return () => clearTimeout(timer);
-    }
-  }, [step]);
+  }, [step, hasActivePlan, planLoading]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[90] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-h-[90vh] bg-card rounded-t-3xl overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
         <div className="sticky top-0 bg-card z-10 px-6 pt-safe pb-3">
           <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-4" />
@@ -81,6 +68,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
         </div>
 
         <div className="px-6 pb-6">
+          {!hasActivePlan || planLoading ? <PaidAccessNotice loading={planLoading} /> : <>
           {step === "details" && (
             <div className="space-y-5">
               {/* Provider summary */}
@@ -250,7 +238,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               </div>
 
               <button
-                onClick={() => setStep("submitting")}
+                onClick={() => { if (hasActivePlan && !planLoading) setStep("submitting"); }}
                 className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
               >
                 ✓ Send Booking Request
@@ -428,13 +416,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                     </div>
                   </div>
                   <div className="flex gap-2 mt-3">
-                    <a
-                      href="tel:+254712345678"
-                      className="flex-1 py-3 rounded-xl bg-trust/10 text-sm font-semibold text-trust active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
-                    >
-                      <Phone className="w-4 h-4" />
-                      +254 712 345 678
-                    </a>
+                    <span className="text-xs text-muted-foreground">Contact available after booking is accepted</span>
                     <button
                       onClick={onChat}
                       className="flex-1 py-3 rounded-xl bg-primary/10 text-sm font-semibold text-primary active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
@@ -585,6 +567,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               </button>
             </div>
           )}
+          </>}
         </div>
       </div>
     </div>

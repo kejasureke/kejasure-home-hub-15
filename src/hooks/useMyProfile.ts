@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePaidAccess } from "@/hooks/usePaidAccess";
 
 export interface MyProfile {
   name: string;
@@ -31,21 +32,12 @@ export const useMyProfile = (): MyProfile => {
   const [phone, setPhone] = useState(() => readLocal("kejasure_phone"));
   const [phoneVerified, setPhoneVerified] = useState(true);
   const [idVerified, setIdVerified] = useState(false);
-  const [activePlan, setActivePlan] = useState<string | null>(null);
+  const { activePlan, loading: planLoading } = usePaidAccess();
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!user) { setLoading(false); return; }
-    const [{ data: prof }, { data: subs }] = await Promise.all([
-      supabase.from("profiles").select("full_name, phone, phone_verified, id_verified").eq("id", user.id).maybeSingle(),
-      supabase
-        .from("subscriptions")
-        .select("status, ends_at, subscription_plans(tier)")
-        .eq("user_id", user.id)
-        .eq("status", "active")
-        .order("created_at", { ascending: false })
-        .limit(1),
-    ]);
+    const { data: prof } = await supabase.from("profiles").select("full_name, phone, phone_verified, id_verified").eq("id", user.id).maybeSingle();
     if (prof?.full_name) {
       setName(prof.full_name);
       // Keep the phone's copy in step with the account so the greeting works on a new device.
@@ -61,9 +53,6 @@ export const useMyProfile = (): MyProfile => {
     // Anyone signed in got here through an SMS code.
     setPhoneVerified(true);
     setIdVerified(!!prof?.id_verified);
-    const sub = subs?.[0] as { ends_at: string | null; subscription_plans: { tier: string } | null } | undefined;
-    const live = sub && (!sub.ends_at || new Date(sub.ends_at) > new Date());
-    setActivePlan(live ? sub?.subscription_plans?.tier ?? null : null);
     setLoading(false);
   }, [user]);
 
@@ -87,5 +76,5 @@ export const useMyProfile = (): MyProfile => {
 
   const initials = name.split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "";
 
-  return { name, phone: formatPhone(phone), initials, phoneVerified, idVerified, activePlan, loading, saveName };
+  return { name, phone: formatPhone(phone), initials, phoneVerified, idVerified, activePlan, loading: loading || planLoading, saveName };
 };

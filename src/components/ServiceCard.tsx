@@ -3,12 +3,15 @@ import { useState } from "react";
 import type { ServiceProvider } from "@/data/mockData";
 import ServiceBookingModal from "./ServiceBookingModal";
 import BeforeAfterSlider from "./BeforeAfterSlider";
+import { usePaidAccess } from "@/hooks/usePaidAccess";
+import PaidAccessNotice from "./PaidAccessNotice";
 
 interface ServiceCardProps {
   provider: ServiceProvider;
 }
 
 const ServiceCard = ({ provider }: ServiceCardProps) => {
+  const { hasActivePlan, loading: planLoading } = usePaidAccess();
   const [showBooking, setShowBooking] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [showPortfolio, setShowPortfolio] = useState(false);
@@ -170,9 +173,10 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
               </div>
             )}
 
-            <div className="flex gap-2">
+            {!hasActivePlan || planLoading ? <PaidAccessNotice loading={planLoading} /> : <div className="flex gap-2">
               <button
                 onClick={() => {
+                  if (!hasActivePlan || planLoading) return;
                   window.dispatchEvent(new CustomEvent("open-service-chat", {
                     detail: {
                       name: provider.name,
@@ -193,7 +197,7 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
                 <Calendar className="w-3.5 h-3.5" />
                 Book
               </button>
-            </div>
+            </div>}
           </div>
         </div>
       </div>
