@@ -1,5 +1,7 @@
 import { X, Calendar, Clock, MapPin, CheckCircle2, Loader2, Phone, MessageCircle, ShieldCheck, Users, Minus, Plus } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { bookingsApi } from "@/lib/backend";
 import type { Property } from "@/data/mockData";
 import { useBookings } from "@/hooks/useBookings";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
@@ -36,7 +38,7 @@ const fmtKES = (n: number) => `KES ${n.toLocaleString("en-KE")}`;
 const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingRequestModalProps) => {
   useLanguage();
   const { hasActivePlan, loading: planLoading } = usePaidAccess();
-  const { bookings, addBooking } = useBookings();
+  const { bookings, addBooking, updateBooking } = useBookings();
   const [step, setStep] = useState<BookingStep>("select");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -44,6 +46,9 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
   const [guests, setGuests] = useState(1);
   const [note, setNote] = useState(initialNote);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
+  const [remoteId, setRemoteId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useHardwareBack(true, onClose);
 
@@ -79,8 +84,52 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
     ? !!selectedDate && !!checkOut && nights > 0 && guests > 0
     : !!selectedDate && !!selectedTime;
 
-  const handleSubmit = () => {
-    if (planLoading || !hasActivePlan || !canProceed || viewingLimitReached) return;
+  const isLiveListing = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(property.id);
+
+  // Follow the real booking status so the provider's reply shows up here.
+  useEffect(() => {
+    if (!remoteId || step !== "pending") return;
+    let alive = true;
+    const check = async () => {
+      const { data } = await supabase.from("bookings").select("status").eq("id", remoteId).maybeSingle();
+      if (!alive || !data) return;
+      const s = data.status;
+      if (s === "accepted" || s === "completed") {
+        if (submittedId) updateBooking(submittedId, { status: "accepted" });
+        haptic("success");
+        setStep("accepted");
+      } else if (s === "declined" || s === "cancelled") {
+        if (submittedId) updateBooking(submittedId, { status: s });
+        setStep("declined");
+      }
+    };
+    check();
+    const t = setInterval(check, 8000);
+    return () => { alive = false; clearInterval(t); };
+  }, [remoteId, step, submittedId, updateBooking]);
+
+  const handleSubmit = async () => {
+    if (submitting || planLoading || !hasActivePlan || !canProceed || viewingLimitReached) return;
+    setSubmitError(null);
+    if (!isLiveListing) {
+      setSubmitError("This home isn't live on KejaSure yet, so requests can't reach the landlord.");
+      return;
+    }
+    setSubmitting(true);
+    const { data, error } = await bookingsApi.create({
+      listing_id: property.id,
+      type: isShortStay ? "short_stay" : "viewing",
+      check_in: selectedDate,
+      check_out: isShortStay ? checkOut : null,
+      guests: isShortStay ? guests : null,
+      message: [isShortStay ? null : `Preferred time: ${selectedTime}`, note || null].filter(Boolean).join("\n") || null,
+      total_kes: isShortStay ? total : null,
+    });
+    setSubmitting(false);
+    if (error || !data) {
+      setSubmitError(error?.message || "Couldn't send your request. Please try again.");
+      return;
+    }
     const booking = addBooking({
       propertyId: property.id,
       propertyTitle: property.title,
@@ -101,6 +150,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
       responseTime: property.landlordResponseTime,
     });
     setSubmittedId(booking.id);
+    setRemoteId(data.id);
     setStep("pending");
   };
 
@@ -361,10 +411,15 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
                 </p>
               </div>
 
+              {submitError && (
+                <p className="text-xs text-destructive text-center">{submitError}</p>
+              )}
               <button
                 onClick={handleSubmit}
-                className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
+                disabled={submitting}
+                className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform disabled:opacity-60 flex items-center justify-center gap-2"
               >
+                {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
                 ✓ Send {isShortStay ? "Booking" : "Viewing"} Request
               </button>
               <button
