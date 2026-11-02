@@ -43,6 +43,13 @@
       "when": 1793439535456,
       "tag": "0005_referral_boosts_hold_for_later",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793616337063,
+      "tag": "0006_migration",
+      "breakpoints": true
     }
   ]
 }
