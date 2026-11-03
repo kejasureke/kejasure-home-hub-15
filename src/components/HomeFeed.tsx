@@ -693,6 +693,7 @@ const HomeFeed = () => {
                 { value: "AC Repair", icon: "❄️", label: "AC Repair" },
                 { value: "Locksmiths", icon: "🔑", label: "Locksmiths" },
                 { value: "Welders", icon: "🔥", label: "Welders" },
+                { value: "Casual Workers", icon: "🧰", label: "Casual Workers" },
                 { value: "Masons", icon: "🧱", label: "Masons" },
               ].map((cat) => (
                 <button

@@ -55,6 +55,7 @@ const commercialCategories: Category[] = [
   { label: "Godowns & Warehouses", icon: Warehouse, filter: (p) => p.commercialType === "godown" || p.commercialType === "warehouse", color: "bg-accent/10 text-accent" },
   { label: "Hospitality", icon: Hotel, filter: (p) => p.commercialType === "hotel" || p.commercialType === "restaurant" || p.commercialType === "bar" || p.commercialType === "club", color: "bg-primary/10 text-primary" },
   { label: "Health & Wellness", icon: Cross, filter: (p) => p.commercialType === "clinic" || p.commercialType === "pharmacy" || p.commercialType === "gym" || p.commercialType === "salon", color: "bg-trust/10 text-trust" },
+  { label: "Jua Kali Spaces", icon: ShoppingBag, filter: (p) => p.commercialType === "jua_kali", color: "bg-primary/10 text-primary" },
   { label: "Industrial & Auto", icon: Wrench, filter: (p) => p.commercialType === "hardware" || p.commercialType === "garage" || p.commercialType === "petrol_station", color: "bg-accent/10 text-accent" },
 ];
 
@@ -100,6 +101,7 @@ const serviceCategories = [
   { label: "Electricians", icon: Zap, color: "bg-primary/10 text-primary" },
   { label: "Security", icon: Shield, color: "bg-trust/10 text-trust" },
   { label: "Painters", icon: Palmtree, color: "bg-accent/10 text-accent" },
+  { label: "Casual Workers", icon: Footprints, color: "bg-primary/10 text-primary" },
 ];
 
 interface ExploreScreenProps {
