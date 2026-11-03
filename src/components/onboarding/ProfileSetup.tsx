@@ -403,7 +403,7 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
   const [serviceCounties, setServiceCounties] = useState<string[]>([]);
   const [plan, setPlan] = useState("");
 
-  const categories = ["Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers", "Security", "Painters", "Fumigators"];
+  const categories = ["Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers", "Security", "Painters", "Fumigators", "Casual Workers"];
   const countyOpts = ALL_COUNTIES;
 
   const baseSteps = [

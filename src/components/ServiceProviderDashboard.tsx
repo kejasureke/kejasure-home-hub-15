@@ -914,7 +914,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
               <div>
                 <label className="text-xs font-semibold text-muted-foreground mb-1 block">Category</label>
                 <div className="flex flex-wrap gap-1.5">
-                  {["Plumbing", "Electrical", "Moving", "Cleaning", "Painting", "Carpentry", "Other"].map((cat) => (
+                  {["Plumbing", "Electrical", "Moving", "Cleaning", "Painting", "Carpentry", "Casual Work", "Other"].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setNewProjectCategory(cat)}
