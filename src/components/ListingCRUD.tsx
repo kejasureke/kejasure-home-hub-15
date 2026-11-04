@@ -74,7 +74,6 @@ const commercialTypes = [
   { value: "club", label: "🎵 Club/Lounge", desc: "Entertainment venue" },
   { value: "supermarket", label: "🛒 Supermarket", desc: "Mini-mart, grocery" },
   { value: "hardware", label: "🔧 Hardware Store", desc: "Building & tools" },
-  { value: "jua_kali", label: "🧺 Jua Kali Space", desc: "Kibanda, fruit stand, hawker spot" },
   { value: "garage", label: "🔩 Garage/Workshop", desc: "Mechanic, body shop" },
   { value: "studio", label: "🎨 Studio Space", desc: "Creative, photo, art" },
   { value: "coworking", label: "💻 Co-Working", desc: "Shared workspace" },
@@ -170,7 +169,7 @@ const commercialAmenities = [
 const serviceCategories = [
   "Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers",
   "Security", "Painters", "Carpenters", "Landscapers", "Pest Control",
-  "Interior Design", "Fumigation", "Casual Workers",
+  "Interior Design", "Fumigation",
 ];
 
 const boostOptions = [

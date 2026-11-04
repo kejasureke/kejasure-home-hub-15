@@ -74,7 +74,6 @@ const commercialTypeOptions = [
   { value: "garage", label: "Garage / Workshop", icon: "🔩" },
   { value: "studio", label: "Studio Space", icon: "🎨" },
   { value: "coworking", label: "Co-Working", icon: "💻" },
-  { value: "jua_kali", label: "Jua Kali Space", icon: "🧺" },
 ];
 
 const sortOptions = [
