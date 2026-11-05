@@ -1,8 +1,7 @@
 import { translate, useLanguage } from "@/lib/language";
-import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw, Calendar, ShieldAlert, BellRing, Gift } from "lucide-react";
+import { User, Settings, ShieldCheck, Crown, ChevronRight, LogOut, HelpCircle, Bell, BarChart3, Building2, Home, Wrench, Shield, Scale, Search, Star, MapPin, Zap, Briefcase, Palmtree, RefreshCw, Calendar, ShieldAlert, BellRing } from "lucide-react";
 import ScamCheckScreen from "./ScamCheckScreen";
 import ListingAlertsScreen from "./ListingAlertsScreen";
-import InviteFriendsScreen from "./InviteFriendsScreen";
 import MyBookingsScreen from "./MyBookingsScreen";
 import { useBookings } from "@/hooks/useBookings";
 import VerificationBadge from "./VerificationBadge";
@@ -62,7 +61,6 @@ const ProfileScreen = () => {
   const [showBoost, setShowBoost] = useState(false);
   const [showScamCheck, setShowScamCheck] = useState(false);
   const [showAlerts, setShowAlerts] = useState(false);
-  const [showInvite, setShowInvite] = useState(false);
   const [showMyBookings, setShowMyBookings] = useState(() => {
     if (sessionStorage.getItem("kejasure_open_bookings")) {
       sessionStorage.removeItem("kejasure_open_bookings");
@@ -125,7 +123,6 @@ const ProfileScreen = () => {
   if (showNeighborhood) return <NeighborhoodSafety onBack={() => setShowNeighborhood(false)} />;
   if (showScamCheck) return <ScamCheckScreen onBack={() => setShowScamCheck(false)} />;
   if (showAlerts) return <ListingAlertsScreen onBack={() => setShowAlerts(false)} />;
-  if (showInvite) return <InviteFriendsScreen onBack={() => setShowInvite(false)} />;
   if (showBoost) return <BoostListingFlow onBack={() => setShowBoost(false)} />;
   if (showNotifications) return (
     <NotificationsScreen
@@ -170,7 +167,6 @@ const ProfileScreen = () => {
     ...(!isTenant ? [{ icon: dashboardItem.icon, label: dashboardItem.label, subtitle: dashboardItem.subtitle, action: dashboardItem.action }] : []),
     { icon: ShieldAlert, label: "Scam Check", subtitle: "Check a number or listing before you pay", action: () => setShowScamCheck(true) },
     { icon: BellRing, label: "New Listing Alerts", subtitle: "Know the minute a match is listed", action: () => setShowAlerts(true) },
-    { icon: Gift, label: "Invite Friends", subtitle: "Free 24h pass when a friend subscribes", action: () => setShowInvite(true) },
     ...(!isTenant ? [{ icon: Crown, label: "Subscription Plans", subtitle: "Manage your plan", action: () => setShowSubscription(true) }] : []),
     ...(!isTenant ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
     ...(!isTenant ? [{ icon: ShieldCheck, label: "Verification", subtitle: isVerified ? "✓ ID verified" : "Verify your identity", action: () => setShowKYC(true) }] : []),
