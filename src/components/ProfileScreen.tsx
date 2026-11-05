@@ -120,7 +120,7 @@ const ProfileScreen = () => {
       }}
     />
   );
-  if (showReviews) return <ReviewRatingFlow onClose={() => setShowReviews(false)} />;
+  if (showReviews) return <ReviewRatingFlow onClose={() => setShowReviews(false)} writeOnly={isTenant} />;
   if (showSubscription) return <SubscriptionPlans onBack={() => setShowSubscription(false)} currentRole={role} />;
   if (showNeighborhood) return <NeighborhoodSafety onBack={() => setShowNeighborhood(false)} />;
   if (showScamCheck) return <ScamCheckScreen onBack={() => setShowScamCheck(false)} />;
@@ -171,13 +171,13 @@ const ProfileScreen = () => {
     { icon: ShieldAlert, label: "Scam Check", subtitle: "Check a number or listing before you pay", action: () => setShowScamCheck(true) },
     { icon: BellRing, label: "New Listing Alerts", subtitle: "Know the minute a match is listed", action: () => setShowAlerts(true) },
     { icon: Gift, label: "Invite Friends", subtitle: "Free 24h pass when a friend subscribes", action: () => setShowInvite(true) },
-    { icon: Crown, label: "Subscription Plans", subtitle: "Manage your plan", action: () => setShowSubscription(true) },
+    ...(!isTenant ? [{ icon: Crown, label: "Subscription Plans", subtitle: "Manage your plan", action: () => setShowSubscription(true) }] : []),
     ...(!isTenant ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
-    { icon: ShieldCheck, label: "Verification", subtitle: isVerified ? "✓ ID verified" : isTenant ? "✓ Phone verified · ID optional" : "Verify your identity", action: () => setShowKYC(true) },
+    ...(!isTenant ? [{ icon: ShieldCheck, label: "Verification", subtitle: isVerified ? "✓ ID verified" : "Verify your identity", action: () => setShowKYC(true) }] : []),
     { icon: MapPin, label: "Neighborhood Safety", subtitle: "Area scores & insights", action: () => setShowNeighborhood(true) },
     { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
     { icon: Search, label: "Saved Searches", subtitle: "Manage alerts & filters", action: () => setShowSavedSearches(true) },
-    { icon: Star, label: "Reviews & Ratings", subtitle: "View & write reviews", action: () => setShowReviews(true) },
+    { icon: Star, label: isTenant ? "Write a Review" : "Reviews & Ratings", subtitle: isTenant ? "Rate a home or provider you've visited" : "View & write reviews", action: () => setShowReviews(true) },
     { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },
     { icon: Settings, label: "Settings", subtitle: "Account preferences", action: () => setShowSettings(true) },
     { icon: HelpCircle, label: "Help & Support", subtitle: "FAQs and contact", action: () => setShowHelp(true) },
@@ -271,7 +271,7 @@ const ProfileScreen = () => {
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
                 <ShieldCheck className="w-3 h-3" /> {translate("Phone verified")} </span>
             )}
-            {me.activePlan ? (
+            {isTenant ? null : me.activePlan ? (
               <span className="tier-badge-premium inline-block capitalize">{me.activePlan} {translate("plan")}</span>
             ) : (
               <button

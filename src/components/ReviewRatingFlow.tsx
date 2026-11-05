@@ -7,6 +7,8 @@ interface ReviewRatingFlowProps {
   targetName?: string;
   targetType?: "landlord" | "agent" | "host" | "provider";
   listingTitle?: string;
+  /** Tenants only write reviews; they don't have reviews of their own to browse. */
+  writeOnly?: boolean;
 }
 
 type Tab = "write" | "reviews";
@@ -31,9 +33,9 @@ const mockReviews: Review[] = [
 
 const ratingLabels = ["", "Terrible", "Poor", "Average", "Good", "Excellent"];
 
-const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "landlord", listingTitle = "2BR Apartment, Kilimani" }: ReviewRatingFlowProps) => {
+const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "landlord", listingTitle = "2BR Apartment, Kilimani", writeOnly = false }: ReviewRatingFlowProps) => {
   const { closing, triggerClose } = useOverlayClose(onClose);
-  const [tab, setTab] = useState<Tab>("reviews");
+  const [tab, setTab] = useState<Tab>(writeOnly ? "write" : "reviews");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
@@ -78,7 +80,7 @@ const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "la
             <p className="text-[10px] text-muted-foreground">{targetName} · {targetType}</p>
           </div>
         </div>
-        <div className="flex gap-1 bg-secondary rounded-xl p-1">
+        {!writeOnly && <div className="flex gap-1 bg-secondary rounded-xl p-1">
           {[
             { key: "reviews" as Tab, label: `Reviews (${mockReviews.length})` },
             { key: "write" as Tab, label: "Write Review" },
@@ -93,7 +95,7 @@ const ReviewRatingFlow = ({ onClose, targetName = "John Kamau", targetType = "la
               {t.label}
             </button>
           ))}
-        </div>
+        </div>}
       </div>
 
       <div className="px-4 py-5 pb-20">
