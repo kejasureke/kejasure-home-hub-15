@@ -22,6 +22,8 @@ export interface Property {
   image: string;
   verified: boolean;
   featured: boolean;
+  /** Active paid boost type, if any */
+  boostKind?: "silver" | "gold" | "hotdeal";
   available: boolean;
   amenities: string[];
   landlordResponseTime: string;

@@ -554,6 +554,7 @@ export type Database = {
           bathrooms: number | null
           bedrooms: number | null
           boost_expires_at: string | null
+          boost_kind: string | null
           county: string | null
           created_at: string
           description: string | null
@@ -582,6 +583,7 @@ export type Database = {
           bathrooms?: number | null
           bedrooms?: number | null
           boost_expires_at?: string | null
+          boost_kind?: string | null
           county?: string | null
           created_at?: string
           description?: string | null
@@ -610,6 +612,7 @@ export type Database = {
           bathrooms?: number | null
           bedrooms?: number | null
           boost_expires_at?: string | null
+          boost_kind?: string | null
           county?: string | null
           created_at?: string
           description?: string | null

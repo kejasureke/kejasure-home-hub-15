@@ -71,6 +71,13 @@
       "when": 1793883963648,
       "tag": "0009_booking_requests_no_free_text",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793889552061,
+      "tag": "0010_listing_boost_kind",
+      "breakpoints": true
     }
   ]
 }

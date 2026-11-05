@@ -50,7 +50,8 @@ async function load(): Promise<Property[]> {
       image: imgs[0] ?? "",
       images: imgs,
       verified: l.verification === "verified",
-      featured: !!l.boost_expires_at && new Date(l.boost_expires_at) > new Date(),
+      featured: !!l.boost_expires_at && new Date(l.boost_expires_at) > new Date() && (l.boost_kind ?? "gold") === "gold",
+      boostKind: l.boost_expires_at && new Date(l.boost_expires_at) > new Date() ? ((l.boost_kind as Property["boostKind"]) ?? "silver") : undefined,
       available: true,
       amenities: Array.isArray(l.amenities) ? l.amenities : [],
       landlordResponseTime: "—",
@@ -91,8 +92,9 @@ const dataUrlToBlob = async (u: string) => (await fetch(u)).blob();
 /** Publish (or update) a provider's listing to their account so every renter can see and request it. */
 export async function publishListing(input: {
   existingId?: string;
-  segment: "rental" | "short_stay" | "commercial" | "corporate";
-  title: string; description: string; price: number; priceUnit: "month" | "night";
+  segment: "rental" | "short_stay" | "commercial" | "corporate" | "service";
+  subcategory?: string;
+  title: string; description: string; price: number; priceUnit: "month" | "night" | "job";
   bedrooms: number; bathrooms: number; county: string; subcounty: string; estate: string;
   lat?: number; lng?: number; amenities: string[]; rules: Record<string, unknown>;
   photos: string[];
@@ -101,7 +103,7 @@ export async function publishListing(input: {
   const uid = auth.user?.id;
   if (!uid) return { error: "Sign in to publish your listing." };
   const row = {
-    owner_id: uid, segment: input.segment, title: input.title || "Untitled home",
+    owner_id: uid, segment: input.segment, subcategory: input.subcategory ?? null, title: input.title || "Untitled home",
     description: input.description, price_kes: input.price, price_unit: input.priceUnit,
     bedrooms: input.bedrooms, bathrooms: input.bathrooms, county: input.county,
     subcounty: input.subcounty, estate: input.estate, lat: input.lat || null, lng: input.lng || null,

@@ -209,6 +209,9 @@ const HomeFeed = () => {
       case "rating": result.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
       case "featured": result.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0)); break;
     }
+    // Paid boosts: Gold is pinned first, then Hot Deal, then Silver (bumped to top). Stable within each group.
+    const boostRank = (p: typeof result[number]) => p.boostKind === "gold" ? 3 : p.boostKind === "hotdeal" ? 2 : p.boostKind === "silver" ? 1 : 0;
+    result = result.map((p, i) => ({ p, i })).sort((x, y) => boostRank(y.p) - boostRank(x.p) || x.i - y.i).map((x) => x.p);
 
     return result;
   }, [segment, county, estate, searchQuery, filters, budgetSeeded, commCategory, freshOnly, stepFreeOnly, petsOnly, properties]);
@@ -886,6 +889,19 @@ const HomeFeed = () => {
                         <span className="text-[10px] font-bold text-accent">⭐ {sp.rating}</span>
                       </div>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Neighborhood hot deals */}
+            {filteredProperties.some((p) => p.boostKind === "hotdeal") && (
+              <div className="p-3 rounded-2xl border-2 border-destructive/40 bg-destructive/5">
+                <h2 className="text-base font-bold mb-1">🔥 {translate("Hot deals")}{estate ? ` · ${estate}` : county ? ` · ${county}` : ""}</h2>
+                <p className="text-[11px] text-muted-foreground mb-3">{translate("Urgent vacancies and price drops in your area")}</p>
+                <div className="space-y-3">
+                  {filteredProperties.filter((p) => p.boostKind === "hotdeal").slice(0, 3).map((p) => (
+                    <PropertyCard key={`hot-${p.id}`} property={p} onPress={handleSelectProperty} liked={isFavorite(p.id)} onToggleLike={toggleFavorite} />
                   ))}
                 </div>
               </div>

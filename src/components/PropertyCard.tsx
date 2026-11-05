@@ -57,7 +57,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPress(property.id); } }}
       {...handlers}
       className={`w-full text-left bg-card rounded-2xl card-shadow overflow-hidden transition-all duration-300 hover:card-shadow-hover active:scale-[0.98] animate-fade-in cursor-pointer ${
-        isComparing ? "ring-2 ring-primary" : ""
+        isComparing ? "ring-2 ring-primary" : property.boostKind === "gold" ? "ring-2 ring-gold" : property.boostKind === "hotdeal" ? "ring-2 ring-destructive/60" : ""
       }`}
     >
       {/* Image */}
@@ -70,8 +70,14 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
         />
 
         {/* Ribbons */}
-        {property.featured && <div className="premium-ribbon">{translate("⭐ Featured")}</div>}
-        {freshAvailability(details) && !property.featured && (
+        {property.featured && <div className="premium-ribbon">{translate(property.type === "shortstay" ? "⭐ Featured Stay" : "⭐ Featured Property")}</div>}
+        {property.boostKind === "hotdeal" && (
+          <div className="absolute top-3 left-0 px-3 py-1 text-xs font-bold rounded-r-full bg-destructive text-destructive-foreground">🔥 {translate("Hot Deal")}</div>
+        )}
+        {property.boostKind === "silver" && (
+          <div className="absolute top-3 left-0 px-3 py-1 text-xs font-semibold rounded-r-full bg-secondary text-foreground">🥈 {translate("Just bumped")}</div>
+        )}
+        {freshAvailability(details) && !property.featured && !property.boostKind && (
           <div className="absolute top-3 left-0 px-3 py-1 text-xs font-semibold rounded-r-full bg-trust text-trust-foreground">
             {translate("Confirmed this week")} </div>
         )}

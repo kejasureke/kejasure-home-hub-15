@@ -590,13 +590,14 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const handleSubmit = async () => {
     if (publishing) return;
     let listingId = (editData as any)?.id ?? `new_${Date.now()}`;
-    if (type !== "service") {
+    {
       setPublishing(true);
       const res = await publishListing({
         existingId: (editData as any)?.id,
-        segment: form.type === "shortstay" ? "short_stay" : form.type === "commercial" ? "commercial" : form.type === "corporate" ? "corporate" : "rental",
+        segment: type === "service" ? "service" : form.type === "shortstay" ? "short_stay" : form.type === "commercial" ? "commercial" : form.type === "corporate" ? "corporate" : "rental",
         title: form.title, description: form.description, price: Number(form.price) || 0,
-        priceUnit: form.type === "shortstay" ? "night" : "month",
+        subcategory: type === "service" ? form.serviceCategory : undefined,
+        priceUnit: type === "service" ? "job" : form.type === "shortstay" ? "night" : "month",
         bedrooms: form.bedrooms, bathrooms: form.bathrooms, county: form.county, subcounty: form.subcounty, estate: form.estate,
         lat: gpsPin?.lat, lng: gpsPin?.lng, amenities: form.amenities,
         rules: { furnished: form.furnished, petFriendly: extraDetails.pets === "yes", homeDetails: extraDetails },

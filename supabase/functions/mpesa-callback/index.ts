@@ -86,7 +86,9 @@ Deno.serve(async (req) => {
         expires_at: endsAt.toISOString(),
         mpesa_receipt: receipt,
       })
-      await admin.from('listings').update({ boost_expires_at: endsAt.toISOString() }).eq('id', payment.listing_id)
+      const name = String(payment.plan_name).toLowerCase()
+      const boostKind = name.includes('silver') ? 'silver' : name.includes('gold') ? 'gold' : (name.includes('hot') ? 'hotdeal' : 'silver')
+      await admin.from('listings').update({ boost_expires_at: endsAt.toISOString(), boost_kind: boostKind }).eq('id', payment.listing_id)
     } else if (payment.kind === 'subscription') {
       // Find or create the matching plan, then activate the subscription
       let planId: string | null = null
