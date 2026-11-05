@@ -1,3 +1,4 @@
+import { useUserRole } from "@/hooks/useUserRole";
 import { ArrowLeft, Bell, MessageCircle, Calendar, Home, TrendingDown, ShieldCheck, Volume2, VolumeX, Clock, ChevronRight, ChevronDown, Trash2, Undo2 } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { InAppAlert } from "@/hooks/useInAppNotifications";
@@ -17,6 +18,10 @@ interface NotificationsScreenProps {
 }
 
 const categoryFilters = ["All", "Messages", "Bookings", "Listings", "Price", "Verified"] as const;
+// Tenants are free and only verify their phone, so provider-side alerts don't apply to them.
+const tenantFilters = ["All", "Messages", "Bookings", "Listings", "Price"] as const;
+const PROVIDER_ONLY = /\b(boost|subscription|subscribed|plan renew|plan expir|payout|lead|listing views?|your listing|verification (approved|rejected)|ID verified)\b/i;
+const isTenantRelevant = (type: string, text: string) => type !== "verified" && !PROVIDER_ONLY.test(text);
 
 const alertTypeLabel: Record<string, string> = {
   message: "Messages",
@@ -55,7 +60,7 @@ function timeAgo(ts: number) {
 
 const NotificationsScreen = ({
   onBack,
-  liveAlerts = [],
+  liveAlerts: liveAlertsAll = [],
   onMarkAlertRead,
   onMarkAllAlertsRead,
   onDismissAlert,
@@ -63,7 +68,12 @@ const NotificationsScreen = ({
   soundEnabled = true,
   onToggleSound,
 }: NotificationsScreenProps) => {
-  const { notifications, unreadCount, markRead, markAllRead, dismiss } = useNotifications();
+  const { notifications: allNotifications, markRead, markAllRead, dismiss } = useNotifications();
+  const { isTenant } = useUserRole();
+  const notifications = isTenant ? allNotifications.filter((n) => isTenantRelevant(n.type, `${n.title} ${n.description}`)) : allNotifications;
+  const unreadCount = notifications.filter((n) => !n.read).length;
+  const liveAlerts = isTenant ? liveAlertsAll.filter((a) => isTenantRelevant(a.type, `${a.title} ${a.body}`)) : liveAlertsAll;
+  const visibleFilters = isTenant ? tenantFilters : categoryFilters;
   const [filter, setFilter] = useState<(typeof categoryFilters)[number]>("All");
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const [undoItem, setUndoItem] = useState<{ alert: InAppAlert; source: "live" | "stored" } | null>(null);
@@ -272,7 +282,7 @@ const NotificationsScreen = ({
 
         {/* Category filters */}
         <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
-          {categoryFilters.map((cat) => (
+          {visibleFilters.map((cat) => (
             <button
               key={cat}
               onClick={() => setFilter(cat)}
