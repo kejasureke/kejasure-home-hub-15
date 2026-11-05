@@ -45,7 +45,6 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
   const [selectedTime, setSelectedTime] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
-  const [note, setNote] = useState(initialNote);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
   const [remoteId, setRemoteId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -123,7 +122,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
       check_in: selectedDate,
       check_out: isShortStay ? checkOut : null,
       guests: isShortStay ? guests : null,
-      message: [isShortStay ? null : `Preferred time: ${selectedTime}`, note || null].filter(Boolean).join("\n") || null,
+      message: [isShortStay ? null : `Preferred time: ${selectedTime}`].filter(Boolean).join("\n") || null,
       total_kes: isShortStay ? total : null,
     });
     setSubmitting(false);
@@ -146,7 +145,6 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
       nightlyPrice: isShortStay ? property.price : undefined,
       cleaningFee: undefined,
       totalPrice: isShortStay ? total : undefined,
-      note: note || undefined,
       landlordName: host.name,
       responseTime: property.landlordResponseTime,
     });
@@ -333,17 +331,6 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
                 </div>
               )}
 
-              {/* Optional note */}
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Add a note (optional)</h4>
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder={isShortStay ? "e.g., Arriving late, any parking?" : "e.g., I'd like to see both bedrooms and the parking area"}
-                  className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none h-20"
-                />
-              </div>
-
               <button
                 onClick={() => canProceed && setStep("confirm")}
                 className={`w-full py-4 rounded-xl text-sm font-bold active:scale-[0.98] transition-transform ${
@@ -402,12 +389,6 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
                         <span className="font-medium">{selectedTime}</span>
                       </div>
                     </>
-                  )}
-                  {note && (
-                    <div className="pt-2 border-t border-trust/10">
-                      <span className="text-muted-foreground text-xs">Note:</span>
-                      <p className="text-xs font-medium mt-0.5">{note}</p>
-                    </div>
                   )}
                 </div>
               </div>

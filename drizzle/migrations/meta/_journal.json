@@ -64,6 +64,13 @@
       "when": 1793883732806,
       "tag": "0008_chat_requires_accepted_booking",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793883963648,
+      "tag": "0009_booking_requests_no_free_text",
+      "breakpoints": true
     }
   ]
 }

@@ -127,17 +127,6 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 </div>
               </div>
 
-              {/* Description */}
-              <div>
-                <h4 className="text-sm font-semibold mb-2">Describe the job</h4>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="e.g., Need help moving 2BR apartment to Kilimani..."
-                  className="w-full px-4 py-3 rounded-xl bg-secondary text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none h-24"
-                />
-              </div>
-
               {/* Location */}
               <div>
                 <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
