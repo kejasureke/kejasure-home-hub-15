@@ -1420,6 +1420,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_chat_in_conversation: {
+        Args: { _conversation_id: string }
+        Returns: boolean
+      }
       chat_contact_phone: {
         Args: { _conversation_id: string }
         Returns: string

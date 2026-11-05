@@ -57,6 +57,13 @@
       "when": 1793883540855,
       "tag": "0007_tenants_free_bookings",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793883732806,
+      "tag": "0008_chat_requires_accepted_booking",
+      "breakpoints": true
     }
   ]
 }

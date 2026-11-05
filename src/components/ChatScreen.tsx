@@ -6,8 +6,6 @@ import { scanMessage } from "@/lib/trust";
 import { ShieldAlert } from "lucide-react";
 import { haptic } from "@/lib/despia";
 import { supabase } from "@/integrations/supabase/client";
-import { usePaidAccess } from "@/hooks/usePaidAccess";
-import PaidAccessNotice from "./PaidAccessNotice";
 
 interface ChatScreenProps {
   onBack: () => void;
@@ -34,12 +32,23 @@ const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString("en-KE", { hou
 
 const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, contactOnline, contactVerified = false, propertyContext, conversationId }: ChatScreenProps) => {
   useLanguage();
-  const { hasActivePlan, loading: planLoading } = usePaidAccess();
+  const [accepted, setAccepted] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [myId, setMyId] = useState<string | null>(null);
   const [phone, setPhone] = useState<string | null>(null);
   const canChat = isUuid(conversationId);
+  // Tenants are free, but chat only opens once the provider accepts a booking.
+  useEffect(() => {
+    setAccepted(false);
+    if (!canChat || !conversationId) return;
+    let cancelled = false;
+    const check = () => supabase.rpc("can_chat_in_conversation", { _conversation_id: conversationId })
+      .then(({ data }) => { if (!cancelled) setAccepted(data === true); });
+    void check();
+    const t = window.setInterval(check, 15000);
+    return () => { cancelled = true; window.clearInterval(t); };
+  }, [conversationId, canChat]);
   const [isTyping, setIsTyping] = useState(false);
   const [safetyDismissed, setSafetyDismissed] = useState(false);
   const [showPhoneReveal, setShowPhoneReveal] = useState(false);
@@ -96,13 +105,13 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
     setPhone(null);
     setPhoneRevealed(false);
     setShowPhoneReveal(false);
-    if (!hasActivePlan || !conversationId || !canChat) return;
+    if (!accepted || !conversationId || !canChat) return;
     let cancelled = false;
     supabase.rpc("chat_contact_phone", { _conversation_id: conversationId }).then(({ data }) => {
       if (!cancelled && typeof data === "string") setPhone(data);
     });
     return () => { cancelled = true; };
-  }, [hasActivePlan, conversationId, canChat]);
+  }, [accepted, conversationId, canChat]);
 
   const initials = contactName.split(" ").map((n) => n[0]).join("");
 
@@ -135,7 +144,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
   };
 
   const sendMessage = async () => {
-    if (!message.trim() || !canChat || !conversationId || !myId || !hasActivePlan) return;
+    if (!message.trim() || !canChat || !conversationId || !myId || !accepted) return;
     const text = message.trim();
     const tempId = `tmp-${Date.now()}`;
     setMessages((prev) => [...prev, { id: tempId, text, sender: "me", time: fmtTime(new Date().toISOString()), status: "sending" }]);
@@ -161,7 +170,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
   };
 
   const handlePhoneReveal = () => {
-    if (!phone || !hasActivePlan) return;
+    if (!phone || !accepted) return;
     setPhoneRevealed(true);
     setShowPhoneReveal(false);
   };
@@ -217,7 +226,7 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
       </div>
 
       {/* Phone revealed banner */}
-      {hasActivePlan && phoneRevealed && phone && (
+      {accepted && phoneRevealed && phone && (
         <div className="bg-trust/10 border-b border-trust/20 animate-fade-in">
           <div className="px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -399,16 +408,19 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
           {translate("Chat opens once you send a booking request to this provider.")} </p>
       )}
       {/* Input */}
-      {!hasActivePlan && <PaidAccessNotice loading={planLoading} />}
+      {canChat && !accepted && (
+        <p className="px-4 py-2 text-[11px] text-center text-muted-foreground border-t border-border">
+          {translate("Chat unlocks once your booking request is accepted.")}</p>
+      )}
       <div className="p-4 border-t border-border glass-surface safe-bottom">
         <div className="flex items-center gap-2 bg-secondary rounded-2xl px-3 py-1">
-          <button disabled={!hasActivePlan} className="p-2" onClick={() => setShowAttachMenu(!showAttachMenu)}>
+          <button disabled={!accepted} className="p-2" onClick={() => setShowAttachMenu(!showAttachMenu)}>
             <Paperclip className="w-5 h-5 text-muted-foreground" />
           </button>
           <input
             type="text"
             placeholder={translate("Type a message...")}
-            disabled={!canChat || !hasActivePlan}
+            disabled={!canChat || !accepted}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
@@ -452,8 +464,8 @@ const ChatScreen = ({ onBack, contactName = "KejaSure member", contactRole, cont
                 {translate("Never send money before viewing the place in person.")} </p>
             </div>
             <div className="space-y-2">
-              <button onClick={handlePhoneReveal} disabled={!phone || !hasActivePlan} className="disabled:opacity-50 w-full py-3.5 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
-                {!hasActivePlan ? translate("Active subscription required") : phone ? translate("✓ Reveal Number (Booking Accepted)") : translate("Unlocks once a booking is accepted")}
+              <button onClick={handlePhoneReveal} disabled={!phone || !accepted} className="disabled:opacity-50 w-full py-3.5 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform">
+                {!accepted ? translate("Unlocks once a booking is accepted") : phone ? translate("✓ Reveal Number (Booking Accepted)") : translate("Unlocks once a booking is accepted")}
               </button>
               <button onClick={() => setShowPhoneReveal(false)} className="w-full py-3 rounded-xl bg-secondary text-sm font-medium text-secondary-foreground">
                 {translate("Cancel")} </button>
