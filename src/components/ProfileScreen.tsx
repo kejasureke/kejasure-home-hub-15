@@ -152,7 +152,6 @@ const ProfileScreen = () => {
   };
 
   const dashboardItem = getDashboardItem();
-  const showBoostOption = !isTenant;
 
   const bookingsActiveCount = bookingCounts.pending + bookingCounts.accepted;
   const menuItems = [
