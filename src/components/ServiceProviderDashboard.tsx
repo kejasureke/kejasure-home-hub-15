@@ -51,13 +51,12 @@ interface ServiceProviderDashboardProps {
 }
 
 const individualPlans = [
-  { name: "Basic", price: 500, features: ["1 service listing", "5 bookings/mo", "Basic profile"], current: false },
-  { name: "Pro", price: 1000, features: ["3 service listings", "Unlimited bookings", "Priority chat", "Portfolio gallery"], current: true },
+  { name: "Free", price: 0, features: ["1 service listing", "Basic profile"], current: true },
+  { name: "Pro", price: 300, features: ["3 service listings", "Unlimited bookings", "Priority chat", "Portfolio gallery"], current: false },
 ];
 
 const businessPlans = [
-  { name: "Business Pro", price: 3000, features: ["10 service listings", "Team members", "CRM tools", "County analytics"], current: false },
-  { name: "Enterprise", price: 5000, features: ["Unlimited listings", "Full team", "API access", "Priority support", "Featured profile"], current: false },
+  { name: "Business", price: 950, features: ["Unlimited service listings", "Team members", "CRM tools", "Featured profile"], current: false },
 ];
 
 const stats = [
@@ -324,7 +323,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
   const currentPlan = individualPlans.find((p) => p.current)!;
   const allPlans = providerType === "individual" ? individualPlans : businessPlans;
 
-  const serviceMpesaPlans = [...individualPlans, ...businessPlans].map((p) => ({
+  const serviceMpesaPlans = [...individualPlans, ...businessPlans].filter((p) => p.price > 0).map((p) => ({
     name: p.name,
     price: p.price,
     duration: "1 month",
@@ -378,7 +377,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
       {showPayment && (
         <MpesaPaymentFlow
           plans={serviceMpesaPlans}
-          selectedPlanIndex={1}
+          selectedPlanIndex={0}
           category="Service Provider Plan"
           onClose={() => setShowPayment(false)}
         />

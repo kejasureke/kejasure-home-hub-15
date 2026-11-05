@@ -23,9 +23,9 @@ interface StayHostDashboardProps {
 }
 
 const plans = [
-  { name: "Basic", price: 1000, features: ["2 listings", "Basic calendar", "Guest chat"], current: false },
-  { name: "Pro", price: 2500, features: ["10 listings", "Full calendar", "Priority chat", "Featured stays"], current: true },
-  { name: "Premium", price: 5000, features: ["Unlimited listings", "Smart pricing", "Priority support", "County heatmaps", "Booking analytics"], current: false },
+  { name: "Free", price: 0, features: ["1 stay listing", "Standard placement"], current: true },
+  { name: "Pro", price: 450, features: ["10 listings", "Full calendar", "Booking analytics", "2 monthly boosts"], current: false },
+  { name: "Premium", price: 2450, features: ["Unlimited listings", "Corporate stays", "Smart pricing", "Featured stays", "5 monthly boosts"], current: false },
 ];
 
 const stats = [
@@ -80,7 +80,7 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
   }, [autoOpenKYC, isVerified, onKYCOpened]);
   const currentPlan = plans.find((p) => p.current)!;
 
-  const hostMpesaPlans = plans.map((p) => ({
+  const hostMpesaPlans = plans.filter((p) => p.price > 0).map((p) => ({
     name: p.name,
     price: p.price,
     duration: "1 month",
@@ -142,7 +142,7 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
       {showPayment && (
         <MpesaPaymentFlow
           plans={hostMpesaPlans}
-          selectedPlanIndex={1}
+          selectedPlanIndex={0}
           category="Stay Host Plan"
           onClose={() => setShowPayment(false)}
         />

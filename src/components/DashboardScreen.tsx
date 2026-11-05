@@ -27,9 +27,9 @@ const stats = [
 ];
 
 const landlordPlans = [
-  { name: "Basic", price: 500, duration: "1 month", features: ["3 listings", "Basic analytics"] },
-  { name: "Pro", price: 1000, duration: "1 month", features: ["10 listings", "Priority chat", "Boost"], popular: true },
-  { name: "Premium", price: 2000, duration: "1 month", features: ["Unlimited listings", "Featured badge", "County heatmaps", "Priority support"] },
+  { name: "Free", price: 0, duration: "forever", features: ["1 active listing", "Standard placement"] },
+  { name: "Pro", price: 450, duration: "1 month", features: ["5 listings", "Basic analytics", "1 monthly boost"], popular: true },
+  { name: "Premium", price: 1450, duration: "1 month", features: ["15 listings", "Commercial + corporate stays", "2 monthly boosts", "Full analytics"] },
 ];
 
 interface BookingRequest {
@@ -134,8 +134,8 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
       )}
       {showPayment && (
         <MpesaPaymentFlow
-          plans={landlordPlans}
-          selectedPlanIndex={1}
+          plans={landlordPlans.filter((p) => p.price > 0)}
+          selectedPlanIndex={0}
           category="Landlord Plan"
           onClose={() => setShowPayment(false)}
         />

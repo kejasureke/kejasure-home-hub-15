@@ -42,61 +42,55 @@ const tenantPlans = [
 
 const landlordPlans = [
   {
-    name: "Basic",
-    price: 500,
-    duration: "/month",
-    badge: "Individual",
-    features: ["1 active listing", "Residential rentals only", "Single-owner profile", "Guest inquiries via chat", "Standard placement"],
-    notIncluded: ["Multiple agents", "CRM tools", "Commercial premises", "Corporate stays", "Boost listings"],
+    name: "Free",
+    price: 0,
+    duration: " forever",
+    features: ["1 active listing", "Chat with tenants once a booking is accepted", "Standard placement", "Basic profile"],
+    notIncluded: ["Boosts", "Analytics", "Featured placement"],
     current: false,
   },
   {
     name: "Pro",
-    price: 1000,
+    price: 450,
     duration: "/month",
-    badge: "Individual",
-    features: ["5 active listings", "Residential rentals only", "Basic analytics", "Priority chat replies", "1 monthly boost"],
-    notIncluded: ["Multiple agents", "CRM tools", "Commercial premises", "Corporate stays", "County heatmaps"],
+    features: ["5 active listings", "Residential rentals", "Basic analytics", "Priority chat replies", "1 monthly boost"],
+    notIncluded: ["Commercial premises", "Corporate stays"],
     popular: true,
     current: false,
   },
   {
     name: "Premium",
-    price: 1500,
+    price: 1450,
     duration: "/month",
-    badge: "Individual",
-    features: ["15 active listings", "Residential + ✨ Commercial premises", "✨ Corporate stays (NGO/expat)", "Full owner analytics", "2 monthly boosts", "Verified owner badge"],
-    notIncluded: ["Multi-agent team", "Full agency CRM", "White label"],
+    features: ["15 active listings", "Residential + ✨ Commercial premises", "✨ Corporate stays (NGO/expat)", "Full owner analytics", "2 monthly boosts", "Featured placement"],
+    notIncluded: [],
     current: false,
   },
 ];
 
 const agencyPlans = [
   {
-    name: "Starter",
-    price: 2499,
-    duration: "/month",
-    badge: "Agency",
-    features: ["3 agent accounts", "25 listings", "Agency-branded profile", "Lead assignment & inbox", "Basic CRM", "Bulk listing upload"],
-    notIncluded: ["Commercial premises", "Corporate stays", "White label"],
+    name: "Free",
+    price: 0,
+    duration: " forever",
+    features: ["1 active listing", "Chat with tenants once a booking is accepted", "Standard placement", "Basic profile"],
+    notIncluded: ["Boosts", "Analytics", "Featured placement"],
     current: false,
   },
   {
     name: "Growth",
-    price: 4999,
+    price: 1950,
     duration: "/month",
-    badge: "Agency",
-    features: ["10 agent accounts", "100 listings", "✨ Commercial premises (shops/offices)", "Full CRM with pipelines", "Agent performance analytics", "5 monthly boosts", "Featured agency badge", "County heatmaps"],
-    notIncluded: ["Corporate stays", "White label"],
+    features: ["5 agent accounts", "50 listings", "Agency-branded profile", "Lead inbox & basic CRM", "Bulk listing upload", "2 monthly boosts"],
+    notIncluded: ["Commercial premises", "Corporate stays", "White label"],
     popular: true,
     current: false,
   },
   {
     name: "Enterprise",
-    price: 9499,
+    price: 4950,
     duration: "/month",
-    badge: "Agency",
-    features: ["Unlimited agents", "Unlimited listings", "✨ Commercial premises", "✨ Corporate stays (NGO/expat)", "Full CRM + lead routing", "White-label custom branding", "Dedicated account manager", "Priority support 24/7"],
+    features: ["Unlimited agents", "Unlimited listings", "✨ Commercial premises", "✨ Corporate stays (NGO/expat)", "Full CRM + lead routing", "White-label branding", "5 monthly boosts", "Priority support"],
     notIncluded: [],
     current: false,
   },
@@ -104,27 +98,27 @@ const agencyPlans = [
 
 const stayHostPlans = [
   {
-    name: "Basic",
-    price: 500,
-    duration: "/month",
-    features: ["2 stay listings", "Short stays only", "Basic calendar", "Guest chat", "Standard placement"],
-    notIncluded: ["Corporate stays", "Smart pricing", "County heatmap"],
+    name: "Free",
+    price: 0,
+    duration: " forever",
+    features: ["1 active listing", "Chat with tenants once a booking is accepted", "Standard placement", "Basic profile"],
+    notIncluded: ["Boosts", "Analytics", "Featured placement"],
     current: false,
   },
   {
     name: "Pro",
-    price: 1000,
+    price: 450,
     duration: "/month",
-    features: ["10 stay listings", "Short stays only", "Full calendar sync", "Priority chat", "Featured stays", "Booking analytics", "2 monthly boosts"],
+    features: ["10 stay listings", "Short stays only", "Full calendar sync", "Priority chat", "Booking analytics", "2 monthly boosts"],
     notIncluded: ["Corporate stays", "Smart pricing"],
     popular: true,
     current: false,
   },
   {
     name: "Premium",
-    price: 3500,
+    price: 2450,
     duration: "/month",
-    features: ["Unlimited listings", "✨ Corporate stays (NGO/expat)", "Smart pricing AI", "Priority support", "County heatmaps", "Booking analytics", "5 monthly boosts"],
+    features: ["Unlimited listings", "✨ Corporate stays (NGO/expat)", "Smart pricing AI", "Featured stays", "County heatmaps", "5 monthly boosts", "Priority support"],
     notIncluded: [],
     current: false,
   },
@@ -132,39 +126,27 @@ const stayHostPlans = [
 
 const serviceProviderPlans = [
   {
-    name: "Basic",
-    price: 300,
-    duration: "/month",
-    badge: "Individual",
-    features: ["1 service listing", "5 bookings/month", "Basic profile", "Client messaging"],
-    notIncluded: ["Portfolio gallery", "Priority placement"],
+    name: "Free",
+    price: 0,
+    duration: " forever",
+    features: ["1 service listing", "Chat with clients once a booking is accepted", "Standard placement", "Basic profile"],
+    notIncluded: ["Boosts", "Analytics", "Featured placement"],
     current: false,
   },
   {
     name: "Pro",
-    price: 1000,
+    price: 300,
     duration: "/month",
-    badge: "Individual",
     features: ["3 service listings", "Unlimited bookings", "Priority chat", "Portfolio gallery", "Client reviews showcase"],
     notIncluded: ["Team members", "CRM tools"],
     popular: true,
     current: false,
   },
   {
-    name: "Business Pro",
-    price: 2500,
+    name: "Business",
+    price: 950,
     duration: "/month",
-    badge: "Business",
-    features: ["10 service listings", "Team members", "CRM tools", "County analytics", "Featured profile", "Priority support"],
-    notIncluded: ["Unlimited listings"],
-    current: false,
-  },
-  {
-    name: "Enterprise",
-    price: 4000,
-    duration: "/month",
-    badge: "Business",
-    features: ["Unlimited listings", "Unlimited team", "Full CRM", "County analytics", "Featured profile", "Priority support"],
+    features: ["Unlimited service listings", "Team members", "CRM tools", "County analytics", "Featured profile", "Priority support"],
     notIncluded: [],
     current: false,
   },
@@ -363,11 +345,19 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
 
         {/* CTA */}
         <button
-          onClick={() => setShowPayment(true)}
+          onClick={() => {
+            if (plans[selectedPlan].price === 0) {
+              toast({ title: translate("You're on the Free plan"), description: translate("Free forever — upgrade anytime for more listings and boosts.") });
+              return;
+            }
+            setShowPayment(true);
+          }}
           className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2 mb-3"
         >
           <Zap className="w-4 h-4" />
-          {`${translate("Subscribe")} — KES ${plans[selectedPlan].price.toLocaleString()}${translate(plans[selectedPlan].duration)}`}
+          {plans[selectedPlan].price === 0
+            ? translate("Continue on Free")
+            : `${translate("Subscribe")} — KES ${plans[selectedPlan].price.toLocaleString()}${translate(plans[selectedPlan].duration)}`}
         </button>
 
         <p className="text-center text-[10px] text-muted-foreground">

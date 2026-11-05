@@ -22,9 +22,9 @@ interface AgencyDashboardProps {
 }
 
 const plans = [
-  { name: "Starter", price: 2000, features: ["5 agent accounts", "50 listings", "Basic CRM"], current: false },
-  { name: "Growth", price: 5000, features: ["15 agent accounts", "200 listings", "Full CRM", "Lead assignment"], current: true },
-  { name: "Enterprise", price: 10000, features: ["Unlimited agents", "Unlimited listings", "Full CRM", "Priority support", "API access"], current: false },
+  { name: "Free", price: 0, features: ["1 active listing", "Standard placement"], current: true },
+  { name: "Growth", price: 1950, features: ["5 agent accounts", "50 listings", "Basic CRM", "2 monthly boosts"], current: false },
+  { name: "Enterprise", price: 4950, features: ["Unlimited agents", "Unlimited listings", "Commercial + corporate stays", "Full CRM", "Priority support"], current: false },
 ];
 
 const stats = [
@@ -100,7 +100,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
 
   const currentPlan = plans.find((p) => p.current)!;
 
-  const agencyMpesaPlans = plans.map((p) => ({
+  const agencyMpesaPlans = plans.filter((p) => p.price > 0).map((p) => ({
     name: p.name,
     price: p.price,
     duration: "1 month",
@@ -253,7 +253,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
       {showPayment && (
         <MpesaPaymentFlow
           plans={agencyMpesaPlans}
-          selectedPlanIndex={1}
+          selectedPlanIndex={0}
           category="Agency Plan"
           onClose={() => setShowPayment(false)}
         />
