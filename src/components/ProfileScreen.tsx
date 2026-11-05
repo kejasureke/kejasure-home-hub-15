@@ -124,7 +124,7 @@ const ProfileScreen = () => {
   if (showNeighborhood) return <NeighborhoodSafety onBack={() => setShowNeighborhood(false)} />;
   if (showScamCheck) return <ScamCheckScreen onBack={() => setShowScamCheck(false)} />;
   if (showAlerts) return <ListingAlertsScreen onBack={() => setShowAlerts(false)} />;
-  if (showBoost) return <BoostListingFlow onBack={() => setShowBoost(false)} />;
+  if (showBoost) return <BoostListingFlow onBack={() => setShowBoost(false)} role={role} />;
   if (showNotifications) return (
     <NotificationsScreen
       onBack={() => setShowNotifications(false)}

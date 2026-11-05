@@ -6,34 +6,61 @@ import MpesaPaymentFlow from "./MpesaPaymentFlow";
 
 interface BoostListingFlowProps {
   onBack: () => void;
+  role?: string;
 }
 
-const boostPlans = [
-  {
-    name: "Spotlight",
-    price: 200,
-    duration: "3 days",
-    features: ["Top of search results", "Highlighted border", "2x more views"],
-  },
-  {
-    name: "Featured",
-    price: 500,
-    duration: "7 days",
-    features: ["⭐ Featured badge", "Top of feed", "5x more views", "Priority in alerts"],
-    popular: true,
-  },
-  {
-    name: "Premium Boost",
-    price: 1000,
-    duration: "14 days",
-    features: ["🏆 Premium badge", "Top of feed", "10x more views", "Push notification blast", "Social media feature"],
-  },
-];
+type BoostKind = "silver" | "gold" | "hotdeal";
 
+// Prices per provider type [silver, gold, hot deal] in KES
+const BOOST_PRICES: Record<string, [number, number, number]> = {
+  landlord: [100, 350, 200],
+  agency: [200, 700, 400],
+  stayhost: [150, 450, 250],
+  serviceprovider: [80, 250, 150],
+};
+
+const roleCopy: Record<string, { item: string; badge: string; hot: string; hotDesc: string }> = {
+  landlord: { item: "listing", badge: "Featured Property", hot: "Neighborhood Hot Deal", hotDesc: "Urgent vacancy or rent drop" },
+  agency: { item: "listing", badge: "Featured Agency Listing", hot: "Neighborhood Hot Deal", hotDesc: "Urgent vacancies or rent drops" },
+  stayhost: { item: "stay", badge: "Featured Stay", hot: "Neighborhood Hot Deal", hotDesc: "Last-minute dates or price drops" },
+  serviceprovider: { item: "service", badge: "Featured Service", hot: "Neighborhood Hot Offer", hotDesc: "Discounts or same-day availability" },
+};
+
+const getBoostPlans = (role: string) => {
+  const r = BOOST_PRICES[role] ? role : "landlord";
+  const [silver, gold, hot] = BOOST_PRICES[r];
+  const c = roleCopy[r];
+  return [
+    {
+      kind: "silver" as BoostKind,
+      name: "Silver Boost",
+      price: silver,
+      duration: "3 days",
+      features: [`Pushes your ${c.item} back to the top of search results`, "Fresh \"Just bumped\" position", "More views in your area"],
+    },
+    {
+      kind: "gold" as BoostKind,
+      name: "Gold Featured Slot",
+      price: gold,
+      duration: "7 days",
+      features: ["Pinned in the featured slot of search results", `"${c.badge}" highlighted badge`, "Gold border on your card"],
+      popular: true,
+    },
+    {
+      kind: "hotdeal" as BoostKind,
+      name: c.hot,
+      price: hot,
+      duration: "5 days",
+      features: [`Highlighted card for ${c.hotDesc.toLowerCase()}`, "Shown to people searching your target neighborhood", "🔥 Hot deal tag"],
+    },
+  ];
+};
 
 interface MyListing { id: string; title: string; views: number; status: string }
 
-const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
+const BoostListingFlow = ({ onBack, role = "landlord" }: BoostListingFlowProps) => {
+  const boostPlans = getBoostPlans(role);
+  const itemWord = (roleCopy[role] ?? roleCopy.landlord).item;
   const { closing, triggerClose } = useOverlayClose(onBack);
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const [selectedBoost, setSelectedBoost] = useState(1);
@@ -62,7 +89,7 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
       <MpesaPaymentFlow
         plans={boostPlans.map(p => ({ name: p.name, price: p.price, duration: p.duration, features: p.features }))}
         selectedPlanIndex={selectedBoost}
-        category="Listing Boost"
+        category={`${boostPlans[selectedBoost].name} Boost`}
         kind="boost"
         listingId={selectedListing}
         onClose={() => setShowPayment(false)}
@@ -79,9 +106,9 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
             <ArrowLeft className="w-4 h-4 text-foreground" />
           </button>
           <div>
-            <h1 className="text-lg font-bold">Boost Listing</h1>
+            <h1 className="text-lg font-bold capitalize">Boost your {itemWord}</h1>
             <p className="text-xs text-muted-foreground">
-              {step === "select-listing" ? "Choose a listing to boost" : "Choose boost package"}
+              {step === "select-listing" ? `Choose a ${itemWord} to boost` : "Choose a boost"}
             </p>
           </div>
         </div>
@@ -95,7 +122,7 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
                 <h3 className="text-sm font-bold text-accent-foreground">Get More Views</h3>
               </div>
               <p className="text-xs text-muted-foreground">
-                Boosted listings get up to <span className="font-bold text-foreground">10x more views</span> and appear at the top of search results with a special badge.
+                Pick from 3 boosts: <span className="font-bold text-foreground">Silver</span> bumps you back to the top, <span className="font-bold text-foreground">Gold</span> pins you in the featured slot with a badge, and <span className="font-bold text-foreground">Hot Deal</span> highlights urgent offers in your target area.
               </p>
             </div>
 
@@ -103,18 +130,18 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
             <div className="grid grid-cols-3 gap-2 mb-5">
               <div className="p-3 rounded-xl bg-card card-shadow text-center">
                 <TrendingUp className="w-5 h-5 mx-auto mb-1 text-primary" />
-                <p className="text-lg font-bold text-foreground">10x</p>
-                <p className="text-[10px] text-muted-foreground">More views</p>
+                <p className="text-sm font-bold text-foreground">Silver</p>
+                <p className="text-[10px] text-muted-foreground">Back to top</p>
               </div>
               <div className="p-3 rounded-xl bg-card card-shadow text-center">
-                <Eye className="w-5 h-5 mx-auto mb-1 text-accent" />
-                <p className="text-lg font-bold text-foreground">Top</p>
-                <p className="text-[10px] text-muted-foreground">Of results</p>
+                <Crown className="w-5 h-5 mx-auto mb-1 text-gold" />
+                <p className="text-sm font-bold text-foreground">Gold</p>
+                <p className="text-[10px] text-muted-foreground">Pinned + badge</p>
               </div>
               <div className="p-3 rounded-xl bg-card card-shadow text-center">
-                <Star className="w-5 h-5 mx-auto mb-1 text-gold" />
-                <p className="text-lg font-bold text-foreground">⭐</p>
-                <p className="text-[10px] text-muted-foreground">Featured badge</p>
+                <Sparkles className="w-5 h-5 mx-auto mb-1 text-destructive" />
+                <p className="text-sm font-bold text-foreground">Hot Deal</p>
+                <p className="text-[10px] text-muted-foreground">Area highlight</p>
               </div>
             </div>
 
@@ -123,7 +150,7 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
             <div className="space-y-2">
               {loading && <p className="text-xs text-muted-foreground">Loading your listings…</p>}
               {!loading && myListings.length === 0 && (
-                <p className="text-xs text-muted-foreground p-4 rounded-2xl bg-card text-center">You have no active listings to boost yet. Publish a listing first.</p>
+                <p className="text-xs text-muted-foreground p-4 rounded-2xl bg-card text-center">{`You have no active ${itemWord}s to boost yet. Publish one first.`}</p>
               )}
               {myListings.map((listing) => (
                 <button
@@ -180,7 +207,7 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
                 >
                   {plan.popular && (
                     <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-accent text-[9px] font-bold text-white uppercase tracking-wider">
-                      ⭐ Best Value
+                      ⭐ Most popular
                     </div>
                   )}
 
@@ -194,7 +221,7 @@ const BoostListingFlow = ({ onBack }: BoostListingFlowProps) => {
                         {selectedBoost === i && <Check className="w-3 h-3 text-white" />}
                       </div>
                       <div>
-                        <h3 className="text-base font-bold text-foreground">{plan.name}</h3>
+                        <h3 className="text-base font-bold text-foreground">{plan.kind === "silver" ? "🥈 " : plan.kind === "gold" ? "🥇 " : "🔥 "}{plan.name}</h3>
                         <p className="text-[11px] text-muted-foreground">{plan.duration}</p>
                       </div>
                     </div>

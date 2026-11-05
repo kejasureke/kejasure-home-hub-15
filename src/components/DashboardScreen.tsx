@@ -8,6 +8,7 @@ import { useKYCStatus } from "@/hooks/useKYCStatus";
 import { Eye, Users, MessageCircle, Calendar, Zap, Plus, TrendingUp, Crown, ArrowLeft, Edit3, Trash2, CheckCircle2, X, Clock, MapPin } from "lucide-react";
 import MpesaPaymentFlow from "./MpesaPaymentFlow";
 import BoostProcessingOverlay from "./BoostProcessingOverlay";
+import BoostListingFlow from "./BoostListingFlow";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 import LocalHomeManager from "./listing/LocalHomeManager";
@@ -140,31 +141,7 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
           onClose={() => setShowPayment(false)}
         />
       )}
-      {showBoost && (
-        <div className="fixed inset-0 z-[70] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={() => setShowBoost(false)}>
-          <div className="w-full max-w-lg mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">⚡ Boost Your Listings</h3>
-              <button onClick={() => setShowBoost(false)}><X className="w-5 h-5 text-muted-foreground" /></button>
-            </div>
-            <div className="space-y-3">
-              {[
-                { name: "3-Day Boost", price: "KES 300", desc: "3x more views" },
-                { name: "7-Day Boost", price: "KES 600", desc: "5x more views + badge" },
-                { name: "30-Day Boost", price: "KES 1,500", desc: "10x views + featured" },
-              ].map((b) => (
-                <button key={b.name} onClick={() => { setShowBoost(false); setBoostProcessing(b.name); toast.success("Boost selected!", { description: `${b.name} — ${b.desc}` }); }} className="w-full flex items-center justify-between p-4 rounded-2xl bg-secondary active:scale-[0.98] transition-transform">
-                  <div>
-                    <p className="text-sm font-semibold text-left">{b.name}</p>
-                    <p className="text-xs text-muted-foreground">{b.desc}</p>
-                  </div>
-                  <span className="text-sm font-bold text-primary">{b.price}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      {showBoost && <BoostListingFlow onBack={() => setShowBoost(false)} role="landlord" />}
       {/* Header */}
       <div className="gradient-trust px-4 pt-safe pb-8">
         <div className="flex items-center gap-3 mb-5">
