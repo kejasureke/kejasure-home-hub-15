@@ -39,7 +39,7 @@ const CaretakerCard = ({ property }: { property: Property }) => {
   }, [user?.id, property.id, hasActivePlan, accountListing]);
   const c = getCaretaker(property);
   if (!c) return null;
-  const unlocked = !!accountListing && acceptedFor === accountListing && canRevealContact(hasActivePlan, "accepted");
+  const unlocked = !!accountListing && acceptedFor === accountListing && canRevealContact("accepted");
 
   if (!hasActivePlan) return <div className="mb-5"><p className="text-sm font-semibold mb-2">{translate("Caretaker contact")}</p><PaidAccessNotice loading={loading} /></div>;
 

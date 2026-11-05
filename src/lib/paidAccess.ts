@@ -10,6 +10,7 @@ export function isActiveSubscription(subscription: SubscriptionWindow, now = Dat
   return subscription.status === "active" && start <= now && end > now;
 }
 
-export function canRevealContact(hasActivePlan: boolean, bookingStatus?: string): boolean {
-  return hasActivePlan && (bookingStatus === "accepted" || bookingStatus === "completed");
+/** Tenants are free; contacts unlock only after the provider accepts the booking. */
+export function canRevealContact(bookingStatus?: string): boolean {
+  return (bookingStatus === "accepted" || bookingStatus === "completed");
 }

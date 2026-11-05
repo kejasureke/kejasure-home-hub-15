@@ -241,7 +241,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
 
                   {/* Actions */}
                   {b.status === "accepted" && !hasActivePlan && <div className="px-3 pb-3"><PaidAccessNotice loading={planLoading} /></div>}
-                  {canRevealContact(hasActivePlan, b.status) && b.status === "accepted" && (
+                  {canRevealContact(b.status) && b.status === "accepted" && (
                     <div className="px-3 pb-3 flex gap-2">
                       {/* Phone-only booking records are not proof of provider acceptance. */}
                       <button

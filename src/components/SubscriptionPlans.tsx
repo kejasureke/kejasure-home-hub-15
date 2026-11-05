@@ -231,6 +231,24 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
     current: p.current,
   }));
 
+  if (label === "Tenant") {
+    return (
+      <div className={`fixed inset-0 z-[60] bg-background overflow-y-auto overscroll-contain ${closing ? "animate-slide-down" : "animate-slide-up"}`}>
+        <div className="sticky top-0 z-20 gradient-premium px-4 pt-safe-compact pb-3 flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={triggerClose} aria-label={translate("Back")} className="text-accent-foreground shrink-0">
+            <ArrowLeft className="w-5 h-5 text-accent-foreground" />
+          </Button>
+          <h1 className="text-lg font-bold text-accent-foreground">{translate("Subscription Plans")}</h1>
+        </div>
+        <div className="px-6 py-12 text-center">
+          <Crown className="w-12 h-12 text-primary mx-auto mb-4" />
+          <h2 className="text-xl font-extrabold mb-2">{translate("KejaSure is free for tenants")}</h2>
+          <p className="text-sm text-muted-foreground">{translate("Browse, chat and request viewings at no cost. Contacts unlock once your booking is accepted.")}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (showPayment) {
     return (
       <MpesaPaymentFlow

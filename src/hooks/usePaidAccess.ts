@@ -48,7 +48,8 @@ export function usePaidAccess() {
   }, [snapshot, now]);
 
   return {
-    hasActivePlan: !!user && subscriptions.some((s) => isActiveSubscription(s, now)),
+    // Tenants use KejaSure free: any signed-in account can book and chat.
+    hasActivePlan: !!user,
     activePlan: subscriptions.find((s) => isActiveSubscription(s, now))?.subscription_plans?.tier ?? null,
     loading: authLoading || (!!user && snapshot?.userId !== user.id),
   };
