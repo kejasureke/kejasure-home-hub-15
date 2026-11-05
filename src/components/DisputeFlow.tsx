@@ -314,7 +314,7 @@ const DisputeFlow = ({ onClose, role }: DisputeFlowProps) => {
       </div>
 
       <div className="flex gap-2 mb-5">
-        <div className={`flex-1 h-1 rounded-full ${step !== "details" ? "bg-primary" : "bg-primary"}`} />
+        <div className="flex-1 h-1 rounded-full bg-primary" />
         <div className={`flex-1 h-1 rounded-full ${step === "booking" || step === "details" ? "bg-primary" : "bg-muted"}`} />
         <div className={`flex-1 h-1 rounded-full ${step === "details" ? "bg-primary" : "bg-muted"}`} />
       </div>
