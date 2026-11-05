@@ -105,7 +105,7 @@ const ProfileScreen = () => {
   if (showStayHost) return <StayHostDashboard onBack={() => setShowStayHost(false)} />;
   if (showServiceProvider) return <ServiceProviderDashboard onBack={() => setShowServiceProvider(false)} />;
   if (showAdmin) return <AdminPanel onBack={() => setShowAdmin(false)} />;
-  if (showDispute) return <DisputeFlow onClose={() => setShowDispute(false)} />;
+  if (showDispute) return <DisputeFlow onClose={() => setShowDispute(false)} role={role} />;
   if (showKYC) return <KYCVerificationFlow onClose={() => setShowKYC(false)} activeRole={role} />;
   if (showSettings) return <SettingsScreen onBack={() => setShowSettings(false)} />;
   if (showHelp) return <HelpSupportScreen onBack={() => setShowHelp(false)} />;
@@ -171,7 +171,7 @@ const ProfileScreen = () => {
     ...(!isTenant ? [{ icon: Zap, label: "Boost Listings", subtitle: "Get more visibility", action: () => setShowBoost(true) }] : []),
     ...(!isTenant ? [{ icon: ShieldCheck, label: "Verification", subtitle: isVerified ? "✓ ID verified" : "Verify your identity", action: () => setShowKYC(true) }] : []),
     { icon: MapPin, label: "Neighborhood Safety", subtitle: "Area scores & insights", action: () => setShowNeighborhood(true) },
-    { icon: Scale, label: "Disputes & Safety", subtitle: "Report issues & track disputes", action: () => setShowDispute(true) },
+    { icon: Scale, label: "Disputes & Safety", subtitle: isTenant ? "Report a viewing problem or unsafe home" : "Report tenant problems & track disputes", action: () => setShowDispute(true) },
     { icon: Search, label: "Saved Searches", subtitle: "Manage alerts & filters", action: () => setShowSavedSearches(true) },
     { icon: Star, label: isTenant ? "Write a Review" : "Reviews & Ratings", subtitle: isTenant ? "Rate a home or provider you've visited" : "View & write reviews", action: () => setShowReviews(true) },
     { icon: Bell, label: "Notifications", subtitle: "Manage alerts", action: () => setShowNotifications(true) },

@@ -360,8 +360,13 @@ export const trustApi = {
       opener_id: user.id,
       category,
       description: description ?? null,
-    });
+    }).select().single();
   },
+  // Every dispute this account opened, with the booking and home it refers to.
+  disputes: () =>
+    supabase.from("disputes")
+      .select("id, category, description, status, resolution, created_at, bookings(type, status, listings(title, estate))")
+      .order("created_at", { ascending: false }),
 };
 
 // ---------- Storage ----------
