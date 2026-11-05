@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { ArrowLeft, ShieldAlert, ShieldCheck, ShieldQuestion, ClipboardPaste, Search } from "lucide-react";
 import { useState } from "react";
 import { useOverlayClose } from "@/hooks/useOverlayClose";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { haptic } from "@/lib/despia";
-import { properties } from "@/data/mockData";
+import { useLiveListings } from "@/lib/liveListings";
+import { properties as sampleProperties } from "@/data/mockData";
 import { getScamRiskScore } from "@/utils/scamDetection";
 
 // Numbers reported by the community (sample data until reports are wired up)
@@ -27,6 +29,8 @@ type Result =
   | { kind: "unknown" };
 
 const ScamCheckScreen = ({ onBack }: { onBack: () => void }) => {
+  const { liveListings } = useLiveListings();
+  const properties = useMemo(() => [...liveListings, ...sampleProperties], [liveListings]);
   const { closing, triggerClose } = useOverlayClose(onBack);
   useHardwareBack(true, triggerClose);
   const [input, setInput] = useState("");

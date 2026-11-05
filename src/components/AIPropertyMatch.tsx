@@ -1,6 +1,7 @@
 import { ArrowLeft, Sparkles, Send, MapPin, Star, Bed, Bath, TrendingUp, Lightbulb, Package } from "lucide-react";
 import { useState } from "react";
-import { properties, serviceProviders } from "@/data/mockData";
+import { useLiveListings } from "@/lib/liveListings";
+import { properties as sampleProperties, serviceProviders } from "@/data/mockData";
 import type { Property } from "@/data/mockData";
 
 interface Props {
@@ -55,7 +56,7 @@ const parseQuery = (query: string) => {
   return { bedrooms, maxPrice, minPrice, location, wantsFurnished, wantsPets, amenityKeywords, isShortStay, wantsCorporate };
 };
 
-const matchProperties = (query: string): { matches: MatchResult[]; recommendations: Recommendation[] } => {
+const matchProperties = (query: string, properties: typeof sampleProperties): { matches: MatchResult[]; recommendations: Recommendation[] } => {
   const parsed = parseQuery(query);
   const scored: MatchResult[] = [];
 
@@ -165,6 +166,8 @@ const suggestedQueries = [
 ];
 
 const AIPropertyMatch = ({ onBack, onSelectProperty }: Props) => {
+  const { liveListings } = useLiveListings();
+  const allHomes = [...liveListings, ...sampleProperties];
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<{ matches: MatchResult[]; recommendations: Recommendation[] } | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -179,7 +182,7 @@ const AIPropertyMatch = ({ onBack, onSelectProperty }: Props) => {
 
     // Simulate AI thinking time
     setTimeout(() => {
-      const result = matchProperties(q);
+      const result = matchProperties(q, allHomes);
       setResults(result);
       setIsSearching(false);
     }, 800);

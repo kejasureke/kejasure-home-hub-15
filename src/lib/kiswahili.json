@@ -773,5 +773,12 @@
   "3 viewings already pending": "Maombi 3 ya kutazama yanasubiri majibu",
   "Wait for a reply or cancel a pending viewing in My Bookings before requesting another.": "Subiri jibu au ghairi ombi linalosubiri katika Nafasi Zangu kabla ya kuomba jingine.",
   "Back to listing": "Rudi kwenye tangazo",
-  "Pending viewings": "Maombi ya kutazama yanayosubiri"
+  "Pending viewings": "Maombi ya kutazama yanayosubiri",
+  "Sample listing": "Tangazo la mfano",
+  "This is an example home. Requests open on live homes posted by landlords.": "Hii ni nyumba ya mfano. Maombi yanapatikana kwa nyumba halisi zilizowekwa na wenye nyumba.",
+  "Listing published": "Tangazo limechapishwa",
+  "Renters can now see this home and send viewing requests.": "Wapangaji sasa wanaweza kuona nyumba hii na kutuma maombi ya kutazama.",
+  "Publishing…": "Inachapisha…",
+  "Publish listing": "Chapisha tangazo",
+  "Couldn't publish your listing.": "Imeshindwa kuchapisha tangazo lako."
 }

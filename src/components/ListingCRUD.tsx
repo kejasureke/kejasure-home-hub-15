@@ -14,6 +14,7 @@ import { homeDetails, saveHomeDetails, saveLocalHome, type HomeDetails } from "@
 import HomeDetailsEditor from "./listing/HomeDetailsEditor";
 import { translate as t, useLanguage } from "@/lib/language";
 import { toast } from "sonner";
+import { publishListing, isLiveListingId } from "@/lib/liveListings";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
 
@@ -584,11 +585,30 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   const captionedCount = Object.values(photoCaptions).filter((c) => c && c.trim()).length;
 
-  const handleSubmit = () => {
-    const listingId = (editData as any)?.id ?? `new_${Date.now()}`;
+  const [publishing, setPublishing] = useState(false);
+  const [published, setPublished] = useState(false);
+  const handleSubmit = async () => {
+    if (publishing) return;
+    let listingId = (editData as any)?.id ?? `new_${Date.now()}`;
+    if (type !== "service") {
+      setPublishing(true);
+      const res = await publishListing({
+        existingId: (editData as any)?.id,
+        segment: form.type === "shortstay" ? "short_stay" : form.type === "commercial" ? "commercial" : form.type === "corporate" ? "corporate" : "rental",
+        title: form.title, description: form.description, price: Number(form.price) || 0,
+        priceUnit: form.type === "shortstay" ? "night" : "month",
+        bedrooms: form.bedrooms, bathrooms: form.bathrooms, county: form.county, subcounty: form.subcounty, estate: form.estate,
+        lat: gpsPin?.lat, lng: gpsPin?.lng, amenities: form.amenities,
+        rules: { furnished: form.furnished, petFriendly: extraDetails.pets === "yes", homeDetails: extraDetails },
+        photos: form.photos,
+      });
+      setPublishing(false);
+      if (res.id) { listingId = res.id; setPublished(true); }
+      else toast.error(res.error || t("Couldn't publish your listing."));
+    }
     try {
       saveHomeDetails(listingId, { ...extraDetails, deposit: form.deposit === "" ? undefined : Math.max(0, Number(form.deposit)), moveInDate: extraDetails.moveInDate || form.moveInDate });
-      if (type !== "service") saveLocalHome({
+      if (type !== "service" && !isLiveListingId(listingId)) saveLocalHome({
         id: listingId, title: form.title, description: form.description,
         type: form.type === "shortstay" ? "shortstay" : form.type === "commercial" ? "commercial" : "rental", corporate: form.type === "corporate",
         county: form.county, subcounty: form.subcounty, ward: "", estate: form.estate,
@@ -607,7 +627,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
         localStorage.setItem("kejasure_caretakers", JSON.stringify(all));
       } catch {}
     }
-    if (!editData && type !== "service") {
+    if (!editData && type !== "service" && !isLiveListingId(listingId)) {
       notifyNewListing({
         title: form.title || "New listing",
         type: form.type,
@@ -631,10 +651,10 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
           <Check className="w-10 h-10 text-trust" />
         </div>
         <h2 className="text-xl font-bold text-foreground mb-2">
-          {t("Listing saved on this phone")}
+          {published ? t("Listing published") : t("Listing saved on this phone")}
         </h2>
         <p className="text-sm text-muted-foreground text-center">
-          {t("These details are not published to other users yet.")}
+          {published ? t("Renters can now see this home and send viewing requests.") : t("These details are not published to other users yet.")}
         </p>
       </div>
     );
@@ -1684,9 +1704,10 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
         ) : (
           <button
             onClick={handleSubmit}
-            className="flex-1 py-3 rounded-xl bg-trust text-white text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+            disabled={publishing}
+            className="disabled:opacity-60 flex-1 py-3 rounded-xl bg-trust text-white text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           >
-            <Check className="w-4 h-4" /> {t("Save on this phone")}
+            <Check className="w-4 h-4" /> {publishing ? t("Publishing…") : type === "service" ? t("Save on this phone") : t("Publish listing")}
           </button>
         )}
       </div>

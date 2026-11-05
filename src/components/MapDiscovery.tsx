@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ArrowLeft, Navigation, Crosshair, CircleOff, MapPin, Settings as SettingsIcon, AlertTriangle } from "lucide-react";
-import { properties, serviceProviders } from "@/data/mockData";
+import { useLiveListings } from "@/lib/liveListings";
+import { properties as sampleProperties, serviceProviders } from "@/data/mockData";
 import { useMapPan } from "@/hooks/useMapPan";
 import MapPins, { type Pin, type PinType } from "./map/MapPins";
 import SelectedCard from "./map/SelectedCard";
@@ -31,6 +33,8 @@ const MAP_W = 390;
 const MAP_H = 420;
 
 const MapDiscovery = ({ onBack, onSelectProperty }: MapDiscoveryProps) => {
+  const { liveListings } = useLiveListings();
+  const properties = useMemo(() => [...liveListings, ...sampleProperties], [liveListings]);
   const [selectedPin, setSelectedPin] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "rentals" | "shortstays" | "services">("all");
   const [showHereTooltip, setShowHereTooltip] = useState(false);

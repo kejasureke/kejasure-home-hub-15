@@ -3,7 +3,8 @@ import { useState, useMemo, useEffect } from "react";
 import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints, Volume2, Bus, GraduationCap, Cross, ShoppingBag, TreePine, Wifi, ChevronDown, ChevronUp, Briefcase, Store, Warehouse, Hotel, Wrench, Truck, Sparkles, Star, Palmtree, Plane, SlidersHorizontal, X } from "lucide-react";
 import { haptic } from "@/lib/despia";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
-import { properties, serviceProviders } from "@/data/mockData";
+import { useLiveListings } from "@/lib/liveListings";
+import { properties as sampleProperties, serviceProviders } from "@/data/mockData";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
 import PropertyCard from "./PropertyCard";
@@ -25,7 +26,7 @@ const segmentMatchers: Record<Segment, (p: Property) => boolean> = {
 interface Category {
   label: string;
   icon: typeof Bed;
-  filter: (p: typeof properties[number]) => boolean;
+  filter: (p: typeof sampleProperties[number]) => boolean;
   color: string;
 }
 
@@ -108,6 +109,8 @@ interface ExploreScreenProps {
 
 const EXPLORE_SEGMENT_KEY = "kejasure_explore_segment";
 const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
+  const { liveListings } = useLiveListings();
+  const properties = useMemo(() => [...liveListings, ...sampleProperties], [liveListings]);
   useLanguage();
   const [segment, setSegmentState] = useState<Segment>(() => {
     try {
@@ -156,7 +159,7 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
 
   const segmentProperties = useMemo(
     () => properties.filter(segmentMatchers[segment]),
-    [segment]
+    [segment, properties]
   );
 
   const filteredProperties = useMemo(() => {

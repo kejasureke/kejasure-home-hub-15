@@ -20,6 +20,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
+import { useLiveListings } from "@/lib/liveListings";
 import { freshAvailability, homeDetails, useHouseHunting, useLowData, localHomes } from "@/lib/houseHunting";
 import ViewingNotebook from "./listing/ViewingNotebook";
 import { Button } from "@/components/ui/button";
@@ -71,7 +72,8 @@ const GreetingName = () => {
 const HomeFeed = () => {
   useLanguage();
   const detailsVersion = useHouseHunting();
-  const properties = useMemo(() => [...localHomes(), ...sampleProperties], [detailsVersion]);
+  const { liveListings } = useLiveListings();
+  const properties = useMemo(() => [...liveListings, ...localHomes(), ...sampleProperties], [detailsVersion, liveListings]);
   const lowData = useLowData();
   const [freshOnly, setFreshOnly] = useState(false);
   const [stepFreeOnly, setStepFreeOnly] = useState(false);

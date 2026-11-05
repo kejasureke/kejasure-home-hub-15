@@ -9,6 +9,7 @@ import { haptic } from "@/lib/despia";
 import Confetti from "./Confetti";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
 import PaidAccessNotice from "./PaidAccessNotice";
+import { isLiveListingId } from "@/lib/liveListings";
 import { canRequestViewing, pendingViewingCount, MAX_PENDING_VIEWINGS } from "@/lib/viewingLimits";
 import { translate, useLanguage } from "@/lib/language";
 import { Button } from "@/components/ui/button";
@@ -84,7 +85,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
     ? !!selectedDate && !!checkOut && nights > 0 && guests > 0
     : !!selectedDate && !!selectedTime;
 
-  const isLiveListing = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(property.id);
+  const isLiveListing = isLiveListingId(property.id);
 
   // Follow the real booking status so the provider's reply shows up here.
   useEffect(() => {
@@ -170,7 +171,13 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
         </div>
 
         <div className="px-6 pb-6">
-          {!hasActivePlan ? <PaidAccessNotice loading={planLoading} /> : viewingLimitReached && (step === "select" || step === "confirm") ? (
+          {!isLiveListing ? (
+            <div className="py-6 space-y-4">
+              <h4 className="text-lg font-bold">{translate("Sample listing")}</h4>
+              <p className="text-sm text-muted-foreground">{translate("This is an example home. Requests open on live homes posted by landlords.")}</p>
+              <Button className="w-full" onClick={onClose}>{translate("Back to listing")}</Button>
+            </div>
+          ) : !hasActivePlan ? <PaidAccessNotice loading={planLoading} /> : viewingLimitReached && (step === "select" || step === "confirm") ? (
             <div className="py-6 space-y-4">
               <h4 className="text-lg font-bold">{translate("3 viewings already pending")}</h4>
               <p className="text-sm text-muted-foreground">{translate("Wait for a reply or cancel a pending viewing in My Bookings before requesting another.")}</p>
