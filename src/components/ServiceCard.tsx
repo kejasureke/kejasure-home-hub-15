@@ -25,10 +25,10 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
 
   return (
     <>
-      <div className="bg-card rounded-2xl card-shadow p-4 transition-all duration-300 hover:card-shadow-hover animate-fade-in relative">
+      <div className={`bg-card rounded-2xl card-shadow p-4 transition-all duration-300 hover:card-shadow-hover animate-fade-in relative ${provider.boostKind === "gold" ? "ring-2 ring-gold" : provider.boostKind === "hotdeal" ? "ring-2 ring-destructive/60" : ""}`}>
         {provider.boosted && (
-          <div className="absolute -top-2 right-4 px-2.5 py-0.5 rounded-full gradient-premium text-[10px] font-bold text-accent-foreground">
-            ⚡ Boosted
+          <div className={`absolute -top-2 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${provider.boostKind === "hotdeal" ? "bg-destructive text-destructive-foreground" : provider.boostKind === "silver" ? "bg-secondary text-foreground" : "gradient-premium text-accent-foreground"}`}>
+            {provider.boostKind === "hotdeal" ? "🔥 Hot Offer" : provider.boostKind === "silver" ? "🥈 Just bumped" : "⭐ Featured Service"}
           </div>
         )}
 

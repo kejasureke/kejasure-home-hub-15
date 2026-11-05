@@ -20,7 +20,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
-import { useLiveListings } from "@/lib/liveListings";
+import { useLiveListings, useLiveServices } from "@/lib/liveListings";
 import { freshAvailability, homeDetails, useHouseHunting, useLowData, localHomes } from "@/lib/houseHunting";
 import ViewingNotebook from "./listing/ViewingNotebook";
 import { Button } from "@/components/ui/button";
@@ -73,6 +73,8 @@ const HomeFeed = () => {
   useLanguage();
   const detailsVersion = useHouseHunting();
   const { liveListings } = useLiveListings();
+  const liveServices = useLiveServices();
+  const allServices = [...liveServices, ...serviceProviders];
   const properties = useMemo(() => [...liveListings, ...localHomes(), ...sampleProperties], [detailsVersion, liveListings]);
   const lowData = useLowData();
   const [freshOnly, setFreshOnly] = useState(false);
@@ -221,11 +223,13 @@ const HomeFeed = () => {
 
   const filteredServices = (() => {
     let list = serviceCategory === "All"
-      ? [...serviceProviders]
-      : serviceProviders.filter((s) => s.category === serviceCategory);
+      ? [...allServices]
+      : allServices.filter((s) => s.category === serviceCategory);
     if (serviceSort === "rating") list.sort((a, b) => b.rating - a.rating);
     else if (serviceSort === "reviews") list.sort((a, b) => b.reviews - a.reviews);
-    return list;
+    // Paid boosts: Gold pinned first, then Hot Offer, then Silver bump
+    const rank = (s: typeof list[number]) => s.boostKind === "gold" ? 3 : s.boostKind === "hotdeal" ? 2 : s.boostKind === "silver" ? 1 : 0;
+    return list.map((s, i) => ({ s, i })).sort((x, y) => rank(y.s) - rank(x.s) || x.i - y.i).map((x) => x.s);
   })();
 
   const handleSelectProperty = (id: string) => {
@@ -877,7 +881,7 @@ const HomeFeed = () => {
                   <Wrench className="w-4 h-4 text-accent" />
                   {translate("Nearby Services")} </h2>
                 <div className="flex gap-3 overflow-x-auto pb-2">
-                  {serviceProviders.slice(0, 4).map((sp) => (
+                  {allServices.slice(0, 4).map((sp) => (
                     <div
                       key={sp.id}
                       className="shrink-0 w-[140px] p-3 bg-card rounded-2xl card-shadow text-center"

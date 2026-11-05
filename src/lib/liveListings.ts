@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Property } from "@/data/mockData";
+import type { Property, ServiceProvider } from "@/data/mockData";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** A home is "live" (can receive real requests) only when it exists as a published account listing. */
@@ -131,4 +131,51 @@ export async function publishListing(input: {
   }
   refreshLiveListings();
   return { id };
+}
+
+/* ---------- Live services (provider-published, segment = service) ---------- */
+const SVC_EVENT = "live-services-updated";
+let svcCache: ServiceProvider[] | null = null;
+
+async function loadServices(): Promise<ServiceProvider[]> {
+  const { data } = await supabase
+    .from("listings")
+    .select("id, title, description, subcategory, price_kes, county, estate, lat, lng, boost_expires_at, boost_kind, verification")
+    .eq("status", "active")
+    .eq("segment", "service")
+    .order("boost_expires_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .limit(100);
+  return (data ?? []).map((l: any): ServiceProvider => {
+    const boostedNow = !!l.boost_expires_at && new Date(l.boost_expires_at) > new Date();
+    return {
+      id: l.id,
+      name: l.title,
+      category: l.subcategory || "Services",
+      rating: 0,
+      reviews: 0,
+      responseSpeed: "—",
+      areaServed: [l.estate, l.county].filter(Boolean).join(", ") || "Kenya",
+      tier: "Basic",
+      boosted: boostedNow,
+      boostKind: boostedNow ? (l.boost_kind ?? "silver") : undefined,
+      avatar: "🛠️",
+      description: l.description ?? "",
+      price: Number(l.price_kes) ? `From KES ${Number(l.price_kes).toLocaleString()}` : undefined,
+      lat: Number(l.lat) || 0,
+      lng: Number(l.lng) || 0,
+    } as ServiceProvider;
+  });
+}
+
+/** Real services published by provider accounts; boosted first. */
+export function useLiveServices() {
+  const [list, setList] = useState<ServiceProvider[]>(svcCache ?? []);
+  useEffect(() => {
+    const sync = () => setList(svcCache ?? []);
+    window.addEventListener(SVC_EVENT, sync);
+    loadServices().then((r) => { svcCache = r; window.dispatchEvent(new Event(SVC_EVENT)); });
+    return () => window.removeEventListener(SVC_EVENT, sync);
+  }, []);
+  return list;
 }

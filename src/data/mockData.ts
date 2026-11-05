@@ -68,6 +68,7 @@ export interface ServiceProvider {
   areaServed: string;
   tier: "Basic" | "Pro" | "Premium";
   boosted: boolean;
+  boostKind?: "silver" | "gold" | "hotdeal";
   avatar: string;
   description: string;
   price?: string;
