@@ -253,7 +253,7 @@ const ProfileScreen = () => {
           ) : hasName ? (
             <div className="flex items-center gap-1.5 max-w-full">
               <h2 className="text-lg font-bold truncate">{displayName}</h2>
-              {!isTenant && <VerificationBadge isVerified={isVerified} variant="dark" />}
+              {!isTenant && <VerificationBadge isVerified={isVerified} role={role} variant="dark" />}
             </div>
           ) : (
             <div>

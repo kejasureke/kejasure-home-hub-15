@@ -1,10 +1,13 @@
-import { ShieldCheck, ShieldAlert, X, CheckCircle2, Circle } from "lucide-react";
+import { ShieldCheck, ShieldAlert, X, CheckCircle2, Circle, Building2 } from "lucide-react";
+import { getRegistrationType } from "@/lib/trust";
 import { useState } from "react";
 import { haptic } from "@/lib/despia";
 
 interface VerificationBadgeProps {
   isVerified: boolean;
   variant?: "light" | "dark";
+  /** Provider role — decides whether the badge reads as Individual or Business. */
+  role?: string;
   /** Verification detail flags for the popover breakdown. */
   details?: {
     phone?: boolean;
@@ -15,10 +18,19 @@ interface VerificationBadgeProps {
   };
 }
 
-const VerificationBadge = ({ isVerified, variant = "light", details }: VerificationBadgeProps) => {
+const VerificationBadge = ({ isVerified, variant = "light", details, role }: VerificationBadgeProps) => {
   const [open, setOpen] = useState(false);
+  const isBusiness = !!role && getRegistrationType(role) === "business";
+  const Icon = isBusiness ? Building2 : ShieldCheck;
 
-  const rows = isVerified
+  const rows = isBusiness
+    ? [
+        { label: "Phone number verified", ok: details?.phone ?? true },
+        { label: "Business certificate / CR12 checked", ok: isVerified },
+        { label: "Director selfie matched", ok: isVerified },
+        { label: "Listing photos checked for reuse", ok: details?.photos ?? isVerified },
+      ]
+    : isVerified
     ? [
         { label: "Phone number verified", ok: details?.phone ?? true },
         { label: "Government ID verified", ok: details?.id ?? true },
@@ -44,10 +56,12 @@ const VerificationBadge = ({ isVerified, variant = "light", details }: Verificat
       {isVerified ? (
         <button
           onClick={onTap}
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-trust/20 text-[10px] font-bold text-trust active:scale-95 transition-transform"
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold active:scale-95 transition-transform ${
+            isBusiness ? "bg-gold/20 text-gold border border-gold/40" : "bg-trust/20 text-trust"
+          }`}
         >
-          <ShieldCheck className="w-3 h-3" />
-          Verified
+          <Icon className="w-3 h-3" />
+          {isBusiness ? "Verified Business" : "ID Verified"}
         </button>
       ) : (
         <button
@@ -77,12 +91,12 @@ const VerificationBadge = ({ isVerified, variant = "light", details }: Verificat
             </div>
             <div className="px-5 pt-3 pb-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isVerified ? "bg-trust/15 text-trust" : "bg-amber-500/15 text-amber-500"}`}>
-                  {isVerified ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isVerified ? (isBusiness ? "bg-gold/15 text-gold" : "bg-trust/15 text-trust") : "bg-amber-500/15 text-amber-500"}`}>
+                  {isVerified ? <Icon className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground">{isVerified ? "Verified by KejaSure" : "Not yet verified"}</p>
-                  <p className="text-[11px] text-muted-foreground">What we checked</p>
+                  <p className="text-sm font-bold text-foreground">{isVerified ? (isBusiness ? "Verified Business" : "Verified Individual") : "Not yet verified"}</p>
+                  <p className="text-[11px] text-muted-foreground">{role ? (isBusiness ? "Registered business · " : "Individual · ") : ""}What we checked</p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="p-1 text-muted-foreground">

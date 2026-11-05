@@ -271,7 +271,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-semibold text-primary-foreground">KejaPrime Agency</h2>
-              <VerificationBadge isVerified={isVerified} variant="light" />
+              <VerificationBadge isVerified={isVerified} role="agency" variant="light" />
             </div>
             <p className="text-xs text-primary-foreground/70">Growth Plan · 4 agents</p>
           </div>

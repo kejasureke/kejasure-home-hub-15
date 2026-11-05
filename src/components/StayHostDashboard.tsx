@@ -160,7 +160,7 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-semibold text-accent-foreground">{me.name || "Your dashboard"}</h2>
-              <VerificationBadge isVerified={isVerified} variant="light" />
+              <VerificationBadge isVerified={isVerified} role="stayhost" variant="light" />
             </div>
             <p className="text-xs text-accent-foreground/70">Pro Host · 3 stays</p>
           </div>

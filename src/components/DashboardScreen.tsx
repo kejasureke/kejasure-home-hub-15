@@ -180,7 +180,7 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-semibold text-primary-foreground">{me.name || "Your dashboard"}</h2>
-              <VerificationBadge isVerified={isVerified} variant="light" />
+              <VerificationBadge isVerified={isVerified} role="landlord" variant="light" />
             </div>
             <p className="text-xs text-primary-foreground/70">Landlord · 4 listings</p>
           </div>
