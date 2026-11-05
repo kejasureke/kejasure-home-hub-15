@@ -17,6 +17,32 @@ export interface TrustState {
 
 const RECHECK_DAYS = 180;
 
+export type RegistrationType = "individual" | "business";
+
+/** How a provider registers. Agencies are always businesses; others choose. */
+export const getRegistrationType = (role: string): RegistrationType | null => {
+  if (role === "agency") return "business";
+  try {
+    const v = localStorage.getItem(`kejasure_kyc_entity_${role}`);
+    return v === "individual" || v === "business" ? v : null;
+  } catch {
+    return null;
+  }
+};
+
+export const setRegistrationType = (role: string, type: RegistrationType) => {
+  try {
+    localStorage.setItem(`kejasure_kyc_entity_${role}`, type);
+  } catch {
+    // ignore
+  }
+};
+
+/** Verification rungs that apply to this provider — individuals never see a business step and vice versa. */
+export const applicableRungs = (role: string): TrustRung[] =>
+  getRegistrationType(role) === "business" ? ["phone", "business", "pro"] : ["phone", "id", "pro"];
+
+
 export const getTrustState = (role: string): TrustState => {
   const read = (k: string) => {
     try {
@@ -32,7 +58,7 @@ export const getTrustState = (role: string): TrustState => {
 
   return {
     phone: true,
-    id: verified && (category === "individual" || category === "business"),
+    id: verified && category === "individual",
     business: verified && category === "business",
     pro: verified && completedJobs >= 5 && rating >= 4.5,
     lastCheck: read(`kejasure_kyc_checked_at_${role}`),

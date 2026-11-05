@@ -1,5 +1,5 @@
 import { Phone, BadgeCheck, Building2, Award, Lock, ChevronRight } from "lucide-react";
-import { getTrustState, type TrustState } from "@/lib/trust";
+import { getTrustState, applicableRungs, type TrustState } from "@/lib/trust";
 import { haptic } from "@/lib/despia";
 
 interface TrustLadderProps {
@@ -8,15 +8,17 @@ interface TrustLadderProps {
   compact?: boolean;
 }
 
-const rungs = [
+const allRungs = [
   { key: "phone" as const, icon: Phone, label: "Phone", desc: "Confirmed at sign-up" },
   { key: "id" as const, icon: BadgeCheck, label: "ID + Selfie", desc: "Government ID matched to your face" },
-  { key: "business" as const, icon: Building2, label: "Business", desc: "Company registration checked" },
+  { key: "business" as const, icon: Building2, label: "Business", desc: "Registration documents + director selfie checked" },
   { key: "pro" as const, icon: Award, label: "Trusted Pro", desc: "5+ completed connections, 4.5★ and above" },
 ];
 
 const TrustLadder = ({ role, onVerify, compact = false }: TrustLadderProps) => {
   const state: TrustState = getTrustState(role);
+  const allowed = applicableRungs(role);
+  const rungs = allRungs.filter((r) => allowed.includes(r.key));
   const earned = rungs.filter((r) => state[r.key]).length;
 
   return (
@@ -26,7 +28,7 @@ const TrustLadder = ({ role, onVerify, compact = false }: TrustLadderProps) => {
           <p className="text-xs font-semibold text-foreground">Trust level</p>
           <p className="text-[10px] text-muted-foreground">Each step makes people more likely to reply</p>
         </div>
-        <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-primary/10 text-primary">{earned}/4</span>
+        <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-primary/10 text-primary">{earned}/{rungs.length}</span>
       </div>
 
       <div className="flex items-center gap-1 mb-3">
@@ -54,7 +56,7 @@ const TrustLadder = ({ role, onVerify, compact = false }: TrustLadderProps) => {
         </div>
       )}
 
-      {onVerify && earned < 4 && (
+      {onVerify && earned < rungs.length && (
         <button
           onClick={() => { haptic("light"); onVerify(); }}
           className="w-full mt-3 py-2.5 rounded-xl gradient-trust text-primary-foreground text-xs font-bold flex items-center justify-center gap-1 active:scale-[0.98] transition-transform"

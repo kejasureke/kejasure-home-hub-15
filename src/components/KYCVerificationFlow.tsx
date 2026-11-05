@@ -5,6 +5,7 @@ import AIPhotoVerification from "./AIPhotoVerification";
 import { openCamera, haptic } from "@/lib/despia";
 import { submitSmileIdJob, waitForVerdict } from "@/lib/kyc/smileid";
 import { markLivenessChecked } from "@/lib/trust";
+import { setRegistrationType } from "@/lib/trust";
 
 
 interface KYCVerificationFlowProps {
@@ -176,8 +177,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
               <div className="w-16 h-16 rounded-2xl gradient-trust mx-auto flex items-center justify-center mb-3">
                 <ShieldCheck className="w-8 h-8 text-primary-foreground" />
               </div>
-              <h2 className="text-lg font-bold">Verify Your Identity</h2>
-              <p className="text-sm text-muted-foreground mt-1">Choose your verification type to get the trusted badge</p>
+              <h2 className="text-lg font-bold">{activeRole === "agency" ? "Verify your agency" : "Are you registering as an individual or a business?"}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{activeRole === "agency" ? "Agencies verify with company documents" : "You only complete the steps for what you choose"}</p>
             </div>
 
             {/* Phone status — already confirmed at signup */}
@@ -198,9 +199,10 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
             </div>
 
 
-            {/* Individual */}
+            {/* Individual — agencies always register as a business */}
+            {activeRole !== "agency" && (
             <button
-              onClick={() => { setVerificationCategory("individual"); setStep("doc_select"); }}
+              onClick={() => { setRegistrationType(activeRole, "individual"); setVerificationCategory("individual"); setStep("doc_select"); }}
               className="w-full text-left p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
             >
               <div className="flex items-center gap-3 mb-3">
@@ -209,7 +211,7 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 </div>
                 <div className="flex-1">
                   <h3 className="text-base font-bold">Individual</h3>
-                  <p className="text-xs text-muted-foreground">Landlords, stay hosts & service providers</p>
+                  <p className="text-xs text-muted-foreground">Registering in your own name</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
@@ -226,10 +228,11 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                 <span className={`text-[10px] font-semibold ${categoryBadgeConfig.individual.color}`}>{categoryBadgeConfig.individual.label}</span>
               </div>
             </button>
+            )}
 
             {/* Business / Agency */}
             <button
-              onClick={() => { setVerificationCategory("business"); setStep("doc_select"); }}
+              onClick={() => { setRegistrationType(activeRole, "business"); setVerificationCategory("business"); setStep("doc_select"); }}
               className="w-full text-left p-4 rounded-2xl border-2 border-border bg-card card-shadow active:scale-[0.98] transition-all"
             >
               <div className="flex items-center gap-3 mb-3">
@@ -237,8 +240,8 @@ const KYCVerificationFlow = ({ onClose, activeRole = "tenant" }: KYCVerification
                   <Building2 className="w-6 h-6 text-amber-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-base font-bold">Business / Agency</h3>
-                  <p className="text-xs text-muted-foreground">Registered companies & agencies</p>
+                  <h3 className="text-base font-bold">Business</h3>
+                  <p className="text-xs text-muted-foreground">Registered company or business name</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>

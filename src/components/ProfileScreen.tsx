@@ -24,6 +24,7 @@ import NeighborhoodSafety from "./NeighborhoodSafety";
 import BoostListingFlow from "./BoostListingFlow";
 import TrustLadder from "./TrustLadder";
 import ReVerifyBanner from "./ReVerifyBanner";
+import { getRegistrationType, getTrustState } from "@/lib/trust";
 
 import { useInAppNotifications } from "@/hooks/useInAppNotifications";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -184,13 +185,14 @@ const ProfileScreen = () => {
       {/* Profile header */}
       <div className="flex items-center gap-4 mb-6">
         {(() => {
-          // Tenants only need phone verification; other roles climb phone → ID → business.
+          // Tenants only need phone verification; providers verify as an individual (ID) or a business (registration docs), never both.
           const tiers = isTenant
             ? [{ key: "phone", label: "Phone", done: me.phoneVerified }]
             : [
                 { key: "phone", label: "Phone", done: me.phoneVerified },
-                { key: "id", label: "ID", done: isVerified },
-                { key: "biz", label: "Biz", done: localStorage.getItem(`kejasure_kyc_verified_biz_${role}`) === "true" },
+                getRegistrationType(role) === "business"
+                  ? { key: "biz", label: "Business", done: getTrustState(role).business }
+                  : { key: "id", label: "ID", done: isVerified },
               ];
           const completed = tiers.filter(t => t.done).length;
           const pct = completed / tiers.length;
