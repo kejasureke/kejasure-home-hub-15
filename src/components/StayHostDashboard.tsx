@@ -25,7 +25,7 @@ interface StayHostDashboardProps {
 
 const plans = [
   { name: "Free", price: 0, features: ["1 stay listing", "Standard placement"], current: true },
-  { name: "Pro", price: 450, features: ["10 listings", "Full calendar", "Booking analytics", "2 monthly boosts"], current: false },
+  { name: "Pro", price: 850, features: ["10 listings", "Full calendar", "Booking analytics", "2 monthly boosts"], current: false },
   { name: "Premium", price: 2450, features: ["Unlimited listings", "Corporate stays", "Smart pricing", "Featured stays", "5 monthly boosts"], current: false },
 ];
 

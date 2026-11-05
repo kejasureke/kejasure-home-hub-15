@@ -29,7 +29,7 @@ const stats = [
 
 const landlordPlans = [
   { name: "Free", price: 0, duration: "forever", features: ["1 active listing", "Standard placement"] },
-  { name: "Pro", price: 450, duration: "1 month", features: ["5 listings", "Basic analytics", "1 monthly boost"], popular: true },
+  { name: "Pro", price: 750, duration: "1 month", features: ["5 listings", "Basic analytics", "1 monthly boost"], popular: true },
   { name: "Premium", price: 1450, duration: "1 month", features: ["15 listings", "Commercial + corporate stays", "2 monthly boosts", "Full analytics"] },
 ];
 

@@ -51,7 +51,7 @@ const landlordPlans = [
   },
   {
     name: "Pro",
-    price: 450,
+    price: 750,
     duration: "/month",
     features: ["5 active listings", "Residential rentals", "Basic analytics", "Priority chat replies", "1 monthly boost"],
     notIncluded: ["Commercial premises", "Corporate stays"],
@@ -107,7 +107,7 @@ const stayHostPlans = [
   },
   {
     name: "Pro",
-    price: 450,
+    price: 850,
     duration: "/month",
     features: ["10 stay listings", "Short stays only", "Full calendar sync", "Priority chat", "Booking analytics", "2 monthly boosts"],
     notIncluded: ["Corporate stays", "Smart pricing"],
@@ -144,7 +144,7 @@ const serviceProviderPlans = [
   },
   {
     name: "Business",
-    price: 950,
+    price: 1500,
     duration: "/month",
     features: ["Unlimited service listings", "Team members", "CRM tools", "County analytics", "Featured profile", "Priority support"],
     notIncluded: [],

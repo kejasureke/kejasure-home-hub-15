@@ -57,7 +57,7 @@ const individualPlans = [
 ];
 
 const businessPlans = [
-  { name: "Business", price: 950, features: ["Unlimited service listings", "Team members", "CRM tools", "Featured profile"], current: false },
+  { name: "Business", price: 1500, features: ["Unlimited service listings", "Team members", "CRM tools", "Featured profile"], current: false },
 ];
 
 const stats = [
