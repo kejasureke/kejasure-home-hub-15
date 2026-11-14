@@ -400,6 +400,8 @@ const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
 // ─── Service Provider Setup ───
 const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: () => void }) => {
   const [step, setStep] = useState(0);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [type, setType] = useState("");
   const [category, setCategory] = useState("");
   const [otherServices, setOtherServices] = useState<string[]>([]);
@@ -410,6 +412,29 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
   const countyOpts = ALL_COUNTIES;
 
   const baseSteps = [
+    {
+      icon: User,
+      title: "What's your name?",
+      subtitle: "This is how your name appears in the app",
+      content: (
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">First Name</label>
+            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. John"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Last Name</label>
+            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="e.g. Kamau"
+              className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
+            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your ID. It cannot be changed after signup.</p>
+          </div>
+        </div>
+      ),
+      valid: firstName.trim().length >= 2 && lastName.trim().length >= 2,
+    },
     {
       icon: MapPin,
       title: "Service type",
@@ -509,9 +534,9 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
       content: (
         <div className="space-y-3">
           {[
-            { name: "Free", price: "Free", desc: "1 county, basic listing" },
-            { name: "Pro", price: "KES 800/mo", desc: "5 counties, priority booking" },
-            { name: "Premium", price: "KES 2,000/mo", desc: "All counties, featured, analytics" },
+            { name: "Free", price: "Free", desc: "1 listing, basic" },
+            { name: "Pro", price: "KES 300/mo", desc: "More listings, priority booking" },
+            { name: "Business", price: "KES 1,500/mo", desc: "All counties, featured, analytics" },
           ].map((p) => (
             <button
               key={p.name}
@@ -537,8 +562,12 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
 
   const handleComplete = async () => {
     try {
+      try { localStorage.setItem("kejasure_display_name", `${firstName} ${lastName}`.trim()); } catch {}
       await upsertProfile({
         role: "serviceprovider",
+        first_name: firstName || null,
+        last_name: lastName || null,
+        display_name: `${firstName} ${lastName}`.trim() || null,
         service_category: type || null,
         agency_name: category || null,
         preferred_counties: serviceCounties.length ? serviceCounties : null,
