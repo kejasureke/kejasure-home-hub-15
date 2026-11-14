@@ -4,6 +4,8 @@ import type { UserRole } from "./RoleSelection";
 import { toast } from "@/hooks/use-toast";
 import { upsertProfile } from "@/integrations/supabase/actions";
 import { kenyaCounties } from "@/data/kenyaCounties";
+import { translate } from "@/lib/language";
+import { OTHER_SERVICES, OTHER_SUBSERVICES, saveProviderServicePick } from "@/data/serviceCategories";
 
 const ALL_COUNTIES = kenyaCounties.map((c) => c.name);
 
@@ -400,10 +402,11 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
   const [step, setStep] = useState(0);
   const [type, setType] = useState("");
   const [category, setCategory] = useState("");
+  const [otherServices, setOtherServices] = useState<string[]>([]);
   const [serviceCounties, setServiceCounties] = useState<string[]>([]);
   const [plan, setPlan] = useState("");
 
-  const categories = ["Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers", "Security", "Painters", "Fumigators"];
+  const categories = ["Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers", "Security", "Painters", "Fumigators", OTHER_SERVICES];
   const countyOpts = ALL_COUNTIES;
 
   const baseSteps = [
@@ -434,13 +437,36 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
                   category === c ? "gradient-trust text-primary-foreground" : "bg-card border border-border text-foreground"
                 }`}
               >
-                {c}
+                {translate(c)}
               </button>
             ))}
           </div>
+          {category === OTHER_SERVICES && (
+            <div className="pt-2 animate-fade-in">
+              <p className="text-xs font-semibold text-foreground">{translate("Which services do you offer?")}</p>
+              <p className="text-[10px] text-muted-foreground mb-2">{translate("Pick all that apply")}</p>
+              <div className="flex flex-wrap gap-2">
+                {OTHER_SUBSERVICES.map((s) => {
+                  const on = otherServices.includes(s.value);
+                  return (
+                    <button
+                      key={s.value}
+                      aria-pressed={on}
+                      onClick={() => setOtherServices((p) => on ? p.filter((x) => x !== s.value) : [...p, s.value])}
+                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
+                        on ? "gradient-trust text-primary-foreground" : "bg-card border border-border text-foreground"
+                      }`}
+                    >
+                      <span>{s.icon}</span>{translate(s.value)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       ),
-      valid: !!type && !!category,
+      valid: !!type && !!category && (category !== OTHER_SERVICES || otherServices.length > 0),
     },
   ];
 
@@ -518,6 +544,7 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
         preferred_counties: serviceCounties.length ? serviceCounties : null,
         plan_name: plan || null,
       });
+      saveProviderServicePick(category, category === OTHER_SERVICES ? otherServices : []);
       onComplete();
     } catch (error) {
       console.error(error);

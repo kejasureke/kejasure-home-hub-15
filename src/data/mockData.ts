@@ -69,6 +69,8 @@ export interface ServiceProvider {
   tier: "Basic" | "Pro" | "Premium";
   boosted: boolean;
   boostKind?: "silver" | "gold" | "hotdeal";
+  /** For "Other Services" providers: the deliveries they offer (gas, water, food…). */
+  subServices?: string[];
   avatar: string;
   description: string;
   price?: string;

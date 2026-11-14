@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Property, ServiceProvider } from "@/data/mockData";
+import { OTHER_SERVICES, cleanSubServices } from "@/data/serviceCategories";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** A home is "live" (can receive real requests) only when it exists as a published account listing. */
@@ -140,7 +141,7 @@ let svcCache: ServiceProvider[] | null = null;
 async function loadServices(): Promise<ServiceProvider[]> {
   const { data } = await supabase
     .from("listings")
-    .select("id, title, description, subcategory, price_kes, county, estate, lat, lng, boost_expires_at, boost_kind, verification")
+    .select("id, title, description, subcategory, price_kes, county, estate, lat, lng, boost_expires_at, boost_kind, verification, rules")
     .eq("status", "active")
     .eq("segment", "service")
     .order("boost_expires_at", { ascending: false, nullsFirst: false })
@@ -152,6 +153,7 @@ async function loadServices(): Promise<ServiceProvider[]> {
       id: l.id,
       name: l.title,
       category: l.subcategory || "Services",
+      subServices: l.subcategory === OTHER_SERVICES ? cleanSubServices(l.rules?.otherServices) : undefined,
       rating: 0,
       reviews: 0,
       responseSpeed: "—",
@@ -159,7 +161,7 @@ async function loadServices(): Promise<ServiceProvider[]> {
       tier: "Basic",
       boosted: boostedNow,
       boostKind: boostedNow ? (l.boost_kind ?? "silver") : undefined,
-      avatar: "🛠️",
+      avatar: l.subcategory === OTHER_SERVICES ? "📦" : "🛠️",
       description: l.description ?? "",
       price: Number(l.price_kes) ? `From KES ${Number(l.price_kes).toLocaleString()}` : undefined,
       lat: Number(l.lat) || 0,

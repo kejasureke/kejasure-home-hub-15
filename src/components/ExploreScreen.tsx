@@ -1,9 +1,10 @@
 import { translate, useLanguage } from "@/lib/language";
 import { useState, useMemo, useEffect } from "react";
-import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints, Volume2, Bus, GraduationCap, Cross, ShoppingBag, TreePine, Wifi, ChevronDown, ChevronUp, Briefcase, Store, Warehouse, Hotel, Wrench, Truck, Sparkles, Star, Palmtree, Plane, SlidersHorizontal, X } from "lucide-react";
+import { Search, ArrowLeft, Bed, Home, Sofa, Car, Building2, DoorOpen, Castle, PawPrint, MapPin, Shield, Droplets, Zap, Footprints, Volume2, Bus, GraduationCap, Cross, ShoppingBag, TreePine, Wifi, ChevronDown, ChevronUp, Briefcase, Store, Warehouse, Hotel, Wrench, Truck, Sparkles, Star, Palmtree, Plane, SlidersHorizontal, X, Package } from "lucide-react";
 import { haptic } from "@/lib/despia";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
-import { useLiveListings } from "@/lib/liveListings";
+import { useLiveListings, useLiveServices } from "@/lib/liveListings";
+import { OTHER_SERVICES } from "@/data/serviceCategories";
 import { properties as sampleProperties, serviceProviders } from "@/data/mockData";
 import type { Property } from "@/data/mockData";
 import { neighborhoodProfiles } from "@/data/neighborhoodData";
@@ -101,6 +102,7 @@ const serviceCategories = [
   { label: "Electricians", icon: Zap, color: "bg-primary/10 text-primary" },
   { label: "Security", icon: Shield, color: "bg-trust/10 text-trust" },
   { label: "Painters", icon: Palmtree, color: "bg-accent/10 text-accent" },
+  { label: OTHER_SERVICES, icon: Package, color: "bg-trust/10 text-trust" },
 ];
 
 interface ExploreScreenProps {
@@ -190,8 +192,10 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
     return results;
   }, [segmentProperties, activeCategory, activePriceRange, activeArea, searchQuery]);
 
+  const liveServices = useLiveServices();
+  const allServices = useMemo(() => [...liveServices, ...serviceProviders], [liveServices]);
   const filteredServices = useMemo(() => {
-    let results = serviceProviders;
+    let results = allServices;
     if (activeServiceCategory) {
       results = results.filter((s) => s.category === activeServiceCategory);
     }
@@ -201,11 +205,12 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
         (s) =>
           s.name.toLowerCase().includes(q) ||
           s.category.toLowerCase().includes(q) ||
+          (s.subServices ?? []).some((x) => x.toLowerCase().includes(q)) ||
           s.areaServed.toLowerCase().includes(q)
       );
     }
     return results;
-  }, [activeServiceCategory, searchQuery]);
+  }, [allServices, activeServiceCategory, searchQuery]);
 
   const activeLabel = activeCategory?.label || activePriceRange?.label || activeArea || activeServiceCategory || "Search Results";
   const showingResults = activeCategory || activePriceRange || activeArea || activeServiceCategory || searchQuery;
@@ -307,7 +312,7 @@ const ExploreScreen = ({ initialSearch = "" }: ExploreScreenProps) => {
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {serviceCategories.map((cat) => {
                   const Icon = cat.icon;
-                  const count = serviceProviders.filter((s) => s.category === cat.label).length;
+                  const count = allServices.filter((s) => s.category === cat.label).length;
                   return (
                     <button
                       key={translate(cat.label)}

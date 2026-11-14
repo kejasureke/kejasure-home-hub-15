@@ -21,3 +21,6 @@
 - Use shared LegalContent for signup, Settings and public policy pages to prevent conflicting disclosures.
 - Public /privacy, /terms and /delete-account pages bypass onboarding and the desktop blocker so store reviewers and former users can access them without an account.
 - Deletion requests currently use the existing support email; do not present email initiation as completed account deletion or store-compliant automated deletion.
+
+## Services
+- Keep the "Other Services" group and its sub-services in the shared service-categories module and store a listing's picks in its rules, so signup, listing form and client filters never drift apart.

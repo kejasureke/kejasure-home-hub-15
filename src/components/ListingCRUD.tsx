@@ -15,6 +15,7 @@ import HomeDetailsEditor from "./listing/HomeDetailsEditor";
 import { translate as t, useLanguage } from "@/lib/language";
 import { toast } from "sonner";
 import { publishListing, isLiveListingId } from "@/lib/liveListings";
+import { OTHER_SERVICES, OTHER_SUBSERVICES, cleanSubServices, readProviderServicePick } from "@/data/serviceCategories";
 
 type ListingType = "rental" | "shortstay" | "service" | "commercial" | "corporate";
 
@@ -54,6 +55,8 @@ interface ListingFormData {
   boostDays: number;
   // Service-specific
   serviceCategory: string;
+  /** Sub-services when serviceCategory is "Other Services" (pick several). */
+  otherServices: string[];
   availability: string;
 }
 
@@ -122,7 +125,7 @@ const defaultForm: ListingFormData = {
   bedrooms: 1, bathrooms: 1, county: "", subcounty: "", estate: "",
   amenities: [], photos: [], videoUrl: "", furnished: false, petFriendly: false,
   deposit: "", moveInDate: "", size: "", sizeSqft: "", floor: "", featured: false, boostDays: 0,
-  serviceCategory: "", availability: "",
+  serviceCategory: "", otherServices: [], availability: "",
 };
 
 const rentalAmenities = [
@@ -170,7 +173,7 @@ const commercialAmenities = [
 const serviceCategories = [
   "Movers", "Cleaners", "Electricians", "Plumbers", "Internet Installers",
   "Security", "Painters", "Carpenters", "Landscapers", "Pest Control",
-  "Interior Design", "Fumigation",
+  "Interior Design", "Fumigation", OTHER_SERVICES,
 ];
 
 const boostOptions = [
@@ -213,6 +216,10 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
     ...defaultForm,
     type: type === "service" ? "rental" : type,
     priceUnit: type === "shortstay" ? "/night" : "/mo",
+    ...(type === "service" && !editData ? (() => {
+      const pick = readProviderServicePick();
+      return pick ? { serviceCategory: pick.category, otherServices: pick.otherServices } : {};
+    })() : {}),
     ...editData,
   });
   const [showSuccess, setShowSuccess] = useState(false);
@@ -589,6 +596,11 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
   const [published, setPublished] = useState(false);
   const handleSubmit = async () => {
     if (publishing) return;
+    if (type === "service" && form.serviceCategory === OTHER_SERVICES && cleanSubServices(form.otherServices).length === 0) {
+      toast.error(t("Pick at least one service"));
+      setStep(0);
+      return;
+    }
     let listingId = (editData as any)?.id ?? `new_${Date.now()}`;
     {
       setPublishing(true);
@@ -600,7 +612,10 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
         priceUnit: type === "service" ? "job" : form.type === "shortstay" ? "night" : "month",
         bedrooms: form.bedrooms, bathrooms: form.bathrooms, county: form.county, subcounty: form.subcounty, estate: form.estate,
         lat: gpsPin?.lat, lng: gpsPin?.lng, amenities: form.amenities,
-        rules: { furnished: form.furnished, petFriendly: extraDetails.pets === "yes", homeDetails: extraDetails },
+        rules: {
+          furnished: form.furnished, petFriendly: extraDetails.pets === "yes", homeDetails: extraDetails,
+          ...(type === "service" && form.serviceCategory === OTHER_SERVICES ? { otherServices: cleanSubServices(form.otherServices) } : {}),
+        },
         photos: form.photos,
       });
       setPublishing(false);
@@ -710,10 +725,38 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
                           : "bg-card card-shadow text-foreground"
                       }`}
                     >
-                      {cat}
+                      {t(cat)}
                     </button>
                   ))}
                 </div>
+                {form.serviceCategory === OTHER_SERVICES && (
+                  <div className="mt-4 p-3 rounded-2xl bg-secondary/60 animate-fade-in">
+                    <p className="text-xs font-semibold text-foreground">{t("Which services do you offer?")}</p>
+                    <p className="text-[10px] text-muted-foreground mb-2">{t("Pick all that apply")}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {OTHER_SUBSERVICES.map((s) => {
+                        const on = (form.otherServices ?? []).includes(s.value);
+                        return (
+                          <button
+                            key={s.value}
+                            type="button"
+                            aria-pressed={on}
+                            onClick={() => {
+                              haptic("light");
+                              const cur = form.otherServices ?? [];
+                              update({ otherServices: on ? cur.filter((x) => x !== s.value) : [...cur, s.value] });
+                            }}
+                            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition-all ${
+                              on ? "bg-primary text-primary-foreground" : "bg-card card-shadow text-foreground"
+                            }`}
+                          >
+                            <span>{s.icon}</span>{t(s.value)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

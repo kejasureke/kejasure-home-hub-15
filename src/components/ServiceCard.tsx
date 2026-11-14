@@ -1,6 +1,8 @@
 import { Star, Clock, MapPin, MessageCircle, Calendar, ChevronDown, ChevronUp, Image, ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
 import type { ServiceProvider } from "@/data/mockData";
+import { OTHER_SUBSERVICES } from "@/data/serviceCategories";
+import { translate } from "@/lib/language";
 import ServiceBookingModal from "./ServiceBookingModal";
 import BeforeAfterSlider from "./BeforeAfterSlider";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
@@ -41,7 +43,19 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
               <h3 className="text-sm font-semibold text-foreground truncate">{provider.name}</h3>
               <span className={tierClass}>{provider.tier}</span>
             </div>
-            <p className="text-xs text-muted-foreground mb-1">{provider.category}</p>
+            <p className="text-xs text-muted-foreground mb-1">{translate(provider.category)}</p>
+            {provider.subServices && provider.subServices.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-1.5">
+                {provider.subServices.map((s) => {
+                  const meta = OTHER_SUBSERVICES.find((o) => o.value === s);
+                  return (
+                    <span key={s} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
+                      {meta?.icon} {translate(s)}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
             {provider.price && (
               <p className="text-xs font-semibold text-primary mb-1">{provider.price}</p>
             )}

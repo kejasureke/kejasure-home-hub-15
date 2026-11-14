@@ -21,6 +21,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { useLiveListings, useLiveServices } from "@/lib/liveListings";
+import { OTHER_SERVICES, OTHER_SUBSERVICES, matchesSubService } from "@/data/serviceCategories";
 import { useHouseHunting, useLowData, localHomes } from "@/lib/houseHunting";
 import { Button } from "@/components/ui/button";
 
@@ -97,6 +98,7 @@ const HomeFeed = () => {
   const [showCompareSelector, setShowCompareSelector] = useState(false);
   const [compareFromProperty, setCompareFromProperty] = useState<string | null>(null);
   const [serviceCategory, setServiceCategory] = useState("All");
+  const [otherFilter, setOtherFilter] = useState("All");
   const [serviceSort, setServiceSort] = useState<"featured" | "rating" | "reviews">("featured");
   const [commCategory, setCommCategory] = useState("All");
   const [showMap, setShowMap] = useState(false);
@@ -214,7 +216,7 @@ const HomeFeed = () => {
   const filteredServices = (() => {
     let list = serviceCategory === "All"
       ? [...allServices]
-      : allServices.filter((s) => s.category === serviceCategory);
+      : allServices.filter((s) => s.category === serviceCategory && (serviceCategory !== OTHER_SERVICES || matchesSubService(s.subServices, otherFilter)));
     if (serviceSort === "rating") list.sort((a, b) => b.rating - a.rating);
     else if (serviceSort === "reviews") list.sort((a, b) => b.reviews - a.reviews);
     // Paid boosts: Gold pinned first, then Hot Offer, then Silver bump
@@ -681,10 +683,11 @@ const HomeFeed = () => {
                 { value: "Locksmiths", icon: "🔑", label: "Locksmiths" },
                 { value: "Welders", icon: "🔥", label: "Welders" },
                 { value: "Masons", icon: "🧱", label: "Masons" },
+                { value: OTHER_SERVICES, icon: "📦", label: "Other" },
               ].map((cat) => (
                 <button
                   key={cat.value}
-                  onClick={() => setServiceCategory(cat.value)}
+                  onClick={() => { setServiceCategory(cat.value); setOtherFilter("All"); }}
                   className={`shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-center transition-all duration-200 ${
                     serviceCategory === cat.value
                       ? "bg-primary/15 ring-1 ring-primary/30 scale-105"
@@ -698,6 +701,23 @@ const HomeFeed = () => {
                 </button>
               ))}
             </div>
+
+            {serviceCategory === OTHER_SERVICES && (
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none animate-fade-in" role="group" aria-label={translate("Other Services")}>
+                {[{ value: "All", icon: "✨" }, ...OTHER_SUBSERVICES].map((s) => (
+                  <button
+                    key={s.value}
+                    aria-pressed={otherFilter === s.value}
+                    onClick={() => setOtherFilter(s.value)}
+                    className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${
+                      otherFilter === s.value ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                    }`}
+                  >
+                    <span>{s.icon}</span>{translate(s.value)}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Sort controls */}
             <div className="flex items-center gap-2">
@@ -724,6 +744,13 @@ const HomeFeed = () => {
             {filteredServices.map((sp) => (
               <ServiceCard key={sp.id} provider={sp} />
             ))}
+            {filteredServices.length === 0 && (
+              <div className="py-10 text-center">
+                <p className="text-3xl mb-2">📦</p>
+                <p className="text-sm font-semibold text-foreground">{translate("No providers here yet")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{translate("Check back soon — new providers join every week.")}</p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
