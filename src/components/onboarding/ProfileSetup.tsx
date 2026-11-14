@@ -58,7 +58,7 @@ const TenantSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
             <p className="text-[11px] text-muted-foreground">
-              Use your real first and last name, exactly as on your ID. It cannot be changed after signup.
+              Use your real first and last name. Your name cannot be changed after registration.
             </p>
           </div>
         </div>
@@ -205,7 +205,7 @@ const LandlordSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your ID. It cannot be changed after signup.</p>
+            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your National ID — this makes your verification smooth and fast. Your name cannot be changed after registration.</p>
           </div>
         </div>
       ),
@@ -279,7 +279,7 @@ const AgencySetup = ({ onComplete, onBack }: { onComplete: () => void; onBack: (
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your ID. It cannot be changed after signup.</p>
+            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your National ID — this makes your verification smooth and fast. Your name cannot be changed after registration.</p>
           </div>
         </div>
       ),
@@ -348,7 +348,7 @@ const StayHostSetup = ({ onComplete, onBack }: { onComplete: () => void; onBack:
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your ID. It cannot be changed after signup.</p>
+            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your National ID — this makes your verification smooth and fast. Your name cannot be changed after registration.</p>
           </div>
         </div>
       ),
@@ -429,7 +429,7 @@ const ServiceProviderSetup = ({ onComplete, onBack }: { onComplete: () => void; 
               className="w-full px-4 py-3.5 rounded-xl bg-card border-2 border-border text-sm font-medium focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/15">
-            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your ID. It cannot be changed after signup.</p>
+            <p className="text-[11px] text-muted-foreground">Use your real first and last name, exactly as on your National ID — this makes your verification smooth and fast. Your name cannot be changed after registration.</p>
           </div>
         </div>
       ),
