@@ -1,20 +1,23 @@
-import { Star, Clock, MapPin, MessageCircle, Calendar, ChevronDown, ChevronUp, Image, ArrowLeftRight } from "lucide-react";
+import { Star, Clock, MapPin, Lock, Calendar, ChevronDown, ChevronUp, Image, ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
 import type { ServiceProvider } from "@/data/mockData";
 import { OTHER_SUBSERVICES } from "@/data/serviceCategories";
-import { translate } from "@/lib/language";
+import { translate, useLanguage } from "@/lib/language";
 import ServiceBookingModal from "./ServiceBookingModal";
 import BeforeAfterSlider from "./BeforeAfterSlider";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
-import PaidAccessNotice from "./PaidAccessNotice";
+import ContactLockNotice from "./ContactLockNotice";
+import { serviceRequestCopy, unlockLine } from "@/lib/requestCopy";
 
 interface ServiceCardProps {
   provider: ServiceProvider;
 }
 
 const ServiceCard = ({ provider }: ServiceCardProps) => {
+  useLanguage();
   const { hasActivePlan, loading: planLoading } = usePaidAccess();
   const [showBooking, setShowBooking] = useState(false);
+  const requestCopy = serviceRequestCopy(provider);
   const [showReviews, setShowReviews] = useState(false);
   const [showPortfolio, setShowPortfolio] = useState(false);
   const [activeProject, setActiveProject] = useState(0);
@@ -187,30 +190,17 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
               </div>
             )}
 
-            {!hasActivePlan || planLoading ? <PaidAccessNotice loading={planLoading} /> : <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  if (!hasActivePlan || planLoading) return;
-                  window.dispatchEvent(new CustomEvent("open-service-chat", {
-                    detail: {
-                      name: provider.name,
-                      role: provider.category,
-                      avatar: provider.avatar,
-                    },
-                  }));
-                }}
-                className="flex-1 py-2 rounded-xl gradient-trust text-xs font-semibold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1"
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                Chat
-              </button>
+            {!hasActivePlan || planLoading ? <ContactLockNotice loading={planLoading} copy={requestCopy} /> : <div className="space-y-1.5">
               <button
                 onClick={() => setShowBooking(true)}
-                className="flex-1 py-2 rounded-xl bg-secondary text-xs font-semibold text-secondary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1"
+                className="w-full py-2.5 rounded-xl gradient-trust text-xs font-semibold text-primary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-1"
               >
                 <Calendar className="w-3.5 h-3.5" />
-                Book
+                {translate(requestCopy.cta)}
               </button>
+              <p className="text-[10px] text-muted-foreground flex items-center justify-center gap-1 text-center">
+                <Lock className="w-3 h-3 shrink-0" />{unlockLine(requestCopy)}
+              </p>
             </div>}
           </div>
         </div>

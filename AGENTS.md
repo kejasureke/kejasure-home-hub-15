@@ -24,3 +24,7 @@
 
 ## Services
 - Keep the "Other Services" group and its sub-services in the shared service-categories module and store a listing's picks in its rules, so signup, listing form and client filters never drift apart.
+- Request buttons and locked-contact messages take their wording from the shared request-copy module (per listing type and service offer), so cards, sheets and notices stay consistent.
+
+## Provider plans
+- Active-listing caps live in the subscription plans table and are enforced by a listings trigger; plan payments must match plans by role and tier, because tier names repeat across provider types.

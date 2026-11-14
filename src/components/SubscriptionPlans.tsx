@@ -237,6 +237,7 @@ const SubscriptionPlans = ({ onBack, currentRole }: SubscriptionPlansProps) => {
         plans={mpesaPlans}
         selectedPlanIndex={Math.max(0, selectedPlan - (plans[0].price === 0 ? 1 : 0))}
         category={`${label} Subscription`}
+        role={role}
         onClose={() => setShowPayment(false)}
         onSuccess={handleSubscriptionSuccess}
       />

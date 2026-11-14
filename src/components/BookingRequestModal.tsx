@@ -8,7 +8,8 @@ import { useHardwareBack } from "@/hooks/useHardwareBack";
 import { haptic } from "@/lib/despia";
 import Confetti from "./Confetti";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
-import PaidAccessNotice from "./PaidAccessNotice";
+import ContactLockNotice from "./ContactLockNotice";
+import { propertyRequestCopy } from "@/lib/requestCopy";
 import { isLiveListingId } from "@/lib/liveListings";
 import { canRequestViewing, pendingViewingCount, MAX_PENDING_VIEWINGS } from "@/lib/viewingLimits";
 import { translate, useLanguage } from "@/lib/language";
@@ -175,7 +176,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
               <p className="text-sm text-muted-foreground">{translate("This is an example home. Requests open on live homes posted by landlords.")}</p>
               <Button className="w-full" onClick={onClose}>{translate("Back to listing")}</Button>
             </div>
-          ) : !hasActivePlan ? <PaidAccessNotice loading={planLoading} /> : viewingLimitReached && (step === "select" || step === "confirm") ? (
+          ) : !hasActivePlan ? <ContactLockNotice loading={planLoading} copy={propertyRequestCopy(property)} /> : viewingLimitReached && (step === "select" || step === "confirm") ? (
             <div className="py-6 space-y-4">
               <h4 className="text-lg font-bold">{translate("3 viewings already pending")}</h4>
               <p className="text-sm text-muted-foreground">{translate("Wait for a reply or cancel a pending viewing in My Bookings before requesting another.")}</p>

@@ -10,7 +10,8 @@ import ViewingNotebook from "./listing/ViewingNotebook";
 import { Button } from "./ui/button";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
 import { canRevealContact } from "@/lib/paidAccess";
-import PaidAccessNotice from "./PaidAccessNotice";
+import ContactLockNotice from "./ContactLockNotice";
+import { propertyRequestCopy } from "@/lib/requestCopy";
 
 interface MyBookingsScreenProps {
   onBack: () => void;
@@ -240,7 +241,7 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                   </div>
 
                   {/* Actions */}
-                  {b.status === "accepted" && !hasActivePlan && <div className="px-3 pb-3"><PaidAccessNotice loading={planLoading} /></div>}
+                  {b.status === "accepted" && !hasActivePlan && <div className="px-3 pb-3"><ContactLockNotice loading={planLoading} copy={propertyRequestCopy({ type: isStay ? "shortstay" : "rental" })} /></div>}
                   {canRevealContact(b.status) && b.status === "accepted" && (
                     <div className="px-3 pb-3 flex gap-2">
                       {/* Phone-only booking records are not proof of provider acceptance. */}

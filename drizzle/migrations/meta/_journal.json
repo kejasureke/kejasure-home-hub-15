@@ -78,6 +78,13 @@
       "when": 1793889552061,
       "tag": "0010_listing_boost_kind",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794619581487,
+      "tag": "0011_provider_plan_listing_caps",
+      "breakpoints": true
     }
   ]
 }

@@ -7,7 +7,8 @@ import { haptic } from "@/lib/despia";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
 import { canRevealContact } from "@/lib/paidAccess";
 import { translate, useLanguage } from "@/lib/language";
-import PaidAccessNotice from "../PaidAccessNotice";
+import ContactLockNotice from "../ContactLockNotice";
+import { propertyRequestCopy } from "@/lib/requestCopy";
 
 /** Caretaker added by the landlord/agent. Number stays locked until a booking is accepted. */
 export function getCaretaker(p: Property): { name: string; phone: string } | null {
@@ -41,7 +42,7 @@ const CaretakerCard = ({ property }: { property: Property }) => {
   if (!c) return null;
   const unlocked = !!accountListing && acceptedFor === accountListing && canRevealContact("accepted");
 
-  if (!hasActivePlan) return <div className="mb-5"><p className="text-sm font-semibold mb-2">{translate("Caretaker contact")}</p><PaidAccessNotice loading={loading} /></div>;
+  if (!hasActivePlan) return <div className="mb-5"><p className="text-sm font-semibold mb-2">{translate("Caretaker contact")}</p><ContactLockNotice loading={loading} copy={propertyRequestCopy(property)} /></div>;
 
   return (
     <div className="mb-5 p-4 rounded-2xl bg-card card-shadow border border-border flex items-center gap-3">
@@ -53,7 +54,7 @@ const CaretakerCard = ({ property }: { property: Property }) => {
           <p className="text-sm font-semibold truncate">{c.name}</p>
         </div>
         <p className="text-[10px] text-muted-foreground">
-          {translate("Caretaker on site")} · {unlocked ? c.phone : translate("Number shows after your viewing is accepted")}
+          {translate("Caretaker on site")} · {unlocked ? c.phone : translate(property.type === "shortstay" ? "Number shows after your stay booking is accepted" : "Number shows after your viewing is accepted")}
         </p>
       </div>
       {unlocked ? (

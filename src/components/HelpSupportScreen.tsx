@@ -16,7 +16,7 @@ const faqs = [
   { q: "How do I book a service provider?", a: "Open the Services category, pick a service type (e.g. Movers, Cleaners, Plumbers), choose a verified provider, and tap Book. You'll select a date/time and the provider will confirm — contact details unlock once they accept." },
 
   // Account & contact
-  { q: "How do I get a landlord's or host's contact?", a: "Subscribe to a plan, then send a booking request on the listing. Once the landlord, host or service provider accepts, their phone and chat are unlocked automatically inside the app." },
+  { q: "How do I get a landlord's or host's contact?", a: "KejaSure is free for tenants. Send a viewing, stay or service request. Once the landlord, host or service provider accepts, their phone and chat unlock automatically inside the app." },
   { q: "Is KejaSure free to use?", a: "Browsing all listings is completely free. A subscription is required to send booking requests. Landlord and provider contacts only unlock after your booking is accepted." },
   { q: "What subscription plans are available?", a: "Tenants can choose KES 30 (24 hours), KES 50 (3 days) or KES 100 (7 days). Landlords, agencies, stay hosts and service providers have their own monthly plans with listing limits and boost credits." },
 

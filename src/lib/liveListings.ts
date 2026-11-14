@@ -99,7 +99,7 @@ export async function publishListing(input: {
   bedrooms: number; bathrooms: number; county: string; subcounty: string; estate: string;
   lat?: number; lng?: number; amenities: string[]; rules: Record<string, unknown>;
   photos: string[];
-}): Promise<{ id?: string; error?: string }> {
+}): Promise<{ id?: string; error?: string; limit?: { tier: string; cap: number } }> {
   const { data: auth } = await supabase.auth.getUser();
   const uid = auth.user?.id;
   if (!uid) return { error: "Sign in to publish your listing." };
@@ -114,6 +114,14 @@ export async function publishListing(input: {
   const res = isUpdate
     ? await supabase.from("listings").update(row).eq("id", input.existingId!).select("id").single()
     : await supabase.from("listings").insert(row).select("id").single();
+  const limitMatch = res.error?.message?.match(/LISTING_LIMIT:([^:]+):(\d+)/);
+  if (limitMatch) {
+    const cap = Number(limitMatch[2]);
+    return {
+      limit: { tier: limitMatch[1], cap },
+      error: `Your ${limitMatch[1]} plan allows ${cap} active listing${cap === 1 ? "" : "s"}. Upgrade to add more.`,
+    };
+  }
   if (res.error || !res.data) return { error: res.error?.message || "Couldn't publish your listing." };
   const id = res.data.id as string;
 

@@ -92,16 +92,20 @@ Deno.serve(async (req) => {
     } else if (payment.kind === 'subscription') {
       // Find or create the matching plan, then activate the subscription
       let planId: string | null = null
+      // Tier names repeat across provider types ("Pro"), so match on role + tier.
+      const ROLE_ALIASES: Record<string, string> = { stayhost: 'host', serviceprovider: 'service_provider' }
+      const VALID_ROLES = ['tenant', 'landlord', 'agency', 'host', 'service_provider']
+      const rawRole = ROLE_ALIASES[payment.role] ?? payment.role
+      const planRole = VALID_ROLES.includes(rawRole) ? rawRole : 'tenant'
       const { data: plan } = await admin
         .from('subscription_plans')
         .select('id')
+        .eq('role', planRole)
         .eq('tier', payment.plan_name)
         .maybeSingle()
       if (plan) {
         planId = plan.id
       } else {
-        const VALID_ROLES = ['tenant', 'landlord', 'agency', 'host', 'service_provider']
-        const planRole = VALID_ROLES.includes(payment.role) ? payment.role : 'tenant'
         const { data: newPlan } = await admin.from('subscription_plans').insert({
           role: planRole,
           tier: payment.plan_name,

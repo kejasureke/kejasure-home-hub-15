@@ -14,6 +14,8 @@ import { homeDetails, saveHomeDetails, saveLocalHome, type HomeDetails } from "@
 import HomeDetailsEditor from "./listing/HomeDetailsEditor";
 import { translate as t, useLanguage } from "@/lib/language";
 import { toast } from "sonner";
+import { createPortal } from "react-dom";
+import SubscriptionPlans from "./SubscriptionPlans";
 import { publishListing, isLiveListingId } from "@/lib/liveListings";
 import { OTHER_SERVICES, OTHER_SUBSERVICES, cleanSubServices, readProviderServicePick } from "@/data/serviceCategories";
 
@@ -594,6 +596,7 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
 
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished] = useState(false);
+  const [showPlans, setShowPlans] = useState(false);
   const handleSubmit = async () => {
     if (publishing) return;
     if (type === "service" && form.serviceCategory === OTHER_SERVICES && cleanSubServices(form.otherServices).length === 0) {
@@ -619,6 +622,15 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
         photos: form.photos,
       });
       setPublishing(false);
+      if (res.limit) {
+        haptic("warning");
+        toast.error(t("Listing limit reached"), {
+          description: t("Your {tier} plan allows {cap} active listing(s). Upgrade to add more.").replace("{tier}", t(res.limit.tier)).replace("{cap}", String(res.limit.cap)),
+          action: { label: t("See plans"), onClick: () => setShowPlans(true) },
+          duration: 8000,
+        });
+        return;
+      }
       if (res.id) { listingId = res.id; setPublished(true); }
       else toast.error(res.error || t("Couldn't publish your listing."));
     }
@@ -1751,10 +1763,16 @@ const ListingCRUD = ({ type, onClose, editData }: ListingCRUDProps) => {
             disabled={publishing}
             className="disabled:opacity-60 flex-1 py-3 rounded-xl bg-trust text-white text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           >
-            <Check className="w-4 h-4" /> {publishing ? t("Publishing…") : type === "service" ? t("Save on this phone") : t("Publish listing")}
+            <Check className="w-4 h-4" /> {publishing ? t("Publishing…") : type === "service" ? t("Publish service") : t("Publish listing")}
           </button>
         )}
       </div>
+      {showPlans && createPortal(
+        <div className="fixed inset-0 z-[110]">
+          <SubscriptionPlans onBack={() => setShowPlans(false)} />
+        </div>,
+        document.body,
+      )}
     </div>
   );
 };

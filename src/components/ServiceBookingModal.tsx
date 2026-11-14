@@ -1,4 +1,4 @@
-import { X, Clock, MessageCircle, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon, MapPin, Star, Send } from "lucide-react";
+import { X, Clock, MessageCircle, Lock, Loader2, CheckCircle2, Phone, ShieldCheck, CalendarIcon, MapPin, Star, Send } from "lucide-react";
 import { pushGlobalAlert } from "@/hooks/useInAppNotifications";
 import { useState, useEffect, useCallback } from "react";
 import { format } from "date-fns";
@@ -7,7 +7,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import type { ServiceProvider } from "@/data/mockData";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
-import PaidAccessNotice from "./PaidAccessNotice";
+import ContactLockNotice from "./ContactLockNotice";
+import { serviceRequestCopy, unlockLine } from "@/lib/requestCopy";
+import { translate, useLanguage } from "@/lib/language";
 
 interface ServiceBookingModalProps {
   provider: ServiceProvider;
@@ -20,7 +22,9 @@ type BookingStep = "details" | "confirm" | "submitting" | "pending" | "accepted"
 const timeSlots = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 
 const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalProps) => {
+  useLanguage();
   const { hasActivePlan, loading: planLoading } = usePaidAccess();
+  const copy = serviceRequestCopy(provider);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [description, setDescription] = useState("");
@@ -32,7 +36,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
   const [submitProgress, setSubmitProgress] = useState(0);
   const [submitStep, setSubmitStep] = useState(0);
 
-  const submitSteps = ["Validating booking details...", "Finding available slot...", "Sending request to provider..."];
+  const submitSteps = ["Checking your request details...", "Finding available slot...", "Sending request to provider..."];
 
   // Submitting animation
   useEffect(() => {
@@ -46,7 +50,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
       setStep("pending");
       pushGlobalAlert({
         type: "booking",
-        title: "New booking request sent",
+        title: "Request sent",
         body: `Your request to ${provider.name} for ${selectedDate ? format(selectedDate, "MMM d") : ""} at ${selectedTime} has been submitted.`,
         action: "open-dashboard",
       });
@@ -60,7 +64,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
         <div className="sticky top-0 bg-card z-10 px-6 pt-safe pb-3">
           <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold">Book {provider.name}</h3>
+            <div className="min-w-0"><h3 className="text-lg font-bold truncate">{translate(copy.cta)}</h3><p className="text-xs text-muted-foreground truncate">{provider.name}</p></div>
             <button onClick={onClose}>
               <X className="w-5 h-5 text-muted-foreground" />
             </button>
@@ -68,7 +72,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
         </div>
 
         <div className="px-6 pb-6">
-          {!hasActivePlan || planLoading ? <PaidAccessNotice loading={planLoading} /> : <>
+          {!hasActivePlan || planLoading ? <ContactLockNotice loading={planLoading} copy={copy} /> : <>
           {step === "details" && (
             <div className="space-y-5">
               {/* Provider summary */}
@@ -158,14 +162,10 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 />
                 <p className="text-[10px] text-muted-foreground mt-1">Tap an area or type your full address</p>
               </div>
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 shrink-0" />{unlockLine(copy)}
+              </p>
               <div className="flex gap-3">
-                <button
-                  onClick={onChat}
-                  className="flex-1 py-3.5 rounded-xl bg-secondary text-sm font-semibold text-secondary-foreground active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Chat First
-                </button>
                 <button
                   onClick={() => selectedDate && selectedTime && location.trim() && setStep("confirm")}
                   className={`flex-1 py-3.5 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform ${
@@ -183,7 +183,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
           {step === "confirm" && (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20">
-                <h4 className="text-sm font-semibold text-trust mb-3">Booking Summary</h4>
+                <h4 className="text-sm font-semibold text-trust mb-3">{translate("Request summary")}</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Provider</span>
@@ -222,7 +222,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
 
               <div className="p-3 rounded-xl bg-accent/5 border border-accent/20">
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  <span className="font-semibold text-accent-foreground">How it works:</span> Your booking request will be sent to {provider.name}. Once they accept, their contact details will be shared with you.
+                  <span className="font-semibold text-accent-foreground">{translate("How it works:")}</span> {translate("Free for tenants.")} {unlockLine(copy)}
                 </p>
               </div>
 
@@ -230,7 +230,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 onClick={() => { if (hasActivePlan && !planLoading) setStep("submitting"); }}
                 className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
               >
-                ✓ Send Booking Request
+                ✓ {translate("Send request")}
               </button>
               <button
                 onClick={() => setStep("details")}
@@ -308,7 +308,7 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               </div>
               <div>
                 <h4 className="text-lg font-bold mb-1">Request Sent!</h4>
-                <p className="text-sm text-muted-foreground">Waiting for {provider.name} to accept your booking…</p>
+                <p className="text-sm text-muted-foreground">{translate("Waiting for {who} to accept your {noun}…").replace("{who}", provider.name).replace("{noun}", translate(copy.noun))}</p>
               </div>
               <div className="p-4 rounded-2xl bg-secondary">
                 <div className="flex items-center justify-between text-sm mb-1">
@@ -365,8 +365,8 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 <div className="w-20 h-20 rounded-full bg-trust/10 flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="w-10 h-10 text-trust" />
                 </div>
-                <h4 className="text-lg font-bold mb-1 text-trust">Booking Accepted! 🎉</h4>
-                <p className="text-sm text-muted-foreground">{provider.name} has confirmed your booking</p>
+                <h4 className="text-lg font-bold mb-1 text-trust">{translate("Request accepted!")} 🎉</h4>
+                <p className="text-sm text-muted-foreground">{translate("{who} accepted your {noun}").replace("{who}", provider.name).replace("{noun}", translate(copy.noun))}</p>
               </div>
 
               <div className="p-4 rounded-2xl bg-trust/5 border border-trust/20">
