@@ -2,7 +2,8 @@ import { translate, useLanguage } from "@/lib/language";
 import PullToRefresh from "@/components/PullToRefresh";
 import { useState, useMemo, useEffect } from "react";
 import { ArrowLeft, MapPin, Clock, CheckCircle2, XCircle, Loader2, MessageCircle, Phone, ShieldAlert, Calendar, MoreVertical, CalendarClock, Star } from "lucide-react";
-import { useBookings, type BookingStatus, type Booking } from "@/hooks/useBookings";
+import { useBookings, syncRemoteBookings, type BookingStatus, type Booking } from "@/hooks/useBookings";
+import { closeReasonLabel, waitLimitMs } from "@/lib/availability";
 import BookingRescheduleModal from "./BookingRescheduleModal";
 import { toast } from "sonner";
 import EmptyIllustration from "./EmptyIllustration";
@@ -54,6 +55,13 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
     try { return new Set(JSON.parse(localStorage.getItem("kejasure_reviewed_bookings") || "[]")); } catch { return new Set(); }
   });
   const [, tick] = useState(0);
+
+  // Follow the real status of sent requests (accepted, declined, or closed on its own)
+  useEffect(() => {
+    syncRemoteBookings();
+    const id = setInterval(syncRemoteBookings, 30000);
+    return () => clearInterval(id);
+  }, []);
 
   // Re-render every 30s so check-in countdowns stay fresh
   useEffect(() => {
@@ -162,6 +170,9 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                         <Icon className={`w-3 h-3 ${badge.spin ? "animate-spin" : ""}`} />
                         {translate(badge.label)}
                       </div>
+                      {b.status === "declined" && closeReasonLabel(b.closeReason) && (
+                        <p className="text-[10px] text-muted-foreground mt-1">{translate(closeReasonLabel(b.closeReason)!)}</p>
+                      )}
                       {/* Timeline stepper */}
                       {b.status !== "declined" && b.status !== "cancelled" && (() => {
                         const target = new Date(b.date).getTime();
@@ -202,14 +213,14 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                       </>
                     ) : (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">{translate("Viewing")}</span>
+                        <span className="text-muted-foreground">{translate(b.kind === "service" ? "Service" : "Viewing")}</span>
                         <span className="font-medium text-foreground">{formatDate(b.date)} · {b.time}</span>
                       </div>
                     )}
                     {b.status === "pending" && (() => {
-                      // 24h SLA — count down from creation
+                      // Requests close on their own if unanswered: services 2h, homes and stays 24h
                       const elapsed = Date.now() - b.createdAt;
-                      const remaining = 24 * 60 * 60 * 1000 - elapsed;
+                      const remaining = waitLimitMs(b.kind === "service" ? "service" : "other") - elapsed;
                       const hrs = Math.max(0, Math.floor(remaining / 3600000));
                       const mins = Math.max(0, Math.floor((remaining % 3600000) / 60000));
                       const overdue = remaining <= 0;
@@ -217,8 +228,8 @@ const MyBookingsScreen = ({ onBack, onOpenChat }: MyBookingsScreenProps) => {
                         <div className={`flex items-center gap-1.5 text-[10px] pt-1 font-semibold ${overdue ? "text-destructive" : "text-accent-foreground"}`}>
                           <Clock className={`w-3 h-3 ${overdue ? "" : "animate-pulse"}`} />
                           {overdue
-                            ? translate("Response overdue — try nudging or messaging")
-                            : `Response expected in ${hrs > 0 ? `${hrs}h ` : ""}${mins}m`}
+                            ? translate("Closing — no reply in time")
+                            : `${translate("Closes if no reply in")} ${hrs > 0 ? `${hrs}h ` : ""}${mins}m`}
                         </div>
                       );
                     })()}

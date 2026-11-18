@@ -1,4 +1,5 @@
 import { translate, useLanguage } from "@/lib/language";
+import { fairServiceOrder } from "@/lib/availability";
 import { Search, SlidersHorizontal, GitCompare, ChevronRight, Clock, MapPin, Navigation, Wrench, Sparkles, Building2, X, BookmarkPlus, Bookmark, SearchX, TrendingUp } from "lucide-react";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -206,6 +207,8 @@ const HomeFeed = () => {
     // Paid boosts: Gold is pinned first, then Hot Deal, then Silver (bumped to top). Stable within each group.
     const boostRank = (p: typeof result[number]) => p.boostKind === "gold" ? 3 : p.boostKind === "hotdeal" ? 2 : p.boostKind === "silver" ? 1 : 0;
     result = result.map((p, i) => ({ p, i })).sort((x, y) => boostRank(y.p) - boostRank(x.p) || x.i - y.i).map((x) => x.p);
+    // Homes marked as taken stay visible for 3 days but always sit below available ones.
+    result = [...result.filter((p) => !p.takenAt), ...result.filter((p) => p.takenAt)];
 
     return result;
   }, [segment, county, estate, searchQuery, filters, budgetSeeded, commCategory, properties]);
@@ -217,11 +220,13 @@ const HomeFeed = () => {
     let list = serviceCategory === "All"
       ? [...allServices]
       : allServices.filter((s) => s.category === serviceCategory && (serviceCategory !== OTHER_SERVICES || matchesSubService(s.subServices, otherFilter)));
+    // Default order is fair turns: boosts on top, then available before busy, fewer waiting requests, rotating turns.
+    if (serviceSort === "featured") return fairServiceOrder(list);
     if (serviceSort === "rating") list.sort((a, b) => b.rating - a.rating);
     else if (serviceSort === "reviews") list.sort((a, b) => b.reviews - a.reviews);
-    // Paid boosts: Gold pinned first, then Hot Offer, then Silver bump
+    // Paid boosts: Gold pinned first, then Hot Offer, then Silver bump; busy providers below free ones
     const rank = (s: typeof list[number]) => s.boostKind === "gold" ? 3 : s.boostKind === "hotdeal" ? 2 : s.boostKind === "silver" ? 1 : 0;
-    return list.map((s, i) => ({ s, i })).sort((x, y) => rank(y.s) - rank(x.s) || x.i - y.i).map((x) => x.s);
+    return list.map((s, i) => ({ s, i })).sort((x, y) => rank(y.s) - rank(x.s) || Number(!!x.s.busyNow) - Number(!!y.s.busyNow) || x.i - y.i).map((x) => x.s);
   })();
 
   const handleSelectProperty = (id: string) => {
@@ -904,12 +909,12 @@ const HomeFeed = () => {
             )}
 
             {/* Neighborhood hot deals */}
-            {filteredProperties.some((p) => p.boostKind === "hotdeal") && (
+            {filteredProperties.some((p) => p.boostKind === "hotdeal" && !p.takenAt) && (
               <div className="p-3 rounded-2xl border-2 border-destructive/40 bg-destructive/5">
                 <h2 className="text-base font-bold mb-1">🔥 {translate("Hot deals")}{estate ? ` · ${estate}` : county ? ` · ${county}` : ""}</h2>
                 <p className="text-[11px] text-muted-foreground mb-3">{translate("Urgent vacancies and price drops in your area")}</p>
                 <div className="space-y-3">
-                  {filteredProperties.filter((p) => p.boostKind === "hotdeal").slice(0, 3).map((p) => (
+                  {filteredProperties.filter((p) => p.boostKind === "hotdeal" && !p.takenAt).slice(0, 3).map((p) => (
                     <PropertyCard key={`hot-${p.id}`} property={p} onPress={handleSelectProperty} liked={isFavorite(p.id)} onToggleLike={toggleFavorite} />
                   ))}
                 </div>

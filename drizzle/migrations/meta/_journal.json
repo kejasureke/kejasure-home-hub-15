@@ -85,6 +85,13 @@
       "when": 1794619581487,
       "tag": "0011_provider_plan_listing_caps",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794998332749,
+      "tag": "0012_fair_availability",
+      "breakpoints": true
     }
   ]
 }

@@ -25,6 +25,8 @@ export interface Property {
   /** Active paid boost type, if any */
   boostKind?: "silver" | "gold" | "hotdeal";
   available: boolean;
+  /** Set when the provider marked the home as taken (shown with a "Taken" badge for 3 days). */
+  takenAt?: string;
   amenities: string[];
   landlordResponseTime: string;
   landlordResponseSpeed: "fast" | "moderate" | "slow";
@@ -71,6 +73,11 @@ export interface ServiceProvider {
   boostKind?: "silver" | "gold" | "hotdeal";
   /** For "Other Services" providers: the deliveries they offer (gas, water, food…). */
   subServices?: string[];
+  /** Live availability: busy providers show below available ones (paid boosts stay on top). */
+  busyNow?: boolean;
+  busyUntil?: string;
+  openRequests?: number;
+  jobCapacity?: number;
   avatar: string;
   description: string;
   price?: string;
@@ -1325,7 +1332,7 @@ export const serviceProviders: ServiceProvider[] = [
   { id: "s13", name: "SteelWorks Welding", category: "Welders", rating: 4.6, reviews: 89, responseSpeed: "< 1 hour", areaServed: "Nairobi, Kiambu", tier: "Basic", boosted: false, avatar: "🔥", description: "Gates, grills, window guards, and metal fabrication", price: "From KES 2,000", availability: "Same day", lat: -1.3100, lng: 36.8300, recentReviews: [{ author: "Paul N.", rating: 4, text: "Strong window grills. Took measurements accurately.", date: "1 week ago" }] },
   { id: "s14", name: "BuildRight Masons", category: "Masons", rating: 4.7, reviews: 176, responseSpeed: "< 30 mins", areaServed: "Nairobi & Environs", tier: "Pro", boosted: true, avatar: "🧱", description: "Construction, tiling, plastering, and renovations", price: "From KES 3,000", availability: "Next day", lat: -1.2800, lng: 36.7900, recentReviews: [{ author: "Janet K.", rating: 5, text: "Tiled my entire bathroom beautifully. Very neat work.", date: "4 days ago" }, { author: "George O.", rating: 4, text: "Good plastering job on my wall repairs. Reasonable price.", date: "2 weeks ago" }] },
   { id: "s15", name: "Mama Gas Express", category: "Other Services", subServices: ["Gas Delivery", "Water Delivery"], rating: 4.8, reviews: 412, responseSpeed: "< 10 mins", areaServed: "Nairobi (Kilimani, Kileleshwa, Lavington)", tier: "Pro", boosted: true, boostKind: "silver", avatar: "🔥", description: "6kg & 13kg gas refills and 20L water bottles delivered to your door", price: "From KES 250 delivery", availability: "Within 1 hour", lat: -1.2890, lng: 36.7860, recentReviews: [{ author: "Wanjiru K.", rating: 5, text: "Gas came in 25 minutes on a Sunday. Rider even fixed the regulator.", date: "1 day ago" }, { author: "Otieno B.", rating: 5, text: "Water bottles always clean and sealed. Reliable every week.", date: "5 days ago" }] },
-  { id: "s16", name: "Maji Safi Deliveries", category: "Other Services", subServices: ["Water Delivery"], rating: 4.6, reviews: 187, responseSpeed: "< 20 mins", areaServed: "Nairobi (Roysambu, Kasarani, Ruiru)", tier: "Basic", boosted: false, avatar: "💧", description: "Treated drinking water in 10L and 20L bottles, plus bulk tank refills", price: "From KES 150", availability: "Same day", lat: -1.2190, lng: 36.8890, recentReviews: [{ author: "Kevin M.", rating: 5, text: "Saved me during the water rationing. Tank refilled same evening.", date: "3 days ago" }] },
+  { id: "s16", name: "Maji Safi Deliveries", category: "Other Services", subServices: ["Water Delivery"], busyNow: true, busyUntil: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), rating: 4.6, reviews: 187, responseSpeed: "< 20 mins", areaServed: "Nairobi (Roysambu, Kasarani, Ruiru)", tier: "Basic", boosted: false, avatar: "💧", description: "Treated drinking water in 10L and 20L bottles, plus bulk tank refills", price: "From KES 150", availability: "Same day", lat: -1.2190, lng: 36.8890, recentReviews: [{ author: "Kevin M.", rating: 5, text: "Saved me during the water rationing. Tank refilled same evening.", date: "3 days ago" }] },
   { id: "s17", name: "Jikoni Fresh Eats", category: "Other Services", subServices: ["Food Delivery", "Grocery Delivery"], rating: 4.7, reviews: 265, responseSpeed: "< 15 mins", areaServed: "Nairobi (Westlands, Parklands, Spring Valley)", tier: "Premium", boosted: true, boostKind: "gold", avatar: "🍲", description: "Home-cooked Kenyan meals and fresh market groceries delivered daily", price: "Meals from KES 350", availability: "11am – 9pm", lat: -1.2650, lng: 36.8030, recentReviews: [{ author: "Achieng O.", rating: 5, text: "Pilau and kachumbari tasted like home. Arrived hot!", date: "2 days ago" }, { author: "Sam N.", rating: 4, text: "Groceries were fresh, one item swapped but they called first.", date: "1 week ago" }] },
   { id: "s18", name: "Boda Errands KE", category: "Other Services", subServices: ["Parcels & Errands", "Grocery Delivery"], rating: 4.5, reviews: 143, responseSpeed: "< 10 mins", areaServed: "Nairobi CBD & Environs", tier: "Pro", boosted: false, avatar: "📦", description: "Parcel drop-offs, shopping runs and quick errands by boda", price: "From KES 200", availability: "Within 45 mins", lat: -1.2840, lng: 36.8230, recentReviews: [{ author: "Linda W.", rating: 5, text: "Picked my keys from the caretaker and delivered to my office. Quick!", date: "4 days ago" }] },
   { id: "s19", name: "TakaTaka Green Collectors", category: "Other Services", subServices: ["Garbage Collection"], rating: 4.4, reviews: 96, responseSpeed: "< 1 hour", areaServed: "Nairobi (South B, South C, Langata)", tier: "Basic", boosted: true, boostKind: "hotdeal", avatar: "♻️", description: "Weekly household garbage pick-up with recycling sorting", price: "From KES 500/mo", availability: "Weekly schedule", lat: -1.3130, lng: 36.8350, recentReviews: [{ author: "Peter G.", rating: 4, text: "Always on schedule. They give sorting bags for free.", date: "1 week ago" }] },

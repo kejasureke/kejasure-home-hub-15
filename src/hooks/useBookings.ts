@@ -1,12 +1,14 @@
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { pushGlobalAlert } from "./useInAppNotifications";
+import { supabase } from "@/integrations/supabase/client";
+import { closeReasonLabel, expireStaleRequests } from "@/lib/availability";
 
 const STORAGE_KEY = "kejasure_bookings";
 const EVENT = "bookings-updated";
 
 export type BookingStatus = "pending" | "accepted" | "declined" | "cancelled" | "completed";
-export type BookingKind = "viewing" | "shortstay";
+export type BookingKind = "viewing" | "shortstay" | "service";
 
 export interface Booking {
   id: string;
@@ -33,6 +35,10 @@ export interface Booking {
   paid?: boolean;
   paidAmount?: number;
   paidAt?: number;
+  /** Id of the real request on the server, when it was sent to a live listing. */
+  remoteId?: string;
+  /** Why the request closed on its own: expired, taken, dates_taken, slot_full, unavailable. */
+  closeReason?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -56,7 +62,9 @@ const alertForStatus = (b: Booking): { title: string; body: string; type: "booki
         ? { type: "booking", title: "Short stay confirmed", body: `${label} is booked. Check-in details are ready.` }
         : { type: "booking", title: "Viewing confirmed", body: `Your viewing for ${label} was accepted by the host.` };
     case "declined":
-      return { type: "booking", title: "Request declined", body: `The host declined your request for ${label}.` };
+      return b.closeReason
+        ? { type: "booking", title: closeReasonLabel(b.closeReason) ?? "Request closed", body: `Your request for ${label} closed. Try another listing or provider.` }
+        : { type: "booking", title: "Request declined", body: `The host declined your request for ${label}.` };
     case "cancelled":
       return { type: "booking", title: "Booking cancelled", body: `${label} booking was cancelled.` };
     case "completed":
@@ -116,7 +124,10 @@ export const useBookings = () => {
   }, []);
 
   const cancelBooking = useCallback((id: string) => {
+    const target = read().find((b) => b.id === id);
     write(read().map((b) => (b.id === id ? { ...b, status: "cancelled" as BookingStatus, updatedAt: Date.now() } : b)));
+    // Cancel the real request too, so the provider's slot and your pending count free up.
+    if (target?.remoteId) supabase.from("bookings").update({ status: "cancelled" }).eq("id", target.remoteId).then(() => {});
     toast("Booking cancelled");
   }, []);
 
@@ -141,3 +152,24 @@ export const _bookingsApi = {
     write(read().map((b) => (b.id === id ? { ...b, ...patch, updatedAt: Date.now() } : b)));
   },
 };
+
+/** Pulls the real status (and close reason) of every request that was sent to a live listing. */
+export async function syncRemoteBookings() {
+  const local = read();
+  const ids = local.map((b) => b.remoteId).filter(Boolean) as string[];
+  if (!ids.length) return;
+  await expireStaleRequests();
+  const { data } = await supabase.from("bookings").select("id, status, close_reason").in("id", ids);
+  if (!data?.length) return;
+  const byId = new Map(data.map((r: any) => [r.id, r]));
+  let changed = false;
+  const next = local.map((b) => {
+    const r: any = b.remoteId ? byId.get(b.remoteId) : null;
+    if (!r) return b;
+    const status: BookingStatus = r.status === "requested" ? "pending" : r.status;
+    if (status === b.status && (r.close_reason ?? undefined) === b.closeReason) return b;
+    changed = true;
+    return { ...b, status, closeReason: r.close_reason ?? undefined, updatedAt: Date.now() };
+  });
+  if (changed) write(next, local);
+}

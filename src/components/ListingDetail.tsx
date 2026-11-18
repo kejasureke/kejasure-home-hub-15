@@ -505,7 +505,12 @@ const ListingDetail = ({ property, onBack, liked = false, onToggleLike, onCompar
 
       {/* Bottom CTA — Book first, contacts after acceptance */}
       <div className="fixed bottom-0 left-0 right-0 p-4 glass-surface border-t border-border safe-bottom">
-        {!hasActivePlan ? <div className="max-w-lg mx-auto"><ContactLockNotice loading={planLoading} copy={propertyRequestCopy(property)} /></div> : <>
+        {property.takenAt ? (
+          <div className="max-w-lg mx-auto text-center py-1">
+            <p className="text-sm font-bold text-foreground">{translate("This home was taken")}</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{translate("The landlord found a tenant. Requests are closed — check similar homes below.")}</p>
+          </div>
+        ) : !hasActivePlan ? <div className="max-w-lg mx-auto"><ContactLockNotice loading={planLoading} copy={propertyRequestCopy(property)} /></div> : <>
         <div className="flex gap-3 max-w-lg mx-auto">
           <button
             onClick={() => setShowBooking(true)}

@@ -82,6 +82,12 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
             {translate("Confirmed this week")} </div>
         )}
 
+        {property.takenAt && (
+          <div className="absolute inset-0 bg-background/55 flex items-center justify-center pointer-events-none">
+            <span className="px-4 py-1.5 rounded-full bg-foreground text-background text-sm font-extrabold tracking-wide shadow-lg">{translate("Taken")}</span>
+          </div>
+        )}
+
         {/* Top right actions */}
         <div className="absolute top-3 right-3 flex gap-2">
           {compareMode && (
@@ -125,7 +131,7 @@ const PropertyCard = ({ property, onPress, liked = false, onToggleLike, compareM
       {/* Content */}
       {/* Content */}
       <div className="p-4 space-y-2.5">
-        <p className="text-[11px] text-muted-foreground">{translate(details.availability === "taken" ? "Taken" : details.availability === "viewing" ? "Viewing arranged" : freshAvailability(details) ? "Confirmed this week" : "Availability not confirmed")}</p>
+        <p className={`text-[11px] ${property.takenAt ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{property.takenAt ? translate("Taken — no longer available") : translate(details.availability === "taken" ? "Taken" : details.availability === "viewing" ? "Viewing arranged" : freshAvailability(details) ? "Confirmed this week" : "Availability not confirmed")}</p>
         {/* Title + Badge row */}
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-sm font-bold text-foreground leading-snug line-clamp-2 flex-1">{property.title}</h3>

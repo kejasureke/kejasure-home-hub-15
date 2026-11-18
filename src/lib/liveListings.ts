@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Property, ServiceProvider } from "@/data/mockData";
 import { OTHER_SERVICES, cleanSubServices } from "@/data/serviceCategories";
+import { fetchServiceStatus, isRecentlyTaken } from "@/lib/availability";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** A home is "live" (can receive real requests) only when it exists as a published account listing. */
@@ -15,14 +16,16 @@ const segmentToType = (s: string): Property["type"] =>
   s === "short_stay" ? "shortstay" : s === "commercial" ? "commercial" : "rental";
 
 async function load(): Promise<Property[]> {
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("listings")
     .select("*, listing_images(url, sort_order)")
-    .eq("status", "active")
+    .in("status", ["active", "rented"])
     .neq("segment", "service")
     .order("created_at", { ascending: false })
     .limit(100);
   if (error || !data) return cache ?? [];
+  // Taken homes stay visible (with a "Taken" badge) for 3 days, then drop out.
+  data = data.filter((l: any) => l.status === "active" || isRecentlyTaken(l.taken_at));
   const paths = data.flatMap((l: any) => (l.listing_images ?? []).map((i: any) => i.url as string));
   const signed: Record<string, string> = {};
   if (paths.length) {
@@ -53,7 +56,8 @@ async function load(): Promise<Property[]> {
       verified: l.verification === "verified",
       featured: !!l.boost_expires_at && new Date(l.boost_expires_at) > new Date() && (l.boost_kind ?? "gold") === "gold",
       boostKind: l.boost_expires_at && new Date(l.boost_expires_at) > new Date() ? ((l.boost_kind as Property["boostKind"]) ?? "silver") : undefined,
-      available: true,
+      available: l.status === "active",
+      takenAt: l.status === "rented" ? l.taken_at ?? undefined : undefined,
       amenities: Array.isArray(l.amenities) ? l.amenities : [],
       landlordResponseTime: "—",
       landlordResponseSpeed: "moderate",
@@ -155,7 +159,9 @@ async function loadServices(): Promise<ServiceProvider[]> {
     .order("boost_expires_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
     .limit(100);
+  const status = await fetchServiceStatus((data ?? []).map((l: any) => l.id));
   return (data ?? []).map((l: any): ServiceProvider => {
+    const st = status[l.id];
     const boostedNow = !!l.boost_expires_at && new Date(l.boost_expires_at) > new Date();
     return {
       id: l.id,
@@ -174,11 +180,15 @@ async function loadServices(): Promise<ServiceProvider[]> {
       price: Number(l.price_kes) ? `From KES ${Number(l.price_kes).toLocaleString()}` : undefined,
       lat: Number(l.lat) || 0,
       lng: Number(l.lng) || 0,
+      busyNow: st?.busyNow ?? false,
+      busyUntil: st?.busyUntil,
+      openRequests: st?.openRequests ?? 0,
+      jobCapacity: st?.jobCapacity ?? 1,
     } as ServiceProvider;
   });
 }
 
-/** Real services published by provider accounts; boosted first. */
+/** Real services published by provider accounts, with live busy state. */
 export function useLiveServices() {
   const [list, setList] = useState<ServiceProvider[]>(svcCache ?? []);
   useEffect(() => {

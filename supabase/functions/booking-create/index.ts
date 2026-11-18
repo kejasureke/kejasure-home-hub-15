@@ -75,8 +75,8 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (!listing || listing.status !== "active") {
     await logAttempt("booking:create", ctx, false, { reason: "listing_unavailable" });
-    return new Response(JSON.stringify({ error: "Listing unavailable" }), {
-      status: 404,
+    return new Response(JSON.stringify({ error: "LISTING_TAKEN: This listing is no longer available." }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
@@ -102,8 +102,10 @@ Deno.serve(async (req) => {
 
   await logAttempt("booking:create", ctx, !error, {}, attest);
   if (error) {
+    // Booking rules (full slot, booked dates, taken home, pending limit) are expected outcomes: send the reason to the app.
+    const expected = error.code === "P0001";
     return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
+      status: expected ? 200 : 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

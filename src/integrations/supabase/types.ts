@@ -83,6 +83,7 @@ export type Database = {
         Row: {
           check_in: string | null
           check_out: string | null
+          close_reason: string | null
           contact_unlocked_at: string | null
           created_at: string
           guest_id: string
@@ -91,6 +92,7 @@ export type Database = {
           id: string
           listing_id: string
           message: string | null
+          slot_at: string | null
           status: Database["public"]["Enums"]["booking_status"]
           total_kes: number | null
           type: Database["public"]["Enums"]["booking_type"]
@@ -99,6 +101,7 @@ export type Database = {
         Insert: {
           check_in?: string | null
           check_out?: string | null
+          close_reason?: string | null
           contact_unlocked_at?: string | null
           created_at?: string
           guest_id: string
@@ -107,6 +110,7 @@ export type Database = {
           id?: string
           listing_id: string
           message?: string | null
+          slot_at?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           total_kes?: number | null
           type: Database["public"]["Enums"]["booking_type"]
@@ -115,6 +119,7 @@ export type Database = {
         Update: {
           check_in?: string | null
           check_out?: string | null
+          close_reason?: string | null
           contact_unlocked_at?: string | null
           created_at?: string
           guest_id?: string
@@ -123,6 +128,7 @@ export type Database = {
           id?: string
           listing_id?: string
           message?: string | null
+          slot_at?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           total_kes?: number | null
           type?: Database["public"]["Enums"]["booking_type"]
@@ -555,11 +561,13 @@ export type Database = {
           bedrooms: number | null
           boost_expires_at: string | null
           boost_kind: string | null
+          busy_until: string | null
           county: string | null
           created_at: string
           description: string | null
           estate: string | null
           id: string
+          job_capacity: number
           landmark: string | null
           lat: number | null
           lng: number | null
@@ -572,6 +580,7 @@ export type Database = {
           status: Database["public"]["Enums"]["listing_status"]
           subcategory: string | null
           subcounty: string | null
+          taken_at: string | null
           title: string
           updated_at: string
           verification: Database["public"]["Enums"]["verification_status"]
@@ -584,11 +593,13 @@ export type Database = {
           bedrooms?: number | null
           boost_expires_at?: string | null
           boost_kind?: string | null
+          busy_until?: string | null
           county?: string | null
           created_at?: string
           description?: string | null
           estate?: string | null
           id?: string
+          job_capacity?: number
           landmark?: string | null
           lat?: number | null
           lng?: number | null
@@ -601,6 +612,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["listing_status"]
           subcategory?: string | null
           subcounty?: string | null
+          taken_at?: string | null
           title: string
           updated_at?: string
           verification?: Database["public"]["Enums"]["verification_status"]
@@ -613,11 +625,13 @@ export type Database = {
           bedrooms?: number | null
           boost_expires_at?: string | null
           boost_kind?: string | null
+          busy_until?: string | null
           county?: string | null
           created_at?: string
           description?: string | null
           estate?: string | null
           id?: string
+          job_capacity?: number
           landmark?: string | null
           lat?: number | null
           lng?: number | null
@@ -630,6 +644,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["listing_status"]
           subcategory?: string | null
           subcounty?: string | null
+          taken_at?: string | null
           title?: string
           updated_at?: string
           verification?: Database["public"]["Enums"]["verification_status"]
@@ -1432,6 +1447,16 @@ export type Database = {
         Returns: string
       }
       claim_referral: { Args: { _code: string }; Returns: string }
+      expire_stale_bookings: { Args: never; Returns: number }
+      listing_availability: {
+        Args: { _listing_id: string }
+        Returns: {
+          end_date: string
+          kind: string
+          slot_at: string
+          start_date: string
+        }[]
+      }
       my_conversations: {
         Args: never
         Returns: {
@@ -1446,11 +1471,44 @@ export type Database = {
           unread: number
         }[]
       }
+      my_incoming_requests: {
+        Args: never
+        Returns: {
+          check_in: string
+          check_out: string
+          close_reason: string
+          created_at: string
+          guest_name: string
+          guests: number
+          id: string
+          listing_id: string
+          listing_segment: string
+          listing_status: string
+          listing_title: string
+          slot_at: string
+          status: string
+          type: string
+        }[]
+      }
       my_referral_code: { Args: never; Returns: string }
       purge_old_otp_attempts: { Args: never; Returns: undefined }
       purge_old_otp_codes: { Args: never; Returns: undefined }
       purge_old_otp_verify_attempts: { Args: never; Returns: undefined }
       purge_old_request_attempts: { Args: never; Returns: undefined }
+      request_wait_limit: {
+        Args: { _type: Database["public"]["Enums"]["booking_type"] }
+        Returns: string
+      }
+      service_status: {
+        Args: { _ids: string[] }
+        Returns: {
+          busy_now: boolean
+          busy_until: string
+          job_capacity: number
+          listing_id: string
+          open_requests: number
+        }[]
+      }
     }
     Enums: {
       app_role:

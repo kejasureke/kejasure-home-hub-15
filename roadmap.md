@@ -28,3 +28,10 @@
 - [ ] Actual deletion and enforced reporting/blocking — blocked by frontend-only scope; require operational processing and account-data changes.
 - [ ] Store billing and console declarations — require a billing decision, owner-approved privacy facts and store-console/native-build access.
 - [ ] Authenticated Settings end-to-end verification — public checks passed; authenticated Settings flow not verified.- [x] Server-enforced booking rules: active plan required, max 3 pending per account, provider-only accept/decline/complete (contact scoping intentionally skipped: active plan unlocks everything)
+
+# Fair availability
+- [ ] Rentals: mark as taken (Taken badge 3 days, close requests, tell savers)
+- [ ] Short stays: block accepted dates, close overlapping requests
+- [ ] Services: busy status, jobs-at-once, full time slots
+- [ ] Fair turns ordering + request expiry (services 2h, homes 24h)
+- [ ] Real provider request inbox (accept/decline) in every dashboard
