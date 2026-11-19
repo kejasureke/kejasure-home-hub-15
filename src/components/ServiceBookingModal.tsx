@@ -10,6 +10,11 @@ import { usePaidAccess } from "@/hooks/usePaidAccess";
 import ContactLockNotice from "./ContactLockNotice";
 import { serviceRequestCopy, unlockLine } from "@/lib/requestCopy";
 import { translate, useLanguage } from "@/lib/language";
+import { supabase } from "@/integrations/supabase/client";
+import { bookingsApi } from "@/lib/backend";
+import { isLiveListingId } from "@/lib/liveListings";
+import { useBookings } from "@/hooks/useBookings";
+import { closeReasonLabel, fetchListingAvailability, formatClock, requestErrorMessage, slotMs } from "@/lib/availability";
 
 interface ServiceBookingModalProps {
   provider: ServiceProvider;
@@ -17,7 +22,7 @@ interface ServiceBookingModalProps {
   onChat: () => void;
 }
 
-type BookingStep = "details" | "confirm" | "submitting" | "pending" | "accepted" | "review" | "reviewed";
+type BookingStep = "details" | "confirm" | "submitting" | "pending" | "accepted" | "declined" | "review" | "reviewed";
 
 const timeSlots = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
 
@@ -37,26 +42,107 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
   const [submitStep, setSubmitStep] = useState(0);
 
   const submitSteps = ["Checking your request details...", "Finding available slot...", "Sending request to provider..."];
+  const isLive = isLiveListingId(provider.id);
+  const { addBooking, updateBooking } = useBookings();
+  const [fullSlots, setFullSlots] = useState<Set<number>>(new Set());
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [remoteId, setRemoteId] = useState<string | null>(null);
+  const [localId, setLocalId] = useState<string | null>(null);
+  const [closedReason, setClosedReason] = useState<string | null>(null);
 
-  // Submitting animation
+  // Times where every one of the provider's job slots is already taken
+  const loadSlots = useCallback(() => {
+    if (isLive) fetchListingAvailability(provider.id).then((a) => setFullSlots(a.fullSlots));
+  }, [isLive, provider.id]);
+  useEffect(loadSlots, [loadSlots]);
+
+  const dayISO = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
+  const slotState = (t: string): "open" | "full" | "past" => {
+    if (!dayISO) return "open";
+    const ms = slotMs(dayISO, t);
+    if (ms < Date.now() + 30 * 60 * 1000) return "past";
+    return fullSlots.has(ms) ? "full" : "open";
+  };
+
+  // Submitting animation (runs while the real request is being sent)
   useEffect(() => {
-    if (step !== "submitting" || !hasActivePlan || planLoading) return;
+    if (step !== "submitting") return;
     setSubmitProgress(0);
     setSubmitStep(0);
-    const progressTimer = setInterval(() => setSubmitProgress((p) => Math.min(p + 5, 100)), 90);
+    const progressTimer = setInterval(() => setSubmitProgress((p) => Math.min(p + 5, 95)), 90);
     const stepTimer = setInterval(() => setSubmitStep((s) => Math.min(s + 1, submitSteps.length - 1)), 700);
-    const completeTimer = setTimeout(() => {
-      if (navigator.vibrate) navigator.vibrate([50, 30, 100]);
-      setStep("pending");
-      pushGlobalAlert({
-        type: "booking",
-        title: "Request sent",
-        body: `Your request to ${provider.name} for ${selectedDate ? format(selectedDate, "MMM d") : ""} at ${selectedTime} has been submitted.`,
-        action: "open-dashboard",
-      });
-    }, 2200);
-    return () => { clearInterval(progressTimer); clearInterval(stepTimer); clearTimeout(completeTimer); };
-  }, [step, hasActivePlan, planLoading]);
+    return () => { clearInterval(progressTimer); clearInterval(stepTimer); };
+  }, [step]);
+
+  const sendRequest = async () => {
+    if (!hasActivePlan || planLoading || !selectedDate || !selectedTime) return;
+    setSendError(null);
+    if (!isLive) {
+      setSendError(translate("This is a sample provider. Requests open on live providers who joined KejaSure."));
+      return;
+    }
+    setStep("submitting");
+    const { data, error } = await bookingsApi.create({
+      listing_id: provider.id,
+      type: "service",
+      check_in: dayISO,
+      check_out: null,
+      guests: null,
+      message: `Preferred time: ${selectedTime}`,
+      total_kes: null,
+    });
+    if (error || !data) {
+      const { code, message } = requestErrorMessage(error?.message);
+      setSendError(message);
+      if (code === "SLOT_FULL") { loadSlots(); setSelectedTime(""); setStep("details"); }
+      else setStep("confirm");
+      return;
+    }
+    const b = addBooking({
+      propertyId: provider.id,
+      propertyTitle: provider.name,
+      propertyImage: "/placeholder.svg",
+      estate: location.trim(),
+      county: provider.areaServed,
+      kind: "service",
+      date: dayISO,
+      time: selectedTime,
+      landlordName: provider.name,
+      responseTime: provider.responseSpeed,
+      remoteId: data.id,
+    });
+    setLocalId(b.id);
+    setRemoteId(data.id);
+    if (navigator.vibrate) navigator.vibrate([50, 30, 100]);
+    setStep("pending");
+    pushGlobalAlert({
+      type: "booking",
+      title: "Request sent",
+      body: `Your request to ${provider.name} for ${format(selectedDate, "MMM d")} at ${selectedTime} was sent. It closes in 2 hours if there's no reply.`,
+      action: "open-dashboard",
+    });
+  };
+
+  // Follow the provider's real reply
+  useEffect(() => {
+    if (!remoteId || step !== "pending") return;
+    let alive = true;
+    const check = async () => {
+      const { data } = await supabase.from("bookings").select("status, close_reason").eq("id", remoteId).maybeSingle();
+      if (!alive || !data) return;
+      if (data.status === "accepted" || data.status === "completed") {
+        if (localId) updateBooking(localId, { status: "accepted" });
+        setStep("accepted");
+      } else if (data.status === "declined" || data.status === "cancelled") {
+        if (localId) updateBooking(localId, { status: data.status, closeReason: data.close_reason ?? undefined });
+        setClosedReason(data.close_reason ?? null);
+        setStep("declined");
+      }
+    };
+    check();
+    const t = setInterval(check, 8000);
+    return () => { alive = false; clearInterval(t); };
+  }, [remoteId, step, localId, updateBooking]);
 
   return (
     <div className="fixed inset-0 z-[90] flex items-end bg-foreground/30 backdrop-blur-sm" onClick={onClose}>
@@ -84,6 +170,15 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 </div>
                 <span className="text-xs font-medium text-trust">⭐ {provider.rating}</span>
               </div>
+
+              {provider.busyNow && (
+                <div className="p-3 rounded-xl bg-accent/10 border border-accent/30 text-xs">
+                  <p className="font-semibold text-foreground">
+                    🟠 {provider.busyUntil ? translate("Busy until {time}").replace("{time}", formatClock(provider.busyUntil)) : translate("Busy right now")}
+                  </p>
+                  <p className="text-muted-foreground mt-0.5">{translate("Pick a later time, or go back and choose a provider who is free now.")}</p>
+                </div>
+              )}
 
               {/* Select Date */}
               <div>
@@ -115,20 +210,31 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
               <div>
                 <h4 className="text-sm font-semibold mb-3">Select Time</h4>
                 <div className="grid grid-cols-3 gap-2">
-                  {timeSlots.map((t) => (
+                  {timeSlots.map((t) => {
+                    const st = slotState(t);
+                    return (
                     <button
                       key={t}
+                      disabled={st !== "open"}
                       onClick={() => setSelectedTime(t)}
                       className={`py-2.5 rounded-xl text-xs font-medium transition-colors ${
-                        selectedTime === t
+                        st !== "open"
+                          ? "bg-muted text-muted-foreground opacity-60"
+                          : selectedTime === t
                           ? "gradient-trust text-primary-foreground"
                           : "bg-secondary text-secondary-foreground"
                       }`}
                     >
                       {t}
+                      {st === "full" && <span className="block text-[9px] font-bold">{translate("Fully booked")}</span>}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
+                {sendError && step === "details" && <p className="text-xs text-destructive mt-2">{sendError}</p>}
+                {selectedDate && (provider.jobCapacity ?? 1) > 1 && (
+                  <p className="text-[10px] text-muted-foreground mt-1.5">{translate("This provider can take {n} jobs at the same time.").replace("{n}", String(provider.jobCapacity))}</p>
+                )}
               </div>
 
               {/* Location */}
@@ -226,8 +332,9 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 </p>
               </div>
 
+              {sendError && <p className="text-xs text-destructive text-center">{sendError}</p>}
               <button
-                onClick={() => { if (hasActivePlan && !planLoading) setStep("submitting"); }}
+                onClick={sendRequest}
                 className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
               >
                 ✓ {translate("Send request")}
@@ -324,6 +431,30 @@ const ServiceBookingModal = ({ provider, onClose, onChat }: ServiceBookingModalP
                 <Clock className="w-3.5 h-3.5" />
                 Avg response: {provider.responseSpeed}
               </div>
+            </div>
+          )}
+
+          {step === "declined" && (
+            <div className="py-8 text-center space-y-5 animate-fade-in">
+              <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+                <X className="w-8 h-8 text-destructive" />
+              </div>
+              <div>
+                <h4 className="text-lg font-bold mb-1">{translate(closeReasonLabel(closedReason) ?? "Request declined")}</h4>
+                <p className="text-sm text-muted-foreground">{translate(
+                  closedReason === "slot_full" ? "That time filled up. Pick another time or try another provider."
+                  : closedReason === "expired" ? "No reply within 2 hours, so the request closed. Try a provider who is free now."
+                  : "The provider can't take this job. Try another time or provider.")}</p>
+              </div>
+              <button
+                onClick={() => { setStep("details"); setSelectedTime(""); setClosedReason(null); setRemoteId(null); loadSlots(); }}
+                className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
+              >
+                {translate("Pick another time")}
+              </button>
+              <button onClick={onClose} className="w-full py-3 rounded-xl bg-secondary text-sm font-medium text-secondary-foreground">
+                {translate("Try another provider")}
+              </button>
             </div>
           )}
 

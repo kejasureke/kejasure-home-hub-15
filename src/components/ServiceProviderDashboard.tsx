@@ -37,6 +37,8 @@ import BoostListingFlow from "./BoostListingFlow";
 import BeforeAfterSlider from "./BeforeAfterSlider";
 import ListingCRUD from "./ListingCRUD";
 import {
+import IncomingRequests from "./provider/IncomingRequests";
+import MyLiveListings from "./provider/MyLiveListings";
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -415,6 +417,9 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
                 </div>
               ))}
             </div>
+
+            <MyLiveListings kind="services" />
+            <IncomingRequests title="Job requests" />
 
             {/* Quick Actions */}
             <h3 className="text-base font-semibold mb-3">Quick Actions</h3>

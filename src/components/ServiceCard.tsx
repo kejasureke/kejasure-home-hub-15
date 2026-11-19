@@ -8,6 +8,7 @@ import BeforeAfterSlider from "./BeforeAfterSlider";
 import { usePaidAccess } from "@/hooks/usePaidAccess";
 import ContactLockNotice from "./ContactLockNotice";
 import { serviceRequestCopy, unlockLine } from "@/lib/requestCopy";
+import { formatClock } from "@/lib/availability";
 
 interface ServiceCardProps {
   provider: ServiceProvider;
@@ -78,9 +79,15 @@ const ServiceCard = ({ provider }: ServiceCardProps) => {
             <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
               <MapPin className="w-3 h-3" />
               {provider.areaServed}
-              {provider.availability && (
+              {provider.busyNow ? (
+                <span className="ml-auto shrink-0 px-2 py-0.5 rounded-full bg-accent/15 text-[10px] font-semibold text-foreground">
+                  🟠 {provider.busyUntil ? translate("Busy until {time}").replace("{time}", formatClock(provider.busyUntil)) : translate("Busy right now")}
+                </span>
+              ) : provider.availability ? (
                 <span className="ml-auto text-[10px] font-medium text-trust">📅 {provider.availability}</span>
-              )}
+              ) : provider.busyNow === false ? (
+                <span className="ml-auto text-[10px] font-semibold text-trust">🟢 {translate("Available now")}</span>
+              ) : null}
             </div>
 
             {/* Recent reviews toggle */}

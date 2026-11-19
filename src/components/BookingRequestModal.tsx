@@ -14,6 +14,7 @@ import { isLiveListingId } from "@/lib/liveListings";
 import { canRequestViewing, pendingViewingCount, MAX_PENDING_VIEWINGS } from "@/lib/viewingLimits";
 import { translate, useLanguage } from "@/lib/language";
 import { Button } from "@/components/ui/button";
+import { closeReasonLabel, fetchListingAvailability, isNightBooked, rangeHitsBooked, requestErrorMessage, type StayRange } from "@/lib/availability";
 
 interface BookingRequestModalProps {
   property: Property;
@@ -50,6 +51,8 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
   const [remoteId, setRemoteId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [bookedStays, setBookedStays] = useState<StayRange[]>([]);
+  const [closedReason, setClosedReason] = useState<string | null>(null);
 
   useHardwareBack(true, onClose);
 
@@ -87,12 +90,18 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
 
   const isLiveListing = isLiveListingId(property.id);
 
+  // Nights another guest already has are blocked, so two guests can never get the same dates.
+  const loadBooked = () => {
+    if (isShortStay && isLiveListing) fetchListingAvailability(property.id).then((a) => setBookedStays(a.stays));
+  };
+  useEffect(loadBooked, [isShortStay, isLiveListing, property.id]);
+
   // Follow the real booking status so the provider's reply shows up here.
   useEffect(() => {
     if (!remoteId || step !== "pending") return;
     let alive = true;
     const check = async () => {
-      const { data } = await supabase.from("bookings").select("status").eq("id", remoteId).maybeSingle();
+      const { data } = await supabase.from("bookings").select("status, close_reason").eq("id", remoteId).maybeSingle();
       if (!alive || !data) return;
       const s = data.status;
       if (s === "accepted" || s === "completed") {
@@ -100,7 +109,8 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
         haptic("success");
         setStep("accepted");
       } else if (s === "declined" || s === "cancelled") {
-        if (submittedId) updateBooking(submittedId, { status: s });
+        if (submittedId) updateBooking(submittedId, { status: s, closeReason: data.close_reason ?? undefined });
+        setClosedReason(data.close_reason ?? null);
         setStep("declined");
       }
     };
@@ -128,7 +138,9 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
     });
     setSubmitting(false);
     if (error || !data) {
-      setSubmitError(error?.message || "Couldn't send your request. Please try again.");
+      const { code, message } = requestErrorMessage(error?.message);
+      setSubmitError(message);
+      if (code === "DATES_TAKEN") { loadBooked(); setCheckOut(""); setSelectedDate(""); setStep("select"); }
       return;
     }
     const booking = addBooking({
@@ -148,6 +160,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
       totalPrice: isShortStay ? total : undefined,
       landlordName: host.name,
       responseTime: property.landlordResponseTime,
+      remoteId: data.id,
     });
     setSubmittedId(booking.id);
     setRemoteId(data.id);
@@ -174,6 +187,12 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
             <div className="py-6 space-y-4">
               <h4 className="text-lg font-bold">{translate("Sample listing")}</h4>
               <p className="text-sm text-muted-foreground">{translate("This is an example home. Requests open on live homes posted by landlords.")}</p>
+              <Button className="w-full" onClick={onClose}>{translate("Back to listing")}</Button>
+            </div>
+          ) : property.takenAt ? (
+            <div className="py-6 space-y-4">
+              <h4 className="text-lg font-bold">{translate("This home was taken")}</h4>
+              <p className="text-sm text-muted-foreground">{translate("The landlord found a tenant. Requests are closed — check similar homes below.")}</p>
               <Button className="w-full" onClick={onClose}>{translate("Back to listing")}</Button>
             </div>
           ) : !hasActivePlan ? <ContactLockNotice loading={planLoading} copy={propertyRequestCopy(property)} /> : viewingLimitReached && (step === "select" || step === "confirm") ? (
@@ -213,24 +232,31 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
                   {isShortStay ? "Check-in" : "Select Date"}
                 </h4>
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-                  {dates.map((d) => (
+                  {dates.map((d) => {
+                    const booked = isShortStay && isNightBooked(d.value, bookedStays);
+                    return (
                     <button
                       key={d.value}
+                      disabled={booked}
+                      aria-label={booked ? `${d.date} ${translate("Booked")}` : undefined}
                       onClick={() => {
                         setSelectedDate(d.value);
                         // Reset checkout if it becomes invalid
                         if (isShortStay && checkOut && checkOut <= d.value) setCheckOut("");
                       }}
                       className={`shrink-0 w-16 py-3 rounded-xl text-center transition-colors ${
-                        selectedDate === d.value
+                        booked
+                          ? "bg-muted text-muted-foreground opacity-60 line-through"
+                          : selectedDate === d.value
                           ? "gradient-trust text-primary-foreground"
                           : "bg-secondary text-secondary-foreground"
                       }`}
                     >
-                      <p className="text-[10px] font-medium">{d.label}</p>
+                      <p className="text-[10px] font-medium">{booked ? translate("Booked") : d.label}</p>
                       <p className="text-xs font-semibold mt-0.5">{d.date}</p>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -244,7 +270,7 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
                     </h4>
                     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
                       {dates
-                        .filter((d) => !selectedDate || d.value > selectedDate)
+                        .filter((d) => !selectedDate || (d.value > selectedDate && !rangeHitsBooked(selectedDate, d.value, bookedStays)))
                         .map((d) => (
                           <button
                             key={d.value}
@@ -262,6 +288,9 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
                     </div>
                     {!selectedDate && (
                       <p className="text-[11px] text-muted-foreground mt-1">Pick a check-in first</p>
+                    )}
+                    {bookedStays.length > 0 && (
+                      <p className="text-[11px] text-muted-foreground mt-1">{translate("Crossed-out nights are already booked by another guest.")}</p>
                     )}
                   </div>
 
@@ -504,11 +533,15 @@ const BookingRequestModal = ({ property, onClose, initialNote = "" }: BookingReq
                 <X className="w-8 h-8 text-destructive" />
               </div>
               <div>
-                <h4 className="text-lg font-bold mb-1">Request Declined</h4>
-                <p className="text-sm text-muted-foreground">The landlord is unavailable. Try a different date or property.</p>
+                <h4 className="text-lg font-bold mb-1">{translate(closedReason ? closeReasonLabel(closedReason) ?? "Request closed" : "Request Declined")}</h4>
+                <p className="text-sm text-muted-foreground">{translate(
+                  closedReason === "taken" ? "Another tenant took this home. Check similar homes nearby."
+                  : closedReason === "dates_taken" ? "Another guest booked those nights. Pick other dates."
+                  : closedReason === "expired" ? "No reply in time, so the request closed. Try another home."
+                  : "The landlord is unavailable. Try a different date or property.")}</p>
               </div>
               <button
-                onClick={() => { setStep("select"); setSelectedDate(""); setSelectedTime(""); setCheckOut(""); }}
+                onClick={() => { setStep("select"); setSelectedDate(""); setSelectedTime(""); setCheckOut(""); setClosedReason(null); loadBooked(); }}
                 className="w-full py-4 rounded-xl gradient-trust text-sm font-bold text-primary-foreground active:scale-[0.98] transition-transform"
               >
                 Try Another Time

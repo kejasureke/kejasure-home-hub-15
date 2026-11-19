@@ -16,6 +16,7 @@ import BoostListingFlow from "./BoostListingFlow";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 import LocalHomeManager from "./listing/LocalHomeManager";
+import IncomingRequests from "./provider/IncomingRequests";
 
 interface StayHostDashboardProps {
   onBack: () => void;
@@ -178,6 +179,8 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
               ))}
             </div>
 
+            <IncomingRequests title="Stay requests" />
+
             {/* Quick Actions */}
             <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
             <div className="space-y-2 mb-5">
@@ -318,26 +321,6 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
               ))}
             </div>
 
-            {/* Recent Booking Requests */}
-            <h3 className="text-base font-semibold mt-6 mb-3">Recent Requests</h3>
-            <div className="space-y-2">
-              {[
-                { guest: "Alice N.", stay: "Cozy Studio", date: "Today", nights: "3 nights", status: "Confirmed" },
-                { guest: "Mark T.", stay: "Penthouse Kilimani", date: "Yesterday", nights: "2 nights", status: "Confirmed" },
-                { guest: "Diana W.", stay: "Beach View Nyali", date: "2 days ago", nights: "5 nights", status: "Pending" },
-              ].map((d) => (
-                <div key={d.guest} className="flex items-center justify-between p-3 rounded-xl bg-card card-shadow">
-                  <div>
-                    <p className="text-xs font-semibold">{d.guest}</p>
-                    <p className="text-[10px] text-muted-foreground">{d.stay} · {d.nights}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] text-muted-foreground">{d.date}</p>
-                    <p className={`text-[10px] font-medium ${d.status === "Confirmed" ? "text-trust" : "text-accent"}`}>{d.status}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 

@@ -15,6 +15,8 @@ import BoostListingFlow from "./BoostListingFlow";
 import KYCVerificationFlow from "./KYCVerificationFlow";
 import ListingCRUD from "./ListingCRUD";
 import LocalHomeManager from "./listing/LocalHomeManager";
+import IncomingRequests from "./provider/IncomingRequests";
+import MyLiveListings from "./provider/MyLiveListings";
 
 interface AgencyDashboardProps {
   onBack: () => void;
@@ -288,6 +290,9 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
                 </div>
               ))}
             </div>
+
+            <IncomingRequests />
+            <MyLiveListings kind="homes" />
 
             {/* Quick Actions */}
             <h3 className="text-base font-semibold mb-3">Quick Actions</h3>
