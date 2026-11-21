@@ -28,3 +28,7 @@
 
 ## Provider plans
 - Active-listing caps live in the subscription plans table and are enforced by a listings trigger; plan payments must match plans by role and tier, because tier names repeat across provider types.
+
+## Fair availability
+- Booking conflicts (taken homes, overlapping stay nights, full service slots, request expiry) are enforced by the bookings and listings triggers, and auto-closed requests carry a close reason; the app's shared availability module only mirrors these rules for display, because local state can't stop two tenants getting the same slot.
+- Provider inboxes read requests through the incoming-requests database function, so providers see only a tenant's first name, never the full profile.

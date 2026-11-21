@@ -75,7 +75,7 @@ export async function expireStaleRequests() {
 }
 
 export const formatClock = (iso?: string) =>
-  iso ? new Date(iso).toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", timeZone: "Africa/Nairobi" }) : "";
+  iso ? new Date(iso).toLocaleTimeString("en-KE", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Africa/Nairobi" }) : "";
 
 const hash = (s: string) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 const boostRank = (s: Pick<ServiceProvider, "boostKind">) => (s.boostKind === "gold" ? 3 : s.boostKind === "hotdeal" ? 2 : s.boostKind === "silver" ? 1 : 0);
