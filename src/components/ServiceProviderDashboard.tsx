@@ -356,6 +356,7 @@ const ServiceProviderDashboard = ({ onBack }: ServiceProviderDashboardProps) => 
           plans={serviceMpesaPlans}
           selectedPlanIndex={0}
           category="Service Provider Plan"
+          role="serviceprovider"
           onClose={() => setShowPayment(false)}
         />
       )}

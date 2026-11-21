@@ -122,6 +122,7 @@ const StayHostDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: StayHostDashboa
           plans={hostMpesaPlans}
           selectedPlanIndex={0}
           category="Stay Host Plan"
+          role="stayhost"
           onClose={() => setShowPayment(false)}
         />
       )}

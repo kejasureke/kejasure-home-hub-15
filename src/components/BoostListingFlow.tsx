@@ -91,6 +91,7 @@ const BoostListingFlow = ({ onBack, role = "landlord" }: BoostListingFlowProps) 
         selectedPlanIndex={selectedBoost}
         category={`${boostPlans[selectedBoost].name} Boost`}
         kind="boost"
+        role={role}
         listingId={selectedListing}
         onClose={() => setShowPayment(false)}
       />

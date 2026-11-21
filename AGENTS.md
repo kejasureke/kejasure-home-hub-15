@@ -28,6 +28,8 @@
 
 ## Provider plans
 - Active-listing caps live in the subscription plans table and are enforced by a listings trigger; plan payments must match plans by role and tier, because tier names repeat across provider types.
+- Payment amounts and lengths are set server-side (plans table for subscriptions, boost catalog in the STK push function) and the callback confirms each result with Safaricom before activating, because app-sent prices and callback bodies can be forged.
+- Verification flags on profiles are written only by backend functions or admins (a profiles trigger reverts other changes), because badges are trusted by other users.
 
 ## Fair availability
 - Booking conflicts (taken homes, overlapping stay nights, full service slots, request expiry) are enforced by the bookings and listings triggers, and auto-closed requests carry a close reason; the app's shared availability module only mirrors these rules for display, because local state can't stop two tenants getting the same slot.

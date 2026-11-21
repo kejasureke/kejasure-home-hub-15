@@ -234,6 +234,7 @@ const AgencyDashboard = ({ onBack, autoOpenKYC, onKYCOpened }: AgencyDashboardPr
           plans={agencyMpesaPlans}
           selectedPlanIndex={0}
           category="Agency Plan"
+          role="agency"
           onClose={() => setShowPayment(false)}
         />
       )}

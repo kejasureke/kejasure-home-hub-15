@@ -2,9 +2,51 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 // Daraja STK callback — no user JWT; Safaricom calls this endpoint.
-// Trust is established by matching the CheckoutRequestID to a pending payment row.
+// The callback body is never trusted on its own: every result is confirmed with
+// Safaricom's STK Push Query API before a payment is marked paid or failed.
 
 interface CallbackItem { Name: string; Value?: string | number }
+
+const DARAJA_BASE = 'https://api.safaricom.co.ke'
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+/** Ask Safaricom for the real result. Returns 'success' | 'failed' | null (not known yet). */
+async function confirmWithSafaricom(checkoutRequestId: string): Promise<{ result: 'success' | 'failed' | null; desc?: string }> {
+  const key = Deno.env.get('MPESA_CONSUMER_KEY')
+  const secret = Deno.env.get('MPESA_CONSUMER_SECRET')
+  const shortcode = Deno.env.get('MPESA_SHORTCODE')
+  const passkey = Deno.env.get('MPESA_PASSKEY')
+  if (!key || !secret || !shortcode || !passkey) return { result: null }
+
+  const authRes = await fetch(`${DARAJA_BASE}/oauth/v1/generate?grant_type=client_credentials`, {
+    headers: { Authorization: 'Basic ' + btoa(`${key}:${secret}`) },
+  })
+  if (!authRes.ok) return { result: null }
+  const { access_token } = await authRes.json()
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const timestamp = new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 14)
+    const res = await fetch(`${DARAJA_BASE}/mpesa/stkpushquery/v1/query`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        BusinessShortCode: shortcode,
+        Password: btoa(`${shortcode}${passkey}${timestamp}`),
+        Timestamp: timestamp,
+        CheckoutRequestID: checkoutRequestId,
+      }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (res.ok && String(data.ResponseCode) === '0' && data.ResultCode !== undefined) {
+      return String(data.ResultCode) === '0'
+        ? { result: 'success', desc: data.ResultDesc }
+        : { result: 'failed', desc: data.ResultDesc }
+    }
+    // Still processing or a temporary error: wait and ask again.
+    await sleep(3000)
+  }
+  return { result: null }
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
@@ -38,40 +80,42 @@ Deno.serve(async (req) => {
       })
     }
 
-    if (cb.ResultCode !== 0) {
+    // Confirm the outcome with Safaricom; ignore what the request body claims.
+    const confirmed = await confirmWithSafaricom(payment.checkout_request_id)
+    if (confirmed.result === null) {
+      // Could not confirm yet — leave the payment pending.
+      return new Response(JSON.stringify({ ResultCode: 0, ResultDesc: 'Accepted' }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (confirmed.result === 'failed') {
       await admin.from('mpesa_payments').update({
         status: 'failed',
-        result_desc: String(cb.ResultDesc ?? 'Failed'),
-      }).eq('id', payment.id)
+        result_desc: String(confirmed.desc ?? 'Failed').slice(0, 200),
+      }).eq('id', payment.id).eq('status', 'pending')
 
       return new Response(JSON.stringify({ ResultCode: 0, ResultDesc: 'Accepted' }), {
         status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    // Success — extract receipt
+    // Confirmed paid. The amount charged was set by the server when the payment started.
     const items: CallbackItem[] = cb.CallbackMetadata?.Item ?? []
     const get = (name: string) => items.find((i) => i.Name === name)?.Value
-    const receipt = String(get('MpesaReceiptNumber') ?? '')
-    const paidAmount = Number(get('Amount') ?? 0)
+    const receipt = String(get('MpesaReceiptNumber') ?? '').replace(/[^A-Za-z0-9]/g, '').slice(0, 20)
 
-    if (paidAmount < payment.price_kes) {
-      await admin.from('mpesa_payments').update({
-        status: 'failed',
-        mpesa_receipt: receipt,
-        result_desc: `Amount mismatch: paid ${paidAmount}, expected ${payment.price_kes}`,
-      }).eq('id', payment.id)
-
+    // Only one request can move this payment from pending to success.
+    const { data: claimed } = await admin.from('mpesa_payments').update({
+      status: 'success',
+      mpesa_receipt: receipt || null,
+      result_desc: String(confirmed.desc ?? 'Success').slice(0, 200),
+    }).eq('id', payment.id).eq('status', 'pending').select('id')
+    if (!claimed?.length) {
       return new Response(JSON.stringify({ ResultCode: 0, ResultDesc: 'Accepted' }), {
         status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-
-    await admin.from('mpesa_payments').update({
-      status: 'success',
-      mpesa_receipt: receipt,
-      result_desc: String(cb.ResultDesc ?? 'Success'),
-    }).eq('id', payment.id)
 
     const startsAt = new Date()
     const endsAt = new Date(startsAt.getTime() + payment.duration_days * 24 * 60 * 60 * 1000)
@@ -90,7 +134,7 @@ Deno.serve(async (req) => {
       const boostKind = name.includes('silver') ? 'silver' : name.includes('gold') ? 'gold' : (name.includes('hot') ? 'hotdeal' : 'silver')
       await admin.from('listings').update({ boost_expires_at: endsAt.toISOString(), boost_kind: boostKind }).eq('id', payment.listing_id)
     } else if (payment.kind === 'subscription') {
-      // Find or create the matching plan, then activate the subscription
+      // Find the matching plan (plans are never created from payment data), then activate the subscription
       let planId: string | null = null
       // Tier names repeat across provider types ("Pro"), so match on role + tier.
       const ROLE_ALIASES: Record<string, string> = { stayhost: 'host', serviceprovider: 'service_provider' }
@@ -106,12 +150,7 @@ Deno.serve(async (req) => {
       if (plan) {
         planId = plan.id
       } else {
-        const { data: newPlan } = await admin.from('subscription_plans').insert({
-          role: planRole,
-          tier: payment.plan_name,
-          price_kes: payment.price_kes,
-        }).select('id').single()
-        planId = newPlan?.id ?? null
+        console.error('Paid plan not found', { paymentId: payment.id })
       }
       if (planId) {
         // Expire any current active subscription for this user, then activate the new one
@@ -135,7 +174,7 @@ Deno.serve(async (req) => {
       user_id: payment.user_id,
       type: 'payment',
       title: 'Payment confirmed',
-      body: `${payment.plan_name} activated. Receipt ${receipt}.`,
+      body: receipt ? `${payment.plan_name} activated. Receipt ${receipt}.` : `${payment.plan_name} activated.`,
       deep_link: payment.kind === 'boost' ? `/listing/${payment.listing_id}` : '/settings/subscription',
     })
 

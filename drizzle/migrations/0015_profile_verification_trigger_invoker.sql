@@ -1,0 +1,1 @@
+ALTER FUNCTION public.protect_profile_verification() SECURITY INVOKER;

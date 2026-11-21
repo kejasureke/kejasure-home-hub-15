@@ -103,6 +103,7 @@ const DashboardScreen = ({ onBack, autoOpenKYC, onKYCOpened }: DashboardScreenPr
           plans={landlordPlans.filter((p) => p.price > 0)}
           selectedPlanIndex={0}
           category="Landlord Plan"
+          role="landlord"
           onClose={() => setShowPayment(false)}
         />
       )}

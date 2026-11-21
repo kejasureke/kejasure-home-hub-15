@@ -73,7 +73,9 @@ Deno.serve(async (req) => {
   }
 
   if (status && FAILED.has(status)) {
-    console.warn("SMS delivery failed", { messageId, phone, status, failureReason });
+    // Never write full phone numbers to logs.
+    const maskedPhone = phone ? `***${String(phone).slice(-3)}` : null;
+    console.warn("SMS delivery failed", { messageId, phone: maskedPhone, status, failureReason });
   }
 
   // AT expects a fast 200 regardless — never make them retry.
