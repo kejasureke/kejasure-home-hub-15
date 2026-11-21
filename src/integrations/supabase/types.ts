@@ -1447,7 +1447,7 @@ export type Database = {
         Returns: string
       }
       claim_referral: { Args: { _code: string }; Returns: string }
-      expire_stale_bookings: { Args: never; Returns: number }
+      expire_stale_bookings: { Args: never; Returns: undefined }
       listing_availability: {
         Args: { _listing_id: string }
         Returns: {
